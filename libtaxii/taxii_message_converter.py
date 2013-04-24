@@ -69,8 +69,8 @@ def dict2xmlPollResponse(dict, privkey=None, pubkey=None):
         s_id = etree.SubElement(poll_resp, '{%s}Subscription_ID' % ns_dict['taxii'])
         s_id.text = dict['subscription_id']
 
-    if 'payload_blocks' in dict:
-        for block in dict['payload_blocks']:
+    if 'payload_block' in dict:
+        for block in dict['payload_block']:
             pb = dict2xmlPayloadBlock(block, poll_resp, privkey=privkey, pubkey=pubkey)
 
     return poll_resp
