@@ -1,4 +1,5 @@
-import uuid
+#Copyright (C) 2013 - The MITRE Corporation
+#For license information, see the LICENSE.txt fileimport uuid
 import StringIO
 import os
 from lxml import etree
