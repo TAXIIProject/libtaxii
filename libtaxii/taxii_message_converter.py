@@ -1,11 +1,25 @@
 #Copyright (C) 2013 - The MITRE Corporation
-#For license information, see the LICENSE.txt fileimport uuid
+#For license information, see the LICENSE.txt file
+import uuid
 import StringIO
 import os
 from lxml import etree
 from M2Crypto import BIO, Rand, SMIME, X509
 
-ns_dict = {'taxii': 'http://taxii.mitre.org/messages/xml/1'}
+ns_dict = {'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1'}
+
+#Define ease-of-use constants
+STATUS_TYPE_BAD_MESSAGE = 'BAD_MESSAGE'
+STATUS_TYPE_DENIED = 'DENIED'
+STATUS_TYPE_FAILURE = 'FAILURE'
+STATUS_TYPE_NOT_FOUND = 'NOT_FOUND'
+STATUS_TYPE_POLLING_UNSUPPORTED = 'POLLING_UNSUPPORTED'
+STATUS_TYPE_RETRY = 'RETRY'
+STATUS_TYPE_SUCCESS = 'SUCCESS'
+STATUS_TYPE_UNAUTHORIZED = 'UNAUTHORIZED'
+STATUS_TYPE_UNSUPPORTED_MESSAGE = 'UNSUPPORTED_MESSAGE'
+STATUS_TYPE_UNSUPPORTED_CONTENT = 'UNSUPPORTED_CONTENT'
+STATUS_TYPE_UNSUPPORTED_PROTOCOL = 'UNSUPPORTED_PROTOCOL'
 
 # Take in a blob of data and a public key. Encrypts and
 # returns the encrypted blob.
@@ -42,6 +56,143 @@ def decrypt_payload(blob, privkey, pubkey):
     p7, data = SMIME.smime_load_pkcs7_bio(inbuf)
     buf = s.decrypt(p7)
     return buf
+
+#Required dictionary keys:
+# message_id - the id of the message
+# in_response_to - the id of the message that this message is in response to
+# status_type - the status type of this status message
+#
+#Optional dictionary keys:
+# extended_headers - a dictionary of key/value pairs to become extended headers
+# status_detail - a string containing the status detail
+# message - a string containing the message
+#
+def dict2xmlStatusMessage(dictionary):
+    status_msg = etree.Element('{%s}Status_Message' % ns_dict['taxii'])
+    if 'in_response_to' not in dictionary: raise ValueError('in_response_to is a required field')
+    __addHeadersDict2xml(status_msg, dictionary)
+    if 'status_type' not in dictionary: raise ValueError('status_type is a required field')
+    status_msg.attrib['status_type'] = dictionary['status_type']
+    
+    if 'status_detail' in dictionary:
+        detail = etree.SubElement(status_msg, '{%s}Status_Detail' % ns_dict['taxii'])
+        detail.text = dictionary['status_detail']
+    
+    if 'message' in dictionary:
+        msg = etree.SubElement(status_msg, '{%s}Message' % ns_dict['taxii'])
+        msg.text = dictionary['message']
+    
+    return status_msg
+
+def xml2dictStatusMessage(xml):
+    dictionary = __getHeadersXml2dict(xml)
+    root = xml.getroot()
+    
+    return dictionary
+
+#Required dictionary keys:
+# message_id - the id of the message
+#
+#Optional dictionary keys:
+# extended_headers - a dictionary of key/value pairs to become extended headers
+def dict2xmlDiscoveryRequest(dictionary):
+    disc_req = etree.Element('{%s}Discovery_Request' % ns_dict['taxii'])
+    __addHeadersDict2xml(disc_req, dictionary)
+    return disc_req
+
+#Required dictionary keys:
+# message_id - the id of the message
+# in_response_to - the id of the message that this message is in response to
+#
+#Optional dictionary keys:
+# extended_headers - a dictionary of key/value pairs to become extended headers
+# service_instances - a list of service_instance dictionaries to be contained in the response
+#
+#Service Instance Dictionary:
+#  required keys:
+#    service_type - the type of service
+#    service_version - a TAXII Services Version ID (from the Services Spec)
+#    protocol_binding - the TAXII Protocol Version ID that this service supports
+#    address - The address of the service being described
+#    message_bindings - a list of TAXII Message Version IDs that this service supports
+#
+#  optional keys:
+#    available - whether or not the service is available to the recipient.
+#    content_bindings - Valid only when service_type = 'INBOX'. A list of Content Binding IDs this service supports.
+#    message - a human readable message
+def dict2xmlDiscoveryResponse(dictionary):
+    disc_resp = etree.Element('{%s}Discovery_Request' % ns_dict['taxii'])
+    if 'in_response_to' not in dictionary: raise ValueError('in_response_to is a required field')
+    __addHeadersDict2xml(disc_resp, dictionary)
+    
+    if 'service_instances' in dictionary:
+        for service_instance in dictionary['service_instances']:
+            #TODO: Add checks for required keys
+            serv_inst = etree.SubElement(disc_resp, '{%s}Service_Instance' % ns_dict['taxii'])
+            
+            serv_inst.attrib['service_type'] = service_instance['service_type']
+            serv_inst.attrib['service_version'] = service_instance['service_version']
+            
+            if 'available' in service_instance:
+                serv_inst.attrib['available'] = service_instance['available']
+            
+            proto_bind = etree.SubElement(serv_inst, '{%s}Protocol_Binding' % ns_dict['taxii'])
+            proto_bind.text = service_instance['protocol_binding']
+            
+            addr = etree.SubElement(serv_inst, '{%s}Address' % ns_dict['taxii'])
+            addr.text = service_instance['address']
+            
+            for message_binding in service_instance['message_bindings']:
+                msg_bind = etree.SubElement(serv_inst, '{%s}Message_Binding' % ns_dict['taxii'])
+                msg_bind.text = message_binding
+            
+            if 'content_bindings' in service_instance:
+                for content_binding in service_instance['content_bindings']:
+                    cont_bind = etree.SubElement(serv_inst, '{%s}Content_Binding' % ns_dict['taxii'])
+                    cont_bind.text = content_binding
+            
+    return disc_resp
+
+#Helper function for internal use. Shouldn't be called by external code.
+#Adds TAXII headers for dict2xml functions
+#Signatures are not supported in this version of libtaxii
+def __addHeadersDict2xml(xml, dictionary):
+    if 'message_id' not in dictionary: raise ValueError('message_id is a required field')
+    xml.attrib['message_id'] = dictionary['message_id']
+    
+    if 'in_response_to' in dictionary:
+        xml.attrib['in_response_to'] = dictionary['in_response_to']
+    
+    if 'extended_headers' in dictionary:
+        extended_headers = dictionary['extended_headers']
+        ext_headers_xml = etree.SubElement(xml, '{%s}Extended_Headers' % ns_dict['taxii'])
+        for header in extended_headers:
+            ext_header = etree.SubElement(ext_headers_xml, '{%s}Extended_Header' % ns_dict['taxii'])
+            ext_header.attrib['name'] = header
+            ext_header.text = extended_headers[header]
+
+#Helper function for internal use. Shouldn't be called by external code.
+#Gets TAXII headers fom the xml for xml2dict functions
+#Signatures are not supported in this version of libtaxii
+def __getHeadersXml2dict(xml):
+    dictionary = {}
+    root = xml.getroot()
+    dictionary['message_id'] = root.attrib['message_id']
+    if 'in_response_to' in root.attrib:
+        dictionary['in_response_to'] = root.attrib['in_response_to']
+    
+    ext_headers = root.xpath('//taxii:Extended_Headers', namespaces=ns_dict)
+    if len(ext_headers) > 0:
+        extended_headers = {}
+        for header in ext_headers[0]:
+            key = header.attrib['name']
+            value = header.text
+            extended_headers[key] = value
+        dictionary['extended_headers'] = extended_headers
+    
+    return dictionary
+
+#############TODO: Refactor below here for TAXII 1.0
 
 #Takes a dictionary and creates an etree that is a valid poll response
 #message_id - Optional. If not supplied, one will be generated
@@ -269,7 +420,7 @@ def xml2str(xml):
 #WARNING: This WILL NOT WORK with version of libxml2 less than 2.9.0
 def validateXml(xml):
     package_dir, package_filename = os.path.split(__file__)
-    schema_file = os.path.join(package_dir, "xsd", "TAXII_XML_10.xsd")
+    schema_file = os.path.join(package_dir, "../xsd", "TAXII_XMLMessageBinding_Schema.xsd")
     taxii_schema_doc = etree.parse(schema_file)
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(xml)
