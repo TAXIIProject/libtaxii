@@ -1,3 +1,6 @@
 *.pyc
 *.swp
 *.swo
+build/
+dist/
+libtaxii.egg-info/
