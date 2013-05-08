@@ -107,12 +107,7 @@ class TaxiiClient:
                 port = 80
 
         if get_params_dict is not None:#Add the query params to the URL
-            path += urllib.urlencode(get_params_dict)
-            #tmp = []
-            #for k, v in get_params_dict.iteritems():
-            #    tmp += '&%s=%s' % (k, v)
-            #tmp[0] = '?'
-            #path += "".join(tmp)
+            path += "?" + urllib.urlencode(get_params_dict)
 
         header_dict = {'Content-Type': 'application/xml',
                        'User-Agent': 'taxiilib.taxiiclient'}
