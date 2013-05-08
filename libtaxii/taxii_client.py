@@ -1,6 +1,7 @@
 #Copyright (C) 2013 - The MITRE Corporation
 #For license information, see the LICENSE.txt file
 import httplib
+import urllib
 import base64
 import uuid
 
@@ -8,7 +9,7 @@ class TaxiiClient:
 
     #Constants for authentication types
     AUTH_NONE = 0#Do not offer any authentication credentials to the server
-    AUTH_BASIC = 1#Offer basic authentication credentials to the server
+    AUTH_BASIC = 1#Offer HTTP Basic authentication credentials to the server
     AUTH_CERT = 2#Offer certificate based authentication credentials to the server
 
     def __init__(self):
@@ -17,12 +18,11 @@ class TaxiiClient:
         self.use_https = False
 
     #Set the authentication type. Must be one of AUTH_NONE, AUTH_BASIC, or AUTH_CERT
-    #Setting the authentication type clears any credentials that have been set
     def setAuthType(self, auth_type):
         #If this isn't a change, don't do anything
         if self.auth_type == auth_type:
             return
-
+        
         if auth_type == TaxiiClient.AUTH_NONE:
             self.auth_type = TaxiiClient.AUTH_NONE
         elif auth_type == TaxiiClient.AUTH_BASIC:
@@ -107,11 +107,12 @@ class TaxiiClient:
                 port = 80
 
         if get_params_dict is not None:#Add the query params to the URL
-            tmp = []
-            for k, v in get_params_dict.iteritems():
-                tmp += '&%s=%s' % (k, v)
-            tmp[0] = '?'
-            path += "".join(tmp)
+            path += urllib.urlencode(get_params_dict)
+            #tmp = []
+            #for k, v in get_params_dict.iteritems():
+            #    tmp += '&%s=%s' % (k, v)
+            #tmp[0] = '?'
+            #path += "".join(tmp)
 
         header_dict = {'Content-Type': 'application/xml',
                        'User-Agent': 'taxiilib.taxiiclient'}
