@@ -8,6 +8,10 @@ from M2Crypto import BIO, Rand, SMIME, X509
 
 ns_dict = {'taxii': 'http://taxii.mitre.org/messages/xml/1'}
 
+class TaxiiDecryptException(Exception):
+    def __init__(self, value):
+        self.value = value
+
 # Take in a blob of data and a public key. Encrypts and
 # returns the encrypted blob.
 def encrypt_payload(blob, pubkey):
@@ -41,7 +45,10 @@ def decrypt_payload(blob, privkey, pubkey):
     s = SMIME.SMIME()
     s.load_key(privkey, pubkey)
     p7, data = SMIME.smime_load_pkcs7_bio(inbuf)
-    buf = s.decrypt(p7)
+    try:
+        buf = s.decrypt(p7)
+    except SMIME.PKCS7_Error, e:
+        raise TaxiiDecryptException(e)
     return buf
 
 #Takes a dictionary and creates an etree that is a valid poll response
