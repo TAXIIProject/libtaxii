@@ -1,32 +1,59 @@
 #Copyright (C) 2013 - The MITRE Corporation
 #For license information, see the LICENSE.txt file
+
+### Contributors ###
+#Contributors: If you would like, add your name to the list, alphabetically by last name
+#
+# Mark Davidson - mdavidson@mitre.org
+#
+
 import random
 import os
 import StringIO
 import datetime
 from lxml import etree
 
-#MSG_STATUS_MESSAGE = 'Status_Message'
+MSG_STATUS_MESSAGE = 'Status_Message'
 MSG_DISCOVERY_REQUEST = 'Discovery_Request'
 MSG_DISCOVERY_RESPONSE = 'Discovery_Response'
 MSG_FEED_INFORMATION_REQUEST = 'Feed_Information_Request'
 MSG_FEED_INFORMATION_RESPONSE = 'Feed_Information_Response'
-#MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
+MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
+MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
 MSG_POLL_REQUEST = 'Poll_Request'
 MSG_POLL_RESPONSE = 'Poll_Response'
-#MSG_INBOX_MESSAGE = 'Inbox_Message'
+MSG_INBOX_MESSAGE = 'Inbox_Message'
 
+#Status Types
+ST_BAD_MESSAGE = 'BAD_MESSAGE'
+ST_DENIED = 'DENIED'
+ST_FAILURE = 'FAILURE'
+ST_NOT_FOUND = 'NOT_FOUND'
+ST_POLLING_UNSUPPORTED = 'POLLING_UNSUPPORTED'
+ST_RETRY = 'RETRY'
+ST_SUCCESS = 'SUCCESS'
+ST_UNAUTHORIZED = 'UNAUTHORIZED'
+ST_UNSUPPORTED_MESSAGE_BINDING = 'UNSUPPORTED_MESSAGE'
+ST_UNSUPPORTED_CONTENT_BINDING = 'UNSUPPORTED_CONTENT'
+ST_UNSUPPORTED_PROTOCOL = 'UNSUPPORTED_PROTOCOL_BINDING'
+
+ACT_SUBSCRIBE = 'SUBSCRIBE'
+ACT_UNSUBSCRIBE = 'UNSUBSCRIBE'
+ACT_STATUS = 'STATUS'
+
+#Service types
 SVC_INBOX = 'INBOX'
 SVC_POLL = 'POLL'
 SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
 SVC_DISCOVERY = 'DISCOVERY'
 
+#Version IDs
 VID_TAXII_SERVICES_10 = 'urn:taxii.mitre.org:services:1.0'
 VID_TAXII_XML_10 = 'urn:taxii.mitre.org:message:xml:1.0'
 VID_TAXII_HTTP_10 = 'urn:taxii.mitre.org:protocol:http:1.0'
 VID_TAXII_HTTPS_10 = 'urn:taxii.mitre.org:protocol:https:1.0'
 
+#Content Bindings
 CB_STIX_XML_10 = 'urn:stix.mitre.org:xml:1.0'
 CB_CAP_11 = 'urn:oasis:names:tc:emergency:cap:1.1'
 CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
@@ -79,6 +106,14 @@ def get_message_from_xml(xml_string):
         return PollRequest.from_etree(etree_xml)
     if message_type == MSG_POLL_RESPONSE:
         return PollResponse.from_etree(etree_xml)
+    if message_type == MSG_STATUS_MESSAGE:
+        return StatusMessage.from_etree(etree_xml)
+    if message_type == MSG_INBOX_MESSAGE:
+        return InboxMessage.from_etree(etree_xml)
+    if message_type == MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST:
+        return ManageFeedSubscriptionRequest.from_etree(etree_xml)
+    if message_type = MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE:
+        return ManageFeedSubscriptionResponse.from_etree(etree_xml)
     
     raise ValueError('Unknown message_type: %s' % message_type)
 
@@ -99,6 +134,14 @@ def get_message_from_dict(d):
         return PollRequest.from_dict(d)
     if message_type == MSG_POLL_RESPONSE:
         return PollResponse.from_dict(d)
+    if message_type == MSG_STATUS_MESSAGE:
+        return StatusMessage.from_dict(d)
+    if message_type == MSG_INBOX_MESSAGE:
+        return InboxMessage.from_dict(d)
+    if message_type == MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST:
+        return ManageFeedSubscriptionRequest.from_dict(d)
+    if message_type = MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE:
+        return ManageFeedSubscriptionResponse.from_dict(d)
     
     raise ValueError('Unknown message_type: %s' % message_type)
 
@@ -111,6 +154,7 @@ def _str2datetime(date_string):
 
 #Allows for code reuse in non-TAXII Message objects
 class BaseNonMessage(object):
+    
     
     def to_etree(self):#Implemented by child classes
         pass
@@ -143,13 +187,32 @@ class BaseNonMessage(object):
     def __eq__(self, other, debug=False):
         pass
     
+    def _checkPropertiesEq(self, other, arglist, debug=False):
+        if debug: print 'rararararara'
+        for arg in arglist:
+            #Check to see if the arg is in both objects
+            in_self = arg in self.__dict__
+            in_other = arg in other.__dict__
+            if in_self != in_other:
+                if debug:
+                    print '%s presence not equal. in_self=%s, in_other=%s' % (arg, in_self, in_other)
+                return False
+            
+            if in_self and in_other:
+                if self.__dict__[arg] != other.__dict__[arg]:
+                    if debug:
+                        print '%s not equal %s != %s' % (arg, self.__dict__[arg], other.__dict__[arg])
+                    return False
+        
+        return True
+    
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
 
 #The TAXIIMessage class keeps track of properties common to all TAXII Messages (i.e., headers).
 #The TAXIIMessage class is extended by each Message Type (e.g., DiscoveryRequest), with each
 #Subclass containing subclass-specific information
-class TAXIIMessage(object):
+class TAXIIMessage(BaseNonMessage):
     message_type = 'TAXIIMessage'
     def __init__(self, message_id, in_response_to=None, extended_headers={}):
         self.message_id = message_id
@@ -160,7 +223,7 @@ class TAXIIMessage(object):
     #by each Message class. In general, when converting to XML,
     #Subclasses should call this method first, then create their specific XML constructs
     def to_etree(self):
-        root_elt = etree.Element('{%s}%s' % (ns_map['taxii'], self.message_type), nsmap=ns_map)
+        root_elt = etree.Element('{%s}%s' % (ns_map['taxii'], self.message_type))
         root_elt.attrib['message_id'] = str(self.message_id)
         
         if self.in_response_to is not None:
@@ -194,20 +257,9 @@ class TAXIIMessage(object):
     
     def __eq__(self, other, debug=False):
         if not isinstance(other, TAXIIMessage):
-            raise ValueError('Not comparing two TAXII Messages!')
-        if self.message_type != other.message_type:
-            if debug: print 'message_type not equal: %s != %s' % (self.message_type, other.message_type)
-            return False
-        if self.message_id != other.message_id:
-            if debug: print 'message_ids not equal: %s != %s' % (self.message_id, other.message_id)
-            return False
-        if self.in_response_to != other.in_response_to:
-            if debug: print 'in_response_tos not equal: %s != %s' % (self.in_response_to, other.in_response_to)
-            return False
-        if self.extended_headers != other.extended_headers:
-            if debug: print 'extended_headers not equal: %s != %s' % (self.extended_headers, other.extended_headers)
-            return False
-        return True
+            raise ValueError('Not comparing two TAXII Messages! (%s, %s)' % (self.__class__.__name__, other.__class__.__name__))
+        
+        return self._checkPropertiesEq(other, ['message_type','message_id','in_response_to','extended_headers'], debug)
     
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
@@ -238,7 +290,7 @@ class TAXIIMessage(object):
             eh_name = header.xpath('./@name')[0]
             eh_value = header.text
             extended_headers[eh_name] = eh_value
-            
+        
         return cls(message_id, in_response_to, extended_headers=extended_headers)
     
     
@@ -269,6 +321,108 @@ class TAXIIMessage(object):
             in_response_to = d['in_response_to']
         return cls(message_id, in_response_to, extended_headers=extended_headers)
 
+class ContentBlock(BaseNonMessage):
+    NAME = 'Content_Block'
+    def __init__(self, content_binding, content, timestamp_label = None, padding = None):
+        self.content_binding = content_binding
+        self.content = content
+        self.timestamp_label = timestamp_label
+        self.padding = padding
+    
+    def to_etree(self):
+        block = etree.Element('{%s}Content_Block' % ns_map['taxii'])
+        cb = etree.SubElement(block, '{%s}Content_Binding' % ns_map['taxii'])
+        cb.text = self.content_binding
+        c = etree.SubElement(block, '{%s}Content' % ns_map['taxii'])
+        
+        if isinstance(self.content, etree._Element):#For XML
+            c.append(self.content)
+        else:#Assume it is a string
+            c.text = self.content
+        
+        if self.timestamp_label is not None:
+            tl = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii'])
+            tl.text = self.timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+        
+        if self.padding is not None:
+            p = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii'])
+            p.text = self.padding
+        
+        return block
+    
+    def to_dict(self):
+        block = {}
+        block['content_binding'] = self.content_binding
+        
+        if isinstance(self.content, etree._Element):#For XML
+            block['content'] = etree.tostring(self.content)
+        else:#Assume string
+            block['content'] = self.content
+        
+        if self.timestamp_label is not None:
+            block['timestamp_label'] = self.timestamp_label
+        
+        if self.padding is not None:
+            block['padding'] = self.padding
+        
+        return block
+    
+    def __eq__(self, other, debug=False):
+        if not self._checkPropertiesEq(other, ['content_binding','timestamp_label','padding'], debug):
+            return False
+        
+        if isinstance(self.content, etree) and isinstance(other.content, etree):
+            #TODO: Implement comparison for etrees
+            pass
+        elif isinstance(self.content, basestring) and isinstance(other.content, basestring):
+            if self.content != other.content:
+                if debug:
+                    print 'contents not equal: %s != %s' % (self.content, other.content)
+                return False
+        else:
+            if debug:
+                print 'content not of same type: %s != %s' % (self.content.__class__.__name__, other.content.__class__.name__)
+            return False
+        
+        return True
+    
+    @staticmethod
+    def from_etree(etree_xml):
+        kwargs = {}
+        kwargs['content_binding'] = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)[0].text
+        padding_set = etree_xml.xpath('./taxii:Padding', namespaces=ns_map)
+        if len(padding_set) > 0:
+            kwargs['padding'] = padding_set[0].text
+        
+        ts_set = etree_xml.xpath('./taxii:Timestamp_Label', namespaces=ns_map)
+        if len(ts_set) > 0:
+            ts_string = ts_set[0].text
+            kwargs['timestamp_label'] = _str2datetime(ts_string)
+        
+        content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)
+        if len(content) == 0:#This has string content
+            kwargs['content'] = content.text
+        else:#This has XML content
+            kwargs['content'] = content[0]
+        
+        return ContentBlock(**kwargs)
+    
+    @staticmethod
+    def from_dict(d):
+        kwargs = {}
+        kwargs['content_binding'] = d['content_binding']
+        if 'padding' in d:
+            kwargs['padding'] = d['padding']
+        if 'timestamp_label' in d:
+            kwargs['timestamp_label'] = d['timestamp_label']
+        
+        if d['content'].startswith('<'):
+            kwargs['content'] = etree.parse(StringIO.StringIO(d['content']))
+        else:
+            kwargs['content'] = d['content']
+        
+        return ContentBlock(**kwargs)
+
 class ServiceContactInfo(BaseNonMessage):
     NAME = 'ServiceContactInfo'
     def __init__(self, protocol_binding, address, message_bindings):
@@ -295,6 +449,9 @@ class ServiceContactInfo(BaseNonMessage):
         for binding in self.message_bindings:
             d['message_bindings'].append(binding)
         return d
+    
+    def __eq__(self, other, debug=False):
+        pass#TODO: Implement this
     
     @classmethod
     def from_etree(cls, etree_xml):
@@ -424,34 +581,7 @@ class DiscoveryResponse(TAXIIMessage):
             return d
         
         def __eq__(self, other, debug=False):
-            if self.service_type != other.service_type:
-                if debug: 
-                    print 'service_types not equal: %s != %s' % (self.service_type, other.service_type)
-                return False
-            
-            if self.service_version != other.service_version :
-                if debug: 
-                    print 'service_versions not equal: %s != %s' % (self.service_version, other.service_version)
-                return False
-            
-            if self.protocol_binding != other.protocol_binding:
-                if debug: 
-                    print 'protocol_bindings not equal: %s != %s' % (self.protocol_binding, other.protocol_binding)
-                return False
-            
-            if self.address != other.address:
-                if debug: 
-                    print 'addresses not equal: %s != %s' % (self.address, other.address)
-                return False
-            
-            if self.available != other.available:
-                if debug: 
-                    print 'availables not equal: %s != %s' % (self.available, other.available)
-                return False
-            
-            if self.message != other.message:
-                if debug: 
-                    print 'messages not equal: %s != %s' % (self.message, other.message)
+            if not self._checkPropertiesEq(other, ['service_type','service_version','protocol_binding','address','available','message'], debug):
                 return False
             
             if set(self.message_bindings) != set(other.message_bindings):
@@ -603,19 +733,7 @@ class FeedInformationResponse(TAXIIMessage):
             return d
         
         def __eq__(self, other, debug=False):
-            if self.feed_name != other.feed_name:
-                if debug: 
-                    print 'feed names not equal: %s != %s' % (self.feed_name, other.feed_name)
-                return False
-            
-            if self.description != other.description:
-                if debug: 
-                    print 'descriptions not equal: %s != %s' % (self.description, other.description)
-                return False
-            
-            if self.available != other.available:
-                if debug: 
-                    print 'availables not equal: %s != %s' % (self.available, other.available)
+            if not self._checkPropertiesEq(other, ['feed_name','description','available'], debug):
                 return False
             
             if set(self.content_bindings) != set(other.content_bindings):
@@ -711,6 +829,9 @@ class FeedInformationResponse(TAXIIMessage):
                     d['message_bindings'].append(binding)
                 return d
             
+            def __eq__(self, other, debug=False):
+                pass#TODO: Implement this
+            
             @staticmethod
             def from_etree(etree_xml):
                 kwargs = {}
@@ -733,15 +854,15 @@ class FeedInformationResponse(TAXIIMessage):
 
 class PollRequest(TAXIIMessage):
     message_type = MSG_POLL_REQUEST
-    
     def __init__(self, 
                  message_id,
-                 feed_name,
+                 in_response_to=None,
+                 extended_headers={},
+                 feed_name=None,
                  subscription_id=None,
                  exclusive_begin_timestamp=None,
                  inclusive_end_timestamp=None,
-                 content_bindings=[],
-                 extended_headers={}
+                 content_bindings=[]
                  ):
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
@@ -790,25 +911,8 @@ class PollRequest(TAXIIMessage):
         if not super(PollRequest, self).__eq__(other, debug):
             return False
         
-        if self.feed_name != other.feed_name:
-            if debug: 
-                print 'feed names not equal: %s != %s' % (self.feed_name, other.feed_name)
-            return False
-        
-        if self.subscription_id != other.subscription_id:
-            if debug: 
-                print 'subscription_ids not equal: %s != %s' % (self.subscription_id, other.subscription_id)
-            return False
-        
-        if self.exclusive_begin_timestamp != other.exclusive_begin_timestamp:
-            if debug: 
-                print 'exclusive_begin_timestamps not equal: %s != %s' % (self.exclusive_begin_timestamp, other.exclusive_begin_timestamp)
-            return False
-        
-        if self.inclusive_end_timestamp != other.inclusive_end_timestamp:
-            if debug:
-                print 'inclusive_end_timestamps not equal: %s != %s' % (self.inclusive_end_timestamp, other.inclusive_end_timestamp)
-            return False
+        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','exclusive_begin_timestamp','inclusive_end_timestamp'], debug):
+                return False
         
         if set(self.content_bindings) != set(other.content_bindings):
             if debug: 
@@ -872,13 +976,13 @@ class PollResponse(TAXIIMessage):
     def __init__(self, 
                  message_id, 
                  in_response_to,
-                 feed_name,
-                 inclusive_end_timestamp,
+                 extended_headers={},
+                 feed_name = None,
+                 inclusive_end_timestamp = None,
                  subscription_id = None,
                  message = None,
                  inclusive_begin_timestamp = None,
-                 content_blocks=[], 
-                 extended_headers={}
+                 content_blocks=[]
                  ):
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.feed_name = feed_name
@@ -888,22 +992,461 @@ class PollResponse(TAXIIMessage):
         self.message = message
         self.content_blocks = content_blocks
     
+    def to_etree(self):
+        xml = super(PollResponse, self).to_etree()
+        xml.attrib['feed_name'] = self.feed_name
+        if self.subscription_id is not None:
+            xml.attrib['subscription_id'] = self.subscription_id
+        
+        if self.message is not None:
+            m = etree.SubElement(xml, '{%s}Message' % ns_map['taxii'])
+            m.text = self.message
+        
+        if self.inclusive_begin_timestamp is not None:
+            ibt = etree.SubElement(xml, '{%s}Inclusive_Begin_Timestamp' % ns_map['taxii'])
+            ibt.text = self.inclusive_begin_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        
+        iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
+        iet.text = self.inclusive_end_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        
+        for block in self.content_blocks:
+            xml.append(block.to_etree())
+        
+        return xml
     
+    def to_dict(self):
+        d = super(PollResponse, self).to_dict()
+        
+        d['feed_name'] = self.feed_name
+        if self.subscription_id is not None:
+            d['subscription_id'] = self.subscription_id
+        if self.message is not None:
+            d['message'] = self.message
+        if self.inclusive_begin_timestamp is not None:
+            d['inclusive_begin_timestamp'] = self.inclusive_begin_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        d['inclusive_end_timestamp'] = self.inclusive_end_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        d['content_blocks'] = []
+        for block in self.content_blocks:
+            d['content_blocks'].append(block.to_dict())
+        
+        return d
+    
+    def __eq__(self, other, debug=False):
+        if not super(PollResponse, self).__eq__(other, debug):
+            return False
+        
+        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','message','inclusive_begin_timestamp','inclusive_end_timestamp'], debug):
+                return False
+        
+        #TODO: Check content blocks
+        
+        return True
+    
+    @classmethod
+    def from_etree(cls, etree_xml):
+        msg = super(PollResponse, cls).from_etree(etree_xml)
+        msg.feed_name = etree_xml.xpath('./@feed_name', namespaces=ns_map)[0]
+        
+        msg.subscription_id = None
+        subs_ids = etree_xml.xpath('./@subscription_id', namespaces=ns_map)
+        if len(subs_ids) > 0:
+            msg.subscription_id = subs_ids[0]
+        
+        msg.message = None
+        messages = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
+        if len(messages) > 0:
+            msg.message = messages[0].text
+        
+        msg.inclusive_begin_timestamp = None
+        ibts = etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)
+        if len(ibts) > 0:
+            msg.inclusive_begin_timestamp = _str2datetime(ibts[0].text)
+        
+        msg.inclusive_end_timestamp = _str2datetime(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+        
+        msg.content_blocks = []
+        blocks = etree_xml.xpath('./taxii:Content_Block', namespaces=ns_map)
+        for block in blocks:
+            msg.content_blocks.append(ContentBlock.from_etree(block))
+        
+        return msg
+    
+    @classmethod
+    def from_dict(cls, d):
+        msg = super(PollResponse, cls).from_dict(d)
+        msg.feed_name = d['feed_name']
+        
+        msg.message = None
+        if 'message' in d:
+            msg.message = d['message']
+        
+        msg.subscription_id = None
+        if 'subscription_id' in d:
+            msg.subscription_id = d['subscription_id']
+        
+        msg.inclusive_begin_timestamp = None
+        if 'inclusive_begin_timestamp' in d:
+            msg.inclusive_begin_timestamp = _str2datetime(d['inclusive_begin_timestamp'])
+        
+        msg.inclusive_end_timestamp = _str2datetime(d['inclusive_end_timestamp'])
+        
+        msg.content_blocks = []
+        for block in d['content_blocks']:
+            msg.content_blocks.append(ContentBlock.from_dict(block))
+        
+        return msg
 
+class StatusMessage(TAXIIMessage):
+    message_type = MSG_STATUS_MESSAGE
+    
+    def __init__(self, message_id, in_response_to, extended_headers={}, status_type=None, status_detail=None, message=None):
+        super(StatusMessage, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
+        self.status_type = status_type
+        self.status_detail = status_detail
+        self.message = message
+    
+    def to_etree(self):
+        xml = super(StatusMessage, self).to_etree()
+        xml.attrib['status_type'] = self.status_type
+        
+        if self.status_detail is not None:
+            sd = etree.SubElement(xml, '{%s}Status_Detail' % ns_map['taxii'])
+            sd.text = self.status_detail
+        
+        if self.message is not None:
+            m = etree.SubElement(xml, '{%s}Message' % ns_map['taxii'])
+            m.text = self.message
+        
+        return xml
+    
+    def to_dict(self):
+        d = super(StatusMessage, self).to_dict()
+        d['status_type'] = self.status_type
+        if self.status_detail is not None:
+            d['status_detail'] = self.status_detail
+        if self.message is not None:
+            d['message'] = self.message
+        return d
+    
+    def __eq__(self, other, debug=None):
+        if not super(StatusMessage, self).__eq__(other, debug):
+            return False
+        
+        return self._checkPropertiesEq(other, ['status_type', 'status_detail', 'status_message'], debug)
+    
+    @classmethod
+    def from_etree(cls, etree_xml):
+        msg = super(StatusMessage, cls).from_etree(etree_xml)
+        msg.status_type = etree_xml.attrib['status_type']
+        
+        msg.status_detail = None
+        sd_set = etree_xml.xpath('./taxii:Status_Detail', namespaces=ns_map)
+        if len(sd_set) > 0:
+            msg.status_detail = sd_set[0].text
+        
+        msg.message = None
+        m_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
+        if len(m_set) > 0:
+            msg.message = m_set[0].text
+        
+        return msg
+    
+    @classmethod
+    def from_dict(cls, d):
+        msg = super(StatusMessage, cls).from_dict(d)
+        msg.status_type = d['status_type']
+        msg.status_detail = None
+        if 'status_detail' in d:
+            msg.status_detail = d['status_detail']
+        
+        msg.message = None
+        if 'message' in d:
+            msg.message = d['message']
+        
+        return msg
 
+class InboxMessage(TAXIIMessage):
+    message_type = MSG_INBOX_MESSAGE
+    
+    def __init__(self, message_id, in_response_to=None, extended_headers={}, content_blocks=[], message=None, subscription_information=None):
+        super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
+        self.content_blocks = content_blocks
+        self.subscription_information = subscription_information
+        self.message = message
+    
+    def to_etree(self):
+        xml = super(InboxMessage, self).to_etree()
+        if self.message is not None:
+            m = etree.SubElement(xml, '{%s}Message' % ns_map['taxii'])
+            m.text = self.message
+        
+        if self.subscription_information is not None:
+            xml.append(self.subscription_information.to_etree())
+        
+        for block in self.content_blocks:
+            xml.append(block.to_etree())
+        
+        return xml
+    
+    def to_dict(self):
+        d = super(InboxMessage, self).to_dict()
+        if self.message is not None:
+            d['message'] = self.message
+        
+        if self.subscription_information is not None:
+            d['subscription_information'] = self.subscription_information.to_dict()
+        
+        d['content_blocks'] = []
+        for block in self.content_blocks:
+            d['content_blocks'].append(block.to_dict())
+        
+        return d
+    
+    def __eq__(self, other, debug=False):
+        if not super(InboxMessage, self).__eq__(other, debug):
+            return False
+        
+        if not self._checkPropertiesEq(other, ['message','subscription_information'], debug):
+            return False
+        
+        #TODO: Check content blokcs
+        
+        return True
+    
+    @classmethod
+    def from_etree(cls, etree_xml):
+        msg = super(InboxMessage, cls).from_etree(etree_xml)
+        
+        msg_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
+        if len(msg_set) > 0:
+            msg.message = msg_set[0].text
+        
+        subs_infos = etree_xml.xpath('./taxii:Source_Subscription', namespaces=ns_map)
+        if len(subs_infos) > 0:
+            msg.subscription_information = InboxMessage.SubscriptionInformation.from_etree(subs_infos[0])
+        
+        content_blocks = etree_xml.xpath('./taxii:Content_Blocks', namespaces=ns_map)
+        msg.content_blocks = []
+        for block in content_blocks:
+            msg.content_blocks.append(ContentBlock.from_etree(block))
+        
+        return msg
+    
+    @classmethod
+    def from_dict(cls, d):
+        msg = super(InboxMessage, cls).from_dict(d)
+        
+        msg.message = None
+        if 'message' in d:
+            msg.message = d['message']
+        
+        msg.subscription_information = None
+        if 'subscription_information' in d:
+            msg.subscription_information = InboxMessage.SubscriptionInformation.from_dict(d['subscription_information'])
+        
+        msg.content_blocks = []
+        for block in d['content_blocks']:
+            msg.content_blocks.append(ContentBlock.from_dict(block))
+        
+        return msg
+        
+    class SubscriptionInformation(BaseNonMessage):
+        def __init__(self, feed_name, subscription_id, inclusive_begin_timestamp_label, inclusive_end_timestamp_label):
+            self.feed_name = feed_name
+            self.subscription_id = subscription_id
+            self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
+            self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
+        
+        def to_etree(self):
+            xml = etree.Element('{%s}Source_Subscription' % ns_map['taxii'])
+            xml.attrib['feed_name'] = self.feed_name
+            xml.attrib['subscription_id'] = self.subscription_id
+            
+            ibtl = etree.SubElement(xml, '{%s}Inclusive_Begin_Timestamp' % ns_map['taxii'])
+            ibtl.text = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+            
+            ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
+            ietl.text = self.inclusive_end_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+            
+            return xml
+        
+        def to_dict(self):
+            d = {}
+            d['feed_name'] = self.feed_name
+            d['subscription_id'] = self.subscription_id
+            d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+            return d
+        
+        def __eq__(self, other, debug=False):
+            return self._checkPropertiesEq(other, ['feed_name','subscription_id','inclusive_begin_timestamp_label','inclusive_end_timestamp_label'], debug)
+        
+        @staticmethod
+        def from_etree(etree_xml):
+            feed_name = etree_xml.attrib['feed_name']
+            subscription_id = etree_xml.attrib['subscription_id']
+            
+            ibtl = _str2datetime(etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)[0].text)
+            ietl = _str2datetime(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+            
+            return InboxMessage.SubscriptionInformation(feed_name, subscription_id, ibtl, ietl)
+        
+        @staticmethod
+        def from_dict(d):
+            feed_name = d['feed_name']
+            subscription_id = d['subscription_id']
+            
+            ibtl = _str2datetime(d['inclusive_begin_timestamp_label'])
+            ietl = _str2datetime(d['inclusive_end_timestamp_label'])
+            
+            return InboxMessage.SubscriptionInformation(feed_name, subscription_id, ibtl, ietl)
 
+class ManageFeedSubscriptionRequest(TAXIIMessage):
+    message_type = MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
+    
+    def __init__(self, message_id, in_response_to=None, extended_headers={}, feed_name=None, action=None, subscription_id=None, delivery_parameters=None):
+        super(ManageFeedSubscriptionRequest, self).__init__(message_id, extended_headers=extended_headers)
+        self.feed_name = feed_name
+        self.action = action
+        self.subscription_id = subscription_id
+        self.delivery_parameters = delivery_parameters
+    
+    def to_etree(self):
+        xml = super(ManageFeedSubscriptionRequest, self).to_etree()
+        xml.attrib['feed_name'] = self.feed_name
+        xml.attrib['action'] = self.action
+        xml.attrib['subscription_id'] = self.subscription_id
+        xml.append(self.delivery_parameters.to_etree())
+        return xml
+    
+    def to_dict(self):
+        d = super(ManageFeedSubscriptionRequest, self).to_dict()
+        d['feed_name'] = self.feed_name
+        d['action'] = self.action
+        d['subscription_id'] = self.subscription_id
+        d['delivery_parameters'] = self.delivery_parameters.to_dict()
+        return d
+    
+    def __eq__(self, other, debug=False):
+        if not super(ManageFeedSubscriptionRequest, self).__eq__(other, debug):
+            return False
+        
+        return self._checkPropertiesEq(other, ['feed_name','subscription_id','action','delivery_parameters'], debug)
+    
+    @classmethod
+    def from_etree(cls, etree_xml):
+        msg = super(ManageFeedSubscriptionRequest, cls).from_etree(etree_xml)
+        msg.feed_name = etree_xml.xpath('./@feed_name', namespaces=ns_map)[0]
+        msg.action = etree_xml.xpath('./@action', namespaces=ns_map)[0]
+        msg.subscription_id = etree_xml.xpath('./@subscription_id', namespaces=ns_map)[0]
+        msg.delivery_parameters = ManageFeedSubscriptionRequest.DeliveryParameters.from_etree(etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map)[0])
+        return msg
+    
+    @classmethod
+    def from_dict(cls, d):
+        msg = super(ManageFeedSubscriptionRequest, cls).from_dict(d)
+        msg.feed_name = d['feed_name']
+        msg.action = d['action']
+        msg.subscription_id = d['subscription_id']
+        msg.delivery_parameters = ManageFeedSubscriptionRequest.DeliveryParameters.from_dict(d['delivery_parameters'])
+        return msg
+    
+    class DeliveryParameters(BaseNonMessage):
+        def __init__(self, inbox_protocol=None, inbox_address=None, delivery_message_binding=None, content_bindings=[]):
+            self.inbox_protocol=inbox_protocol
+            self.inbox_address=inbox_address
+            self.delivery_message_binding = delivery_message_binding
+            self.content_bindings = content_bindings
+        
+        def to_etree(self):
+            xml = etree.Element('{%s}Push_Parameters' % ns_map['taxii'])
+            
+            if self.inbox_protocol is not None:
+                pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii'])
+                pb.text = self.inbox_protocol
+            
+            if self.inbox_address is not None:
+                a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii'])
+                a.text = self.inbox_address
+            
+            if self.delivery_message_binding is not None:
+                mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii'])
+                mb.text = self.delivery_message_binding
+            
+            for binding in self.content_bindings:
+                cb = etree.SubElement(xml, '{%s}Content_Binding' % ns_map['taxii'])
+                cb.text = binding
+            
+            return xml
+        
+        def to_dict(self):
+            d = {}
+            
+            if self.inbox_protocol is not None:
+                d['inbox_protocol'] = self.inbox_protocol
+            
+            if self.inbox_address is not None:
+                d['inbox_address'] = self.inbox_address
+            
+            if self.delivery_message_binding is not None:
+                d['delivery_message_binding'] = self.delivery_message_binding
+            
+            d['content_bindings'] = []
+            for binding in self.content_bindings:
+                d['content_bindings'].append(binding)
+            
+            return d
+        
+        def __eq__(self, other, debug=False):
+            if not self._checkPropertiesEq(other, ['inbox_protocol','address','deliver_message_binding'], debug):
+                return False
+            
+            if set(self.content_bindings) != set(other.content_bindings):
+                if debug:
+                    print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
+                return False
+            
+            return True
+        
+        @staticmethod
+        def from_etree(etree_xml):
+            inbox_protocol = None
+            inbox_protocol_set = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)
+            if len(inbox_protocol_set) > 0:
+                inbox_protocol = inbox_protocol_set[0].text
+            
+            inbox_address = None
+            inbox_address_set = etree_xml.xpath('./taxii:Address', namespaces=ns_map)
+            if len(inbox_address_set) > 0:
+                inbox_address = inbox_address_set[0].text
+            
+            delivery_message_binding = None
+            delivery_message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
+            if len(delivery_message_binding_set) > 0:
+                delivery_message_binding = delivery_message_binding_set[0].text
+            
+            content_bindings = []
+            content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
+            for binding in content_binding_set:
+                content_bindings.append(binding.text)
+            
+            return ManageFeedSubscriptionRequest.DeliveryParameters(inbox_protocol, inbox_address, delivery_message_binding, content_bindings)
+        
+        @staticmethod
+        def from_dict(d):
+            return ManageFeedSubscriptionRequest.DeliveryParameters(**d)
 
-
-
-
-
-
-
-
-
-
-
-
+class ManageFeedSubscriptionResponse(TAXIIMessage):
+    message_type = MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
+    
+    def __init__(self, message_id, in_response_to, extended_headers={}, feed_name=None, message=None, subscription_instances=None)
+        super(ManageFeedSubscriptionResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
+        self.feed_name = feed_name
+        self.message = message
+        self.subscription_instances = subscription_instances
+        raise Exception('Class not fully implemented yet!')
+    
+    #TODO: Fill out the rest of this
 
 
 
