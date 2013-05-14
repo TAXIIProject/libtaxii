@@ -58,47 +58,9 @@ class TaxiiClient:
             if 'cert_file' not in auth_credentials_dict:
                 raise Exception('Invalid auth credentials. Field \'cert_file\' is not present')
             self.auth_credentials = auth_credentials_dict
-
-    #Wrapper method for callTaxiiService
-    #Calls a Poll service, does some 'nice' things
-    #Host is the hostname of the server
-    #Path is the path portion of the URL.
-    #Port is the port to connect to. Code will assume 80 for http, 443 for https if not specified
-    #excl_begin_ts - begin timestamp of the range; exclusive
-    #incl_end_ts - end timestamp of the range; inclusive
-    #subs_id - subscription ID, if specified
-    #payload_bindings - a list of payload bindings.
-    def callPollService(self, host, path, feed_name, port=None, excl_begin_ts=None, incl_end_ts=None, subs_id=None, payload_bindings=None):
-        params = {}
-        params['message_id'] = uuid.uuid4().hex
-        params['message_type'] = 'poll_request'
-        params['feed_name'] = feed_name
-        if excl_begin_ts is not None: params['exclusive_begin_timestamp'] = excl_begin_ts
-        if incl_end_ts is not None: params['inclusive_end_timestamp'] = incl_end_ts
-        if payload_bindings is not None: params['payload_binding'] = ','.join(payload_bindings)
-        if subs_id is not None: params['subscription_id'] = subs_id
-        return self.callTaxiiService(host, path, 'GET', port, None, params)
-
-    #Wrapper method for callTaxiiService
-    #Calls a discovery service, does some 'nice' things
-    #Host is the hostname of the server
-    #Path is the path portion of the URL.
-    #Port is the port to connect to. Code will assume 80 for http, 443 for https if not specified
-    def callDiscoveryService(self, host, path, port=None):
-        params = {}
-        params['message_id'] = uuid.uuid1().hex
-        params['message_type'] = 'discovery_request'
-        return self.callTaxiiService(host, path, 'GET', port, None, params)
-
-    #Wrapper method for callTaxiiService
-    #Calls an inbox service
-    def callInboxService(self, host, path, inbox_xml, port=None):
-        return self.callTaxiiService(host, path, 'POST', port, inbox_xml, None)
-
-    #TODO: Implement the feed management stuff
-
+    
     #url, hostname, post/get, xml, get params
-    def callTaxiiService(self, host, path, method, port=None, post_data=None, get_params_dict=None):
+    def callTaxiiService(self, host, path, port=None, post_data=None, get_params_dict=None, method='POST'):
 
         if port is None:#If the caller did not specify a port, use the default
             if self.use_https:
