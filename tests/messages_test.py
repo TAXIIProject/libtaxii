@@ -42,8 +42,7 @@ def perform_tests(taxii_message):
         raise Exception('\tFailure of test #1 - XML not schema valid')
     msg_from_xml = tm.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()
-    msg_from_dict = tm.get_message_from_dict(dictionary)#TODO: needs fixed
-    
+    msg_from_dict = tm.get_message_from_dict(dictionary)
     if taxii_message != msg_from_xml:
         print '\t Failure of test #2 - running equals w/ debug:'
         taxii_message.__eq__(msg_from_xml, True)
@@ -216,7 +215,7 @@ delivery_parameters_kwargs['inbox_address'] = 'http://example.com/inbox'
 delivery_parameters_kwargs['delivery_message_binding'] = tm.VID_TAXII_XML_10
 delivery_parameters_kwargs['content_bindings'] = [tm.CB_STIX_XML_10]
 
-delivery_parameters1 = tm.ManageFeedSubscriptionRequest.DeliveryParameters(**delivery_parameters_kwargs)
+delivery_parameters1 = tm.DeliveryParameters(**delivery_parameters_kwargs)
 
 manage_feed_subscription_request_kwargs = {}
 manage_feed_subscription_request_kwargs['message_id'] = tm.generate_message_id()
@@ -229,9 +228,32 @@ manage_feed_subscription_request1 = tm.ManageFeedSubscriptionRequest(**manage_fe
 
 perform_tests(manage_feed_subscription_request1)
 
+## Manage Feed Subscription Response
 
+poll_instance_kwargs = {}
+poll_instance_kwargs['protocol_binding'] = tm.VID_TAXII_HTTP_10
+poll_instance_kwargs['poll_address'] = 'http://example.com/poll'
+poll_instance_kwargs['poll_message_bindings'] = [tm.VID_TAXII_XML_10]
 
+poll_instance1 = tm.ManageFeedSubscriptionResponse.PollInstance(**poll_instance_kwargs)
 
+subscription_instance_kwargs = {}
+subscription_instance_kwargs['subscription_id'] = 'SubsId005'
+subscription_instance_kwargs['delivery_parameters'] = [delivery_parameters1]
+subscription_instance_kwargs['poll_instances'] = [poll_instance1]
+
+subscription_instance1 = tm.ManageFeedSubscriptionResponse.SubscriptionInstance(**subscription_instance_kwargs)
+
+manage_feed_subscription_response_kwargs = {}
+manage_feed_subscription_response_kwargs['message_id'] = tm.generate_message_id()
+manage_feed_subscription_response_kwargs['in_response_to'] = tm.generate_message_id()
+manage_feed_subscription_response_kwargs['feed_name'] = 'Feed001'
+manage_feed_subscription_response_kwargs['message'] = 'This is a message.'
+manage_feed_subscription_response_kwargs['subscription_instances'] = [subscription_instance1]
+
+manage_feed_subscription_response1 = tm.ManageFeedSubscriptionResponse(**manage_feed_subscription_response_kwargs)
+
+perform_tests(manage_feed_subscription_response1)
 
 
 
