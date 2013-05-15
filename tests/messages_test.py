@@ -25,6 +25,7 @@
 # Mark Davidson - mdavidson@mitre.org
 #
 
+import libtaxii as t
 import libtaxii.messages as tm
 import datetime
 from lxml import etree
@@ -64,6 +65,10 @@ def perform_tests(taxii_message):
 discovery_request_kwargs = {}
 discovery_request_kwargs['message_id'] = tm.generate_message_id() #Required
 discovery_request_kwargs['extended_headers'] = {'ext_header1': 'value1', 'ext_header2': 'value2'} #Optional
+
+#TODO: Do it like the line below this.
+#TODO: Say which args are optional
+#tm.DiscoveryRequest(message_id=tm.generate_message_id(), ... )
 discovery_request1 = tm.DiscoveryRequest(**discovery_request_kwargs)
 
 perform_tests(discovery_request1)
@@ -71,10 +76,10 @@ perform_tests(discovery_request1)
 ## Discovery Response
 service_kwargs = {}
 service_kwargs['service_type'] = tm.SVC_INBOX
-service_kwargs['service_version'] = tm.VID_TAXII_SERVICES_10
-service_kwargs['protocol_binding'] = tm.VID_TAXII_HTTP_10
+service_kwargs['service_version'] = t.VID_TAXII_SERVICES_10
+service_kwargs['protocol_binding'] = t.VID_TAXII_HTTP_10
 service_kwargs['address'] = 'http://example.com/inboxservice/'
-service_kwargs['message_bindings'] = [tm.VID_TAXII_XML_10, 'temporaryvalue']
+service_kwargs['message_bindings'] = [t.VID_TAXII_XML_10, 'temporaryvalue']
 service_kwargs['available'] = 'true'
 service_kwargs['content_bindings'] = []
 service_kwargs['message'] = 'This is a message.'
@@ -98,27 +103,27 @@ perform_tests(feed_information_request1)
 ## Feed Information Response
 
 push_method_kwargs = {}
-push_method_kwargs['protocol_binding'] = tm.VID_TAXII_HTTP_10
-push_method_kwargs['message_bindings'] = [tm.VID_TAXII_XML_10]
+push_method_kwargs['protocol_binding'] = t.VID_TAXII_HTTP_10
+push_method_kwargs['message_bindings'] = [t.VID_TAXII_XML_10]
 push_method1 = tm.FeedInformationResponse.Feed.PushMethod(**push_method_kwargs)
 
 polling_service_kwargs = {}
-polling_service_kwargs['protocol_binding'] = tm.VID_TAXII_HTTP_10
+polling_service_kwargs['protocol_binding'] = t.VID_TAXII_HTTP_10
 polling_service_kwargs['address'] = 'http://example.com/PollService/'
-polling_service_kwargs['message_bindings'] = [tm.VID_TAXII_XML_10]
+polling_service_kwargs['message_bindings'] = [t.VID_TAXII_XML_10]
 polling_service1 = tm.FeedInformationResponse.Feed.PollingService(**polling_service_kwargs)
 
 subscription_service_kwargs = {}
-subscription_service_kwargs['protocol_binding'] = tm.VID_TAXII_HTTP_10
+subscription_service_kwargs['protocol_binding'] = t.VID_TAXII_HTTP_10
 subscription_service_kwargs['address'] = 'http://example.com/SubsService/'
-subscription_service_kwargs['message_bindings'] = [tm.VID_TAXII_XML_10]
+subscription_service_kwargs['message_bindings'] = [t.VID_TAXII_XML_10]
 subscription_service1 = tm.FeedInformationResponse.Feed.SubscriptionService(**subscription_service_kwargs)
 
 feed_kwargs = {}
 feed_kwargs['feed_name'] = 'Feed1'
 feed_kwargs['description'] = 'Description of a feed'
 feed_kwargs['available'] = 'true'
-feed_kwargs['content_bindings'] = [tm.CB_STIX_XML_10]
+feed_kwargs['content_bindings'] = [t.CB_STIX_XML_10]
 feed_kwargs['push_methods'] = [push_method1]
 feed_kwargs['polling_services'] = [polling_service1]
 feed_kwargs['subscription_services'] = [subscription_service1]
@@ -149,7 +154,7 @@ perform_tests(poll_request1)
 ## Poll Response
 
 xml_content_block_kwargs = {}
-xml_content_block_kwargs['content_binding'] = tm.CB_STIX_XML_10
+xml_content_block_kwargs['content_binding'] = t.CB_STIX_XML_10
 xml_content_block_kwargs['content'] = etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')).getroot()
 xml_content_block_kwargs['padding'] = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 xml_content_block_kwargs['timestamp_label'] = datetime.datetime.now()
@@ -210,10 +215,10 @@ perform_tests(inbox_message1)
 ## Manage Feed Subscription Request 
 
 delivery_parameters_kwargs = {}
-delivery_parameters_kwargs['inbox_protocol'] = tm.VID_TAXII_HTTP_10
+delivery_parameters_kwargs['inbox_protocol'] = t.VID_TAXII_HTTP_10
 delivery_parameters_kwargs['inbox_address'] = 'http://example.com/inbox'
-delivery_parameters_kwargs['delivery_message_binding'] = tm.VID_TAXII_XML_10
-delivery_parameters_kwargs['content_bindings'] = [tm.CB_STIX_XML_10]
+delivery_parameters_kwargs['delivery_message_binding'] = t.VID_TAXII_XML_10
+delivery_parameters_kwargs['content_bindings'] = [t.CB_STIX_XML_10]
 
 delivery_parameters1 = tm.DeliveryParameters(**delivery_parameters_kwargs)
 
@@ -231,9 +236,9 @@ perform_tests(manage_feed_subscription_request1)
 ## Manage Feed Subscription Response
 
 poll_instance_kwargs = {}
-poll_instance_kwargs['protocol_binding'] = tm.VID_TAXII_HTTP_10
+poll_instance_kwargs['protocol_binding'] = t.VID_TAXII_HTTP_10
 poll_instance_kwargs['poll_address'] = 'http://example.com/poll'
-poll_instance_kwargs['poll_message_bindings'] = [tm.VID_TAXII_XML_10]
+poll_instance_kwargs['poll_message_bindings'] = [t.VID_TAXII_XML_10]
 
 poll_instance1 = tm.ManageFeedSubscriptionResponse.PollInstance(**poll_instance_kwargs)
 

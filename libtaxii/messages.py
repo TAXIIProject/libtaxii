@@ -47,17 +47,6 @@ SVC_POLL = 'POLL'
 SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
 SVC_DISCOVERY = 'DISCOVERY'
 
-#Version IDs
-VID_TAXII_SERVICES_10 = 'urn:taxii.mitre.org:services:1.0'
-VID_TAXII_XML_10 = 'urn:taxii.mitre.org:message:xml:1.0'
-VID_TAXII_HTTP_10 = 'urn:taxii.mitre.org:protocol:http:1.0'
-VID_TAXII_HTTPS_10 = 'urn:taxii.mitre.org:protocol:https:1.0'
-
-#Content Bindings
-CB_STIX_XML_10 = 'urn:stix.mitre.org:xml:1.0'
-CB_CAP_11 = 'urn:oasis:names:tc:emergency:cap:1.1'
-CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
-
 ns_map = {'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1'}#, 
           #TODO: figure out what to do with the digital signature namespace
           #'ds': 'http://www.w3.org/2000/09/xmldsig#'}
@@ -86,6 +75,9 @@ def validate_xml(xml_string):
         return xml_schema.error_log.last_error
     return valid
 
+def get_message_from_http_response(http_response):
+    return None
+
 def get_message_from_xml(xml_string):
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -93,7 +85,7 @@ def get_message_from_xml(xml_string):
         f = xml_string
     
     etree_xml = etree.parse(f).getroot()
-    message_type = etree_xml.tag[53:]
+    message_type = etree_xml.tag[53:]#TODO: Make this less fragile
     if message_type == MSG_DISCOVERY_REQUEST:
         return DiscoveryRequest.from_etree(etree_xml)
     if message_type == MSG_DISCOVERY_RESPONSE:
@@ -146,6 +138,7 @@ def get_message_from_dict(d):
     raise ValueError('Unknown message_type: %s' % message_type)
 
 #TODO: find a better way of parsing a string into a datetime object
+#TODO: Explore dateutil
 def _str2datetime(date_string):
     if '.' in date_string:
         return datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
@@ -156,13 +149,13 @@ def _str2datetime(date_string):
 class BaseNonMessage(object):
     
     def to_etree(self):#Implemented by child classes
-        pass
+        pass#TODO: Raise errors when these are called
     
     def to_dict(self):#Implemented by child classes
         pass
     
     def to_xml(self):
-        return etree.tostring(self.to_etree)
+        return etree.tostring(self.to_etree())
     
     @classmethod
     def from_etree(cls, src_etree):#Implemented by child classes
