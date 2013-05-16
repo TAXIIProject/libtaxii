@@ -7,30 +7,44 @@
 # Mark Davidson - mdavidson@mitre.org
 #
 
+import libtaxii as t
 import libtaxii.clients as tc
 import libtaxii.messages as tm
-import libtaxii as t
 
 import datetime
 
 #Create the TAXII HTTPS Client
 client = tc.HttpClient()
-client.setUseHttps(True)
-client.setAuthType(tc.HttpClient.AUTH_BASIC)
-client.setAuthCredentials({'username':'some_username', 'password':'some_password'})
+
+#Uncomment to use HTTPS
+#client.setUseHttps(True)
+
+#Uncomment to use basic authentication
+#client.setAuthType(tc.HttpClient.AUTH_BASIC)
+#client.setAuthCredentials({'username':'some_username', 'password':'some_password'})
+
+#Uncomment to use certificate-based authentication
+#client.setAuthType(tc.HttpClient.AUTH_CERT)
+#client.setAuthCredentials({'key_file': 'key_filename', 'cert_file': 'cert_filename'})
 
 #Create the poll request
-poll_request_kwargs = {}
-poll_request_kwargs['message_id'] = tm.generate_message_id()
-poll_request_kwargs['feed_name'] = 'TheFeedToPoll'
-poll_request_kwargs['subscription_id'] = 'SomeID'
-poll_request_kwargs['exclusive_begin_timestamp'] = datetime.datetime.now()
-poll_request_kwargs['inclusive_end_timestamp'] = datetime.datetime.now()
-poll_request_kwargs['content_bindings'] = []
+poll_request1 = tm.PollRequest(message_id = tm.generate_message_id(),
+                               feed_name = 'TheFeedToPoll',
+                               subscription_id = 'SubsId012',
+                               exclusive_begin_timestamp_label = datetime.datetime.now(),
+                               inclusive_end_timestamp_label = datetime.datetime.now(),
+                               content_bindings = [])
 
-poll_request1 = tm.PollRequest(**poll_request_kwargs)
+#Call through a proxy:
+proxy_host = 'gatekeeper.mitre.org'
+proxy_port = 80
+service_url = 'http://example.iana.org/servicepath/'
 
-#Call the poll service
-http_response = client.callTaxiiService('tspdev01.mitre.org', '/PathToService/', t.VID_TAXII_XML_10, poll_request1.to_xml())
-taxii_response = get_message_from_http_response(http_response)
-print http_response
+http_response = client.callTaxiiService(proxy_host, service_url, t.VID_TAXII_XML_10, poll_request1.to_xml(), port=proxy_port)
+
+#Call without a proxy
+#http_response = client.callTaxiiService('google.com', '', t.VID_TAXII_XML_10, poll_request1.to_xml())
+
+taxii_message = t.get_message_from_http_response(http_response,
+                                                 poll_request1.message_id)
+print(taxii_message.to_xml())
