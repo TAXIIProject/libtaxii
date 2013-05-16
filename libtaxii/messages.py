@@ -149,21 +149,21 @@ def _str2datetime(date_string):
 class BaseNonMessage(object):
     
     def to_etree(self):#Implemented by child classes
-        pass#TODO: Raise errors when these are called
+        raise Exception('Method not implemented by child class!')
     
     def to_dict(self):#Implemented by child classes
-        pass
+        raise Exception('Method not implemented by child class!')
     
     def to_xml(self):
         return etree.tostring(self.to_etree())
     
     @classmethod
     def from_etree(cls, src_etree):#Implemented by child classes
-        pass
+        raise Exception('Method not implemented by child class!')
     
     @classmethod
     def from_dict(cls, src_etree):#Implemented by child classes
-        pass
+        raise Exception('Method not implemented by child class!')
     
     @classmethod
     def from_xml(cls, xml):
@@ -177,7 +177,7 @@ class BaseNonMessage(object):
         return cls.from_etree(etree_xml)
     
     def __eq__(self, other, debug=False):
-        pass
+        raise Exception('Method not implemented by child class!')
     
     def _checkPropertiesEq(self, other, arglist, debug=False):
         for arg in arglist:
@@ -499,52 +499,6 @@ class ContentBlock(BaseNonMessage):
         
         return ContentBlock(**kwargs)
 
-class ServiceContactInfo(BaseNonMessage):
-    NAME = 'ServiceContactInfo'
-    def __init__(self, protocol_binding, address, message_bindings):
-        self.protocol_binding=protocol_binding
-        self.address = address
-        self.message_bindings = message_bindings
-    
-    def to_etree(self):
-        x = etree.Element('{%s}%s' % (ns_map['taxii'], self.NAME))
-        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
-        proto_bind.text = self.protocol_binding
-        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii'])
-        address.text = self.address
-        for binding in self.message_bindings:
-            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii'])
-            b.text = binding
-        return x
-    
-    def to_dict(self):
-        d = {}
-        d['protocol_binding'] = self.protocol_binding
-        d['address'] = self.address
-        d['message_bindings'] = []
-        for binding in self.message_bindings:
-            d['message_bindings'].append(binding)
-        return d
-    
-    def __eq__(self, other, debug=False):
-        pass#TODO: Implement this
-    
-    @classmethod
-    def from_etree(cls, etree_xml):
-        kwargs = {}
-        kwargs['protocol_binding'] = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-        kwargs['address'] = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
-        kwargs['message_bindings'] = []
-        message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-        for message_binding in message_binding_set:
-            kwargs['message_bindings'].append(message_binding.text)
-        return cls(**kwargs)
-    
-    @classmethod
-    def from_dict(cls, d):
-        return cls(**d)
-        
-
 #### TAXII Message Classes ####
 
 class DiscoveryRequest(TAXIIMessage):
@@ -580,8 +534,9 @@ class DiscoveryResponse(TAXIIMessage):
         #Who knows if this is a good way to compare the service instances or not...
         for item1, item2 in zip(sorted(self.service_instances), sorted(other.service_instances)):
             if item1 != item2:
-                if debug: 
+                if debug:
                     print 'service instances not equal: %s != %s' % (item1, item2)
+                    item1.__eq__(item2, debug)#This will print why they are not equal
                 return False
         
         return True
@@ -607,34 +562,34 @@ class DiscoveryResponse(TAXIIMessage):
         return msg
     
     class ServiceInstance(BaseNonMessage):
-        def __init__(self, service_type, service_version, protocol_binding, address, message_bindings, available=None, content_bindings=[], message=None):
+        def __init__(self, service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content=[], available=None, message=None):
             self.service_type = service_type
-            self.service_version = service_version
+            self.services_version = services_version
             self.protocol_binding = protocol_binding
-            self.address = address
+            self.service_address = service_address
             self.message_bindings = message_bindings
-            self.content_bindings = content_bindings
+            self.inbox_service_accepted_content = inbox_service_accepted_content
             self.available = available
             self.message = message
         
         def to_etree(self):
             si = etree.Element('{%s}Service_Instance' % ns_map['taxii'])
             si.attrib['service_type'] = self.service_type
-            si.attrib['service_version'] = self.service_version
+            si.attrib['service_version'] = self.services_version
             if self.available is not None: 
-                si.attrib['available'] = self.available
+                si.attrib['available'] = str(self.available)
             
             protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii'])
             protocol_binding.text = self.protocol_binding
             
-            address = etree.SubElement(si, '{%s}Address' % ns_map['taxii'])
-            address.text = self.address
+            service_address = etree.SubElement(si, '{%s}Address' % ns_map['taxii'])
+            service_address.text = self.service_address
             
             for mb in self.message_bindings:
                 message_binding = etree.SubElement(si, '{%s}Message_Binding' % ns_map['taxii'])
                 message_binding.text = mb
             
-            for cb in self.content_bindings:
+            for cb in self.inbox_service_accepted_content:
                 content_binding = etree.SubElement(si, '{%s}Content_Binding' % ns_map['taxii'])
                 content_binding.text = cb
             
@@ -647,17 +602,17 @@ class DiscoveryResponse(TAXIIMessage):
         def to_dict(self):
             d = {}
             d['service_type'] = self.service_type
-            d['service_version'] = self.service_version
+            d['services_version'] = self.services_version
             d['protocol_binding'] = self.protocol_binding
-            d['address'] = self.address
+            d['service_address'] = self.service_address
             d['message_bindings'] = self.message_bindings
-            d['content_bindings'] = self.content_bindings
+            d['inbox_service_accepted_content'] = self.inbox_service_accepted_content
             d['available'] = self.available
             d['message'] = self.message
             return d
         
         def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['service_type','service_version','protocol_binding','address','available','message'], debug):
+            if not self._checkPropertiesEq(other, ['service_type','services_version','protocol_binding','service_address','available','message'], debug):
                 return False
             
             if set(self.message_bindings) != set(other.message_bindings):
@@ -665,9 +620,9 @@ class DiscoveryResponse(TAXIIMessage):
                     print 'message_bindings not equal'
                 return False
             
-            if set(self.content_bindings) != set(other.content_bindings):
+            if set(self.inbox_service_accepted_content) != set(other.inbox_service_accepted_content):
                 if debug: 
-                    print 'content_bindings not equal'
+                    print 'inbox_service_accepted_contents not equal'
                 return False
             
             return True
@@ -675,30 +630,31 @@ class DiscoveryResponse(TAXIIMessage):
         @staticmethod
         def from_etree(etree_xml):#Expects a taxii:Service_Instance element
             service_type = etree_xml.attrib['service_type']
-            service_version = etree_xml.attrib['service_version']
+            services_version = etree_xml.attrib['service_version']
             available = None
             if 'available' in etree_xml.attrib: 
-                available = etree_xml.attrib['available']
+                tmp_available = etree_xml.attrib['available']
+                available = tmp_available == 'True'
             
             protocol_binding = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-            address = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+            service_address = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
             
             message_bindings = []
             message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
             for mb in message_binding_set:
                 message_bindings.append(mb.text)
             
-            content_bindings = []
-            content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-            for cb in content_binding_set:
-                content_bindings.append(cb.text)
+            inbox_service_accepted_contents = []
+            inbox_service_accepted_content_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
+            for cb in inbox_service_accepted_content_set:
+                inbox_service_accepted_contents.append(cb.text)
             
             message = None
             message_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
             if len(message_set) > 0:
                 message = message_set[0].text
             
-            return DiscoveryResponse.ServiceInstance(service_type, service_version, protocol_binding, address, message_bindings, available, content_bindings, message)
+            return DiscoveryResponse.ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_contents, available, message)
         
         @staticmethod
         def from_dict(d):
@@ -709,21 +665,21 @@ class FeedInformationRequest(TAXIIMessage):
 
 class FeedInformationResponse(TAXIIMessage):
     message_type = MSG_FEED_INFORMATION_RESPONSE
-    def __init__(self, message_id, in_response_to, extended_headers={}, feeds=[]):
+    def __init__(self, message_id, in_response_to, extended_headers={}, feed_informations=[]):
         super(FeedInformationResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
-        self.feeds = feeds
+        self.feed_informations = feed_informations
     
     def to_etree(self):
         xml = super(FeedInformationResponse, self).to_etree()
-        for feed in self.feeds:
+        for feed in self.feed_informations:
             xml.append(feed.to_etree())
         return xml
     
     def to_dict(self):
         d = super(FeedInformationResponse, self).to_dict()
-        d['feeds'] = []
-        for feed in self.feeds:
-            d['feeds'].append(feed.to_dict())
+        d['feed_informations'] = []
+        for feed in self.feed_informations:
+            d['feed_informations'].append(feed.to_dict())
         return d
     
     def __eq__(self, other, debug=False):
@@ -731,10 +687,10 @@ class FeedInformationResponse(TAXIIMessage):
             return False
         
         #Who knows if this is a good way to compare the service instances or not...
-        for item1, item2 in zip(sorted(self.feeds), sorted(other.feeds)):
+        for item1, item2 in zip(sorted(self.feed_informations), sorted(other.feed_informations)):
             if item1 != item2:
                 if debug: 
-                    print 'feeds not equal: %s != %s' % (item1, item2)
+                    print 'feed_informations not equal: %s != %s' % (item1, item2)
                     item1.__eq__(item2, debug)#This will print why they are not equal
                 return False
         
@@ -743,50 +699,50 @@ class FeedInformationResponse(TAXIIMessage):
     @classmethod
     def from_etree(cls, etree_xml):
         msg = super(FeedInformationResponse, cls).from_etree(etree_xml)
-        msg.feeds = []
-        feeds = etree_xml.xpath('./taxii:Feed', namespaces=ns_map)
-        for feed in feeds:
-            msg.feeds.append(FeedInformationResponse.Feed.from_etree(feed))
+        msg.feed_informations = []
+        feed_informations = etree_xml.xpath('./taxii:Feed', namespaces=ns_map)
+        for feed in feed_informations:
+            msg.feed_informations.append(FeedInformationResponse.FeedInformation.from_etree(feed))
         return msg
     
     @classmethod
     def from_dict(cls, d):
         msg = super(FeedInformationResponse, cls).from_dict(d)
-        msg.feeds = []
-        for feed in d['feeds']:
-            msg.feeds.append(FeedInformationResponse.Feed.from_dict(feed))
+        msg.feed_informations = []
+        for feed in d['feed_informations']:
+            msg.feed_informations.append(FeedInformationResponse.FeedInformation.from_dict(feed))
         return msg
     
-    class Feed(BaseNonMessage):
-        def __init__(self, feed_name, description, content_bindings, available=None, push_methods=[], polling_services=[], subscription_services=[]):
+    class FeedInformation(BaseNonMessage):
+        def __init__(self, feed_name, feed_description, supported_contents, available=None, push_methods=[], polling_service_instances=[], subscription_methods=[]):
             self.feed_name = feed_name
             self.available = available
-            self.description = description
-            self.content_bindings = content_bindings
+            self.feed_description = feed_description
+            self.supported_contents = supported_contents
             self.push_methods = push_methods
-            self.polling_services = polling_services
-            self.subscription_services = subscription_services
+            self.polling_service_instances = polling_service_instances
+            self.subscription_methods = subscription_methods
         
         def to_etree(self):
             f = etree.Element('{%s}Feed' % ns_map['taxii'])
             f.attrib['feed_name'] = self.feed_name
             if self.available is not None:
-                f.attrib['available'] = self.available
-            description = etree.SubElement(f, '{%s}Description' % ns_map['taxii'])
-            description.text = self.description
+                f.attrib['available'] = str(self.available)
+            feed_description = etree.SubElement(f, '{%s}Description' % ns_map['taxii'])
+            feed_description.text = self.feed_description
             
-            for binding in self.content_bindings:
+            for binding in self.supported_contents:
                 cb = etree.SubElement(f, '{%s}Content_Binding' % ns_map['taxii'])
                 cb.text = binding
             
             for push_method in self.push_methods:
                 f.append(push_method.to_etree())
             
-            for polling_service in self.polling_services:
+            for polling_service in self.polling_service_instances:
                 f.append(polling_service.to_etree())
             
-            for subscription_service in self.subscription_services:
-                f.append(subscription_service.to_etree())
+            for subscription_method in self.subscription_methods:
+                f.append(subscription_method.to_etree())
             
             return f
         
@@ -795,29 +751,29 @@ class FeedInformationResponse(TAXIIMessage):
             d['feed_name'] = self.feed_name
             if self.available is not None:
                 d['available'] = self.available
-            d['description'] = self.description
-            d['content_bindings'] = self.content_bindings
+            d['feed_description'] = self.feed_description
+            d['supported_contents'] = self.supported_contents
             d['push_methods'] = []
             for push_method in self.push_methods:
                 d['push_methods'].append(push_method.to_dict())
             d['polling_services'] = []
-            for polling_service in self.polling_services:
+            for polling_service in self.polling_service_instances:
                 d['polling_services'].append(polling_service.to_dict())
-            d['subscription_services'] = []
-            for subscription_service in self.subscription_services:
-                d['subscription_services'].append(subscription_service.to_dict())
+            d['subscription_methods'] = []
+            for subscription_method in self.subscription_methods:
+                d['subscription_methods'].append(subscription_method.to_dict())
             return d
         
         def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['feed_name','description','available'], debug):
+            if not self._checkPropertiesEq(other, ['feed_name','feed_description','available'], debug):
                 return False
             
-            if set(self.content_bindings) != set(other.content_bindings):
+            if set(self.supported_contents) != set(other.supported_contents):
                 if debug: 
-                    print 'content bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
+                    print 'supported_contents not equal: %s != %s' % (self.supported_contents, other.supported_contents)
                 return False
             
-            #TODO: Test equality of: push_methods=[], polling_services=[], subscription_services=[]
+            #TODO: Test equality of: push_methods=[], polling_service_instances=[], subscription_methods=[]
             
             return True
         
@@ -827,30 +783,31 @@ class FeedInformationResponse(TAXIIMessage):
             kwargs['feed_name'] = etree_xml.attrib['feed_name']
             kwargs['available'] = None
             if 'available' in etree_xml.attrib:
-                kwargs['available'] = etree_xml.attrib['available']
+                tmp = etree_xml.attrib['available']
+                kwargs['available'] = tmp == 'True'
             
-            kwargs['description'] = etree_xml.xpath('./taxii:Description', namespaces=ns_map)[0].text
-            kwargs['content_bindings'] = []
-            content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-            for binding_elt in content_binding_set:
-                kwargs['content_bindings'].append(binding_elt.text)
+            kwargs['feed_description'] = etree_xml.xpath('./taxii:Description', namespaces=ns_map)[0].text
+            kwargs['supported_contents'] = []
+            supported_content_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
+            for binding_elt in supported_content_set:
+                kwargs['supported_contents'].append(binding_elt.text)
             
             kwargs['push_methods'] = []
             push_method_set = etree_xml.xpath('./taxii:Push_Method', namespaces=ns_map)
             for push_method_elt in push_method_set:
-                kwargs['push_methods'].append(FeedInformationResponse.Feed.PushMethod.from_etree(push_method_elt))
+                kwargs['push_methods'].append(FeedInformationResponse.FeedInformation.PushMethod.from_etree(push_method_elt))
             
-            kwargs['polling_services'] = []
+            kwargs['polling_service_instances'] = []
             polling_service_set = etree_xml.xpath('./taxii:Polling_Service', namespaces=ns_map)
             for polling_elt in polling_service_set:
-                kwargs['polling_services'].append(FeedInformationResponse.Feed.PollingService.from_etree(polling_elt))
+                kwargs['polling_service_instances'].append(FeedInformationResponse.FeedInformation.PollingServiceInstance.from_etree(polling_elt))
             
-            kwargs['subscription_services'] = []            
-            subscription_service_set = etree_xml.xpath('./taxii:Subscription_Service', namespaces=ns_map)
-            for subscription_elt in subscription_service_set:
-                kwargs['subscription_services'].append(FeedInformationResponse.Feed.SubscriptionService.from_etree(subscription_elt))
+            kwargs['subscription_methods'] = []            
+            subscription_method_set = etree_xml.xpath('./taxii:Subscription_Service', namespaces=ns_map)
+            for subscription_elt in subscription_method_set:
+                kwargs['subscription_methods'].append(FeedInformationResponse.FeedInformation.SubscriptionMethod.from_etree(subscription_elt))
             
-            return FeedInformationResponse.Feed(**kwargs)
+            return FeedInformationResponse.FeedInformation(**kwargs)
         
         @staticmethod
         def from_dict(d):
@@ -860,73 +817,180 @@ class FeedInformationResponse(TAXIIMessage):
             if 'available' in d:
                 kwargs['available'] = d['available']
             
-            kwargs['description'] = d['description']
-            kwargs['content_bindings'] = []
-            if 'content_bindings' in d:
-                for binding in d['content_bindings']:
-                    kwargs['content_bindings'].append(binding)
+            kwargs['feed_description'] = d['feed_description']
+            kwargs['supported_contents'] = []
+            if 'supported_contents' in d:
+                for binding in d['supported_contents']:
+                    kwargs['supported_contents'].append(binding)
             
             kwargs['push_methods'] = []
             if 'push_methods' in d:
                 for push_method in d['push_methods']:
-                    kwargs['push_methods'].append(FeedInformationResponse.Feed.PushMethod.from_dict(push_method))
+                    kwargs['push_methods'].append(FeedInformationResponse.FeedInformation.PushMethod.from_dict(push_method))
             
-            kwargs['polling_services'] = []
-            if 'polling_services' in d:
-                for polling in d['polling_services']:
-                    kwargs['polling_services'].append(FeedInformationResponse.Feed.PollingService.from_dict(polling))
+            kwargs['polling_service_instances'] = []
+            if 'polling_service_instances' in d:
+                for polling in d['polling_service_instances']:
+                    kwargs['polling_service_instances'].append(FeedInformationResponse.FeedInformation.PollingServiceInstance.from_dict(polling))
             
-            kwargs['subscription_services'] = []
-            if 'subscription_services' in d:
-                for subscription_svc in d['subscription_services']:
-                    kwargs['subscription_services'].append(FeedInformationResponse.Feed.SubscriptionService.from_dict(subscription_svc))
+            kwargs['subscription_methods'] = []
+            if 'subscription_methods' in d:
+                for subscription_method in d['subscription_methods']:
+                    kwargs['subscription_methods'].append(FeedInformationResponse.FeedInformation.SubscriptionMethod.from_dict(subscription_method))
             
-            return FeedInformationResponse.Feed(**kwargs)
+            return FeedInformationResponse.FeedInformation(**kwargs)
         
         class PushMethod(BaseNonMessage):
-            def __init__(self, protocol_binding, message_bindings):
-                self.protocol_binding=protocol_binding
-                self.message_bindings = message_bindings
+            def __init__(self, push_protocol, push_message_bindings):
+                self.push_protocol = push_protocol
+                self.push_message_bindings = push_message_bindings
             
             def to_etree(self):
                 x = etree.Element('{%s}Push_Method' % ns_map['taxii'])
                 proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
-                proto_bind.text = self.protocol_binding
-                for binding in self.message_bindings:
+                proto_bind.text = self.push_protocol
+                for binding in self.push_message_bindings:
                     b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii'])
                     b.text = binding
                 return x
             
             def to_dict(self):
                 d = {}
-                d['protocol_binding'] = self.protocol_binding
-                d['message_bindings'] = []
-                for binding in self.message_bindings:
-                    d['message_bindings'].append(binding)
+                d['push_protocol'] = self.push_protocol
+                d['push_message_bindings'] = []
+                for binding in self.push_message_bindings:
+                    d['push_message_bindings'].append(binding)
                 return d
             
             def __eq__(self, other, debug=False):
-                pass#TODO: Implement this
+                if not self._checkPropertiesEq(other, ['push_protocol'], debug):
+                    return False
+                
+                if set(self.push_message_bindings) != set(other.push_message_bindings):
+                    if debug:
+                        print 'message bindings not equal: %s != %s' % (self.push_message_bindings, other.push_message_bindings)
+                    return False
+                
+                return True
             
             @staticmethod
             def from_etree(etree_xml):
                 kwargs = {}
-                kwargs['protocol_binding'] = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-                kwargs['message_bindings'] = []
+                kwargs['push_protocol'] = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
+                kwargs['push_message_bindings'] = []
                 message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
                 for message_binding in message_binding_set:
-                    kwargs['message_bindings'].append(message_binding.text)
-                return FeedInformationResponse.Feed.PushMethod(**kwargs)
+                    kwargs['push_message_bindings'].append(message_binding.text)
+                return FeedInformationResponse.FeedInformation.PushMethod(**kwargs)
             
             @staticmethod
             def from_dict(d):
-                return FeedInformationResponse.Feed.PushMethod(**d)
+                return FeedInformationResponse.FeedInformation.PushMethod(**d)
         
-        class PollingService(ServiceContactInfo):#TODO - maybe inherit from push method?
+        class PollingServiceInstance(BaseNonMessage):
             NAME = 'Polling_Service'
+            def __init__(self, poll_protocol, poll_address, poll_message_bindings):
+                self.poll_protocol = poll_protocol
+                self.poll_address = poll_address
+                self.poll_message_bindings = poll_message_bindings
+    
+            def to_etree(self):
+                x = etree.Element('{%s}Polling_Service' % ns_map['taxii'])
+                proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
+                proto_bind.text = self.poll_protocol
+                address = etree.SubElement(x, '{%s}Address' % ns_map['taxii'])
+                address.text = self.poll_address
+                for binding in self.poll_message_bindings:
+                    b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii'])
+                    b.text = binding
+                return x
+            
+            def to_dict(self):
+                d = {}
+                d['poll_protocol'] = self.poll_protocol
+                d['poll_address'] = self.poll_address
+                d['poll_message_bindings'] = []
+                for binding in self.poll_message_bindings:
+                    d['poll_message_bindings'].append(binding)
+                return d
+    
+            def __eq__(self, other, debug=False):
+                if not self._checkPropertiesEq(other, ['poll_protocol','poll_address'], debug):
+                    return False
+                
+                if set(self.poll_message_bindings) != set(other.poll_message_bindings):
+                    if debug:
+                        print 'poll_message_bindings not equal %s != %s' % (self.poll_message_bindings, other.poll_message_bindings)
+                    return False
+                
+                return True
+            
+            @classmethod
+            def from_etree(cls, etree_xml):
+                protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
+                addr = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+                bindings = []
+                message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
+                for message_binding in message_binding_set:
+                    bindings.append(message_binding.text)
+                return cls(protocol, addr, bindings)
+            
+            @classmethod
+            def from_dict(cls, d):
+                return cls(**d)
         
-        class SubscriptionService(ServiceContactInfo):#TODO - maybe inherit from push method?
+        class SubscriptionMethod(BaseNonMessage):
             NAME = 'Subscription_Service'
+            def __init__(self, subscription_protocol, subscription_address, subscription_message_bindings):
+                self.subscription_protocol = subscription_protocol
+                self.subscription_address = subscription_address
+                self.subscription_message_bindings = subscription_message_bindings
+            
+            def to_etree(self):
+                x = etree.Element('{%s}%s' % (ns_map['taxii'], self.NAME))
+                proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
+                proto_bind.text = self.subscription_protocol
+                address = etree.SubElement(x, '{%s}Address' % ns_map['taxii'])
+                address.text = self.subscription_address
+                for binding in self.subscription_message_bindings:
+                    b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii'])
+                    b.text = binding
+                return x
+    
+            def to_dict(self):
+                d = {}
+                d['subscription_protocol'] = self.subscription_protocol
+                d['subscription_address'] = self.subscription_address
+                d['subscription_message_bindings'] = []
+                for binding in self.subscription_message_bindings:
+                    d['subscription_message_bindings'].append(binding)
+                return d
+           
+            def __eq__(self, other, debug=False):
+                if not self._checkPropertiesEq(other, ['subscription_protocol','subscription_address'], debug):
+                    return False
+                
+                if set(self.subscription_message_bindings) != set(other.subscription_message_bindings):
+                    if debug:
+                        print 'subscription_message_bindings not equal: %s != %s' % (self.subscription_message_bindings, other.subscription_message_bindings)
+                    return False
+                
+                return True
+            
+            @classmethod
+            def from_etree(cls, etree_xml):
+                protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
+                addr = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+                bindings = []
+                message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
+                for message_binding in message_binding_set:
+                    bindings.append(message_binding.text)
+                return cls(protocol, addr, bindings)
+            
+            @classmethod
+            def from_dict(cls, d):
+                return cls(**d)
+
 
 class PollRequest(TAXIIMessage):
     message_type = MSG_POLL_REQUEST
@@ -935,15 +999,15 @@ class PollRequest(TAXIIMessage):
                  in_response_to=None,
                  extended_headers={},
                  feed_name=None,
+                 exclusive_begin_timestamp_label=None,
+                 inclusive_end_timestamp_label=None,
                  subscription_id=None,
-                 exclusive_begin_timestamp=None,
-                 inclusive_end_timestamp=None,
                  content_bindings=[]
                  ):
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
-        self.exclusive_begin_timestamp = exclusive_begin_timestamp
-        self.inclusive_end_timestamp = inclusive_end_timestamp
+        self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
+        self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
         self.subscription_id = subscription_id
         self.content_bindings = content_bindings
     
@@ -953,15 +1017,15 @@ class PollRequest(TAXIIMessage):
         if self.subscription_id is not None:
             xml.attrib['subscription_id'] = self.subscription_id
         
-        if self.exclusive_begin_timestamp is not None:
+        if self.exclusive_begin_timestamp_label is not None:
             ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii'])
             #TODO: Add TZ Info
-            ebt.text = self.exclusive_begin_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+            ebt.text = self.exclusive_begin_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         
-        if self.inclusive_end_timestamp is not None:
+        if self.inclusive_end_timestamp_label is not None:
             iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
             #TODO: Add TZ Info
-            iet.text = self.inclusive_end_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+            iet.text = self.inclusive_end_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         
         for binding in self.content_bindings:
             b = etree.SubElement(xml, '{%s}Content_Binding' % ns_map['taxii'])
@@ -974,10 +1038,10 @@ class PollRequest(TAXIIMessage):
         d['feed_name'] = self.feed_name
         if self.subscription_id is not None:
             d['subscription_id'] = self.subscription_id
-        if self.exclusive_begin_timestamp is not None:#TODO: Add TZ Info
-            d['exclusive_begin_timestamp'] = self.exclusive_begin_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
-        if self.inclusive_end_timestamp is not None:#TODO: Add TZ Info
-            d['inclusive_end_timestamp'] = self.inclusive_end_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        if self.exclusive_begin_timestamp_label is not None:#TODO: Add TZ Info
+            d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+        if self.inclusive_end_timestamp_label is not None:#TODO: Add TZ Info
+            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         d['content_bindings'] = []
         for bind in self.content_bindings:
             d['content_bindings'].append(bind)
@@ -987,12 +1051,12 @@ class PollRequest(TAXIIMessage):
         if not super(PollRequest, self).__eq__(other, debug):
             return False
         
-        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','exclusive_begin_timestamp','inclusive_end_timestamp'], debug):
+        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','exclusive_begin_timestamp_label','inclusive_end_timestamp_label'], debug):
                 return False
         
         if set(self.content_bindings) != set(other.content_bindings):
             if debug: 
-                print 'content_bindingss not equal: %s != %s' % (self.content_bindings, other.content_bindings)
+                print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
             return False
         
         return True
@@ -1006,20 +1070,20 @@ class PollRequest(TAXIIMessage):
         if len(subscription_id_set) > 0:
             msg.subscription_id = subscription_id_set[0]
         
-        msg.exclusive_begin_timestamp = None
+        msg.exclusive_begin_timestamp_label = None
         begin_ts_set = etree_xml.xpath('./taxii:Exclusive_Begin_Timestamp', namespaces=ns_map)
         if len(begin_ts_set) > 0:
-            msg.exclusive_begin_timestamp = _str2datetime(begin_ts_set[0].text)
+            msg.exclusive_begin_timestamp_label = _str2datetime(begin_ts_set[0].text)
         
-        msg.inclusive_end_timestamp = None
+        msg.inclusive_end_timestamp_label = None
         end_ts_set = etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)
         if len(end_ts_set) > 0:
-            msg.inclusive_end_timestamp = _str2datetime(end_ts_set[0].text)
+            msg.inclusive_end_timestamp_label = _str2datetime(end_ts_set[0].text)
         
         msg.content_bindings = []
         content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
         for binding in content_binding_set:
-            msg.content_bindings.append(binding)
+            msg.content_bindings.append(binding.text)
         
         return msg
     
@@ -1032,13 +1096,13 @@ class PollRequest(TAXIIMessage):
         if 'subscription_id' in d:
             msg.subscription_id = d['subscription_id']
         
-        msg.exclusive_begin_timestamp = None
-        if 'exclusive_begin_timestamp' in d:
-            msg.exclusive_begin_timestamp = _str2datetime(d['exclusive_begin_timestamp'])
+        msg.exclusive_begin_timestamp_label = None
+        if 'exclusive_begin_timestamp_label' in d:
+            msg.exclusive_begin_timestamp_label = _str2datetime(d['exclusive_begin_timestamp_label'])
         
-        msg.inclusive_end_timestamp = None
-        if 'inclusive_end_timestamp' in d:
-            msg.inclusive_end_timestamp = _str2datetime(d['inclusive_end_timestamp'])
+        msg.inclusive_end_timestamp_label = None
+        if 'inclusive_end_timestamp_label' in d:
+            msg.inclusive_end_timestamp_label = _str2datetime(d['inclusive_end_timestamp_label'])
         
         msg.content_bindings = []
         if 'content_bindings' in d:
@@ -1054,16 +1118,16 @@ class PollResponse(TAXIIMessage):
                  in_response_to,
                  extended_headers={},
                  feed_name = None,
-                 inclusive_end_timestamp = None,
+                 inclusive_begin_timestamp_label = None,
+                 inclusive_end_timestamp_label = None,
                  subscription_id = None,
                  message = None,
-                 inclusive_begin_timestamp = None,
                  content_blocks=[]
                  ):
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.feed_name = feed_name
-        self.inclusive_end_timestamp = inclusive_end_timestamp
-        self.inclusive_begin_timestamp = inclusive_begin_timestamp
+        self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
+        self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.subscription_id = subscription_id
         self.message = message
         self.content_blocks = content_blocks
@@ -1078,12 +1142,12 @@ class PollResponse(TAXIIMessage):
             m = etree.SubElement(xml, '{%s}Message' % ns_map['taxii'])
             m.text = self.message
         
-        if self.inclusive_begin_timestamp is not None:
+        if self.inclusive_begin_timestamp_label is not None:
             ibt = etree.SubElement(xml, '{%s}Inclusive_Begin_Timestamp' % ns_map['taxii'])
-            ibt.text = self.inclusive_begin_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+            ibt.text = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         
         iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
-        iet.text = self.inclusive_end_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        iet.text = self.inclusive_end_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         
         for block in self.content_blocks:
             xml.append(block.to_etree())
@@ -1098,9 +1162,9 @@ class PollResponse(TAXIIMessage):
             d['subscription_id'] = self.subscription_id
         if self.message is not None:
             d['message'] = self.message
-        if self.inclusive_begin_timestamp is not None:
-            d['inclusive_begin_timestamp'] = self.inclusive_begin_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
-        d['inclusive_end_timestamp'] = self.inclusive_end_timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')
+        if self.inclusive_begin_timestamp_label is not None:
+            d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
+        d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         d['content_blocks'] = []
         for block in self.content_blocks:
             d['content_blocks'].append(block.to_dict())
@@ -1111,7 +1175,7 @@ class PollResponse(TAXIIMessage):
         if not super(PollResponse, self).__eq__(other, debug):
             return False
         
-        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','message','inclusive_begin_timestamp','inclusive_end_timestamp'], debug):
+        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','message','inclusive_begin_timestamp_label','inclusive_end_timestamp_label'], debug):
                 return False
         
         #TODO: Check content blocks
@@ -1133,12 +1197,12 @@ class PollResponse(TAXIIMessage):
         if len(messages) > 0:
             msg.message = messages[0].text
         
-        msg.inclusive_begin_timestamp = None
+        msg.inclusive_begin_timestamp_label = None
         ibts = etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)
         if len(ibts) > 0:
-            msg.inclusive_begin_timestamp = _str2datetime(ibts[0].text)
+            msg.inclusive_begin_timestamp_label = _str2datetime(ibts[0].text)
         
-        msg.inclusive_end_timestamp = _str2datetime(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+        msg.inclusive_end_timestamp_label = _str2datetime(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
         
         msg.content_blocks = []
         blocks = etree_xml.xpath('./taxii:Content_Block', namespaces=ns_map)
@@ -1160,11 +1224,11 @@ class PollResponse(TAXIIMessage):
         if 'subscription_id' in d:
             msg.subscription_id = d['subscription_id']
         
-        msg.inclusive_begin_timestamp = None
-        if 'inclusive_begin_timestamp' in d:
-            msg.inclusive_begin_timestamp = _str2datetime(d['inclusive_begin_timestamp'])
+        msg.inclusive_begin_timestamp_label = None
+        if 'inclusive_begin_timestamp_label' in d:
+            msg.inclusive_begin_timestamp_label = _str2datetime(d['inclusive_begin_timestamp_label'])
         
-        msg.inclusive_end_timestamp = _str2datetime(d['inclusive_end_timestamp'])
+        msg.inclusive_end_timestamp_label = _str2datetime(d['inclusive_end_timestamp_label'])
         
         msg.content_blocks = []
         for block in d['content_blocks']:
@@ -1244,7 +1308,7 @@ class StatusMessage(TAXIIMessage):
 class InboxMessage(TAXIIMessage):
     message_type = MSG_INBOX_MESSAGE
     
-    def __init__(self, message_id, in_response_to=None, extended_headers={}, content_blocks=[], message=None, subscription_information=None):
+    def __init__(self, message_id, in_response_to=None, extended_headers={}, message=None, subscription_information=None, content_blocks=[]):
         super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
         self.content_blocks = content_blocks
         self.subscription_information = subscription_information
@@ -1581,8 +1645,8 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
     
     class PollInstance:
         
-        def __init__(self, protocol_binding, poll_address, poll_message_bindings=[]):
-            self.protocol_binding = protocol_binding
+        def __init__(self, poll_protocol, poll_address, poll_message_bindings=[]):
+            self.poll_protocol = poll_protocol
             self.poll_address = poll_address
             self.poll_message_bindings = poll_message_bindings
         
@@ -1590,7 +1654,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             xml = etree.Element('{%s}Poll_Instance' % ns_map['taxii'])
             
             pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii'])
-            pb.text = self.protocol_binding
+            pb.text = self.poll_protocol
             
             a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii'])
             a.text = self.poll_address
@@ -1604,7 +1668,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         def to_dict(self):
             d = {}
             
-            d['protocol_binding'] = self.protocol_binding
+            d['poll_protocol'] = self.poll_protocol
             d['poll_address'] = self.poll_address
             d['poll_message_bindings'] = []
             for binding in self.poll_message_bindings:
@@ -1613,7 +1677,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             return d
         
         def __eq__(self, other, debug=True):
-            if not self._checkPropertiesEq(other, ['protocol_binding','poll_address'], debug):
+            if not self._checkPropertiesEq(other, ['poll_protocol','poll_address'], debug):
                 return False
             
             if set(self.poll_message_bindings) != set(other.poll_message_bindings):
@@ -1625,13 +1689,13 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         
         @staticmethod
         def from_etree(etree_xml):
-            protocol_binding = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
+            poll_protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
             address = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
             poll_message_bindings = []
             for b in etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map):
                 poll_message_bindings.append(b.text)
             
-            return ManageFeedSubscriptionResponse.PollInstance(protocol_binding, address, poll_message_bindings)
+            return ManageFeedSubscriptionResponse.PollInstance(poll_protocol, address, poll_message_bindings)
         
         @staticmethod
         def from_dict(d):
