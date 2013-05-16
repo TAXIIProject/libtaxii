@@ -109,7 +109,7 @@ class HttpClient:
         
         header_dict['Content-Type'] = 'application/xml'
         header_dict['X-TAXII-Content-Type'] = message_binding
-        print '3ax'
+        
         req = conn.request('POST', path, post_data, headers=header_dict)
         response = conn.getresponse()
         
