@@ -75,9 +75,6 @@ def validate_xml(xml_string):
         return xml_schema.error_log.last_error
     return valid
 
-def get_message_from_http_response(http_response):
-    return None
-
 def get_message_from_xml(xml_string):
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -85,7 +82,12 @@ def get_message_from_xml(xml_string):
         f = xml_string
     
     etree_xml = etree.parse(f).getroot()
-    message_type = etree_xml.tag[53:]#TODO: Make this less fragile
+    qn = etree.QName(etree_xml)
+    if qn.namespace != ns_map['taxii']:
+        raise ValueError('Unsupported namespace: %s' % qn.namespace)
+    
+    message_type = qn.localname
+    
     if message_type == MSG_DISCOVERY_REQUEST:
         return DiscoveryRequest.from_etree(etree_xml)
     if message_type == MSG_DISCOVERY_RESPONSE:
