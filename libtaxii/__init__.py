@@ -43,7 +43,7 @@ def get_message_from_http_response(http_response, in_response_to):
         
         return tm.StatusMessage(message_id = '0', in_response_to = in_response_to, status_type = tm.ST_FAILURE, message = m)
         
-    elif taxii_content_type == t.VID_TAXII_XML_10:#It's a TAXII XML 1.0 message
+    elif taxii_content_type == VID_TAXII_XML_10:#It's a TAXII XML 1.0 message
         return tm.get_message_from_xml(response_message)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
