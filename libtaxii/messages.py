@@ -1367,7 +1367,7 @@ class InboxMessage(TAXIIMessage):
         if len(subs_infos) > 0:
             msg.subscription_information = InboxMessage.SubscriptionInformation.from_etree(subs_infos[0])
         
-        content_blocks = etree_xml.xpath('./taxii:Content_Blocks', namespaces=ns_map)
+        content_blocks = etree_xml.xpath('./taxii:Content_Block', namespaces=ns_map)
         msg.content_blocks = []
         for block in content_blocks:
             msg.content_blocks.append(ContentBlock.from_etree(block))
