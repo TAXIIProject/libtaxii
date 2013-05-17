@@ -157,9 +157,20 @@ poll_response1 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
                                  inclusive_begin_timestamp_label = datetime.datetime.now(),#Optional
                                  subscription_id = 'SubsId001',#Optional
                                  message = 'This is a message.',#Optional
-                                 content_blocks = [xml_content_block1, string_content_block1])#Optional
+                                 content_blocks = [xml_content_block1])#Optional
 
 perform_tests(poll_response1)
+
+poll_response2 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
+                                 in_response_to = tm.generate_message_id(),#Required - this should be the ID of the corresponding request
+                                 feed_name = 'FeedName',#Required
+                                 inclusive_end_timestamp_label = datetime.datetime.now(),#Required
+                                 inclusive_begin_timestamp_label = datetime.datetime.now(),#Optional
+                                 subscription_id = 'SubsId001',#Optional
+                                 message = 'This is a message.',#Optional
+                                 content_blocks = [string_content_block1])#Optional
+
+perform_tests(poll_response2)
 
 ## Status Message
 status_message_kwargs = {}
@@ -187,9 +198,16 @@ subscription_information1 = tm.InboxMessage.SubscriptionInformation(feed_name = 
 inbox_message1 = tm.InboxMessage(message_id = tm.generate_message_id(),#Required
                                  message = 'This is a message.',#Optional
                                  subscription_information = subscription_information1,#Optional
-                                 content_blocks = [xml_content_block1, string_content_block1])#Optional
+                                 content_blocks = [xml_content_block1])#Optional
 
 perform_tests(inbox_message1)
+
+inbox_message2 = tm.InboxMessage(message_id = tm.generate_message_id(),#Required
+                                 message = 'This is a message.',#Optional
+                                 subscription_information = subscription_information1,#Optional
+                                 content_blocks = [string_content_block1])#Optional
+
+perform_tests(inbox_message2)
 
 ## Manage Feed Subscription Request 
 
