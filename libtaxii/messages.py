@@ -403,9 +403,19 @@ class ContentBlock(BaseNonMessage):
     NAME = 'Content_Block'
     def __init__(self, content_binding, content, timestamp_label = None, padding = None):
         self.content_binding = content_binding
-        self.content = content
+        self.content = self._stringify_content(content)
         self.timestamp_label = timestamp_label
         self.padding = padding
+    
+    #Always a string or raises an error
+    def _stringify_content(self, content):
+        if isinstance(content, basestring):
+            return content
+        
+        if isinstance(content, etree._ElementTree) or isinstance(content, etree._Element):
+            return etree.tostring(content)
+        
+        return str(content)
     
     def to_etree(self):
         block = etree.Element('{%s}Content_Block' % ns_map['taxii'])
@@ -413,9 +423,15 @@ class ContentBlock(BaseNonMessage):
         cb.text = self.content_binding
         c = etree.SubElement(block, '{%s}Content' % ns_map['taxii'])
         
-        if isinstance(self.content, etree._Element):#For XML
-            c.append(self.content)
-        else:#Assume it is a string
+        if self.content.startswith('<'):#It might be XML
+            try:
+                xml = etree.parse(StringIO.StringIO(self.content)).getroot()
+                c.append(xml)
+            except:
+                pass#Keep calm and carry on
+            finally:
+                c.text = self.content
+        else:
             c.text = self.content
         
         if self.timestamp_label is not None:
@@ -434,7 +450,7 @@ class ContentBlock(BaseNonMessage):
         
         if isinstance(self.content, etree._Element):#For XML
             block['content'] = etree.tostring(self.content)
-        else:#Assume string
+        else:
             block['content'] = self.content
         
         if self.timestamp_label is not None:
@@ -449,18 +465,9 @@ class ContentBlock(BaseNonMessage):
         if not self._checkPropertiesEq(other, ['content_binding','timestamp_label','padding'], debug):
             return False
         
-        if isinstance(self.content, etree._Element) and isinstance(other.content, etree._Element):
-            #TODO: Implement comparison for etrees
-            pass
-        elif isinstance(self.content, basestring) and isinstance(other.content, basestring):
-            if self.content != other.content:
-                if debug:
-                    print 'contents not equal: %s != %s' % (self.content, other.content)
-                return False
-        else:
-            if debug:
-                print 'content not of same type: %s != %s' % (self.content.__class__.__name__, other.content.__class__.__name__)
-            return False
+        #TODO: It's pretty hard to check and see if content is equal....
+        #if not self._checkPropertiesEq(other, ['content'], debug):
+        #    return False
         
         return True
     
@@ -477,11 +484,11 @@ class ContentBlock(BaseNonMessage):
             ts_string = ts_set[0].text
             kwargs['timestamp_label'] = _str2datetime(ts_string)
         
-        content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)
-        if len(content[0]) == 0:#This has string content
-            kwargs['content'] = content[0].text
+        content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)[0]
+        if len(content) == 0:#This has string content
+            kwargs['content'] = content.text
         else:#This has XML content
-            kwargs['content'] = content[0][0]
+            kwargs['content'] = content[0]
         
         return ContentBlock(**kwargs)
     
@@ -494,10 +501,7 @@ class ContentBlock(BaseNonMessage):
         if 'timestamp_label' in d:
             kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
         
-        if d['content'].startswith('<'):
-            kwargs['content'] = etree.parse(StringIO.StringIO(d['content'])).getroot()
-        else:
-            kwargs['content'] = d['content']
+        kwargs['content'] = d['content']
         
         return ContentBlock(**kwargs)
 
