@@ -423,7 +423,7 @@ class ContentBlock(BaseNonMessage):
             tl.text = self.timestamp_label.strftime('%Y-%m-%d %H:%M:%S.%f')
         
         if self.padding is not None:
-            p = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii'])
+            p = etree.SubElement(block, '{%s}Padding' % ns_map['taxii'])
             p.text = self.padding
         
         return block
@@ -449,7 +449,7 @@ class ContentBlock(BaseNonMessage):
         if not self._checkPropertiesEq(other, ['content_binding','timestamp_label','padding'], debug):
             return False
         
-        if isinstance(self.content, etree) and isinstance(other.content, etree):
+        if isinstance(self.content, etree._Element) and isinstance(other.content, etree._Element):
             #TODO: Implement comparison for etrees
             pass
         elif isinstance(self.content, basestring) and isinstance(other.content, basestring):
@@ -459,7 +459,7 @@ class ContentBlock(BaseNonMessage):
                 return False
         else:
             if debug:
-                print 'content not of same type: %s != %s' % (self.content.__class__.__name__, other.content.__class__.name__)
+                print 'content not of same type: %s != %s' % (self.content.__class__.__name__, other.content.__class__.__name__)
             return False
         
         return True
@@ -478,10 +478,10 @@ class ContentBlock(BaseNonMessage):
             kwargs['timestamp_label'] = _str2datetime(ts_string)
         
         content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)
-        if len(content) == 0:#This has string content
-            kwargs['content'] = content.text
+        if len(content[0]) == 0:#This has string content
+            kwargs['content'] = content[0].text
         else:#This has XML content
-            kwargs['content'] = content[0]
+            kwargs['content'] = content[0][0]
         
         return ContentBlock(**kwargs)
     
@@ -492,10 +492,10 @@ class ContentBlock(BaseNonMessage):
         if 'padding' in d:
             kwargs['padding'] = d['padding']
         if 'timestamp_label' in d:
-            kwargs['timestamp_label'] = d['timestamp_label']
+            kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
         
         if d['content'].startswith('<'):
-            kwargs['content'] = etree.parse(StringIO.StringIO(d['content']))
+            kwargs['content'] = etree.parse(StringIO.StringIO(d['content'])).getroot()
         else:
             kwargs['content'] = d['content']
         
@@ -1268,6 +1268,7 @@ class StatusMessage(TAXIIMessage):
             d['status_detail'] = self.status_detail
         if self.message is not None:
             d['message'] = self.message
+            d['message'] = self.message
         return d
     
     def __eq__(self, other, debug=None):
@@ -1351,7 +1352,18 @@ class InboxMessage(TAXIIMessage):
         if not self._checkPropertiesEq(other, ['message','subscription_information'], debug):
             return False
         
-        #TODO: Check content blokcs
+        if len(self.content_blocks) != len (other.content_blocks):
+            if debug:
+                print 'content block lengths not equal: %s != %s' % (len(self.content_blocks), len (other.content_blocks))
+            return False
+        
+        #Who knows if this is a good way to compare the content blocks or not...
+        for item1, item2 in zip(sorted(self.content_blocks), sorted(other.content_blocks)):
+            if item1 != item2:
+                if debug:
+                    print 'content blocks not equal: %s != %s' % (item1, item2)
+                    item1.__eq__(item2, debug)#This will print why they are not equal
+                return False
         
         return True
     
