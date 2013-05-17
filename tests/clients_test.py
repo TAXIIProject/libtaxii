@@ -36,7 +36,7 @@ poll_request1 = tm.PollRequest(message_id = tm.generate_message_id(),
                                content_bindings = [])
 
 #Call through a proxy:
-proxy_host = 'gatekeeper.mitre.org'
+proxy_host = 'proxyname'
 proxy_port = 80
 service_url = 'http://example.iana.org/servicepath/'
 
