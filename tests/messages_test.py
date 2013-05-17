@@ -10,7 +10,7 @@
 # 1. Create a kwargs dictionary. http://stackoverflow.com/questions/1769403/understanding-kwargs-in-python
 #    The kwargs dictionary shows users which arguments the constructor takes
 # 2. Create the TAXII Message (or related object) from kwargs
-# (The following are done in perform_tests)
+# (The following are done in message_tests)
 # 3. Convert the TAXII Message to xml
 # 4. Validate the XML w/ the TAXII XML Schema
 # 5. Convert the XML to a TAXII Message
@@ -31,7 +31,7 @@ import datetime
 from lxml import etree
 import StringIO
 
-def perform_tests(taxii_message):
+def message_tests(taxii_message):
     if not isinstance(taxii_message, tm.TAXIIMessage):
         raise ValueError('taxii_message was not an instance of TAXIIMessage')
     
@@ -61,16 +61,40 @@ def perform_tests(taxii_message):
     
     print '***** All tests completed!'
 
-#TODO: Do it like the line below this.
-#TODO: Say which args are optional
-#tm.DiscoveryRequest(message_id=tm.generate_message_id(), ... )
+def contentblock_tests(content_block):
+    if not isinstance(content_block, tm.ContentBlock):
+        raise ValueError('content_block was not an instance of ContentBlock')
+    
+    print '***** Starting Content Block tests'
+    
+    xml_string = content_block.to_xml()
+    block_from_xml = tm.ContentBlock.from_xml(xml_string)
+    dictionary = content_block.to_dict()
+    block_from_dict = tm.ContentBlock.from_dict(dictionary)
+    
+    if content_block != block_from_xml:
+        print '\t Failure of test #1 - running equals w/ debug:'
+        content_block.__equals(block_from_xml, True)
+        raise Exception('Test #1 failed - content_block != block_from_xml')
+    
+    if content_block != block_from_dict:
+        print '\t Failure of test #2 - running equals w/ debug:'
+        content_block.__eq__(block_from_dict, True)
+        raise Exception('Test #2 failed - content_block != block_from_dict')
+    
+    if block_from_xml != block_from_dict:
+        print '\t Failure of test #3 - running equals w/ debug:'
+        block_from_xml.__eq__(block_from_dict, True)
+        raise Exception('Test #3 failed - block_from_xml != block_from_dict')
+    
+    print '***** All tests completed!'
 
 ## Discovery Request
 discovery_request1 = tm.DiscoveryRequest(message_id = tm.generate_message_id(), #Required
                                          extended_headers={'ext_header1': 'value1', 'ext_header2': 'value2'})#Optional. 
                                          #Extended headers are optional for every message type, but only demonstrated here
 
-perform_tests(discovery_request1)
+message_tests(discovery_request1)
 
 ## Discovery Response
 
@@ -91,12 +115,12 @@ discovery_response1 = tm.DiscoveryResponse(message_id = tm.generate_message_id()
                                            in_response_to = tm.generate_message_id(),#Required. This should be the ID of the corresponding request
                                            service_instances = [service_instance1])#Optional.
 
-perform_tests(discovery_response1)
+message_tests(discovery_response1)
 
 ##Feed Information Request
 feed_information_request1 = tm.FeedInformationRequest(message_id = tm.generate_message_id())#Required
 
-perform_tests(feed_information_request1)
+message_tests(feed_information_request1)
 
 ## Feed Information Response
 
@@ -123,7 +147,7 @@ feed_information_response1 = tm.FeedInformationResponse(message_id = tm.generate
                                                         in_response_to = tm.generate_message_id(),#Required. This should be the ID of the corresponding request
                                                         feed_informations=[feed1])#Optional
 
-perform_tests(feed_information_response1)
+message_tests(feed_information_response1)
 
 ## Poll Request
 
@@ -134,7 +158,7 @@ poll_request1 = tm.PollRequest(message_id = tm.generate_message_id(),#Required
                                inclusive_end_timestamp_label = datetime.datetime.now(),#Optional - Absence means 'no upper bound'
                                content_bindings = [t.CB_STIX_XML_10])#Optional - defaults to accepting all content bindings
 
-perform_tests(poll_request1)
+message_tests(poll_request1)
 
 ## Poll Response
 
@@ -159,7 +183,7 @@ poll_response1 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
                                  message = 'This is a message.',#Optional
                                  content_blocks = [xml_content_block1])#Optional
 
-perform_tests(poll_response1)
+message_tests(poll_response1)
 
 poll_response2 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
                                  in_response_to = tm.generate_message_id(),#Required - this should be the ID of the corresponding request
@@ -170,7 +194,7 @@ poll_response2 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
                                  message = 'This is a message.',#Optional
                                  content_blocks = [string_content_block1])#Optional
 
-perform_tests(poll_response2)
+message_tests(poll_response2)
 
 ## Status Message
 status_message_kwargs = {}
@@ -186,7 +210,7 @@ status_message1 = tm.StatusMessage(message_id = tm.generate_message_id(),#Requir
                                    status_detail = 'Machine-processable info here!',#May be optional or not allowed, depending on status_type
                                    message = 'This is a message.')#Optional
 
-perform_tests(status_message1)
+message_tests(status_message1)
 
 ## Inbox Message
 
@@ -200,14 +224,14 @@ inbox_message1 = tm.InboxMessage(message_id = tm.generate_message_id(),#Required
                                  subscription_information = subscription_information1,#Optional
                                  content_blocks = [xml_content_block1])#Optional
 
-perform_tests(inbox_message1)
+message_tests(inbox_message1)
 
 inbox_message2 = tm.InboxMessage(message_id = tm.generate_message_id(),#Required
                                  message = 'This is a message.',#Optional
                                  subscription_information = subscription_information1,#Optional
                                  content_blocks = [string_content_block1])#Optional
 
-perform_tests(inbox_message2)
+message_tests(inbox_message2)
 
 ## Manage Feed Subscription Request 
 
@@ -222,7 +246,7 @@ manage_feed_subscription_request1 = tm.ManageFeedSubscriptionRequest(message_id 
                                                                      subscription_id = 'SubsId056',#Required for unsubscribe, prohibited otherwise
                                                                      delivery_parameters = delivery_parameters1)#Required
 
-perform_tests(manage_feed_subscription_request1)
+message_tests(manage_feed_subscription_request1)
 
 ## Manage Feed Subscription Response
 
@@ -252,12 +276,24 @@ manage_feed_subscription_response1 = tm.ManageFeedSubscriptionResponse(message_i
                                                                        message = 'This is a message',#Optional
                                                                        subscription_instances = [subscription_instance1])#Required
 
-perform_tests(manage_feed_subscription_response1)
+message_tests(manage_feed_subscription_response1)
 
 
+### Test some Content Blocks ###
+cb1 = tm.ContentBlock(content_binding = t.CB_STIX_XML_10, content = '<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')
+contentblock_tests(cb1)
 
+cb2 = tm.ContentBlock(content_binding = t.CB_STIX_XML_10, content = StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
+contentblock_tests(cb2)
 
+cb3 = tm.ContentBlock(content_binding = t.CB_STIX_XML_10, content = etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
+contentblock_tests(cb3)
 
+cb4 = tm.ContentBlock(content_binding = t.CB_STIX_XML_10, content = '<Something thats not XML')
+contentblock_tests(cb4)
+
+cb5 = tm.ContentBlock(content_binding = t.CB_STIX_XML_10, content = 'Something thats not XML <xml/>')
+contentblock_tests(cb5)
 
 
 
