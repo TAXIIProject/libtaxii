@@ -428,9 +428,8 @@ class ContentBlock(BaseNonMessage):
                 xml = etree.parse(StringIO.StringIO(self.content)).getroot()
                 c.append(xml)
             except:
-                pass#Keep calm and carry on
-            finally:
                 c.text = self.content
+                pass#Keep calm and carry on
         else:
             c.text = self.content
         
