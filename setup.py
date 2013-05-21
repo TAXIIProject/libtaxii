@@ -11,7 +11,7 @@ except ImportError:
 if sys.version_info <(2, 6):
     raise Exception('libtaxii requires Python 2.6 or higher.')
 
-install_requires = ['lxml>=2.3.2', 'M2Crypto>=0.21.1']
+install_requires = ['lxml>=2.3.2', 'M2Crypto>=0.21.1', 'python-dateutil>=1.5']
 
 setup(name='libtaxii',
       description='TAXII Library.',
@@ -19,7 +19,7 @@ setup(name='libtaxii',
       author_email='mdavidson@mitre.org',
       url="http://taxii.mitre.org/",
       version='0.1',
-      py_modules=['libtaxii.clients', 'libtaxii.messages','libtaxii.taxii_message_converter', 'libtaxii.taxii_client'],
+      py_modules=['libtaxii.clients', 'libtaxii.messages','libtaxii.experimental_xenc_helper','libtaxii.taxii_message_converter', 'libtaxii.taxii_client'],
       install_requires=install_requires,
       data_files=[('xsd', ['xsd/TAXII_XMLMessageBinding_Schema.xsd',
                            'xsd/xmldsig-core-schema.xsd'])],
