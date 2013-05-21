@@ -431,7 +431,7 @@ class ContentBlock(BaseNonMessage):
         
         if self.timestamp_label is not None:
             tl = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii'])
-            tl.text = self.timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            tl.text = self.timestamp_label.isoformat()
         
         if self.padding is not None:
             p = etree.SubElement(block, '{%s}Padding' % ns_map['taxii'])
@@ -449,7 +449,7 @@ class ContentBlock(BaseNonMessage):
             block['content'] = self.content
         
         if self.timestamp_label is not None:
-            block['timestamp_label'] = self.timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            block['timestamp_label'] = self.timestamp_label.isoformat()
         
         if self.padding is not None:
             block['padding'] = self.padding
@@ -1021,12 +1021,12 @@ class PollRequest(TAXIIMessage):
         if self.exclusive_begin_timestamp_label is not None:
             ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii'])
             #TODO: Add TZ Info
-            ebt.text = self.exclusive_begin_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            ebt.text = self.exclusive_begin_timestamp_label.isoformat()
         
         if self.inclusive_end_timestamp_label is not None:
             iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
             #TODO: Add TZ Info
-            iet.text = self.inclusive_end_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            iet.text = self.inclusive_end_timestamp_label.isoformat()
         
         for binding in self.content_bindings:
             b = etree.SubElement(xml, '{%s}Content_Binding' % ns_map['taxii'])
@@ -1040,9 +1040,9 @@ class PollRequest(TAXIIMessage):
         if self.subscription_id is not None:
             d['subscription_id'] = self.subscription_id
         if self.exclusive_begin_timestamp_label is not None:#TODO: Add TZ Info
-            d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
         if self.inclusive_end_timestamp_label is not None:#TODO: Add TZ Info
-            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         d['content_bindings'] = []
         for bind in self.content_bindings:
             d['content_bindings'].append(bind)
@@ -1145,10 +1145,10 @@ class PollResponse(TAXIIMessage):
         
         if self.inclusive_begin_timestamp_label is not None:
             ibt = etree.SubElement(xml, '{%s}Inclusive_Begin_Timestamp' % ns_map['taxii'])
-            ibt.text = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            ibt.text = self.inclusive_begin_timestamp_label.isoformat()
         
         iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
-        iet.text = self.inclusive_end_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+        iet.text = self.inclusive_end_timestamp_label.isoformat()
         
         for block in self.content_blocks:
             xml.append(block.to_etree())
@@ -1164,8 +1164,8 @@ class PollResponse(TAXIIMessage):
         if self.message is not None:
             d['message'] = self.message
         if self.inclusive_begin_timestamp_label is not None:
-            d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
-        d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.isoformat()
+        d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         d['content_blocks'] = []
         for block in self.content_blocks:
             d['content_blocks'].append(block.to_dict())
@@ -1416,10 +1416,10 @@ class InboxMessage(TAXIIMessage):
             xml.attrib['subscription_id'] = self.subscription_id
             
             ibtl = etree.SubElement(xml, '{%s}Inclusive_Begin_Timestamp' % ns_map['taxii'])
-            ibtl.text = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            ibtl.text = self.inclusive_begin_timestamp_label.isoformat()
             
             ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
-            ietl.text = self.inclusive_end_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            ietl.text = self.inclusive_end_timestamp_label.isoformat()
             
             return xml
         
@@ -1427,8 +1427,8 @@ class InboxMessage(TAXIIMessage):
             d = {}
             d['feed_name'] = self.feed_name
             d['subscription_id'] = self.subscription_id
-            d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
-            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.strftime('%Y-%m-%dT%H:%M:%S')
+            d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.isoformat()
+            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
             return d
         
         def __eq__(self, other, debug=False):
