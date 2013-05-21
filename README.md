@@ -10,7 +10,8 @@ and to customary Python practices. In places where these conflict, and the goal 
 to make libtaxii intuitive both to Python developers and XML developers.
 
 ## Getting Started
-Documentation is not currently well supported. New users should start by looking in the /tests
+Documentation is being developed on
+an ongoing basis and may be incomplete in some areas. New users should start by looking in the /tests
 directory for examples on how to use messages.py and clients.py. If your questions is not answered there (and they very well may not be),
 you are encouraged to post your question to the TAXII discussion list (http://taxii.mitre.org/community/registration.html).
 
