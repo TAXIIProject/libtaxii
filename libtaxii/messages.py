@@ -11,6 +11,7 @@ import random
 import os
 import StringIO
 import datetime
+import dateutil.parser
 from lxml import etree
 
 MSG_STATUS_MESSAGE = 'Status_Message'
@@ -139,13 +140,8 @@ def get_message_from_dict(d):
     
     raise ValueError('Unknown message_type: %s' % message_type)
 
-#TODO: find a better way of parsing a string into a datetime object
-#TODO: Explore dateutil
 def _str2datetime(date_string):
-    if '.' in date_string:
-        return datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
-    
-    return datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+    return dateutil.parser.parse(date_string)
 
 #Allows for code reuse in non-TAXII Message objects
 class BaseNonMessage(object):
@@ -301,7 +297,7 @@ class TAXIIMessage(BaseNonMessage):
     #by each Message class. In general, when converting to XML,
     #Subclasses should call this method first, then create their specific XML constructs
     def to_etree(self):
-        root_elt = etree.Element('{%s}%s' % (ns_map['taxii'], self.message_type))
+        root_elt = etree.Element('{%s}%s' % (ns_map['taxii'], self.message_type), nsmap = ns_map)
         root_elt.attrib['message_id'] = str(self.message_id)
         
         if self.in_response_to is not None:
@@ -418,7 +414,7 @@ class ContentBlock(BaseNonMessage):
         return str(content)
     
     def to_etree(self):
-        block = etree.Element('{%s}Content_Block' % ns_map['taxii'])
+        block = etree.Element('{%s}Content_Block' % ns_map['taxii'], nsmap=ns_map)
         cb = etree.SubElement(block, '{%s}Content_Binding' % ns_map['taxii'])
         cb.text = self.content_binding
         c = etree.SubElement(block, '{%s}Content' % ns_map['taxii'])
