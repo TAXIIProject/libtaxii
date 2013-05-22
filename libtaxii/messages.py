@@ -400,6 +400,9 @@ class ContentBlock(BaseNonMessage):
     def __init__(self, content_binding, content, timestamp_label = None, padding = None):
         self.content_binding = content_binding
         self.content = self._stringify_content(content)
+        if timestamp_label is not None:
+            if timestamp_label.tzinfo is None:
+                raise ValueError('timestamp_label.tzinfo must not be None')
         self.timestamp_label = timestamp_label
         self.padding = padding
     
@@ -1007,7 +1010,13 @@ class PollRequest(TAXIIMessage):
                  ):
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
+        if exclusive_begin_timestamp_label is not None:
+            if exclusive_begin_timestamp_label.tzinfo is None:
+                raise ValueError('exclusive_begin_timestamp_label.tzinfo must not be None')
         self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
+        if inclusive_end_timestamp_label is not None:
+            if inclusive_end_timestamp_label.tzinfo is None:
+                raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
         self.subscription_id = subscription_id
         self.content_bindings = content_bindings
@@ -1127,7 +1136,13 @@ class PollResponse(TAXIIMessage):
                  ):
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.feed_name = feed_name
+        if inclusive_end_timestamp_label is not None:
+            if inclusive_end_timestamp_label.tzinfo is None:
+                raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
+        if inclusive_begin_timestamp_label is not None:
+            if inclusive_begin_timestamp_label.tzinfo is None:
+                raise ValueError('inclusive_begin_timestamp_label.tzinfo must not be None')
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.subscription_id = subscription_id
         self.message = message
@@ -1407,7 +1422,13 @@ class InboxMessage(TAXIIMessage):
         def __init__(self, feed_name, subscription_id, inclusive_begin_timestamp_label, inclusive_end_timestamp_label):
             self.feed_name = feed_name
             self.subscription_id = subscription_id
+            if inclusive_begin_timestamp_label is not None:
+                if inclusive_begin_timestamp_label.tzinfo is None:
+                    raise ValueError('inclusive_begin_timestamp_label.tzinfo must not be None')
             self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
+            if inclusive_end_timestamp_label is not None:
+                if inclusive_end_timestamp_label.tzinfo is None:
+                    raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
             self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
         
         def to_etree(self):
