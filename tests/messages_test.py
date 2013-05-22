@@ -4,20 +4,8 @@
 #This file has two purposes:
 # 1. To provide a rough unit test of libtaxii.messages
 # 2. To provide examples of how to use libtaxii.messages
-#
-# Generally speaking, the tests are performed as follows:
-# 
-# 1. Create a kwargs dictionary. http://stackoverflow.com/questions/1769403/understanding-kwargs-in-python
-#    The kwargs dictionary shows users which arguments the constructor takes
-# 2. Create the TAXII Message (or related object) from kwargs
-# (The following are done in message_tests)
-# 3. Convert the TAXII Message to xml
-# 4. Validate the XML w/ the TAXII XML Schema
-# 5. Convert the XML to a TAXII Message
-# 6. Convert the TAXII Message to a python dictionary
-# 7. Convert the dictionary to a TAXII Message
-# 8. Compare all three messages for equality
-#
+
+
 
 ### Contributors ###
 #Contributors: If you would like, add your name to the list, alphabetically by last name
@@ -29,6 +17,7 @@ import libtaxii as t
 import libtaxii.messages as tm
 import datetime
 from lxml import etree
+from dateutil.tz import tzutc
 import StringIO
 
 def message_tests(taxii_message):
@@ -154,8 +143,8 @@ message_tests(feed_information_response1)
 poll_request1 = tm.PollRequest(message_id = tm.generate_message_id(),#Required
                                feed_name = 'TheFeedToPoll',#Required
                                subscription_id = 'SubsId002',#Optional
-                               exclusive_begin_timestamp_label = datetime.datetime.now(),#Optional - Absence means 'no lower bound'
-                               inclusive_end_timestamp_label = datetime.datetime.now(),#Optional - Absence means 'no upper bound'
+                               exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional - Absence means 'no lower bound'
+                               inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Optional - Absence means 'no upper bound'
                                content_bindings = [t.CB_STIX_XML_10])#Optional - defaults to accepting all content bindings
 
 message_tests(poll_request1)
@@ -167,18 +156,18 @@ stix_etree = etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http:
 xml_content_block1 = tm.ContentBlock(content_binding = t.CB_STIX_XML_10,#Required
                                      content = stix_etree,#Required. Can be etree or string
                                      padding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',#Optional
-                                     timestamp_label = datetime.datetime.now())#Optional
+                                     timestamp_label = datetime.datetime.now(tzutc()))#Optional
 
 string_content_block1 = tm.ContentBlock(content_binding = 'string',#Required
                                         content = 'Sample content',#Required
                                         padding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',#Optional
-                                        timestamp_label = datetime.datetime.now())#Optional
+                                        timestamp_label = datetime.datetime.now(tzutc()))#Optional
 
 poll_response1 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
                                  in_response_to = tm.generate_message_id(),#Required - this should be the ID of the corresponding request
                                  feed_name = 'FeedName',#Required
-                                 inclusive_end_timestamp_label = datetime.datetime.now(),#Required
-                                 inclusive_begin_timestamp_label = datetime.datetime.now(),#Optional
+                                 inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Required
+                                 inclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional
                                  subscription_id = 'SubsId001',#Optional
                                  message = 'This is a message.',#Optional
                                  content_blocks = [xml_content_block1])#Optional
@@ -188,8 +177,8 @@ message_tests(poll_response1)
 poll_response2 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
                                  in_response_to = tm.generate_message_id(),#Required - this should be the ID of the corresponding request
                                  feed_name = 'FeedName',#Required
-                                 inclusive_end_timestamp_label = datetime.datetime.now(),#Required
-                                 inclusive_begin_timestamp_label = datetime.datetime.now(),#Optional
+                                 inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Required
+                                 inclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional
                                  subscription_id = 'SubsId001',#Optional
                                  message = 'This is a message.',#Optional
                                  content_blocks = [string_content_block1])#Optional
@@ -197,12 +186,6 @@ poll_response2 = tm.PollResponse(message_id = tm.generate_message_id(),#Required
 message_tests(poll_response2)
 
 ## Status Message
-status_message_kwargs = {}
-status_message_kwargs['message_id'] = tm.generate_message_id()
-status_message_kwargs['in_response_to'] = tm.generate_message_id()
-status_message_kwargs['status_type'] = tm.ST_SUCCESS
-status_message_kwargs['status_detail'] = 'Real info should go here!'
-status_message_kwargs['message'] = 'This is a message.'
 
 status_message1 = tm.StatusMessage(message_id = tm.generate_message_id(),#Required
                                    in_response_to = tm.generate_message_id(),#Required. Should be the ID of the corresponding request
@@ -216,8 +199,8 @@ message_tests(status_message1)
 
 subscription_information1 = tm.InboxMessage.SubscriptionInformation(feed_name = 'SomeFeedName',#Required
                                                                     subscription_id = 'SubsId021',#Required
-                                                                    inclusive_begin_timestamp_label = datetime.datetime.now(),#Optional - Absence means 'no lower bound'
-                                                                    inclusive_end_timestamp_label = datetime.datetime.now())#Optional - Absence means 'no upper bound'
+                                                                    inclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional - Absence means 'no lower bound'
+                                                                    inclusive_end_timestamp_label = datetime.datetime.now(tzutc()))#Optional - Absence means 'no upper bound'
 
 inbox_message1 = tm.InboxMessage(message_id = tm.generate_message_id(),#Required
                                  message = 'This is a message.',#Optional
@@ -254,21 +237,9 @@ poll_instance1 = tm.ManageFeedSubscriptionResponse.PollInstance(poll_protocol = 
                                                                 poll_address = 'http://example.com/poll',#Required
                                                                 poll_message_bindings = [t.VID_TAXII_XML_10])#Required
 
-subscription_instance_kwargs = {}
-subscription_instance_kwargs['subscription_id'] = 'SubsId005'
-subscription_instance_kwargs['delivery_parameters'] = [delivery_parameters1]
-subscription_instance_kwargs['poll_instances'] = [poll_instance1]
-
 subscription_instance1 = tm.ManageFeedSubscriptionResponse.SubscriptionInstance(subscription_id = 'SubsId234',#required
                                                                                 delivery_parameters = [delivery_parameters1],#Required if message is responding to a status action. Optional otherwise
                                                                                 poll_instances = [poll_instance1])#Required if action was polling subscription. Optional otherwise
-
-manage_feed_subscription_response_kwargs = {}
-manage_feed_subscription_response_kwargs['message_id'] = tm.generate_message_id()
-manage_feed_subscription_response_kwargs['in_response_to'] = tm.generate_message_id()
-manage_feed_subscription_response_kwargs['feed_name'] = 'Feed001'
-manage_feed_subscription_response_kwargs['message'] = 'This is a message.'
-manage_feed_subscription_response_kwargs['subscription_instances'] = [subscription_instance1]
 
 manage_feed_subscription_response1 = tm.ManageFeedSubscriptionResponse(message_id = tm.generate_message_id(),#Required
                                                                        in_response_to = tm.generate_message_id(),#Required - Should be the ID of the corresponding request
