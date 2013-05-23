@@ -199,11 +199,14 @@ class BaseNonMessage(object):
         return not self.__eq__(other, debug)
 
 class DeliveryParameters(BaseNonMessage):
-        def __init__(self, inbox_protocol=None, inbox_address=None, delivery_message_binding=None, content_bindings=[]):
+        def __init__(self, inbox_protocol=None, inbox_address=None, delivery_message_binding=None, content_bindings=None):
             self.inbox_protocol=inbox_protocol
             self.inbox_address=inbox_address
             self.delivery_message_binding = delivery_message_binding
-            self.content_bindings = content_bindings
+            if content_bindings is None:
+                self.content_bindings = []
+            else:
+                self.content_bindings = content_bindings
         
         def to_etree(self):
             xml = etree.Element('{%s}Push_Parameters' % ns_map['taxii'])
@@ -288,10 +291,13 @@ class DeliveryParameters(BaseNonMessage):
 #Subclass containing subclass-specific information
 class TAXIIMessage(BaseNonMessage):
     message_type = 'TAXIIMessage'
-    def __init__(self, message_id, in_response_to=None, extended_headers={}):
+    def __init__(self, message_id, in_response_to=None, extended_headers=None):
         self.message_id = message_id
         self.in_response_to = in_response_to
-        self.extended_headers = extended_headers
+        if extended_headers is None:
+            self.extended_headers = {}
+        else:
+            self.extended_headers = extended_headers
     
     #Creates the base etree for the TAXII Message. Message-specific constructs must be added
     #by each Message class. In general, when converting to XML,
@@ -510,9 +516,12 @@ class DiscoveryRequest(TAXIIMessage):
 
 class DiscoveryResponse(TAXIIMessage):
     message_type = MSG_DISCOVERY_RESPONSE
-    def __init__(self, message_id, in_response_to, extended_headers={}, service_instances=[]):
+    def __init__(self, message_id, in_response_to, extended_headers=None, service_instances=None):
         super(DiscoveryResponse, self).__init__(message_id, in_response_to, extended_headers)
-        self.service_instances = service_instances
+        if service_instances is None:
+            self.service_instances = []
+        else:
+            self.service_instances = service_instances
     
     def to_etree(self):
         xml = super(DiscoveryResponse, self).to_etree()
@@ -566,13 +575,16 @@ class DiscoveryResponse(TAXIIMessage):
         return msg
     
     class ServiceInstance(BaseNonMessage):
-        def __init__(self, service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content=[], available=None, message=None):
+        def __init__(self, service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content=None, available=None, message=None):
             self.service_type = service_type
             self.services_version = services_version
             self.protocol_binding = protocol_binding
             self.service_address = service_address
             self.message_bindings = message_bindings
-            self.inbox_service_accepted_content = inbox_service_accepted_content
+            if inbox_service_accepted_content is None:
+                self.inbox_service_accepted_content = []
+            else:
+                self.inbox_service_accepted_content = inbox_service_accepted_content
             self.available = available
             self.message = message
         
@@ -669,9 +681,12 @@ class FeedInformationRequest(TAXIIMessage):
 
 class FeedInformationResponse(TAXIIMessage):
     message_type = MSG_FEED_INFORMATION_RESPONSE
-    def __init__(self, message_id, in_response_to, extended_headers={}, feed_informations=[]):
+    def __init__(self, message_id, in_response_to, extended_headers=None, feed_informations=None):
         super(FeedInformationResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
-        self.feed_informations = feed_informations
+        if feed_informations is None:
+            self.feed_informations = []
+        else:
+            self.feed_informations = feed_informations
     
     def to_etree(self):
         xml = super(FeedInformationResponse, self).to_etree()
@@ -718,14 +733,25 @@ class FeedInformationResponse(TAXIIMessage):
         return msg
     
     class FeedInformation(BaseNonMessage):
-        def __init__(self, feed_name, feed_description, supported_contents, available=None, push_methods=[], polling_service_instances=[], subscription_methods=[]):
+        def __init__(self, feed_name, feed_description, supported_contents, available=None, push_methods=None, polling_service_instances=None, subscription_methods=None):
             self.feed_name = feed_name
             self.available = available
             self.feed_description = feed_description
             self.supported_contents = supported_contents
-            self.push_methods = push_methods
-            self.polling_service_instances = polling_service_instances
-            self.subscription_methods = subscription_methods
+            if push_methods is None:
+                self.push_methods = []
+            else:
+                self.push_methods = push_methods
+            
+            if polling_service_instances is None:
+                self.polling_service_instances = []
+            else:
+                self.polling_service_instances = polling_service_instances
+            
+            if subscription_methods is None:
+                self.subscription_methods = []
+            else:
+                self.subscription_methods = subscription_methods
         
         def to_etree(self):
             f = etree.Element('{%s}Feed' % ns_map['taxii'])
@@ -1001,12 +1027,12 @@ class PollRequest(TAXIIMessage):
     def __init__(self, 
                  message_id,
                  in_response_to=None,
-                 extended_headers={},
+                 extended_headers=None,
                  feed_name=None,
                  exclusive_begin_timestamp_label=None,
                  inclusive_end_timestamp_label=None,
                  subscription_id=None,
-                 content_bindings=[]
+                 content_bindings=None
                  ):
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
@@ -1019,7 +1045,10 @@ class PollRequest(TAXIIMessage):
                 raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
         self.subscription_id = subscription_id
-        self.content_bindings = content_bindings
+        if content_bindings is None:
+            self.content_bindings = []
+        else:
+            self.content_bindings = content_bindings
     
     def to_etree(self):
         xml = super(PollRequest, self).to_etree()
@@ -1126,13 +1155,13 @@ class PollResponse(TAXIIMessage):
     def __init__(self, 
                  message_id, 
                  in_response_to,
-                 extended_headers={},
+                 extended_headers=None,
                  feed_name = None,
                  inclusive_begin_timestamp_label = None,
                  inclusive_end_timestamp_label = None,
                  subscription_id = None,
                  message = None,
-                 content_blocks=[]
+                 content_blocks=None
                  ):
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.feed_name = feed_name
@@ -1146,7 +1175,10 @@ class PollResponse(TAXIIMessage):
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.subscription_id = subscription_id
         self.message = message
-        self.content_blocks = content_blocks
+        if content_blocks is None:
+            self.content_blocks = []
+        else:
+            self.content_blocks = content_blocks
     
     def to_etree(self):
         xml = super(PollResponse, self).to_etree()
@@ -1255,7 +1287,7 @@ class PollResponse(TAXIIMessage):
 class StatusMessage(TAXIIMessage):
     message_type = MSG_STATUS_MESSAGE
     
-    def __init__(self, message_id, in_response_to, extended_headers={}, status_type=None, status_detail=None, message=None):
+    def __init__(self, message_id, in_response_to, extended_headers=None, status_type=None, status_detail=None, message=None):
         super(StatusMessage, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.status_type = status_type
         self.status_detail = status_detail
@@ -1325,11 +1357,14 @@ class StatusMessage(TAXIIMessage):
 class InboxMessage(TAXIIMessage):
     message_type = MSG_INBOX_MESSAGE
     
-    def __init__(self, message_id, in_response_to=None, extended_headers={}, message=None, subscription_information=None, content_blocks=[]):
+    def __init__(self, message_id, in_response_to=None, extended_headers=None, message=None, subscription_information=None, content_blocks=None):
         super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
-        self.content_blocks = content_blocks
         self.subscription_information = subscription_information
         self.message = message
+        if content_blocks is None:
+            self.content_blocks = []
+        else:
+            self.content_blocks = content_blocks
     
     def to_etree(self):
         xml = super(InboxMessage, self).to_etree()
@@ -1478,7 +1513,7 @@ class InboxMessage(TAXIIMessage):
 class ManageFeedSubscriptionRequest(TAXIIMessage):
     message_type = MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
     
-    def __init__(self, message_id, in_response_to=None, extended_headers={}, feed_name=None, action=None, subscription_id=None, delivery_parameters=None):
+    def __init__(self, message_id, in_response_to=None, extended_headers=None, feed_name=None, action=None, subscription_id=None, delivery_parameters=None):
         super(ManageFeedSubscriptionRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
         self.action = action
@@ -1528,11 +1563,14 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 class ManageFeedSubscriptionResponse(TAXIIMessage):
     message_type = MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
     
-    def __init__(self, message_id, in_response_to, extended_headers={}, feed_name=None, message=None, subscription_instances=[]):
+    def __init__(self, message_id, in_response_to, extended_headers=None, feed_name=None, message=None, subscription_instances=None):
         super(ManageFeedSubscriptionResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.feed_name = feed_name
         self.message = message
-        self.subscription_instances = subscription_instances
+        if subscription_instances is None:
+            self.subscription_instances = []
+        else:
+            self.subscription_instances = subscription_instances
     
     def to_etree(self):
         xml = super(ManageFeedSubscriptionResponse, self).to_etree()
@@ -1607,10 +1645,17 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
     
     class SubscriptionInstance(BaseNonMessage):
         
-        def __init__(self, subscription_id, delivery_parameters=[], poll_instances=[]):
+        def __init__(self, subscription_id, delivery_parameters=None, poll_instances=None):
             self.subscription_id = subscription_id
-            self.delivery_parameters = delivery_parameters
-            self.poll_instances = poll_instances
+            if delivery_parameters is None:
+                self.delivery_parameters = []
+            else:
+                self.delivery_parameters = delivery_parameters
+            
+            if poll_instances is None:
+                self.poll_instances = []
+            else:
+                self.poll_instances = poll_instances
         
         def to_etree(self):
             xml = etree.Element('{%s}Subscription' % ns_map['taxii'])
@@ -1679,10 +1724,13 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
     
     class PollInstance:
         
-        def __init__(self, poll_protocol, poll_address, poll_message_bindings=[]):
+        def __init__(self, poll_protocol, poll_address, poll_message_bindings=None):
             self.poll_protocol = poll_protocol
             self.poll_address = poll_address
-            self.poll_message_bindings = poll_message_bindings
+            if poll_message_bindings is None:
+                self.poll_message_bindings = []
+            else:
+                self.poll_message_bindings = poll_message_bindings
         
         def to_etree(self):
             xml = etree.Element('{%s}Poll_Instance' % ns_map['taxii'])
