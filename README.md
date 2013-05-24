@@ -13,7 +13,7 @@ to make libtaxii intuitive both to Python developers and XML developers.
 Documentation is available here: https://github.com/TAXIIProject/libtaxii/wiki/Documentation
 
 
-If your questions is not answered in the documentation (and it very well may not be, documentation is an ongoing process),
+If your question is not answered in the documentation (and it very well may not be, documentation is an ongoing process),
 you are encouraged to post your question to the TAXII discussion list (http://taxii.mitre.org/community/registration.html).
 
 ## Versioning
