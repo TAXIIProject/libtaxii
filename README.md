@@ -31,8 +31,7 @@ or signing up for the TAXII discussion list and posting your questions
 
 ## News / Updates
 
-This information can now be found on the following web page: https://github.com/TAXIIProject/libtaxii/wiki/Release-Notes
-
-More information can be found at https://github.com/TAXIIProject.
+General information can now be found here: https://github.com/TAXIIProject/libtaxii/wiki
+Release notes can now be found here: https://github.com/TAXIIProject/libtaxii/wiki/Release-Notes
 
 For license information, see the LICENSE.txt file.
