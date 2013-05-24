@@ -10,7 +10,9 @@ and to customary Python practices. In places where these conflict, and the goal 
 to make libtaxii intuitive both to Python developers and XML developers.
 
 ## Getting Started
-Documentation is availale here: https://github.com/TAXIIProject/libtaxii/wiki/Documentation
+Documentation is available here: https://github.com/TAXIIProject/libtaxii/wiki/Documentation
+
+
 If your questions is not answered in the documentation (and it very well may not be, documentation is an ongoing process),
 you are encouraged to post your question to the TAXII discussion list (http://taxii.mitre.org/community/registration.html).
 
@@ -32,6 +34,8 @@ or signing up for the TAXII discussion list and posting your questions
 ## News / Updates
 
 General information can now be found here: https://github.com/TAXIIProject/libtaxii/wiki
+
+
 Release notes can now be found here: https://github.com/TAXIIProject/libtaxii/wiki/Release-Notes
 
 For license information, see the LICENSE.txt file.
