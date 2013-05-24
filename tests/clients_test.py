@@ -39,11 +39,10 @@ poll_request1 = tm.PollRequest(message_id = tm.generate_message_id(),
 proxy_host = 'proxyname'
 proxy_port = 80
 service_url = 'http://example.iana.org/servicepath/'
-
 http_response = client.callTaxiiService(proxy_host, service_url, t.VID_TAXII_XML_10, poll_request1.to_xml(), port=proxy_port)
 
 #Call without a proxy
-#http_response = client.callTaxiiService('google.com', '', t.VID_TAXII_XML_10, poll_request1.to_xml())
+#http_response = client.callTaxiiService('example.com', '/servicepath/', t.VID_TAXII_XML_10, poll_request1.to_xml())
 
 taxii_message = t.get_message_from_http_response(http_response,
                                                  poll_request1.message_id)
