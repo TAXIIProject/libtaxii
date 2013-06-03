@@ -19,7 +19,7 @@ If your question is not answered in the documentation (and it very well may not 
 you are encouraged to post your question to the TAXII discussion list (http://taxii.mitre.org/community/registration.html).
 
 ## Layout
-The libtaxii project has the following layout:
+The libtaxii project has the following layout:  
 libtaxii/ - A folder containing the libtaxii library. The `import libtaxii` statement imports this folder.  
 tests/ - A folder containing libtaxii tests.  
 xsd/ - A folder containing XML Schemas used by libtaxii  
