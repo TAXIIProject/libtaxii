@@ -19,11 +19,12 @@ class HttpClient:
     AUTH_NONE = 0#Do not offer any authentication credentials to the server
     AUTH_BASIC = 1#Offer HTTP Basic authentication credentials to the server
     AUTH_CERT = 2#Offer certificate based authentication credentials to the server
-
+	
     def __init__(self):
         self.auth_type = HttpClient.AUTH_NONE
         self.auth_credentials = {}
         self.use_https = False
+		self.do_connect = False
 
     #Set the authentication type. Must be one of AUTH_NONE, AUTH_BASIC, or AUTH_CERT
     def setAuthType(self, auth_type):
@@ -39,14 +40,23 @@ class HttpClient:
             self.auth_type = HttpClient.AUTH_CERT
         else:
             raise Exception('Invalid auth_type specified. Must be one of HttpClient AUTH_NONE, AUTH_BASIC, or AUTH_CERT')
-
+	
+	#If this is set to true, the web request will involve a connect() command
+	def setDoConnect(self, bool):
+		if bool == True:
+			self.do_connect = True
+		elif bool == Flase:
+			self.do_connect = False
+		else:
+			raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
+	
     def setUseHttps(self, bool):
         if bool == True:
             self.use_https = True
         elif bool == False:
             self.use_https = False
         else:
-            raise('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
+            raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
 
     #This sets the authentication credentials to be used later when making a request.
     #note that it is possible to pass in one dict containing all credentials and swap between
@@ -110,6 +120,9 @@ class HttpClient:
         header_dict['Content-Type'] = 'application/xml'
         header_dict['X-TAXII-Content-Type'] = message_binding
         
+		if self.do_connect:
+			conn.connect()
+		
         req = conn.request('POST', path, post_data, headers=header_dict)
         response = conn.getresponse()
         
