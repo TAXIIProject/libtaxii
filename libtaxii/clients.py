@@ -19,12 +19,13 @@ class HttpClient:
     AUTH_NONE = 0#Do not offer any authentication credentials to the server
     AUTH_BASIC = 1#Offer HTTP Basic authentication credentials to the server
     AUTH_CERT = 2#Offer certificate based authentication credentials to the server
-	
+    
     def __init__(self):
         self.auth_type = HttpClient.AUTH_NONE
         self.auth_credentials = {}
         self.use_https = False
-		self.do_connect = False
+        self.proxy_host = None
+        self.proxy_port = None
 
     #Set the authentication type. Must be one of AUTH_NONE, AUTH_BASIC, or AUTH_CERT
     def setAuthType(self, auth_type):
@@ -40,16 +41,13 @@ class HttpClient:
             self.auth_type = HttpClient.AUTH_CERT
         else:
             raise Exception('Invalid auth_type specified. Must be one of HttpClient AUTH_NONE, AUTH_BASIC, or AUTH_CERT')
-	
-	#If this is set to true, the web request will involve a connect() command
-	def setDoConnect(self, bool):
-		if bool == True:
-			self.do_connect = True
-		elif bool == Flase:
-			self.do_connect = False
-		else:
-			raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
-	
+    
+    #Set the proxy to tell libtaxii to use a proxy when making a connection.
+    #Set proxy_host to None to tell libtaxii to not use a proxy
+    def setProxy(self, proxy_host=None, proxy_port=80):
+        self.proxy_host = proxy_host
+        self.proxy_port = proxy_port
+    
     def setUseHttps(self, bool):
         if bool == True:
             self.use_https = True
@@ -91,6 +89,14 @@ class HttpClient:
         header_dict = {'Content-Type': 'application/xml',
                        'User-Agent': 'libtaxii.httpclient'}
         
+        if self.proxy_host is not None:#Using a proxy, need to change around the params
+            if self.use_https:
+                path = 'https://' + host + path
+            else:
+                path = 'http://' + host + path
+            
+            host = self.proxy_host
+        
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTPS_10
             if self.auth_type == HttpClient.AUTH_NONE:
@@ -120,9 +126,11 @@ class HttpClient:
         header_dict['Content-Type'] = 'application/xml'
         header_dict['X-TAXII-Content-Type'] = message_binding
         
-		if self.do_connect:
-			conn.connect()
-		
+        print 'host = %s; path = %s;' % (host, path)
+        
+        if self.proxy_host is not None:#Using a proxy
+            conn.connect()
+        
         req = conn.request('POST', path, post_data, headers=header_dict)
         response = conn.getresponse()
         
