@@ -1,6 +1,5 @@
 libtaxii requires:
     - lxml>=2.3.2 (https://pypi.python.org/pypi/lxml)
-    - M2Crypto >=0.21.1 (https://pypi.python.org/pypi/M2Crypto)
 
 libtaxii install
 ----------------
