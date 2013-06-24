@@ -126,8 +126,6 @@ class HttpClient:
         header_dict['Content-Type'] = 'application/xml'
         header_dict['X-TAXII-Content-Type'] = message_binding
         
-        print 'host = %s; path = %s;' % (host, path)
-        
         if self.proxy_host is not None:#Using a proxy
             conn.connect()
         
