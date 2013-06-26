@@ -37,10 +37,8 @@ CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
 # If the X-TAXII-Content-Type header is present, but indicates an unsupported 
 # Message Binding, this function will raise a ValueError.
 def get_message_from_http_response(http_response, in_response_to):
-    #print http_response.__class__.__name__
     if isinstance(http_response, httplib.HTTPResponse):
         return get_message_from_httplib_http_response(http_response, in_response_to)
-    #elif isinstance(http_response, HTTPError)
     elif isinstance(http_response, urllib.addinfourl):
         return get_message_from_urllib_addinfourl(http_response, in_response_to)
     else:
