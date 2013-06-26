@@ -82,7 +82,7 @@ class HttpClient:
             self.auth_credentials = auth_credentials_dict
     
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
-        return self.callTaxiiService2(host, path, message_binding, post_data, port, get_params_dict)
+        
         if port is None:#If the caller did not specify a port, use the default
             if self.use_https:
                 port = 443
@@ -92,10 +92,8 @@ class HttpClient:
         if get_params_dict is not None:#Add the query params to the URL
             path += '?' + urllib.urlencode(get_params_dict)
         
-        header_dict = {'Content-Type':         'application/xml',
-                       'User-Agent':           'libtaxii.httpclient',
-                       'Content-Type':         'application/xml',
-                       'X-TAXII-Content-Type': message_binding}
+        header_dict = {'Content-Type': 'application/xml',
+                       'User-Agent': 'libtaxii.httpclient'}
         
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTPS_10
@@ -122,6 +120,9 @@ class HttpClient:
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
                 conn = httplib.HTTPConnection(host, port, key_file, cert_file)
+        
+        header_dict['Content-Type'] = 'application/xml'
+        header_dict['X-TAXII-Content-Type'] = message_binding
         
         req = conn.request('POST', path, post_data, headers=header_dict)
         response = conn.getresponse()
