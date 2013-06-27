@@ -68,7 +68,7 @@ def validate_xml(xml_string):
     
     etree_xml = etree.parse(f)
     package_dir, package_filename = os.path.split(__file__)
-    schema_file = os.path.join(package_dir, "../xsd", "TAXII_XMLMessageBinding_Schema.xsd")
+    schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
     taxii_schema_doc = etree.parse(schema_file)
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
