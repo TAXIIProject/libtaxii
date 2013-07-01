@@ -20,6 +20,7 @@ class HttpClient:
     AUTH_NONE = 0#Do not offer any authentication credentials to the server
     AUTH_BASIC = 1#Offer HTTP Basic authentication credentials to the server
     AUTH_CERT = 2#Offer certificate based authentication credentials to the server
+    AUTH_CERT_BASIC = 3#Offer certificate based auth and HTTP Basic credentials
     
     #Proxy Constants
     PROXY_HTTP = 'http'
@@ -44,6 +45,8 @@ class HttpClient:
             self.auth_type = HttpClient.AUTH_BASIC
         elif auth_type == HttpClient.AUTH_CERT:
             self.auth_type = HttpClient.AUTH_CERT
+        elif auth_type == HttpClient.AUTH_CERT_BASIC:
+            self.auth_type = HttpClient.AUTH_CERT_BASIC
         else:
             raise Exception('Invalid auth_type specified. Must be one of HttpClient AUTH_NONE, AUTH_BASIC, or AUTH_CERT')
     
@@ -66,20 +69,31 @@ class HttpClient:
     #note that it is possible to pass in one dict containing all credentials and swap between
     #auth types.
     def setAuthCredentials(self, auth_credentials_dict):
+        
         if self.auth_type == HttpClient.AUTH_NONE:
-            self.auth_credentials = auth_credentials_dict
+            req_fields = []
+            #self.auth_credentials = auth_credentials_dict
         elif self.auth_type == HttpClient.AUTH_BASIC:
-            if 'username' not in auth_credentials_dict:
-                raise Exception('Invalid auth credentials. Field \'username\' is not present')
-            if 'password' not in auth_credentials_dict:
-                raise Exception('Invalid auth credentials. Field \'password\' is not present')
-            self.auth_credentials = auth_credentials_dict
+            req_fields = ['username','password']
+            #if 'username' not in auth_credentials_dict:
+            #    raise Exception('Invalid auth credentials. Field \'username\' is not present')
+            #if 'password' not in auth_credentials_dict:
+            #    raise Exception('Invalid auth credentials. Field \'password\' is not present')
+            #self.auth_credentials = auth_credentials_dict
         elif self.auth_type == HttpClient.AUTH_CERT:
-            if 'key_file' not in auth_credentials_dict:
-                raise Exception('Invalid auth credentials. Field \'key_file\' is not present')
-            if 'cert_file' not in auth_credentials_dict:
-                raise Exception('Invalid auth credentials. Field \'cert_file\' is not present')
-            self.auth_credentials = auth_credentials_dict
+            req_fields = ['key_file','cert_file']
+            #if 'key_file' not in auth_credentials_dict:
+            #    raise Exception('Invalid auth credentials. Field \'key_file\' is not present')
+            #if 'cert_file' not in auth_credentials_dict:
+            #    raise Exception('Invalid auth credentials. Field \'cert_file\' is not present')
+            #self.auth_credentials = auth_credentials_dict
+        elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
+            req_fields = ['key_file','cert_file','username','password']
+        
+        for k in req_fields:
+            if k not in auth_credentials_dict:
+                raise Exception('Invalid auth credentials. Field %s is not present' % k)
+        self.auth_credentials = auth_credentials_dict
     
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
         
@@ -94,6 +108,9 @@ class HttpClient:
         
         header_dict = {'Content-Type': 'application/xml',
                        'User-Agent': 'libtaxii.httpclient'}
+        
+        if self.auth_type == HttpClient.AUTH_CERT_BASIC:
+                raise Exception('AuthType AUTH_CERT_BASIC not supported by callTaxiiService. Use callTaxiiService2.')
         
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTPS_10
@@ -153,6 +170,12 @@ class HttpClient:
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
+            elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
+                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
+                header_dict['Authorization'] = 'Basic %s' % base64string
+                k = self.auth_credentials['key_file']
+                c = self.auth_credentials['cert_file']
+                handler_list.append(HTTPSClientAuthHandler(k, c))
         else:#Not using https
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTP_10
             
@@ -165,6 +188,12 @@ class HttpClient:
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPClientAuthHandler(k, c))
+            elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
+                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
+                header_dict['Authorization'] = 'Basic %s' % base64string
+                k = self.auth_credentials['key_file']
+                c = self.auth_credentials['cert_file']
+                handler_list.append(HTTPSClientAuthHandler(k, c))
             handler_list.append(urllib2.HTTPHandler())
         
         if self.proxy_string is not None:
