@@ -10,7 +10,7 @@
 import libtaxii.messages as tm
 import libtaxii.clients as tc
 
-import httplib, urllib
+import httplib, urllib, urllib2
 
 #TAXII Version IDs
 VID_TAXII_SERVICES_10 = 'urn:taxii.mitre.org:services:1.0'
@@ -39,11 +39,27 @@ CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
 def get_message_from_http_response(http_response, in_response_to):
     if isinstance(http_response, httplib.HTTPResponse):
         return get_message_from_httplib_http_response(http_response, in_response_to)
+    elif isinstance(http_response, urllib2.HTTPError):
+        return get_message_from_urllib2_httperror(http_response, in_response_to)
     elif isinstance(http_response, urllib.addinfourl):
         return get_message_from_urllib_addinfourl(http_response, in_response_to)
     else:
         raise ValueError('Unsupported response type: %s.' % http_response.__class__.__name__)
 
+
+def get_message_from_urllib2_httperror(http_response, in_response_to):
+    taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
+    response_message = http_response.read()
+    
+    if taxii_content_type is None:
+        m = str(http_response.info()) + '\r\n' + http_response.read()
+        return tm.StatusMessage(message_id = '0', in_response_to = in_response_to, status_type = tm.ST_FAILURE, message = m)
+    elif taxii_content_type == VID_TAXII_XML_10:#It's a TAXII XML 1.0 message
+        return tm.get_message_from_xml(response_message)
+    else:
+        raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type) 
+        
+    return None
 
 def get_message_from_urllib_addinfourl(http_response, in_response_to):
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
