@@ -52,7 +52,7 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
     response_message = http_response.read()
     
     if taxii_content_type is None:
-        m = str(http_response.info()) + '\r\n' + http_response.read()
+        m = str(http_response.info()) + '\r\n' + response_message
         return tm.StatusMessage(message_id = '0', in_response_to = in_response_to, status_type = tm.ST_FAILURE, message = m)
     elif taxii_content_type == VID_TAXII_XML_10:#It's a TAXII XML 1.0 message
         return tm.get_message_from_xml(response_message)
