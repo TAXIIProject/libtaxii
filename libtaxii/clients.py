@@ -14,6 +14,7 @@ import base64
 import uuid
 import libtaxii
 
+
 class HttpClient:
 
     #Constants for authentication types
@@ -49,7 +50,15 @@ class HttpClient:
             self.auth_type = HttpClient.AUTH_CERT_BASIC
         else:
             raise Exception('Invalid auth_type specified. Must be one of HttpClient AUTH_NONE, AUTH_BASIC, or AUTH_CERT')
-    
+
+    @property
+    def basic_auth_header(self):
+        """Returns a Base64-encoded HTTP Basic Authorization Header."""
+
+        return "Basic " + base64.b64encode('%s:%s' % (
+                                           self.auth_credentials['username'],
+                                           self.auth_credentials['password']))
+
     #Set the proxy to tell libtaxii to use a proxy when making a connection.
     #Set proxy_string to None to tell libtaxii to not use a proxy
     #Proxy string should be something like 'http://proxy.example.com:80'
@@ -117,8 +126,7 @@ class HttpClient:
             if self.auth_type == HttpClient.AUTH_NONE:
                 conn = httplib.HTTPSConnection(host, port)
             elif self.auth_type == HttpClient.AUTH_BASIC:
-                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
-                header_dict['Authorization'] = 'Basic %s' % base64string
+                header_dict['Authorization'] = self.basic_auth_header
                 conn = httplib.HTTPSConnection(host, port)
             else:#AUTH_CERT
                 key_file = self.auth_credentials['key_file']
@@ -130,8 +138,7 @@ class HttpClient:
                 conn = httplib.HTTPConnection(host, port)
             #TODO: Consider deleting because this is a terrible idea
             elif self.auth_type == HttpClient.AUTH_BASIC:#Sending credentials in cleartext.. tsk tsk
-                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
-                header_dict['Authorization'] = 'Basic %s' % base64string
+                header_dict['Authorization'] = self.basic_auth_header
                 conn = httplib.HTTPConnection(host, port)
             else:#AUTH_CERT
                 key_file = self.auth_credentials['key_file']
@@ -164,15 +171,13 @@ class HttpClient:
             if self.auth_type == HttpClient.AUTH_NONE:
                 handler_list.append(urllib2.HTTPSHandler())
             elif self.auth_type == HttpClient.AUTH_BASIC:
-                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
-                header_dict['Authorization'] = 'Basic %s' % base64string
+                header_dict['Authorization'] = self.basic_auth_header
             elif self.auth_type == HttpClient.AUTH_CERT:
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
             elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
-                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
-                header_dict['Authorization'] = 'Basic %s' % base64string
+                header_dict['Authorization'] = self.basic_auth_header
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
@@ -182,15 +187,13 @@ class HttpClient:
             if self.auth_type == HttpClient.AUTH_NONE:
                 handler_list.append(urllib2.HTTPHandler())
             elif self.auth_type == HttpClient.AUTH_BASIC:
-                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
-                header_dict['Authorization'] = 'Basic %s' % base64string
+                header_dict['Authorization'] = self.basic_auth_header
             elif self.auth_type == HttpClient.AUTH_CERT:
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPClientAuthHandler(k, c))
             elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
-                base64string = base64.encodestring('%s:%s' % (self.auth_credentials['username'], self.auth_credentials['password']))
-                header_dict['Authorization'] = 'Basic %s' % base64string
+                header_dict['Authorization'] = self.basic_auth_header
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
