@@ -81,21 +81,10 @@ class HttpClient:
         
         if self.auth_type == HttpClient.AUTH_NONE:
             req_fields = []
-            #self.auth_credentials = auth_credentials_dict
         elif self.auth_type == HttpClient.AUTH_BASIC:
             req_fields = ['username','password']
-            #if 'username' not in auth_credentials_dict:
-            #    raise Exception('Invalid auth credentials. Field \'username\' is not present')
-            #if 'password' not in auth_credentials_dict:
-            #    raise Exception('Invalid auth credentials. Field \'password\' is not present')
-            #self.auth_credentials = auth_credentials_dict
         elif self.auth_type == HttpClient.AUTH_CERT:
             req_fields = ['key_file','cert_file']
-            #if 'key_file' not in auth_credentials_dict:
-            #    raise Exception('Invalid auth credentials. Field \'key_file\' is not present')
-            #if 'cert_file' not in auth_credentials_dict:
-            #    raise Exception('Invalid auth credentials. Field \'cert_file\' is not present')
-            #self.auth_credentials = auth_credentials_dict
         elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
             req_fields = ['key_file','cert_file','username','password']
         
