@@ -60,7 +60,8 @@ class HttpClient:
                                            self.auth_credentials['password']))
 
     #Set the proxy to tell libtaxii to use a proxy when making a connection.
-    #Set proxy_string to None to tell libtaxii to not use a proxy
+    #Set proxy_string to None to tell libtaxii to use the system proxy
+    #Set proxy_string to 'noproxy' to tell libtaxii to not use any proxy (this includes ignoring the system proxy setting)
     #Proxy string should be something like 'http://proxy.example.com:80'
     def setProxy(self, proxy_string=None, proxy_type=PROXY_HTTP):
         self.proxy_string = proxy_string
@@ -189,7 +190,11 @@ class HttpClient:
             handler_list.append(urllib2.HTTPHandler())
         
         if self.proxy_string is not None:
-            handler_list.append(urllib2.ProxyHandler({self.proxy_type: self.proxy_string}))
+            if self.proxy_string == 'noproxy':
+                #Dont use any proxy, including the system-specified proxy
+                handler_list.append(urllib2.ProxyHandler({}))
+            else:#Use a specific proxy
+                handler_list.append(urllib2.ProxyHandler({self.proxy_type: self.proxy_string}))
         
         opener = urllib2.build_opener(*handler_list)
         urllib2.install_opener(opener)
