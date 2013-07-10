@@ -18,10 +18,10 @@ import libtaxii
 class HttpClient:
 
     #Constants for authentication types
-    AUTH_NONE = 0#Do not offer any authentication credentials to the server
-    AUTH_BASIC = 1#Offer HTTP Basic authentication credentials to the server
-    AUTH_CERT = 2#Offer certificate based authentication credentials to the server
-    AUTH_CERT_BASIC = 3#Offer certificate based auth and HTTP Basic credentials
+    AUTH_NONE = 0  # Do not offer any authentication credentials to the server
+    AUTH_BASIC = 1  # Offer HTTP Basic authentication credentials to the server
+    AUTH_CERT = 2  # Offer certificate based authentication credentials to the server
+    AUTH_CERT_BASIC = 3  # Offer certificate based auth and HTTP Basic credentials
 
     #Proxy Constants
     PROXY_HTTP = 'http'
@@ -90,11 +90,11 @@ class HttpClient:
         if self.auth_type == HttpClient.AUTH_NONE:
             req_fields = []
         elif self.auth_type == HttpClient.AUTH_BASIC:
-            req_fields = ['username','password']
+            req_fields = ['username', 'password']
         elif self.auth_type == HttpClient.AUTH_CERT:
-            req_fields = ['key_file','cert_file']
+            req_fields = ['key_file', 'cert_file']
         elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
-            req_fields = ['key_file','cert_file','username','password']
+            req_fields = ['key_file', 'cert_file', 'username', 'password']
 
         for k in req_fields:
             if k not in auth_credentials_dict:
@@ -102,13 +102,13 @@ class HttpClient:
         self.auth_credentials = auth_credentials_dict
 
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
-        if port is None:#If the caller did not specify a port, use the default
+        if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:
                 port = 443
             else:
                 port = 80
 
-        if get_params_dict is not None:#Add the query params to the URL
+        if get_params_dict is not None:  # Add the query params to the URL
             path += '?' + urllib.urlencode(get_params_dict)
 
         header_dict = {'Content-Type': 'application/xml',
@@ -124,19 +124,19 @@ class HttpClient:
             elif self.auth_type == HttpClient.AUTH_BASIC:
                 header_dict['Authorization'] = self.basic_auth_header
                 conn = httplib.HTTPSConnection(host, port)
-            else:#AUTH_CERT
+            else:  # AUTH_CERT
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
                 conn = httplib.HTTPSConnection(host, port, key_file, cert_file)
-        else:#Not using https
+        else:  # Not using https
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTP_10
             if self.auth_type == HttpClient.AUTH_NONE:
                 conn = httplib.HTTPConnection(host, port)
             #TODO: Consider deleting because this is a terrible idea
-            elif self.auth_type == HttpClient.AUTH_BASIC:#Sending credentials in cleartext.. tsk tsk
+            elif self.auth_type == HttpClient.AUTH_BASIC:  # Sending credentials in cleartext.. tsk tsk
                 header_dict['Authorization'] = self.basic_auth_header
                 conn = httplib.HTTPConnection(host, port)
-            else:#AUTH_CERT
+            else:  # AUTH_CERT
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
                 conn = httplib.HTTPConnection(host, port, key_file, cert_file)
@@ -178,7 +178,7 @@ class HttpClient:
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
-        else:#Not using https
+        else:  # Not using https
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTP_10
 
             if self.auth_type == HttpClient.AUTH_NONE:
@@ -206,7 +206,7 @@ class HttpClient:
         opener = urllib2.build_opener(*handler_list)
         urllib2.install_opener(opener)
 
-        if port is None:#If the caller did not specify a port, use the default
+        if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:
                 port = 443
             else:
@@ -243,7 +243,7 @@ class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
         return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
 
-class HTTPClientAuthHandler(urllib2.HTTPSHandler):#TODO: Is this used / is this possible?
+class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
     def __init__(self, key, cert):
         urllib2.HTTPSHandler.__init__(self)
         self.key = key

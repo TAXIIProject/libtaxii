@@ -252,8 +252,8 @@ class DeliveryParameters(BaseNonMessage):
                 indicating which types of contents the Consumer requests to
                 receive for this TAXII  Data Feed
             """
-            self.inbox_protocol=inbox_protocol
-            self.inbox_address=inbox_address
+            self.inbox_protocol = inbox_protocol
+            self.inbox_address = inbox_address
             self.delivery_message_binding = delivery_message_binding
             if content_bindings is None:
                 self.content_bindings = []
@@ -300,7 +300,7 @@ class DeliveryParameters(BaseNonMessage):
             return d
 
         def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['inbox_protocol','address','deliver_message_binding'], debug):
+            if not self._checkPropertiesEq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
                 return False
 
             if set(self.content_bindings) != set(other.content_bindings):
@@ -372,7 +372,7 @@ class TAXIIMessage(BaseNonMessage):
         general, when converting to XML, subclasses should call this method
         first, then create their specific XML constructs.
         """
-        root_elt = etree.Element('{%s}%s' % (ns_map['taxii'], self.message_type), nsmap = ns_map)
+        root_elt = etree.Element('{%s}%s' % (ns_map['taxii'], self.message_type), nsmap=ns_map)
         root_elt.attrib['message_id'] = str(self.message_id)
 
         if self.in_response_to is not None:
@@ -415,7 +415,7 @@ class TAXIIMessage(BaseNonMessage):
         if not isinstance(other, TAXIIMessage):
             raise ValueError('Not comparing two TAXII Messages! (%s, %s)' % (self.__class__.__name__, other.__class__.__name__))
 
-        return self._checkPropertiesEq(other, ['message_type','message_id','in_response_to','extended_headers'], debug)
+        return self._checkPropertiesEq(other, ['message_type', 'message_id', 'in_response_to', 'extended_headers'], debug)
 
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
@@ -486,7 +486,7 @@ class TAXIIMessage(BaseNonMessage):
 class ContentBlock(BaseNonMessage):
     NAME = 'Content_Block'
 
-    def __init__(self, content_binding, content, timestamp_label = None, padding = None):
+    def __init__(self, content_binding, content, timestamp_label=None, padding=None):
         """Create a ContentBlock.
 
         Arguments:
@@ -524,13 +524,13 @@ class ContentBlock(BaseNonMessage):
         cb.text = self.content_binding
         c = etree.SubElement(block, '{%s}Content' % ns_map['taxii'])
 
-        if self.content.startswith('<'):#It might be XML
+        if self.content.startswith('<'):  # It might be XML
             try:
                 xml = etree.parse(StringIO.StringIO(self.content)).getroot()
                 c.append(xml)
             except:
                 c.text = self.content
-                pass#Keep calm and carry on
+                pass  # Keep calm and carry on
         else:
             c.text = self.content
 
@@ -548,7 +548,7 @@ class ContentBlock(BaseNonMessage):
         block = {}
         block['content_binding'] = self.content_binding
 
-        if isinstance(self.content, etree._Element):#For XML
+        if isinstance(self.content, etree._Element):  # For XML
             block['content'] = etree.tostring(self.content)
         else:
             block['content'] = self.content
@@ -562,7 +562,7 @@ class ContentBlock(BaseNonMessage):
         return block
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['content_binding','timestamp_label','padding'], debug):
+        if not self._checkPropertiesEq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
             return False
 
         #TODO: It's pretty hard to check and see if content is equal....
@@ -585,9 +585,9 @@ class ContentBlock(BaseNonMessage):
             kwargs['timestamp_label'] = _str2datetime(ts_string)
 
         content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)[0]
-        if len(content) == 0:#This has string content
+        if len(content) == 0:  # This has string content
             kwargs['content'] = content.text
-        else:#This has XML content
+        else:  # This has XML content
             kwargs['content'] = content[0]
 
         return ContentBlock(**kwargs)
@@ -651,7 +651,8 @@ class DiscoveryResponse(TAXIIMessage):
             return False
 
         if len(self.service_instances) != len(other.service_instances):
-            if debug: print 'service_instance lengths not equal: %s != %s' % (len(self.service_instances), len(other.service_instances))
+            if debug:
+                print 'service_instance lengths not equal: %s != %s' % (len(self.service_instances), len(other.service_instances))
             return False
 
         #Who knows if this is a good way to compare the service instances or not...
@@ -659,7 +660,7 @@ class DiscoveryResponse(TAXIIMessage):
             if item1 != item2:
                 if debug:
                     print 'service instances not equal: %s != %s' % (item1, item2)
-                    item1.__eq__(item2, debug)#This will print why they are not equal
+                    item1.__eq__(item2, debug)  # This will print why they are not equal
                 return False
 
         return True
@@ -724,7 +725,7 @@ class DiscoveryResponse(TAXIIMessage):
             si = etree.Element('{%s}Service_Instance' % ns_map['taxii'])
             si.attrib['service_type'] = self.service_type
             si.attrib['service_version'] = self.services_version
-            if self.available is not None: 
+            if self.available is not None:
                 si.attrib['available'] = str(self.available)
 
             protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii'])
@@ -760,27 +761,27 @@ class DiscoveryResponse(TAXIIMessage):
             return d
 
         def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['service_type','services_version','protocol_binding','service_address','available','message'], debug):
+            if not self._checkPropertiesEq(other, ['service_type', 'services_version', 'protocol_binding', 'service_address', 'available', 'message'], debug):
                 return False
 
             if set(self.message_bindings) != set(other.message_bindings):
-                if debug: 
+                if debug:
                     print 'message_bindings not equal'
                 return False
 
             if set(self.inbox_service_accepted_content) != set(other.inbox_service_accepted_content):
-                if debug: 
+                if debug:
                     print 'inbox_service_accepted_contents not equal'
                 return False
 
             return True
 
         @staticmethod
-        def from_etree(etree_xml):#Expects a taxii:Service_Instance element
+        def from_etree(etree_xml):  # Expects a taxii:Service_Instance element
             service_type = etree_xml.attrib['service_type']
             services_version = etree_xml.attrib['service_version']
             available = None
-            if 'available' in etree_xml.attrib: 
+            if 'available' in etree_xml.attrib:
                 tmp_available = etree_xml.attrib['available']
                 available = tmp_available == 'True'
 
@@ -854,9 +855,9 @@ class FeedInformationResponse(TAXIIMessage):
         #Who knows if this is a good way to compare the service instances or not...
         for item1, item2 in zip(sorted(self.feed_informations), sorted(other.feed_informations)):
             if item1 != item2:
-                if debug: 
+                if debug:
                     print 'feed_informations not equal: %s != %s' % (item1, item2)
-                    item1.__eq__(item2, debug)#This will print why they are not equal
+                    item1.__eq__(item2, debug)  # This will print why they are not equal
                 return False
 
         return True
@@ -966,11 +967,11 @@ class FeedInformationResponse(TAXIIMessage):
             return d
 
         def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['feed_name','feed_description','available'], debug):
+            if not self._checkPropertiesEq(other, ['feed_name', 'feed_description', 'available'], debug):
                 return False
 
             if set(self.supported_contents) != set(other.supported_contents):
-                if debug: 
+                if debug:
                     print 'supported_contents not equal: %s != %s' % (self.supported_contents, other.supported_contents)
                 return False
 
@@ -1003,7 +1004,7 @@ class FeedInformationResponse(TAXIIMessage):
             for polling_elt in polling_service_set:
                 kwargs['polling_service_instances'].append(FeedInformationResponse.FeedInformation.PollingServiceInstance.from_etree(polling_elt))
 
-            kwargs['subscription_methods'] = []            
+            kwargs['subscription_methods'] = []
             subscription_method_set = etree_xml.xpath('./taxii:Subscription_Service', namespaces=ns_map)
             for subscription_elt in subscription_method_set:
                 kwargs['subscription_methods'].append(FeedInformationResponse.FeedInformation.SubscriptionMethod.from_etree(subscription_elt))
@@ -1106,7 +1107,7 @@ class FeedInformationResponse(TAXIIMessage):
 
                 Arguments:
                 - poll_protocol (string) - the protocol binding supported by
-                  this Poll Service instance. 
+                  this Poll Service instance.
                 - poll_address (string) - the address of the TAXII Daemon
                   hosting this Poll Service instance.
                 - poll_message_bindings (list of strings) - the message
@@ -1137,7 +1138,7 @@ class FeedInformationResponse(TAXIIMessage):
                 return d
 
             def __eq__(self, other, debug=False):
-                if not self._checkPropertiesEq(other, ['poll_protocol','poll_address'], debug):
+                if not self._checkPropertiesEq(other, ['poll_protocol', 'poll_address'], debug):
                     return False
 
                 if set(self.poll_message_bindings) != set(other.poll_message_bindings):
@@ -1200,7 +1201,7 @@ class FeedInformationResponse(TAXIIMessage):
                 return d
 
             def __eq__(self, other, debug=False):
-                if not self._checkPropertiesEq(other, ['subscription_protocol','subscription_address'], debug):
+                if not self._checkPropertiesEq(other, ['subscription_protocol', 'subscription_address'], debug):
                     return False
 
                 if set(self.subscription_message_bindings) != set(other.subscription_message_bindings):
@@ -1228,7 +1229,7 @@ class FeedInformationResponse(TAXIIMessage):
 class PollRequest(TAXIIMessage):
     message_type = MSG_POLL_REQUEST
 
-    def __init__(self, 
+    def __init__(self,
                  message_id,
                  in_response_to=None,
                  extended_headers=None,
@@ -1255,7 +1256,7 @@ class PollRequest(TAXIIMessage):
         - subscription_id (string) - the existing subscription the Consumer
           wishes to poll.
         - content_bindings (list of strings) - the type of content that is
-          requested in the response to this poll. 
+          requested in the response to this poll.
         """
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
@@ -1300,9 +1301,9 @@ class PollRequest(TAXIIMessage):
         d['feed_name'] = self.feed_name
         if self.subscription_id is not None:
             d['subscription_id'] = self.subscription_id
-        if self.exclusive_begin_timestamp_label is not None:#TODO: Add TZ Info
+        if self.exclusive_begin_timestamp_label is not None:  # TODO: Add TZ Info
             d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
-        if self.inclusive_end_timestamp_label is not None:#TODO: Add TZ Info
+        if self.inclusive_end_timestamp_label is not None:  # TODO: Add TZ Info
             d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         d['content_bindings'] = []
         for bind in self.content_bindings:
@@ -1313,11 +1314,11 @@ class PollRequest(TAXIIMessage):
         if not super(PollRequest, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','exclusive_begin_timestamp_label','inclusive_end_timestamp_label'], debug):
+        if not self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'exclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
                 return False
 
         if set(self.content_bindings) != set(other.content_bindings):
-            if debug: 
+            if debug:
                 print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
             return False
 
@@ -1376,15 +1377,15 @@ class PollRequest(TAXIIMessage):
 class PollResponse(TAXIIMessage):
     message_type = MSG_POLL_RESPONSE
 
-    def __init__(self, 
-                 message_id, 
+    def __init__(self,
+                 message_id,
                  in_response_to,
                  extended_headers=None,
-                 feed_name = None,
-                 inclusive_begin_timestamp_label = None,
-                 inclusive_end_timestamp_label = None,
-                 subscription_id = None,
-                 message = None,
+                 feed_name=None,
+                 inclusive_begin_timestamp_label=None,
+                 inclusive_end_timestamp_label=None,
+                 subscription_id=None,
+                 message=None,
                  content_blocks=None
                  ):
         """Create a new PollResponse:
@@ -1466,7 +1467,7 @@ class PollResponse(TAXIIMessage):
         if not super(PollResponse, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['feed_name','subscription_id','message','inclusive_begin_timestamp_label','inclusive_end_timestamp_label'], debug):
+        if not self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'message', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
                 return False
 
         #TODO: Check content blocks
@@ -1546,7 +1547,7 @@ class StatusMessage(TAXIIMessage):
           this status in a machine-readable format.
         - message (string) - Additional information for the status. There is no
           expectation that this field be interpretable by a machine; it is
-          instead targeted to a human operator. 
+          instead targeted to a human operator.
         """
         super(StatusMessage, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.status_type = status_type
@@ -1671,12 +1672,12 @@ class InboxMessage(TAXIIMessage):
         if not super(InboxMessage, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['message','subscription_information'], debug):
+        if not self._checkPropertiesEq(other, ['message', 'subscription_information'], debug):
             return False
 
-        if len(self.content_blocks) != len (other.content_blocks):
+        if len(self.content_blocks) != len(other.content_blocks):
             if debug:
-                print 'content block lengths not equal: %s != %s' % (len(self.content_blocks), len (other.content_blocks))
+                print 'content block lengths not equal: %s != %s' % (len(self.content_blocks), len(other.content_blocks))
             return False
 
         #Who knows if this is a good way to compare the content blocks or not...
@@ -1684,7 +1685,7 @@ class InboxMessage(TAXIIMessage):
             if item1 != item2:
                 if debug:
                     print 'content blocks not equal: %s != %s' % (item1, item2)
-                    item1.__eq__(item2, debug)#This will print why they are not equal
+                    item1.__eq__(item2, debug)  # This will print why they are not equal
                 return False
 
         return True
@@ -1775,7 +1776,7 @@ class InboxMessage(TAXIIMessage):
             return d
 
         def __eq__(self, other, debug=False):
-            return self._checkPropertiesEq(other, ['feed_name','subscription_id','inclusive_begin_timestamp_label','inclusive_end_timestamp_label'], debug)
+            return self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug)
 
         @staticmethod
         def from_etree(etree_xml):
@@ -1814,7 +1815,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         - subscription_id (string) - the ID of a previously created
           subscription
         - delivery_parameters (a list of DeliveryParameter objects) - the
-          delivery parameters for this request. 
+          delivery parameters for this request.
         """
         super(ManageFeedSubscriptionRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
@@ -1842,7 +1843,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         if not super(ManageFeedSubscriptionRequest, self).__eq__(other, debug):
             return False
 
-        return self._checkPropertiesEq(other, ['feed_name','subscription_id','action','delivery_parameters'], debug)
+        return self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'action', 'delivery_parameters'], debug)
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -1916,7 +1917,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         if not super(ManageFeedSubscriptionResponse, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['feed_name','message'], debug):
+        if not self._checkPropertiesEq(other, ['feed_name', 'message'], debug):
             return False
 
         if len(self.subscription_instances) != len(other.subscription_instances):
@@ -2100,7 +2101,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             return d
 
         def __eq__(self, other, debug=True):
-            if not self._checkPropertiesEq(other, ['poll_protocol','poll_address'], debug):
+            if not self._checkPropertiesEq(other, ['poll_protocol', 'poll_address'], debug):
                 return False
 
             if set(self.poll_message_bindings) != set(other.poll_message_bindings):
