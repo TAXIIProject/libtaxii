@@ -23,9 +23,9 @@ import StringIO
 def message_tests(taxii_message):
     if not isinstance(taxii_message, tm.TAXIIMessage):
         raise ValueError('taxii_message was not an instance of TAXIIMessage')
-    
+
     print '***** Message type = %s; id = %s' % (taxii_message.message_type, taxii_message.message_id)
-    
+
     xml_string = taxii_message.to_xml()
     valid = tm.validate_xml(xml_string)
     if not valid:
@@ -37,45 +37,45 @@ def message_tests(taxii_message):
         print '\t Failure of test #2 - running equals w/ debug:'
         taxii_message.__eq__(msg_from_xml, True)
         raise Exception('Test #2 failed - taxii_message != msg_from_xml')
-    
+
     if taxii_message != msg_from_dict:
         print '\t Failure of test #3 - running equals w/ debug:'
         taxii_message.__eq__(msg_from_dict, True)
         raise Exception('Test #3 failed - taxii_message != msg_from_dict')
-    
+
     if msg_from_xml != msg_from_dict:
         print '\t Failure of test #4 - running equals w/ debug:'
         msg_from_xml.__eq__(msg_from_dict, True)
         raise Exception('Test #4 failed - msg_from_xml != msg_from_dict')
-    
+
     print '***** All tests completed!'
 
 def contentblock_tests(content_block):
     if not isinstance(content_block, tm.ContentBlock):
         raise ValueError('content_block was not an instance of ContentBlock')
-    
+
     print '***** Starting Content Block tests'
-    
+
     xml_string = content_block.to_xml()
     block_from_xml = tm.ContentBlock.from_xml(xml_string)
     dictionary = content_block.to_dict()
     block_from_dict = tm.ContentBlock.from_dict(dictionary)
-    
+
     if content_block != block_from_xml:
         print '\t Failure of test #1 - running equals w/ debug:'
         content_block.__equals(block_from_xml, True)
         raise Exception('Test #1 failed - content_block != block_from_xml')
-    
+
     if content_block != block_from_dict:
         print '\t Failure of test #2 - running equals w/ debug:'
         content_block.__eq__(block_from_dict, True)
         raise Exception('Test #2 failed - content_block != block_from_dict')
-    
+
     if block_from_xml != block_from_dict:
         print '\t Failure of test #3 - running equals w/ debug:'
         block_from_xml.__eq__(block_from_dict, True)
         raise Exception('Test #3 failed - block_from_xml != block_from_dict')
-    
+
     print '***** All tests completed!'
 
 ## Discovery Request
