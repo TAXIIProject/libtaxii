@@ -7,12 +7,14 @@
 # Mark Davidson - mdavidson@mitre.org
 #
 
+import datetime
+
+from dateutil.tz import tzutc
+
 import libtaxii as t
 import libtaxii.clients as tc
 import libtaxii.messages as tm
 
-import datetime
-from dateutil.tz import tzutc
 
 #Create the TAXII HTTPS Client
 client = tc.HttpClient()
@@ -26,14 +28,14 @@ client.setUseHttps(True)
 
 #Uncomment to use certificate-based authentication
 client.setAuthType(tc.HttpClient.AUTH_CERT)
-client.setAuthCredentials({'key_file': 'keyfile', 
+client.setAuthCredentials({'key_file': 'keyfile',
                            'cert_file': 'certfile'})
 
 #Uncomment to set a proxy
 #client.setProxy(tc.HttpClient.PROXY_HTTP, 'http://proxy.company.com:80')
 
 #Create the poll request
-poll_request1 = tm.PollRequest(message_id = tm.generate_message_id(), feed_name = 'TheFeedToPoll')
+poll_request1 = tm.PollRequest(message_id=tm.generate_message_id(), feed_name='TheFeedToPoll')
 
 #Call without a proxy
 http_response = client.callTaxiiService2('hostname', '/poll_service_path/', t.VID_TAXII_XML_10, poll_request1.to_xml())
