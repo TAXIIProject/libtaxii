@@ -34,8 +34,11 @@ class HttpClient:
         self.proxy_type = None
         self.proxy_string = None
 
-    #Set the authentication type. Must be one of AUTH_NONE, AUTH_BASIC, or AUTH_CERT
     def setAuthType(self, auth_type):
+        """Set the authentication type.
+
+        Must be one of AUTH_NONE, AUTH_BASIC, or AUTH_CERT
+        """
         #If this isn't a change, don't do anything
         if self.auth_type == auth_type:
             return
@@ -54,16 +57,19 @@ class HttpClient:
     @property
     def basic_auth_header(self):
         """Returns a Base64-encoded HTTP Basic Authorization Header."""
-
         return "Basic " + base64.b64encode('%s:%s' % (
                                            self.auth_credentials['username'],
                                            self.auth_credentials['password']))
 
-    #Set the proxy to tell libtaxii to use a proxy when making a connection.
-    #Set proxy_string to None to tell libtaxii to use the system proxy
-    #Set proxy_string to 'noproxy' to tell libtaxii to not use any proxy (this includes ignoring the system proxy setting)
-    #Proxy string should be something like 'http://proxy.example.com:80'
     def setProxy(self, proxy_string=None, proxy_type=PROXY_HTTP):
+        """Set the proxy settings to use when making a connection.
+
+        Arguments:
+        - proxy_string - a string like 'http://proxy.example.com:80'
+          If set to None, use the system proxy.
+          If set to 'noproxy', don't use a proxy (even the system proxy)
+        - proxy_type - either PROXY_HTTP or PROXY_HTTPS
+        """
         self.proxy_string = proxy_string
         self.proxy_type = proxy_type
 
@@ -75,11 +81,12 @@ class HttpClient:
         else:
             raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
 
-    #This sets the authentication credentials to be used later when making a request.
-    #note that it is possible to pass in one dict containing all credentials and swap between
-    #auth types.
     def setAuthCredentials(self, auth_credentials_dict):
+        """Set the authentication credentials used later when making a request.
 
+        Note that it is possible to pass in one dict containing credentials for
+        different authentication types and swap between them later.
+        """
         if self.auth_type == HttpClient.AUTH_NONE:
             req_fields = []
         elif self.auth_type == HttpClient.AUTH_BASIC:
@@ -95,7 +102,6 @@ class HttpClient:
         self.auth_credentials = auth_credentials_dict
 
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
-
         if port is None:#If the caller did not specify a port, use the default
             if self.use_https:
                 port = 443
@@ -143,11 +149,12 @@ class HttpClient:
 
         return response
 
-
-    # New way to call a TAXII Service. Uses urllib2 instead of httplib, and therefore returns a different kind
-    # of object than callTaxiiService.
     def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
+        """New method of calling a TAXII Service
 
+        Note: this uses urllib2 instead of httplib, and therefore returns
+        a different kind of object than callTaxiiService.
+        """
         header_dict = {'Content-Type':         'application/xml',
                        'User-Agent':           'libtaxii.httpclient',
                        'Content-Type':         'application/xml',
@@ -221,6 +228,7 @@ class HttpClient:
         except urllib2.HTTPError, error:
             return error
 
+
 #http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
 class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
     def __init__(self, key, cert):
@@ -234,6 +242,7 @@ class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
     def getConnection(self, host, timeout=0):
         return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
 
+
 class HTTPClientAuthHandler(urllib2.HTTPSHandler):#TODO: Is this used / is this possible?
     def __init__(self, key, cert):
         urllib2.HTTPSHandler.__init__(self)
@@ -245,12 +254,3 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):#TODO: Is this used / is this 
 
     def getConnection(self, host, timeout=0):
         return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
-
-
-
-
-
-
-
-
-
