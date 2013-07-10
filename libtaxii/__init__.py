@@ -50,7 +50,7 @@ def get_message_from_http_response(http_response, in_response_to):
 def get_message_from_urllib2_httperror(http_response, in_response_to):
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
     response_message = http_response.read()
-    
+
     if taxii_content_type is None:
         m = str(http_response.info()) + '\r\n' + response_message
         return tm.StatusMessage(message_id = '0', in_response_to = in_response_to, status_type = tm.ST_FAILURE, message = m)
@@ -58,53 +58,53 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
         return tm.get_message_from_xml(response_message)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type) 
-        
+
     return None
 
 def get_message_from_urllib_addinfourl(http_response, in_response_to):
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
     response_message = http_response.read()
-    
+
     if taxii_content_type is None:#Treat it as a Failure Status Message, per the spec
-        
+
         message = []
         header_tuples = http_response.getheaders()
         for k, v in header_tuples:
             message.append(k + ': ' + v + '\r\n')
         message.append('\r\n')
         message.append(response_message)
-        
+
         m = ''.join(message)
-        
+
         return tm.StatusMessage(message_id = '0', in_response_to = in_response_to, status_type = tm.ST_FAILURE, message = m)
-    
+
     elif taxii_content_type == VID_TAXII_XML_10:#It's a TAXII XML 1.0 message
         return tm.get_message_from_xml(response_message)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type) 
-        
+
     return None
 
 def get_message_from_httplib_http_response(http_response, in_response_to):
     taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
     response_message = http_response.read()
-    
+
     if taxii_content_type is None:#Treat it as a Failure Status Message, per the spec
-        
+
         message = []        
         header_tuples = http_response.getheaders()
         for k, v in header_tuples:
             message.append(k + ': ' + v + '\r\n')
         message.append('\r\n')
         message.append(response_message)
-        
+
         m = ''.join(message)
-        
+
         return tm.StatusMessage(message_id = '0', in_response_to = in_response_to, status_type = tm.ST_FAILURE, message = m)
-        
+
     elif taxii_content_type == VID_TAXII_XML_10:#It's a TAXII XML 1.0 message
         return tm.get_message_from_xml(response_message)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
-    
+
     return None
