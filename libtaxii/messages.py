@@ -48,9 +48,11 @@ SVC_POLL = 'POLL'
 SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
 SVC_DISCOVERY = 'DISCOVERY'
 
-ns_map = {'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1'}#, 
-          #TODO: figure out what to do with the digital signature namespace
-          #'ds': 'http://www.w3.org/2000/09/xmldsig#'}
+ns_map = {
+            'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
+            #TODO: figure out what to do with the digital signature namespace
+            #'ds': 'http://www.w3.org/2000/09/xmldsig#',
+         }
 
 ### General purpose helper methods ###
 
