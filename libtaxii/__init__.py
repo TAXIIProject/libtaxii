@@ -23,20 +23,27 @@ CB_STIX_XML_10 = 'urn:stix.mitre.org:xml:1.0'
 CB_CAP_11 = 'urn:oasis:names:tc:emergency:cap:1.1'
 CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
 
-#http_response - an httplib http_response object
-#in_response_to - a string containing the default value for in_response_to
-#
-# This function parses the HTTP Response by reading the X-TAXII-Content-Type
-# HTTP header to determine if the message binding is supported. If the 
-# X-TAXII-Content-Type header is present and the value indicates a supported 
-# Message Binidng, this function will attempt to parse the HTTP Response body.
-# 
-# If the X-TAXII-Content-Type header is not present, this function will attempt
-# to build a Failure Status Message per the HTTP Binding 1.0 specification.
-#
-# If the X-TAXII-Content-Type header is present, but indicates an unsupported 
-# Message Binding, this function will raise a ValueError.
+
 def get_message_from_http_response(http_response, in_response_to):
+    """Create a TAXII message from an HTTPResponse object.
+
+    Arguments:
+    - http_response - an httplib http_response object
+    - in_response_to - a string containing the default value for in_response_to
+
+    This function parses the HTTP Response by reading the X-TAXII-Content-Type
+    HTTP header to determine if the message binding is supported. If the
+    X-TAXII-Content-Type header is present and the value indicates a supported
+    Message Binidng, this function will attempt to parse the HTTP Response
+    body.
+
+    If the X-TAXII-Content-Type header is not present, this function will
+    attempt to build a Failure Status Message per the HTTP Binding 1.0
+    specification.
+
+    If the X-TAXII-Content-Type header is present, but indicates an unsupported
+    Message Binding, this function will raise a ValueError.
+    """
     if isinstance(http_response, httplib.HTTPResponse):
         return get_message_from_httplib_http_response(http_response, in_response_to)
     elif isinstance(http_response, urllib2.HTTPError):
