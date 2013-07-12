@@ -420,11 +420,15 @@ class TAXIIMessage(BaseNonMessage):
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
 
-    #Pulls properties of a TAXII Message from an etree. Message-specific constructs must be pulled
-    #by each Message class. In general, when converting from etree,
-    #Subclasses should call this method first, then parse their specific XML constructs
     @classmethod
     def from_etree(cls, src_etree):
+        """Pulls properties of a TAXII Message from an etree.
+
+        Message-specific constructs must be pulled by each Message class. In
+        general, when converting from etree, subclasses should call this method
+        first, then parse their specific XML constructs.
+        """
+
         #Get the message type
         message_type = src_etree.tag[53:]
         if message_type != cls.message_type:
