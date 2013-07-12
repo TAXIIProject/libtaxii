@@ -149,7 +149,7 @@ class HttpClient:
 
         return response
 
-    def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
+    def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None, **kwargs):
         """New method of calling a TAXII Service
 
         Note: this uses urllib2 instead of httplib, and therefore returns
@@ -157,8 +157,9 @@ class HttpClient:
         """
         header_dict = {'Content-Type':         'application/xml',
                        'User-Agent':           'libtaxii.httpclient',
-                       'Content-Type':         'application/xml',
                        'X-TAXII-Content-Type': message_binding}
+        if kwargs['content_type']:
+            header_dict['Content-Type'] = kwargs['content_type']
 
         handler_list = []
 
