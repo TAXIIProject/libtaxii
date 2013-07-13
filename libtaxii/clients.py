@@ -155,11 +155,22 @@ class HttpClient:
         Note: this uses urllib2 instead of httplib, and therefore returns
         a different kind of object than callTaxiiService.
         """
-        header_dict = {'Content-Type':         'application/xml',
-                       'User-Agent':           'libtaxii.httpclient',
-                       'X-TAXII-Content-Type': message_binding}
-        if kwargs['content_type']:
-            header_dict['Content-Type'] = kwargs['content_type']
+        if 'content_type' in kwargs:
+            content_type = kwargs.get('content_type')
+        else:
+            if message_binding == libtaxii.VID_TAXII_JSON_10:
+                content_type = 'application/json'
+            elif message_binding == libtaxii.VID_TAXII_XML_10:
+                content_type = 'application/xml'
+            else:
+                # unknow content type received
+                # should we default to XML ?
+                content_type = 'application/xml'
+
+        header_dict = {'Content-Type': content_type,
+                       'User-Agent': 'libtaxii.httpclient',
+                       'X-TAXII-Content-Type': message_binding
+                       }
 
         handler_list = []
 
