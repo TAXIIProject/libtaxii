@@ -149,16 +149,27 @@ class HttpClient:
 
         return response
 
-    def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
+    def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
+                          content_type=None):
         """New method of calling a TAXII Service
 
         Note: this uses urllib2 instead of httplib, and therefore returns
         a different kind of object than callTaxiiService.
         """
-        header_dict = {'Content-Type':         'application/xml',
-                       'User-Agent':           'libtaxii.httpclient',
-                       'Content-Type':         'application/xml',
-                       'X-TAXII-Content-Type': message_binding}
+
+        header_dict = {'User-Agent': 'libtaxii.httpclient',
+                       'X-TAXII-Content-Type': message_binding
+                       }
+
+        content_type_map = {libtaxii.VID_TAXII_JSON_10: 'application/xml',
+                            libtaxii.VID_TAXII_XML_10: 'application/json'}
+
+        if content_type is not None:
+            header_dict['Content-Type'] = content_type
+        else:
+            if message_binding not in content_type_map:
+                raise ValueError("content_type not specified, and the message_binding is unrecognized")
+            header_dict['Content-Type'] = content_type_map[message_binding]
 
         handler_list = []
 
