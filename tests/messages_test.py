@@ -63,6 +63,8 @@ def contentblock_tests(content_block):
     block_from_xml = tm.ContentBlock.from_xml(xml_string)
     dictionary = content_block.to_dict()
     block_from_dict = tm.ContentBlock.from_dict(dictionary)
+    json_string = content_block.to_json()
+    block_from_json = tm.ContentBlock.from_json(json_string)
 
     if content_block != block_from_xml:
         print '\t Failure of test #1 - running equals w/ debug:'
@@ -78,6 +80,10 @@ def contentblock_tests(content_block):
         print '\t Failure of test #3 - running equals w/ debug:'
         block_from_xml.__eq__(block_from_dict, True)
         raise Exception('Test #3 failed - block_from_xml != block_from_dict')
+    if block_from_json != block_from_dict:
+        print '\t Failure of test #3 - running equals w/ debug:'
+        block_from_json.__eq__(block_from_dict, True)
+        raise Exception('Test #3 failed - block_from_json != block_from_dict')
 
     print '***** All tests completed!'
 

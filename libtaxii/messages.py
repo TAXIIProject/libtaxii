@@ -13,6 +13,10 @@ import StringIO
 import datetime
 import dateutil.parser
 from lxml import etree
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 MSG_STATUS_MESSAGE = 'Status_Message'
 MSG_DISCOVERY_REQUEST = 'Discovery_Request'
@@ -155,6 +159,10 @@ def get_message_from_dict(d):
         return ManageFeedSubscriptionResponse.from_dict(d)
 
     raise ValueError('Unknown message_type: %s' % message_type)
+
+
+def get_message_from_json(json_string):
+    return get_message_from_dict(json.loads(json_string))
 
 
 def _str2datetime(date_string):
@@ -411,6 +419,9 @@ class TAXIIMessage(BaseNonMessage):
 
         return d
 
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
     def __eq__(self, other, debug=False):
         if not isinstance(other, TAXIIMessage):
             raise ValueError('Not comparing two TAXII Messages! (%s, %s)' % (self.__class__.__name__, other.__class__.__name__))
@@ -485,6 +496,10 @@ class TAXIIMessage(BaseNonMessage):
         if 'in_response_to' in d:
             in_response_to = d['in_response_to']
         return cls(message_id, in_response_to, extended_headers=extended_headers)
+
+    @classmethod
+    def from_json(cls, json_string):
+        return cls.from_dict(json.loads(json_string))
 
 
 class ContentBlock(BaseNonMessage):
@@ -565,6 +580,9 @@ class ContentBlock(BaseNonMessage):
 
         return block
 
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
             return False
@@ -609,6 +627,10 @@ class ContentBlock(BaseNonMessage):
 
         return ContentBlock(**kwargs)
 
+    @classmethod
+    def from_json(cls, json_string):
+        return cls.from_dict(json.loads(json_string))
+
 
 #### TAXII Message Classes ####
 
@@ -649,6 +671,9 @@ class DiscoveryResponse(TAXIIMessage):
         for service_instance in self.service_instances:
             d['service_instances'].append(service_instance.to_dict())
         return d
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
 
     def __eq__(self, other, debug=False):
         if not super(DiscoveryResponse, self).__eq__(other, debug):
