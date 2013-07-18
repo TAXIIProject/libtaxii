@@ -17,9 +17,11 @@ import libtaxii.clients as tc
 #TAXII Version IDs
 VID_TAXII_SERVICES_10 = 'urn:taxii.mitre.org:services:1.0'
 VID_TAXII_XML_10 = 'urn:taxii.mitre.org:message:xml:1.0'
-VID_TAXII_JSON_10 = 'urn:cert.europa.eu:message:json:1.0'
 VID_TAXII_HTTP_10 = 'urn:taxii.mitre.org:protocol:http:1.0'
 VID_TAXII_HTTPS_10 = 'urn:taxii.mitre.org:protocol:https:1.0'
+
+#Third Party Version IDs
+VID_CERT_EU_JSON_10 = 'urn:cert.europa.eu:message:json:1.0'
 
 #TAXII Content Bindings
 CB_STIX_XML_10 = 'urn:stix.mitre.org:xml:1.0'
