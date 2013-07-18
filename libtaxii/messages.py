@@ -66,6 +66,21 @@ def generate_message_id(maxlen=5):
     message_id = random.randint(1, 10 ** maxlen)
     return str(message_id)
 
+global_xml_parser = None
+def get_xml_parser():
+    """ Get the XML Parser being used by libtaxii.messages. 
+    This method instantiates an XML Parser with no_network=True and
+    huge_tree=True if the XML Parser has not already been set via 
+    set_xml_parser() """
+    global global_xml_parser
+    if global_xml_parser is None:
+        global_xml_parser = etree.XMLParser(no_network=True, huge_tree=True)
+    return global_xml_parser
+
+def set_xml_parser(xml_parser=None):
+    """ Set the libtaxii.messages XML parser. """
+    global global_xml_parser
+    global_xml_parser = xml_parser
 
 def validate_xml(xml_string):
     """Validate XML with the TAXII XML Schema 1.0."""
@@ -73,11 +88,11 @@ def validate_xml(xml_string):
         f = StringIO.StringIO(xml_string)
     else:
         f = xml_string
-
-    etree_xml = etree.parse(f)
+    
+    etree_xml = etree.parse(f, get_xml_parser())
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
-    taxii_schema_doc = etree.parse(schema_file)
+    taxii_schema_doc = etree.parse(schema_file, get_xml_parser())
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
     if not valid:
@@ -96,7 +111,7 @@ def get_message_from_xml(xml_string):
     else:
         f = xml_string
 
-    etree_xml = etree.parse(f).getroot()
+    etree_xml = etree.parse(f, get_xml_parser()).getroot()
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)
@@ -214,7 +229,7 @@ class BaseNonMessage(object):
         else:
             f = xml
 
-        etree_xml = etree.parse(f).getroot()
+        etree_xml = etree.parse(f, get_xml_parser()).getroot()
         return cls.from_etree(etree_xml)
 
     def __eq__(self, other, debug=False):
@@ -476,7 +491,7 @@ class TAXIIMessage(BaseNonMessage):
         else:
             f = xml
 
-        etree_xml = etree.parse(f).getroot()
+        etree_xml = etree.parse(f, get_xml_parser()).getroot()
         return cls.from_etree(etree_xml)
 
     @classmethod
@@ -545,7 +560,7 @@ class ContentBlock(BaseNonMessage):
 
         if self.content.startswith('<'):  # It might be XML
             try:
-                xml = etree.parse(StringIO.StringIO(self.content)).getroot()
+                xml = etree.parse(StringIO.StringIO(self.content), get_xml_parser()).getroot()
                 c.append(xml)
             except:
                 c.text = self.content
