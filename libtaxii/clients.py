@@ -162,8 +162,8 @@ class HttpClient:
                        'X-TAXII-Content-Type': message_binding
                        }
 
-        content_type_map = {libtaxii.VID_TAXII_JSON_10: 'application/xml',
-                            libtaxii.VID_TAXII_XML_10: 'application/json'}
+        content_type_map = {libtaxii.VID_TAXII_XML_10: 'application/xml',
+                            libtaxii.VID_CERT_EU_JSON_10: 'application/json'}
 
         if content_type is not None:
             header_dict['Content-Type'] = content_type
