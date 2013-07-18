@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation instructions for libtaxii &mdash; libtaxii 1.0.104 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.104',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="libtaxii 1.0.104 documentation" href="index.html" />
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">libtaxii 1.0.104 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation-instructions-for-libtaxii">
+<h1>Installation instructions for libtaxii<a class="headerlink" href="#installation-instructions-for-libtaxii" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="step-1-install-libtaxii-s-dependencies">
+<h2>Step 1: Install libtaxii&#8217;s dependencies<a class="headerlink" href="#step-1-install-libtaxii-s-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>These libraries may have their own dependencies (for example, lxml requires libxml2). Look in setup.py for the minimum required version of each library.</p>
+<ol class="arabic simple">
+<li>lxml - Home page: <a class="reference external" href="http://lxml.de/">http://lxml.de/</a></li>
+<li>dateutil - Home page: <a class="reference external" href="http://labix.org/python-dateutil">http://labix.org/python-dateutil</a></li>
+<li>M2Crypto <strong>(only required for libtaxii 1.0.101 and lower)</strong> - Home page: <a class="reference external" href="http://chandlerproject.org/Projects/MeTooCrypto">http://chandlerproject.org/Projects/MeTooCrypto</a></li>
+</ol>
+</div>
+<div class="section" id="step-2-install-libtaxii">
+<h2>Step 2: Install libtaxii<a class="headerlink" href="#step-2-install-libtaxii" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>On the tags section (<a class="reference external" href="https://github.com/TAXIIProject/libtaxii/tags">https://github.com/TAXIIProject/libtaxii/tags</a>) of libtaxii&#8217;s GitHub page, identify the version of libtaxii you would like to install.</li>
+<li>Download the zip (Windows) or tarball (Unix/Linux) to the computer you want to install libtaxii on.</li>
+<li>Extract the contents of the zip/tarball</li>
+<li>Navigate into the directory where the extracted contents are</li>
+<li>Run the following command <tt class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></tt></li>
+</ol>
+</div>
+<div class="section" id="step-3-test-the-installation">
+<h2>Step 3: Test the installation<a class="headerlink" href="#step-3-test-the-installation" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li>At a command prompt, type <tt class="docutils literal"><span class="pre">python</span></tt> to enter the python interpreter</li>
+<li>Type the following command: <tt class="docutils literal"><span class="pre">import</span> <span class="pre">libtaxii</span></tt></li>
+<li>If you do not get an ImportError, the install succeeded.</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation instructions for libtaxii</a><ul>
+<li><a class="reference internal" href="#step-1-install-libtaxii-s-dependencies">Step 1: Install libtaxii&#8217;s dependencies</a></li>
+<li><a class="reference internal" href="#step-2-install-libtaxii">Step 2: Install libtaxii</a></li>
+<li><a class="reference internal" href="#step-3-test-the-installation">Step 3: Test the installation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="overview.html"
+                        title="previous chapter">Overview</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="getting_started.html"
+                        title="next chapter">Getting Started</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="overview.html" title="Overview"
+             >previous</a> |</li>
+        <li><a href="index.html">libtaxii 1.0.104 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, The MITRE Corporation.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
