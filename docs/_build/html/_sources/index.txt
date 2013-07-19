@@ -14,7 +14,6 @@ Contents:
    Overview <overview>
    Install <install>
    Getting Started <getting_started>
-   Release Notes <release_notes>
    API Documentation <libtaxii>
 
 Indices and tables

@@ -23,7 +23,8 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="libtaxii 1.0.104 documentation" href="index.html" /> 
+    <link rel="top" title="libtaxii 1.0.104 documentation" href="index.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,6 +36,9 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             accesskey="P">previous</a> |</li>
         <li><a href="index.html">libtaxii 1.0.104 documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -48,13 +52,74 @@
 <h1>libtaxii Package<a class="headerlink" href="#libtaxii-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">libtaxii</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-libtaxii.__init__"></span><dl class="function">
+<span class="target" id="module-libtaxii.__init__"></span><div class="line-block">
+<div class="line">Copyright (C) 2013 - The MITRE Corporation</div>
+<div class="line">For license information, see the LICENSE.txt file</div>
+</div>
+<div class="line-block">
+<div class="line">Contributors:</div>
+</div>
+<ul class="simple">
+<li>Alex Ciobanu - <a class="reference external" href="mailto:calex&#37;&#52;&#48;cert&#46;europa&#46;eu">calex<span>&#64;</span>cert<span>&#46;</span>europa<span>&#46;</span>eu</a></li>
+<li>Mark Davidson - <a class="reference external" href="mailto:mdavidson&#37;&#52;&#48;mitre&#46;org">mdavidson<span>&#64;</span>mitre<span>&#46;</span>org</a></li>
+</ul>
+<dl class="data">
+<dt id="libtaxii.__init__.CB_CAP_11">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">CB_CAP_11</tt><em class="property"> = 'urn:oasis:names:tc:emergency:cap:1.1'</em><a class="headerlink" href="#libtaxii.__init__.CB_CAP_11" title="Permalink to this definition">¶</a></dt>
+<dd><p>Content Binding ID for CAP 1.1</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.CB_STIX_XML_10">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">CB_STIX_XML_10</tt><em class="property"> = 'urn:stix.mitre.org:xml:1.0'</em><a class="headerlink" href="#libtaxii.__init__.CB_STIX_XML_10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Content Binding ID for STIX XML 1.0</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.CB_XENC_122002">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">CB_XENC_122002</tt><em class="property"> = 'http://www.w3.org/2001/04/xmlenc#'</em><a class="headerlink" href="#libtaxii.__init__.CB_XENC_122002" title="Permalink to this definition">¶</a></dt>
+<dd><p>Content Binding ID for XML Encryption</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.VID_CERT_EU_JSON_10">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">VID_CERT_EU_JSON_10</tt><em class="property"> = 'urn:cert.europa.eu:message:json:1.0'</em><a class="headerlink" href="#libtaxii.__init__.VID_CERT_EU_JSON_10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version ID for the CERT EU JSON Message Binding</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.VID_TAXII_HTTPS_10">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">VID_TAXII_HTTPS_10</tt><em class="property"> = 'urn:taxii.mitre.org:protocol:https:1.0'</em><a class="headerlink" href="#libtaxii.__init__.VID_TAXII_HTTPS_10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version ID for the TAXII HTTPS Protocol Binding Specification 1.0</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.VID_TAXII_HTTP_10">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">VID_TAXII_HTTP_10</tt><em class="property"> = 'urn:taxii.mitre.org:protocol:http:1.0'</em><a class="headerlink" href="#libtaxii.__init__.VID_TAXII_HTTP_10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version ID for the TAXII HTTP Protocol Binding Specification 1.0</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.VID_TAXII_SERVICES_10">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">VID_TAXII_SERVICES_10</tt><em class="property"> = 'urn:taxii.mitre.org:services:1.0'</em><a class="headerlink" href="#libtaxii.__init__.VID_TAXII_SERVICES_10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version ID for the TAXII Services Specification 1.0</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.__init__.VID_TAXII_XML_10">
+<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">VID_TAXII_XML_10</tt><em class="property"> = 'urn:taxii.mitre.org:message:xml:1.0'</em><a class="headerlink" href="#libtaxii.__init__.VID_TAXII_XML_10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version ID for the TAXII XML Message Binding Specification 1.0</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="libtaxii.__init__.get_message_from_http_response">
 <tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">get_message_from_http_response</tt><big>(</big><em>http_response</em>, <em>in_response_to</em><big>)</big><a class="headerlink" href="#libtaxii.__init__.get_message_from_http_response" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a TAXII message from an HTTPResponse object.</p>
-<p>Arguments:
-- http_response - an httplib http_response object
-- in_response_to - a string containing the default value for in_response_to</p>
+<p>Arguments:</p>
+<ul class="simple">
+<li>http_response - an httplib http_response object</li>
+<li>in_response_to - a string containing the default value for in_response_to</li>
+</ul>
 <p>This function parses the HTTP Response by reading the X-TAXII-Content-Type
 HTTP header to determine if the message binding is supported. If the
 X-TAXII-Content-Type header is present and the value indicates a supported
@@ -63,60 +128,24 @@ body.</p>
 <p>If the X-TAXII-Content-Type header is not present, this function will
 attempt to build a Failure Status Message per the HTTP Binding 1.0
 specification.</p>
-<p>If the X-TAXII-Content-Type header is present, but indicates an unsupported
+<p>If the X-TAXII-Content-Type header is present and indicates an unsupported
 Message Binding, this function will raise a ValueError.</p>
 </dd></dl>
-
-<dl class="function">
-<dt id="libtaxii.__init__.get_message_from_httplib_http_response">
-<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">get_message_from_httplib_http_response</tt><big>(</big><em>http_response</em>, <em>in_response_to</em><big>)</big><a class="headerlink" href="#libtaxii.__init__.get_message_from_httplib_http_response" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="libtaxii.__init__.get_message_from_urllib2_httperror">
-<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">get_message_from_urllib2_httperror</tt><big>(</big><em>http_response</em>, <em>in_response_to</em><big>)</big><a class="headerlink" href="#libtaxii.__init__.get_message_from_urllib2_httperror" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="libtaxii.__init__.get_message_from_urllib_addinfourl">
-<tt class="descclassname">libtaxii.__init__.</tt><tt class="descname">get_message_from_urllib_addinfourl</tt><big>(</big><em>http_response</em>, <em>in_response_to</em><big>)</big><a class="headerlink" href="#libtaxii.__init__.get_message_from_urllib_addinfourl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-libtaxii.clients">
 <span id="clients-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">clients</span></tt> Module<a class="headerlink" href="#module-libtaxii.clients" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="libtaxii.clients.HTTPClientAuthHandler">
-<em class="property">class </em><tt class="descclassname">libtaxii.clients.</tt><tt class="descname">HTTPClientAuthHandler</tt><big>(</big><em>key</em>, <em>cert</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HTTPClientAuthHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">urllib2.HTTPSHandler</span></tt></p>
-<dl class="method">
-<dt id="libtaxii.clients.HTTPClientAuthHandler.getConnection">
-<tt class="descname">getConnection</tt><big>(</big><em>host</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HTTPClientAuthHandler.getConnection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="libtaxii.clients.HTTPClientAuthHandler.https_open">
-<tt class="descname">https_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HTTPClientAuthHandler.https_open" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="libtaxii.clients.HTTPSClientAuthHandler">
-<em class="property">class </em><tt class="descclassname">libtaxii.clients.</tt><tt class="descname">HTTPSClientAuthHandler</tt><big>(</big><em>key</em>, <em>cert</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HTTPSClientAuthHandler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">urllib2.HTTPSHandler</span></tt></p>
-<dl class="method">
-<dt id="libtaxii.clients.HTTPSClientAuthHandler.getConnection">
-<tt class="descname">getConnection</tt><big>(</big><em>host</em>, <em>timeout=0</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HTTPSClientAuthHandler.getConnection" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="libtaxii.clients.HTTPSClientAuthHandler.https_open">
-<tt class="descname">https_open</tt><big>(</big><em>req</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HTTPSClientAuthHandler.https_open" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="line-block">
+<div class="line">Copyright (C) 2013 - The MITRE Corporation</div>
+<div class="line">For license information, see the LICENSE.txt file</div>
+</div>
+<div class="line-block">
+<div class="line">Contributors:</div>
+</div>
+<ul class="simple">
+<li>Alex Ciobanu - <a class="reference external" href="mailto:calex&#37;&#52;&#48;cert&#46;europa&#46;eu">calex<span>&#64;</span>cert<span>&#46;</span>europa<span>&#46;</span>eu</a></li>
+<li>Mark Davidson - <a class="reference external" href="mailto:mdavidson&#37;&#52;&#48;mitre&#46;org">mdavidson<span>&#64;</span>mitre<span>&#46;</span>org</a></li>
+</ul>
 <dl class="class">
 <dt id="libtaxii.clients.HttpClient">
 <em class="property">class </em><tt class="descclassname">libtaxii.clients.</tt><tt class="descname">HttpClient</tt><a class="headerlink" href="#libtaxii.clients.HttpClient" title="Permalink to this definition">¶</a></dt>
@@ -151,6 +180,21 @@ Message Binding, this function will raise a ValueError.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="libtaxii.clients.HttpClient.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.clients.HttpClient.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.clients.HttpClient.__init__">
+<tt class="descname">__init__</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.clients.HttpClient.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.clients.HttpClient.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.clients'</em><a class="headerlink" href="#libtaxii.clients.HttpClient.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="libtaxii.clients.HttpClient.basic_auth_header">
 <tt class="descname">basic_auth_header</tt><a class="headerlink" href="#libtaxii.clients.HttpClient.basic_auth_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a Base64-encoded HTTP Basic Authorization Header.</p>
@@ -163,7 +207,7 @@ Message Binding, this function will raise a ValueError.</p>
 
 <dl class="method">
 <dt id="libtaxii.clients.HttpClient.callTaxiiService2">
-<tt class="descname">callTaxiiService2</tt><big>(</big><em>host</em>, <em>path</em>, <em>message_binding</em>, <em>post_data</em>, <em>port=None</em>, <em>get_params_dict=None</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HttpClient.callTaxiiService2" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">callTaxiiService2</tt><big>(</big><em>host</em>, <em>path</em>, <em>message_binding</em>, <em>post_data</em>, <em>port=None</em>, <em>get_params_dict=None</em>, <em>content_type=None</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HttpClient.callTaxiiService2" title="Permalink to this definition">¶</a></dt>
 <dd><p>New method of calling a TAXII Service</p>
 <p>Note: this uses urllib2 instead of httplib, and therefore returns
 a different kind of object than callTaxiiService.</p>
@@ -189,7 +233,7 @@ different authentication types and swap between them later.</p>
 <tt class="descname">setProxy</tt><big>(</big><em>proxy_string=None</em>, <em>proxy_type='http'</em><big>)</big><a class="headerlink" href="#libtaxii.clients.HttpClient.setProxy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the proxy settings to use when making a connection.</p>
 <p>Arguments:
-- proxy_string - a string like &#8216;<a class="reference external" href="http://proxy.example.com:80">http://proxy.example.com:80</a>&#8216;</p>
+* proxy_string - a string like &#8216;<a class="reference external" href="http://proxy.example.com:80">http://proxy.example.com:80</a>&#8216;</p>
 <blockquote>
 <div>If set to None, use the system proxy.
 If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)</div></blockquote>
@@ -208,60 +252,83 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 </div>
 <div class="section" id="module-libtaxii.messages">
 <span id="messages-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">messages</span></tt> Module<a class="headerlink" href="#module-libtaxii.messages" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="libtaxii.messages.BaseNonMessage">
-<em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">BaseNonMessage</tt><a class="headerlink" href="#libtaxii.messages.BaseNonMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Base class for non-TAXII Message objects</p>
-<dl class="classmethod">
-<dt id="libtaxii.messages.BaseNonMessage.from_dict">
-<em class="property">classmethod </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.BaseNonMessage.from_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an instance of this class from a dictionary.</p>
-<p>To be implemented by child classes.</p>
+<div class="line-block">
+<div class="line">Copyright (C) 2013 - The MITRE Corporation</div>
+<div class="line">For license information, see the LICENSE.txt file</div>
+</div>
+<div class="line-block">
+<div class="line">Contributors:</div>
+</div>
+<ul class="simple">
+<li>Alex Ciobanu - <a class="reference external" href="mailto:calex&#37;&#52;&#48;cert&#46;europa&#46;eu">calex<span>&#64;</span>cert<span>&#46;</span>europa<span>&#46;</span>eu</a></li>
+<li>Mark Davidson - <a class="reference external" href="mailto:mdavidson&#37;&#52;&#48;mitre&#46;org">mdavidson<span>&#64;</span>mitre<span>&#46;</span>org</a></li>
+</ul>
+<dl class="data">
+<dt id="libtaxii.messages.ACT_STATUS">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ACT_STATUS</tt><em class="property"> = 'STATUS'</em><a class="headerlink" href="#libtaxii.messages.ACT_STATUS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying an Action of Status</p>
 </dd></dl>
 
-<dl class="classmethod">
-<dt id="libtaxii.messages.BaseNonMessage.from_etree">
-<em class="property">classmethod </em><tt class="descname">from_etree</tt><big>(</big><em>src_etree</em><big>)</big><a class="headerlink" href="#libtaxii.messages.BaseNonMessage.from_etree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an instance of this class from an etree.</p>
-<p>To be implemented by child classes.</p>
+<dl class="data">
+<dt id="libtaxii.messages.ACT_SUBSCRIBE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ACT_SUBSCRIBE</tt><em class="property"> = 'SUBSCRIBE'</em><a class="headerlink" href="#libtaxii.messages.ACT_SUBSCRIBE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying an Action of Subscribe</p>
 </dd></dl>
 
-<dl class="classmethod">
-<dt id="libtaxii.messages.BaseNonMessage.from_xml">
-<em class="property">classmethod </em><tt class="descname">from_xml</tt><big>(</big><em>xml</em><big>)</big><a class="headerlink" href="#libtaxii.messages.BaseNonMessage.from_xml" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="libtaxii.messages.BaseNonMessage.to_dict">
-<tt class="descname">to_dict</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.BaseNonMessage.to_dict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a dictionary representation of this class.</p>
-<p>To be implemented by child classes.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="libtaxii.messages.BaseNonMessage.to_etree">
-<tt class="descname">to_etree</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.BaseNonMessage.to_etree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an etree representation of this class.</p>
-<p>To be implemented by child classes.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="libtaxii.messages.BaseNonMessage.to_xml">
-<tt class="descname">to_xml</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.BaseNonMessage.to_xml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create an XML representation of this class.</p>
-</dd></dl>
-
+<dl class="data">
+<dt id="libtaxii.messages.ACT_UNSUBSCRIBE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ACT_UNSUBSCRIBE</tt><em class="property"> = 'UNSUBSCRIBE'</em><a class="headerlink" href="#libtaxii.messages.ACT_UNSUBSCRIBE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying an Action of Unsubscribe</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="libtaxii.messages.ContentBlock">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ContentBlock</tt><big>(</big><em>content_binding</em>, <em>content</em>, <em>timestamp_label=None</em>, <em>padding=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
 <dl class="attribute">
 <dt id="libtaxii.messages.ContentBlock.NAME">
 <tt class="descname">NAME</tt><em class="property"> = 'Content_Block'</em><a class="headerlink" href="#libtaxii.messages.ContentBlock.NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ContentBlock.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.ContentBlock.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ContentBlock.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ContentBlock.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>content_binding</em>, <em>content</em>, <em>timestamp_label=None</em>, <em>padding=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ContentBlock.</p>
+<p>Arguments:
+- content_binding (string) - a Content Binding ID or nesting expression</p>
+<blockquote>
+<div>indicating the type of content contained in the Content field of this
+Content Block</div></blockquote>
+<ul class="simple">
+<li>content (string or etree) - a piece of content of the type specified
+by the Content Binding.</li>
+<li>timestamp_label (datetime) - the Timestamp Label associated with this
+Content Block.</li>
+<li>padding (string) - an arbitrary amount of padding for this Content
+Block.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ContentBlock.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.ContentBlock.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ContentBlock._stringify_content">
+<tt class="descname">_stringify_content</tt><big>(</big><em>content</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock._stringify_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Always a string or raises an error.</p>
+</dd></dl>
 
 <dl class="staticmethod">
 <dt id="libtaxii.messages.ContentBlock.from_dict">
@@ -271,6 +338,11 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="staticmethod">
 <dt id="libtaxii.messages.ContentBlock.from_etree">
 <em class="property">static </em><tt class="descname">from_etree</tt><big>(</big><em>etree_xml</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock.from_etree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="libtaxii.messages.ContentBlock.from_json">
+<em class="property">classmethod </em><tt class="descname">from_json</tt><big>(</big><em>json_string</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock.from_json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -283,12 +355,65 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <tt class="descname">to_etree</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock.to_etree" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="libtaxii.messages.ContentBlock.to_json">
+<tt class="descname">to_json</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.ContentBlock.to_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="libtaxii.messages.DeliveryParameters">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">DeliveryParameters</tt><big>(</big><em>inbox_protocol=None</em>, <em>inbox_address=None</em>, <em>delivery_message_binding=None</em>, <em>content_bindings=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DeliveryParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.DeliveryParameters.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.DeliveryParameters.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.DeliveryParameters.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DeliveryParameters.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.DeliveryParameters.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>inbox_protocol=None</em>, <em>inbox_address=None</em>, <em>delivery_message_binding=None</em>, <em>content_bindings=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DeliveryParameters.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up Delivery Parameters.</p>
+<p>Arguments
+- inbox_protocol (string) - identifies the protocol to be used when</p>
+<blockquote>
+<div>pushing TAXII Data Feed content to a Consumer&#8217;s TAXII Inbox
+Service implementation.</div></blockquote>
+<ul>
+<li><dl class="first docutils">
+<dt>inbox_address (string) - identifies the address of the TAXII</dt>
+<dd><p class="first last">Daemon hosting the Inbox Service to which the Consumer requests
+content  for this TAXII Data Feed to be delivered.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>delivery_message_binding (string) - identifies the message</dt>
+<dd><p class="first last">binding to be used to send pushed content for this subscription.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>content_bindings (list of strings) - contains Content Binding IDs</dt>
+<dd><p class="first last">indicating which types of contents the Consumer requests to
+receive for this TAXII  Data Feed</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.DeliveryParameters.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.DeliveryParameters.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="libtaxii.messages.DeliveryParameters.from_dict">
 <em class="property">static </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DeliveryParameters.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -316,6 +441,16 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">DiscoveryRequest</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryRequest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.TAXIIMessage" title="libtaxii.messages.TAXIIMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.TAXIIMessage</span></tt></a></p>
 <dl class="attribute">
+<dt id="libtaxii.messages.DiscoveryRequest.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.DiscoveryRequest.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.DiscoveryRequest.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.DiscoveryRequest.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="libtaxii.messages.DiscoveryRequest.message_type">
 <tt class="descname">message_type</tt><em class="property"> = 'Discovery_Request'</em><a class="headerlink" href="#libtaxii.messages.DiscoveryRequest.message_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -329,7 +464,49 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.DiscoveryResponse.ServiceInstance">
 <em class="property">class </em><tt class="descname">ServiceInstance</tt><big>(</big><em>service_type</em>, <em>services_version</em>, <em>protocol_binding</em>, <em>service_address</em>, <em>message_bindings</em>, <em>inbox_service_accepted_content=None</em>, <em>available=None</em>, <em>message=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.ServiceInstance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.DiscoveryResponse.ServiceInstance.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.ServiceInstance.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.DiscoveryResponse.ServiceInstance.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.ServiceInstance.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.DiscoveryResponse.ServiceInstance.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>service_type</em>, <em>services_version</em>, <em>protocol_binding</em>, <em>service_address</em>, <em>message_bindings</em>, <em>inbox_service_accepted_content=None</em>, <em>available=None</em>, <em>message=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.ServiceInstance.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new ServiceInstance.</p>
+<p>Arguments:
+- service_type (string) - identifies the Service Type of this</p>
+<blockquote>
+<div>Service Instance.</div></blockquote>
+<ul class="simple">
+<li>services_version (string) - identifies the TAXII Services
+Specification to which this Service conforms.</li>
+<li>protocol_binding (string) - identifies the protocol binding
+supported by this Service</li>
+<li>service_address (string) - identifies the network address of the
+TAXII Daemon that hosts this Service.</li>
+<li>message_bindings (list of strings) - identifies the message
+bindings supported by this Service instance.</li>
+<li>inbox_service_accepted_content (list of strings) - identifies
+content bindings that this Inbox Service is willing to accept</li>
+<li>available (boolean) - indicates whether the identity of the
+requester (authenticated or otherwise) is allowed to access this
+TAXII  Service.</li>
+<li>message (string) - contains a message regarding this Service
+instance.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.DiscoveryResponse.ServiceInstance.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.ServiceInstance.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="libtaxii.messages.DiscoveryResponse.ServiceInstance.from_dict">
 <em class="property">static </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.ServiceInstance.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -351,6 +528,38 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.DiscoveryResponse.__doc__">
+<tt class="descclassname">DiscoveryResponse.</tt><tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.DiscoveryResponse.__eq__">
+<tt class="descclassname">DiscoveryResponse.</tt><tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.DiscoveryResponse.__init__">
+<tt class="descclassname">DiscoveryResponse.</tt><tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>service_instances=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a DiscoveryResponse</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- in_response_to (string) - the Message ID of the message to which this</p>
+<blockquote>
+<div>is a response.</div></blockquote>
+<ul class="simple">
+<li>extended_headers (dictionary) - A dictionary of name/value pairs for
+use as Extended Headers</li>
+<li>service_instances (list of ServiceInstance objects) - a list of
+service instances that this response contains</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.DiscoveryResponse.__module__">
+<tt class="descclassname">DiscoveryResponse.</tt><tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="libtaxii.messages.DiscoveryResponse.from_dict">
@@ -377,12 +586,27 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <tt class="descclassname">DiscoveryResponse.</tt><tt class="descname">to_etree</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.to_etree" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="libtaxii.messages.DiscoveryResponse.to_json">
+<tt class="descclassname">DiscoveryResponse.</tt><tt class="descname">to_json</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.DiscoveryResponse.to_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="libtaxii.messages.FeedInformationRequest">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">FeedInformationRequest</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationRequest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.TAXIIMessage" title="libtaxii.messages.TAXIIMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.TAXIIMessage</span></tt></a></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationRequest.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.FeedInformationRequest.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationRequest.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationRequest.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="libtaxii.messages.FeedInformationRequest.message_type">
 <tt class="descname">message_type</tt><em class="property"> = 'Feed_Information_Request'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationRequest.message_type" title="Permalink to this definition">¶</a></dt>
@@ -397,14 +621,45 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation">
 <em class="property">class </em><tt class="descname">FeedInformation</tt><big>(</big><em>feed_name</em>, <em>feed_description</em>, <em>supported_contents</em>, <em>available=None</em>, <em>push_methods=None</em>, <em>polling_service_instances=None</em>, <em>subscription_methods=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
 <dl class="class">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance">
 <em class="property">class </em><tt class="descname">PollingServiceInstance</tt><big>(</big><em>poll_protocol</em>, <em>poll_address</em>, <em>poll_message_bindings</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
 <dl class="attribute">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.NAME">
 <tt class="descname">NAME</tt><em class="property"> = 'Polling_Service'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>poll_protocol</em>, <em>poll_address</em>, <em>poll_message_bindings</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new PollingServiceInstance.</p>
+<p>Arguments:
+- poll_protocol (string) - the protocol binding supported by</p>
+<blockquote>
+<div>this Poll Service instance.</div></blockquote>
+<ul class="simple">
+<li>poll_address (string) - the address of the TAXII Daemon
+hosting this Poll Service instance.</li>
+<li>poll_message_bindings (list of strings) - the message
+bindings supported by this Poll Service instance</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PollingServiceInstance.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -432,7 +687,38 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod">
 <em class="property">class </em><tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">PushMethod</tt><big>(</big><em>push_protocol</em>, <em>push_message_bindings</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>push_protocol</em>, <em>push_message_bindings</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new PushMethod.</p>
+<p>Arguments:
+- push_protocol (string) - a protocol binding that can be used</p>
+<blockquote>
+<div>to push content to an Inbox Service instance.</div></blockquote>
+<ul class="simple">
+<li>push_message_bindings (list of strings) - the message
+bindings that can be used to push content to an Inbox Service
+instance using the protocol identified in the Push Protocol
+field.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.from_dict">
 <em class="property">static </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.PushMethod.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -458,10 +744,41 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod">
 <em class="property">class </em><tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">SubscriptionMethod</tt><big>(</big><em>subscription_protocol</em>, <em>subscription_address</em>, <em>subscription_message_bindings</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
 <dl class="attribute">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.NAME">
 <tt class="descname">NAME</tt><em class="property"> = 'Subscription_Service'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>subscription_protocol</em>, <em>subscription_address</em>, <em>subscription_message_bindings</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new SubscriptionMethod.</p>
+<p>Arguments:
+- subscription_protocol (string) - the protocol binding</p>
+<blockquote>
+<div>supported by this Feed Management Service instance.</div></blockquote>
+<ul class="simple">
+<li>subscription_address (string) - the address of the TAXII
+Daemon hosting this Feed Management Service instance.</li>
+<li>subscription_message_bindings (list of strings) - the message
+bindings supported by this Feed Management Service Instance</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.SubscriptionMethod.__module__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -486,6 +803,51 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 
 </dd></dl>
 
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.__doc__">
+<tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.__eq__">
+<tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.__init__">
+<tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">__init__</tt><big>(</big><em>feed_name</em>, <em>feed_description</em>, <em>supported_contents</em>, <em>available=None</em>, <em>push_methods=None</em>, <em>polling_service_instances=None</em>, <em>subscription_methods=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new FeedInformation</p>
+<p>Arguments:
+- feed_name (string) - the name by which this TAXII Data Feed is</p>
+<blockquote>
+<div>identified.</div></blockquote>
+<ul class="simple">
+<li>feed_description (string) - a prose description of this TAXII
+Data Feed.</li>
+<li>supported_contents (list of strings) - Content Binding IDs
+indicating which types of content are currently expressed in this
+TAXII Data Feed.</li>
+<li>available (boolean) - whether the identity of the requester
+(authenticated or otherwise) is allowed to access this TAXII
+Service.</li>
+<li>push_methods (list of PushMethod objects) - the protocols that
+can be used to push content via a subscription.</li>
+<li>polling_service_instances (list of PollingServiceInstance
+objects) - the bindings and address a Consumer can use to
+interact with a Poll Service instance that supports this TAXII
+Data Feed.</li>
+<li>subscription_methods (list of SubscriptionMethod objects) - the
+protocol and address of the TAXII Daemon hosting the Feed
+Management Service that can process subscriptions for this TAXII
+Data Feed.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.__module__">
+<tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="libtaxii.messages.FeedInformationResponse.FeedInformation.from_dict">
 <em class="property">static </em><tt class="descclassname">FeedInformationResponse.FeedInformation.</tt><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.FeedInformation.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -507,6 +869,38 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.__doc__">
+<tt class="descclassname">FeedInformationResponse.</tt><tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.__eq__">
+<tt class="descclassname">FeedInformationResponse.</tt><tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.FeedInformationResponse.__init__">
+<tt class="descclassname">FeedInformationResponse.</tt><tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>feed_informations=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new FeedInformationResponse.</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- in_response_to (string) - the Message ID of the message to which this</p>
+<blockquote>
+<div>is a response.</div></blockquote>
+<ul class="simple">
+<li>extended_headers (dictionary) - A dictionary of name/value pairs for
+use as Extended Headers</li>
+<li>feed_informations (list of FeedInformation objects) - A list of
+FeedInformation objects to be contained in this response</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.FeedInformationResponse.__module__">
+<tt class="descclassname">FeedInformationResponse.</tt><tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.FeedInformationResponse.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="libtaxii.messages.FeedInformationResponse.from_dict">
@@ -542,7 +936,41 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.InboxMessage.SubscriptionInformation">
 <em class="property">class </em><tt class="descname">SubscriptionInformation</tt><big>(</big><em>feed_name</em>, <em>subscription_id</em>, <em>inclusive_begin_timestamp_label</em>, <em>inclusive_end_timestamp_label</em><big>)</big><a class="headerlink" href="#libtaxii.messages.InboxMessage.SubscriptionInformation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.InboxMessage.SubscriptionInformation.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.InboxMessage.SubscriptionInformation.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.InboxMessage.SubscriptionInformation.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.InboxMessage.SubscriptionInformation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.InboxMessage.SubscriptionInformation.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>feed_name</em>, <em>subscription_id</em>, <em>inclusive_begin_timestamp_label</em>, <em>inclusive_end_timestamp_label</em><big>)</big><a class="headerlink" href="#libtaxii.messages.InboxMessage.SubscriptionInformation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new SubscriptionInformation.</p>
+<p>Arguments:
+- feed_name (string) - the name of the TAXII Data Feed from which</p>
+<blockquote>
+<div>this content is being provided.</div></blockquote>
+<ul class="simple">
+<li>subcription_id (string) - the Subscription ID for which this
+content is being provided.</li>
+<li>inclusive_begin_timestamp_label (datetime) - a Timestamp Label
+indicating the beginning of the time range this Inbox Message
+covers.</li>
+<li>inclusive_end_timestamp_label (datetime) - a Timestamp Label
+indicating the end of the time range this Inbox Message covers.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.InboxMessage.SubscriptionInformation.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.InboxMessage.SubscriptionInformation.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="libtaxii.messages.InboxMessage.SubscriptionInformation.from_dict">
 <em class="property">static </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.InboxMessage.SubscriptionInformation.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -564,6 +992,39 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.InboxMessage.__doc__">
+<tt class="descclassname">InboxMessage.</tt><tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.InboxMessage.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.InboxMessage.__eq__">
+<tt class="descclassname">InboxMessage.</tt><tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.InboxMessage.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.InboxMessage.__init__">
+<tt class="descclassname">InboxMessage.</tt><tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em>, <em>message=None</em>, <em>subscription_information=None</em>, <em>content_blocks=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.InboxMessage.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new InboxMessage.</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- extended_headers (dictionary) - A dictionary of name/value pairs for</p>
+<blockquote>
+<div>use as Extended Headers</div></blockquote>
+<ul class="simple">
+<li>message (string) - prose information for the message recipient.</li>
+<li>subscription_information (a SubscriptionInformation object) - This
+field is only present if this message is being sent to provide
+content in accordance with an existing TAXII Data Feed subscription.</li>
+<li>content_blocks (a list of ContentBlock objects)</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.InboxMessage.__module__">
+<tt class="descclassname">InboxMessage.</tt><tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.InboxMessage.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="libtaxii.messages.InboxMessage.from_dict">
@@ -592,10 +1053,105 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 
 </dd></dl>
 
+<dl class="data">
+<dt id="libtaxii.messages.MSG_DISCOVERY_REQUEST">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_DISCOVERY_REQUEST</tt><em class="property"> = 'Discovery_Request'</em><a class="headerlink" href="#libtaxii.messages.MSG_DISCOVERY_REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Discovery Request Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_DISCOVERY_RESPONSE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_DISCOVERY_RESPONSE</tt><em class="property"> = 'Discovery_Response'</em><a class="headerlink" href="#libtaxii.messages.MSG_DISCOVERY_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Discovery Response Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_FEED_INFORMATION_REQUEST">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_FEED_INFORMATION_REQUEST</tt><em class="property"> = 'Feed_Information_Request'</em><a class="headerlink" href="#libtaxii.messages.MSG_FEED_INFORMATION_REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Feed Information Request Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_FEED_INFORMATION_RESPONSE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_FEED_INFORMATION_RESPONSE</tt><em class="property"> = 'Feed_Information_Response'</em><a class="headerlink" href="#libtaxii.messages.MSG_FEED_INFORMATION_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Feed Information Response Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_INBOX_MESSAGE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_INBOX_MESSAGE</tt><em class="property"> = 'Inbox_Message'</em><a class="headerlink" href="#libtaxii.messages.MSG_INBOX_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Inbox Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST</tt><em class="property"> = 'Subscription_Management_Request'</em><a class="headerlink" href="#libtaxii.messages.MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Subscription Management Request Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE</tt><em class="property"> = 'Subscription_Management_Response'</em><a class="headerlink" href="#libtaxii.messages.MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Subscription Management Response Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_POLL_REQUEST">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_POLL_REQUEST</tt><em class="property"> = 'Poll_Request'</em><a class="headerlink" href="#libtaxii.messages.MSG_POLL_REQUEST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Poll Request Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_POLL_RESPONSE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_POLL_RESPONSE</tt><em class="property"> = 'Poll_Response'</em><a class="headerlink" href="#libtaxii.messages.MSG_POLL_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Poll Response Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.MSG_STATUS_MESSAGE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">MSG_STATUS_MESSAGE</tt><em class="property"> = 'Status_Message'</em><a class="headerlink" href="#libtaxii.messages.MSG_STATUS_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Message</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="libtaxii.messages.ManageFeedSubscriptionRequest">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ManageFeedSubscriptionRequest</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>action=None</em>, <em>subscription_id=None</em>, <em>delivery_parameters=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionRequest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.TAXIIMessage" title="libtaxii.messages.TAXIIMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.TAXIIMessage</span></tt></a></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionRequest.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionRequest.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionRequest.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionRequest.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionRequest.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>action=None</em>, <em>subscription_id=None</em>, <em>delivery_parameters=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionRequest.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new ManageFeedSubscriptionRequest</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- extended_headers (dictionary) - A dictionary of name/value pairs for</p>
+<blockquote>
+<div>use as Extended Headers</div></blockquote>
+<ul class="simple">
+<li>feed_name (string) - the name of the TAXII Data Feed to which the
+action applies.</li>
+<li>action (string) - the requested action to take.</li>
+<li>subscription_id (string) - the ID of a previously created
+subscription</li>
+<li>delivery_parameters (a list of DeliveryParameter objects) - the
+delivery parameters for this request.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionRequest.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionRequest.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="classmethod">
 <dt id="libtaxii.messages.ManageFeedSubscriptionRequest.from_dict">
 <em class="property">classmethod </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionRequest.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -630,7 +1186,39 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance">
 <em class="property">class </em><tt class="descname">PollInstance</tt><big>(</big><em>poll_protocol</em>, <em>poll_address</em>, <em>poll_message_bindings=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="staticmethod">
+<dd><dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=True</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>poll_protocol</em>, <em>poll_address</em>, <em>poll_message_bindings=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new PollInstance.</p>
+<p>Arguments:
+- poll_protocol (string) - The protocol binding supported by this</p>
+<blockquote>
+<div>instance of a Polling Service.</div></blockquote>
+<ul class="simple">
+<li>poll_address (string) - the address of the TAXII Daemon hosting
+this Poll Service.</li>
+<li>poll_message_bindings (list of strings) - one or more message
+bindings that can be used when interacting with this Poll Service
+instance.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
 <dt id="libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.from_dict">
 <em class="property">static </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.PollInstance.from_dict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -655,7 +1243,41 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance">
 <em class="property">class </em><tt class="descclassname">ManageFeedSubscriptionResponse.</tt><tt class="descname">SubscriptionInstance</tt><big>(</big><em>subscription_id</em>, <em>delivery_parameters=None</em>, <em>poll_instances=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>subscription_id</em>, <em>delivery_parameters=None</em>, <em>poll_instances=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new SubscriptionInstance.</p>
+<p>Arguments:
+- subscription_id (string) - an identifier that is used to</p>
+<blockquote>
+<div>reference the given subscription in subsequent exchanges.</div></blockquote>
+<ul class="simple">
+<li>delivery_parameters (list of DeliveryParameter objects) - a copy
+of the Delivery Parameters of the Manage Feed Subscription
+Request Message that established this subscription.</li>
+<li>poll_instances (list of PollInstance objects) - Each Poll
+Instance represents an instance of a Poll Service that can be
+contacted to retrieve content associated with the new
+Subscription.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.from_dict">
 <em class="property">static </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.SubscriptionInstance.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -677,6 +1299,41 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.__doc__">
+<tt class="descclassname">ManageFeedSubscriptionResponse.</tt><tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.__eq__">
+<tt class="descclassname">ManageFeedSubscriptionResponse.</tt><tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.__init__">
+<tt class="descclassname">ManageFeedSubscriptionResponse.</tt><tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>message=None</em>, <em>subscription_instances=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new ManageFeedSubscriptionResponse.</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- in_response_to (string) - Contains the Message ID of the message to</p>
+<blockquote>
+<div>which this is a response.</div></blockquote>
+<ul class="simple">
+<li>extended_headers (dictionary) - A dictionary of name/value pairs for
+use as Extended Headers</li>
+<li>feed_name (string) - the name of the TAXII Data Feed to which the
+action applies.</li>
+<li>message (string) - a message associated with the subscription
+response.</li>
+<li>subscription_instances (a list of SubscriptionInstance objects)</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.ManageFeedSubscriptionResponse.__module__">
+<tt class="descclassname">ManageFeedSubscriptionResponse.</tt><tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.ManageFeedSubscriptionResponse.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="classmethod">
 <dt id="libtaxii.messages.ManageFeedSubscriptionResponse.from_dict">
@@ -709,6 +1366,46 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dt id="libtaxii.messages.PollRequest">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">PollRequest</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>exclusive_begin_timestamp_label=None</em>, <em>inclusive_end_timestamp_label=None</em>, <em>subscription_id=None</em>, <em>content_bindings=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollRequest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.TAXIIMessage" title="libtaxii.messages.TAXIIMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.TAXIIMessage</span></tt></a></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.PollRequest.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.PollRequest.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.PollRequest.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollRequest.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.PollRequest.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>exclusive_begin_timestamp_label=None</em>, <em>inclusive_end_timestamp_label=None</em>, <em>subscription_id=None</em>, <em>content_bindings=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollRequest.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new PollRequest.</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- extended_headers (dictionary) - A dictionary of name/value pairs for</p>
+<blockquote>
+<div>use as Extended Headers</div></blockquote>
+<ul class="simple">
+<li>feed_name (string) - the name of the TAXII Data Feed that is being
+polled.</li>
+<li>exclusive_begin_timestamp_label (datetime) - a Timestamp Label
+indicating the beginning of the range of TAXII Data Feed content the
+requester wishes to receive.</li>
+<li>inclusive_end_timestamp_label (datetime) - a Timestamp Label
+indicating the end of the range of TAXII Data Feed content the
+requester wishes to receive.</li>
+<li>subscription_id (string) - the existing subscription the Consumer
+wishes to poll.</li>
+<li>content_bindings (list of strings) - the type of content that is
+requested in the response to this poll.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.PollRequest.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.PollRequest.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="classmethod">
 <dt id="libtaxii.messages.PollRequest.from_dict">
 <em class="property">classmethod </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollRequest.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -740,6 +1437,46 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dt id="libtaxii.messages.PollResponse">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">PollResponse</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>inclusive_begin_timestamp_label=None</em>, <em>inclusive_end_timestamp_label=None</em>, <em>subscription_id=None</em>, <em>message=None</em>, <em>content_blocks=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollResponse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.TAXIIMessage" title="libtaxii.messages.TAXIIMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.TAXIIMessage</span></tt></a></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.PollResponse.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.PollResponse.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.PollResponse.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollResponse.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.PollResponse.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>feed_name=None</em>, <em>inclusive_begin_timestamp_label=None</em>, <em>inclusive_end_timestamp_label=None</em>, <em>subscription_id=None</em>, <em>message=None</em>, <em>content_blocks=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollResponse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new PollResponse:</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- in_response_to (string) - Contains the Message ID of the message to</p>
+<blockquote>
+<div>which this is a response.response.</div></blockquote>
+<ul class="simple">
+<li>extended_headers (dictionary) - A dictionary of name/value pairs for
+use as Extended Headers</li>
+<li>feed_name (string) - the name of the TAXII Data Feed that was polled</li>
+<li>inclusive_begin_timestamp_label (datetime) - a Timestamp Label
+indicating the beginning of the time range this Poll Response covers</li>
+<li>inclusive_end_timestamp_label (datetime) - a Timestamp Label
+indicating the end of the time range this Poll Response covers.</li>
+<li>subscription_id (string) - the Subscription ID for which this content
+is being provided.</li>
+<li>message (string) - additional information for the message recipient</li>
+<li>content_blocks (list of ContentBlock objects) - a piece of content
+and additional information related to the content.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.PollResponse.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.PollResponse.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="classmethod">
 <dt id="libtaxii.messages.PollResponse.from_dict">
 <em class="property">classmethod </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.PollResponse.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -767,10 +1504,137 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 
 </dd></dl>
 
+<dl class="data">
+<dt id="libtaxii.messages.ST_BAD_MESSAGE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_BAD_MESSAGE</tt><em class="property"> = 'BAD_MESSAGE'</em><a class="headerlink" href="#libtaxii.messages.ST_BAD_MESSAGE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Bad Message</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_DENIED">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_DENIED</tt><em class="property"> = 'DENIED'</em><a class="headerlink" href="#libtaxii.messages.ST_DENIED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Denied</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_FAILURE">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_FAILURE</tt><em class="property"> = 'FAILURE'</em><a class="headerlink" href="#libtaxii.messages.ST_FAILURE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Failure</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_NOT_FOUND">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_NOT_FOUND</tt><em class="property"> = 'NOT_FOUND'</em><a class="headerlink" href="#libtaxii.messages.ST_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Not Found</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_POLLING_UNSUPPORTED">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_POLLING_UNSUPPORTED</tt><em class="property"> = 'POLLING_UNSUPPORTED'</em><a class="headerlink" href="#libtaxii.messages.ST_POLLING_UNSUPPORTED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Polling Unsupported</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_RETRY">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_RETRY</tt><em class="property"> = 'RETRY'</em><a class="headerlink" href="#libtaxii.messages.ST_RETRY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Retry</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_SUCCESS">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_SUCCESS</tt><em class="property"> = 'SUCCESS'</em><a class="headerlink" href="#libtaxii.messages.ST_SUCCESS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Success</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_UNAUTHORIZED">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_UNAUTHORIZED</tt><em class="property"> = 'UNAUTHORIZED'</em><a class="headerlink" href="#libtaxii.messages.ST_UNAUTHORIZED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Unauthorized</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_UNSUPPORTED_CONTENT_BINDING">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_UNSUPPORTED_CONTENT_BINDING</tt><em class="property"> = 'UNSUPPORTED_CONTENT'</em><a class="headerlink" href="#libtaxii.messages.ST_UNSUPPORTED_CONTENT_BINDING" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Unsupported Content Binding</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_UNSUPPORTED_MESSAGE_BINDING">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_UNSUPPORTED_MESSAGE_BINDING</tt><em class="property"> = 'UNSUPPORTED_MESSAGE'</em><a class="headerlink" href="#libtaxii.messages.ST_UNSUPPORTED_MESSAGE_BINDING" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Unsupported Message Binding</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.ST_UNSUPPORTED_PROTOCOL">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">ST_UNSUPPORTED_PROTOCOL</tt><em class="property"> = 'UNSUPPORTED_PROTOCOL_BINDING'</em><a class="headerlink" href="#libtaxii.messages.ST_UNSUPPORTED_PROTOCOL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Status Type of Unsupported Protocol Binding</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.SVC_DISCOVERY">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">SVC_DISCOVERY</tt><em class="property"> = 'DISCOVERY'</em><a class="headerlink" href="#libtaxii.messages.SVC_DISCOVERY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Service Type of Discovery</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.SVC_FEED_MANAGEMENT">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">SVC_FEED_MANAGEMENT</tt><em class="property"> = 'FEED_MANAGEMENT'</em><a class="headerlink" href="#libtaxii.messages.SVC_FEED_MANAGEMENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Service Type of Feed Management</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.SVC_INBOX">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">SVC_INBOX</tt><em class="property"> = 'INBOX'</em><a class="headerlink" href="#libtaxii.messages.SVC_INBOX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Service Type of Inbox</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="libtaxii.messages.SVC_POLL">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">SVC_POLL</tt><em class="property"> = 'POLL'</em><a class="headerlink" href="#libtaxii.messages.SVC_POLL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant identifying a Service Type of Poll</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="libtaxii.messages.StatusMessage">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">StatusMessage</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>status_type=None</em>, <em>status_detail=None</em>, <em>message=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.StatusMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.TAXIIMessage" title="libtaxii.messages.TAXIIMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.TAXIIMessage</span></tt></a></p>
+<dl class="attribute">
+<dt id="libtaxii.messages.StatusMessage.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = None</em><a class="headerlink" href="#libtaxii.messages.StatusMessage.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.StatusMessage.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.StatusMessage.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.StatusMessage.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to</em>, <em>extended_headers=None</em>, <em>status_type=None</em>, <em>status_detail=None</em>, <em>message=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.StatusMessage.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new StatusMessage.</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- in_response_to (string) - Contains the Message ID of the message to</p>
+<blockquote>
+<div>which this is a response.</div></blockquote>
+<ul class="simple">
+<li>extended_headers (dictionary) - A dictionary of name/value pairs for
+use as Extended Headers</li>
+<li>status_type (string) - One of the defined Status Types or a third
+partydefined Status Type.</li>
+<li>status_detail (string) - A field for additional information about
+this status in a machine-readable format.</li>
+<li>message (string) - Additional information for the status. There is no
+expectation that this field be interpretable by a machine; it is
+instead targeted to a human operator.</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.StatusMessage.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.StatusMessage.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="classmethod">
 <dt id="libtaxii.messages.StatusMessage.from_dict">
 <em class="property">classmethod </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.StatusMessage.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -801,10 +1665,45 @@ If set to &#8216;noproxy&#8217;, don&#8217;t use a proxy (even the system proxy)
 <dl class="class">
 <dt id="libtaxii.messages.TAXIIMessage">
 <em class="property">class </em><tt class="descclassname">libtaxii.messages.</tt><tt class="descname">TAXIIMessage</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#libtaxii.messages.BaseNonMessage" title="libtaxii.messages.BaseNonMessage"><tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></a></p>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">libtaxii.messages.BaseNonMessage</span></tt></p>
 <p>Encapsulate properties common to all TAXII Messages (such as headers).</p>
 <p>This class is extended by each Message Type (e.g., DiscoveryRequest), with
 each subclass containing subclass-specific information</p>
+<dl class="attribute">
+<dt id="libtaxii.messages.TAXIIMessage.__doc__">
+<tt class="descname">__doc__</tt><em class="property"> = 'Encapsulate properties common to all TAXII Messages (such as headers).\n\n    This class is extended by each Message Type (e.g., DiscoveryRequest), with\n    each subclass containing subclass-specific information\n    '</em><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.__doc__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.TAXIIMessage.__eq__">
+<tt class="descname">__eq__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.TAXIIMessage.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>message_id</em>, <em>in_response_to=None</em>, <em>extended_headers=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new TAXIIMessage</p>
+<p>Arguments:
+- message_id (string) - A value identifying this message.
+- in_response_to (string) - Contains the Message ID of the message to</p>
+<blockquote>
+<div>which this is a response.</div></blockquote>
+<ul class="simple">
+<li>extended_headers (dictionary) - A dictionary of name/value pairs for
+use as Extended Headers</li>
+</ul>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="libtaxii.messages.TAXIIMessage.__module__">
+<tt class="descname">__module__</tt><em class="property"> = 'libtaxii.messages'</em><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="libtaxii.messages.TAXIIMessage.__ne__">
+<tt class="descname">__ne__</tt><big>(</big><em>other</em>, <em>debug=False</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="classmethod">
 <dt id="libtaxii.messages.TAXIIMessage.from_dict">
 <em class="property">classmethod </em><tt class="descname">from_dict</tt><big>(</big><em>d</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.from_dict" title="Permalink to this definition">¶</a></dt>
@@ -817,6 +1716,15 @@ method first, then parse their specific dictionary constructs.</p>
 <dl class="classmethod">
 <dt id="libtaxii.messages.TAXIIMessage.from_etree">
 <em class="property">classmethod </em><tt class="descname">from_etree</tt><big>(</big><em>src_etree</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.from_etree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pulls properties of a TAXII Message from an etree.</p>
+<p>Message-specific constructs must be pulled by each Message class. In
+general, when converting from etree, subclasses should call this method
+first, then parse their specific XML constructs.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="libtaxii.messages.TAXIIMessage.from_json">
+<em class="property">classmethod </em><tt class="descname">from_json</tt><big>(</big><em>json_string</em><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.from_json" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -851,6 +1759,11 @@ first, then create their specific XML constructs.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="libtaxii.messages.TAXIIMessage.to_json">
+<tt class="descname">to_json</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.to_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="libtaxii.messages.TAXIIMessage.to_xml">
 <tt class="descname">to_xml</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.TAXIIMessage.to_xml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a message to XML.</p>
@@ -858,6 +1771,13 @@ first, then create their specific XML constructs.</p>
 for cls.to_etree.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="function">
+<dt id="libtaxii.messages._str2datetime">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">_str2datetime</tt><big>(</big><em>date_string</em><big>)</big><a class="headerlink" href="#libtaxii.messages._str2datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Users of libtaxii should not use this function.
+Takes a date string and creates a datetime object</p>
 </dd></dl>
 
 <dl class="function">
@@ -875,11 +1795,34 @@ the dictionary.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="libtaxii.messages.get_message_from_json">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">get_message_from_json</tt><big>(</big><em>json_string</em><big>)</big><a class="headerlink" href="#libtaxii.messages.get_message_from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a TAXII Message object from a json string.</p>
+<p>Note: This function auto-detects which TAXII Message should be created form
+the JSON string.</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="libtaxii.messages.get_message_from_xml">
 <tt class="descclassname">libtaxii.messages.</tt><tt class="descname">get_message_from_xml</tt><big>(</big><em>xml_string</em><big>)</big><a class="headerlink" href="#libtaxii.messages.get_message_from_xml" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a TAXII Message object from an XML string.</p>
 <p>Note: This function auto-detects which TAXII Message should be created from
 the XML.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libtaxii.messages.get_xml_parser">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">get_xml_parser</tt><big>(</big><big>)</big><a class="headerlink" href="#libtaxii.messages.get_xml_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the XML Parser being used by libtaxii.messages. 
+This method instantiates an XML Parser with no_network=True and
+huge_tree=True if the XML Parser has not already been set via 
+set_xml_parser()</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="libtaxii.messages.set_xml_parser">
+<tt class="descclassname">libtaxii.messages.</tt><tt class="descname">set_xml_parser</tt><big>(</big><em>xml_parser=None</em><big>)</big><a class="headerlink" href="#libtaxii.messages.set_xml_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the libtaxii.messages XML parser.</p>
 </dd></dl>
 
 <dl class="function">
@@ -907,6 +1850,9 @@ the XML.</p>
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="getting_started.html"
+                        title="previous chapter">Getting Started</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/libtaxii.txt"
@@ -938,6 +1884,9 @@ the XML.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="Getting Started"
+             >previous</a> |</li>
         <li><a href="index.html">libtaxii 1.0.104 documentation</a> &raquo;</li> 
       </ul>
     </div>

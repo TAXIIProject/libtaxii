@@ -1,0 +1,1 @@
+sphinx-apidoc ..\libtaxii -o . -f

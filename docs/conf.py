@@ -123,7 +123,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -246,3 +246,18 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+# -- Things to skip ----------------------------------------------------
+
+def skip_non_api_items(app, what, name, obj, skip, options):
+    if name in ['BaseNonMessage',
+                'get_message_from_httplib_http_response',
+                'get_message_from_urllib2_httperror',
+                'get_message_from_urllib_addinfourl',
+                'HTTPClientAuthHandler',
+                'HTTPSClientAuthHandler']:
+        return True
+    return False
+
+def setup(app):
+    app.connect('autodoc-skip-member', skip_non_api_items)

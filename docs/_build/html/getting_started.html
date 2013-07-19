@@ -24,7 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="libtaxii 1.0.104 documentation" href="index.html" />
-    <link rel="prev" title="Overview" href="overview.html" /> 
+    <link rel="next" title="libtaxii Package" href="libtaxii.html" />
+    <link rel="prev" title="Installation instructions for libtaxii" href="install.html" /> 
   </head>
   <body>
     <div class="related">
@@ -34,7 +35,13 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="overview.html" title="Overview"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="libtaxii.html" title="libtaxii Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation instructions for libtaxii"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">libtaxii 1.0.104 documentation</a> &raquo;</li> 
       </ul>
@@ -48,15 +55,15 @@
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <p>This page gives an introduction to libtaxii and how to use it. Please note that this page is being actively worked on and feedback is welcome.</p>
-</div>
-<div class="section" id="libtaxii">
-<h1>libtaxii<a class="headerlink" href="#libtaxii" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="libtaxii-components">
+<h2>libtaxii Components<a class="headerlink" href="#libtaxii-components" title="Permalink to this headline">¶</a></h2>
 <p>libtaxii contains the following components:</p>
 <ul class="simple">
 <li><strong>libtaxii\__init__.py</strong> - Interface for methods that span messages.py and clients.py. Defines constants applicable to both TAXII Messages and TAXII Clients.</li>
 <li><strong>libtaxii\messages.py</strong> - Interface for handling TAXII Messages, creating the XML representation of a TAXII Message, and parsing the XML representation of a TAXII Message. Defines constants relevant to TAXII Messages.</li>
 <li><strong>libtaxii\clients.py</strong> - Interface for a TAXII HTTP and HTTPS client. Defines constants relevant to TAXII HTTP Clients</li>
 </ul>
+</div>
 <div class="section" id="messages-class-structure-messages-py">
 <h2>Messages Class Structure (messages.py)<a class="headerlink" href="#messages-class-structure-messages-py" title="Permalink to this headline">¶</a></h2>
 <p>In messages.py, each TAXII Message has a corresponding class (e.g., There is a DiscoveryRequest class for the Discovery Request message). In addition, other classes exist where appropriate. If a class can only exist with the context of a specific TAXII Message (e.g., a ServiceInstance can only exist in a DiscoveryResponse), that class (ServiceInstance) is a subclass of the message class (DiscoveryResponse). If a class can exist across multiple messages (e.g., ContentBlock can exist in both PollResponse and InboxMessage) it exists as a peer to TAXII Messages.</p>
@@ -141,8 +148,8 @@ The Clients portion of libtaxii is a fairly straightforward wrapper around httpl
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Getting Started</a></li>
-<li><a class="reference internal" href="#libtaxii">libtaxii</a><ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#libtaxii-components">libtaxii Components</a></li>
 <li><a class="reference internal" href="#messages-class-structure-messages-py">Messages Class Structure (messages.py)</a></li>
 <li><a class="reference internal" href="#messages-serialization-and-deserialization-messages-py">Messages Serialization and Deserialization (messages.py)</a></li>
 <li><a class="reference internal" href="#clients-clients-py">Clients (clients.py)</a></li>
@@ -151,8 +158,11 @@ The Clients portion of libtaxii is a fairly straightforward wrapper around httpl
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="overview.html"
-                        title="previous chapter">Overview</a></p>
+  <p class="topless"><a href="install.html"
+                        title="previous chapter">Installation instructions for libtaxii</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="libtaxii.html"
+                        title="next chapter">libtaxii Package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/getting_started.txt"
@@ -182,7 +192,13 @@ The Clients portion of libtaxii is a fairly straightforward wrapper around httpl
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="overview.html" title="Overview"
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="libtaxii.html" title="libtaxii Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="install.html" title="Installation instructions for libtaxii"
              >previous</a> |</li>
         <li><a href="index.html">libtaxii 1.0.104 documentation</a> &raquo;</li> 
       </ul>

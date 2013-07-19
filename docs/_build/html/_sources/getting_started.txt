@@ -3,8 +3,8 @@ Getting Started
 
 This page gives an introduction to libtaxii and how to use it. Please note that this page is being actively worked on and feedback is welcome.
 
-libtaxii
-========
+libtaxii Components
+---------
 libtaxii contains the following components:
 
 * **libtaxii\\__init__.py** - Interface for methods that span messages.py and clients.py. Defines constants applicable to both TAXII Messages and TAXII Clients.

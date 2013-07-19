@@ -1,12 +1,13 @@
-#Copyright (C) 2013 - The MITRE Corporation
-#For license information, see the LICENSE.txt file
+""" 
+| Copyright (C) 2013 - The MITRE Corporation
+| For license information, see the LICENSE.txt file
 
-### Contributors ###
-#Contributors: If you would like, add your name to the list, alphabetically by last name
-#
-# Alex Ciobanu - calex@cert.europa.eu 
-# Mark Davidson - mdavidson@mitre.org
-#
+| Contributors:
+ 
+* Alex Ciobanu - calex@cert.europa.eu  
+* Mark Davidson - mdavidson@mitre.org  
+
+"""
 
 import random
 import os
@@ -19,44 +20,70 @@ try:
 except ImportError:
     import json
 
+#:Constant identifying a Status Message
 MSG_STATUS_MESSAGE = 'Status_Message'
+#:Constant identifying a Discovery Request Message
 MSG_DISCOVERY_REQUEST = 'Discovery_Request'
+#:Constant identifying a Discovery Response Message
 MSG_DISCOVERY_RESPONSE = 'Discovery_Response'
+#:Constant identifying a Feed Information Request Message
 MSG_FEED_INFORMATION_REQUEST = 'Feed_Information_Request'
+#:Constant identifying a Feed Information Response Message
 MSG_FEED_INFORMATION_RESPONSE = 'Feed_Information_Response'
+#:Constant identifying a Subscription Management Request Message
 MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
+#:Constant identifying a Subscription Management Response Message
 MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
+#:Constant identifying a Poll Request Message
 MSG_POLL_REQUEST = 'Poll_Request'
+#:Constant identifying a Poll Response Message
 MSG_POLL_RESPONSE = 'Poll_Response'
+#:Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = 'Inbox_Message'
 
 #Status Types
+#: Constant identifying a Status Type of Bad Message
 ST_BAD_MESSAGE = 'BAD_MESSAGE'
+#: Constant identifying a Status Type of Denied
 ST_DENIED = 'DENIED'
+#: Constant identifying a Status Type of Failure
 ST_FAILURE = 'FAILURE'
+#: Constant identifying a Status Type of Not Found
 ST_NOT_FOUND = 'NOT_FOUND'
+#: Constant identifying a Status Type of Polling Unsupported
 ST_POLLING_UNSUPPORTED = 'POLLING_UNSUPPORTED'
+#: Constant identifying a Status Type of Retry
 ST_RETRY = 'RETRY'
+#: Constant identifying a Status Type of Success
 ST_SUCCESS = 'SUCCESS'
+#: Constant identifying a Status Type of Unauthorized
 ST_UNAUTHORIZED = 'UNAUTHORIZED'
+#: Constant identifying a Status Type of Unsupported Message Binding
 ST_UNSUPPORTED_MESSAGE_BINDING = 'UNSUPPORTED_MESSAGE'
+#: Constant identifying a Status Type of Unsupported Content Binding
 ST_UNSUPPORTED_CONTENT_BINDING = 'UNSUPPORTED_CONTENT'
+#: Constant identifying a Status Type of Unsupported Protocol Binding
 ST_UNSUPPORTED_PROTOCOL = 'UNSUPPORTED_PROTOCOL_BINDING'
 
+#: Constant identifying an Action of Subscribe
 ACT_SUBSCRIBE = 'SUBSCRIBE'
+#: Constant identifying an Action of Unsubscribe
 ACT_UNSUBSCRIBE = 'UNSUBSCRIBE'
+#: Constant identifying an Action of Status
 ACT_STATUS = 'STATUS'
 
 #Service types
+#: Constant identifying a Service Type of Inbox
 SVC_INBOX = 'INBOX'
+#: Constant identifying a Service Type of Poll
 SVC_POLL = 'POLL'
+#: Constant identifying a Service Type of Feed Management
 SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
+#: Constant identifying a Service Type of Discovery
 SVC_DISCOVERY = 'DISCOVERY'
 
 ns_map = {
             'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
-            #TODO: figure out what to do with the digital signature namespace
-            #'ds': 'http://www.w3.org/2000/09/xmldsig#',
          }
 
 ### General purpose helper methods ###
@@ -178,15 +205,25 @@ def get_message_from_dict(d):
 
 
 def get_message_from_json(json_string):
+    """Create a TAXII Message object from a json string.
+    
+    Note: This function auto-detects which TAXII Message should be created form
+    the JSON string.
+    """
     return get_message_from_dict(json.loads(json_string))
 
 
 def _str2datetime(date_string):
+    """ Users of libtaxii should not use this function.
+    Takes a date string and creates a datetime object
+    """
     return dateutil.parser.parse(date_string)
 
 
 class BaseNonMessage(object):
-    """Base class for non-TAXII Message objects"""
+    """This class should not be used directly by libtaxii users.  
+    
+    Base class for non-TAXII Message objects"""
 
     def to_etree(self):
         """Create an etree representation of this class.

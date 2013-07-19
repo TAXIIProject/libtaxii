@@ -1,12 +1,13 @@
-#Copyright (C) 2013 - The MITRE Corporation
-#For license information, see the LICENSE.txt file
+""" 
+| Copyright (C) 2013 - The MITRE Corporation
+| For license information, see the LICENSE.txt file
 
-### Contributors ###
-#Contributors: If you would like, add your name to the list, alphabetically by last name
-#
-# Alex Ciobanu - calex@cert.europa.eu 
-# Mark Davidson - mdavidson@mitre.org
-#
+| Contributors:
+ 
+* Alex Ciobanu - calex@cert.europa.eu  
+* Mark Davidson - mdavidson@mitre.org  
+
+"""
 
 import httplib
 import urllib
@@ -63,17 +64,18 @@ class HttpClient:
                                            self.auth_credentials['password']))
 
     def setProxy(self, proxy_string=None, proxy_type=PROXY_HTTP):
-        """Set the proxy settings to use when making a connection.
+        """
+        Set the proxy settings to use when making a connection.
 
         Arguments:
-        - proxy_string - a string like 'http://proxy.example.com:80'
+        * proxy_string - a string like 'http://proxy.example.com:80'
           If set to None, use the system proxy.
           If set to 'noproxy', don't use a proxy (even the system proxy)
-        - proxy_type - either PROXY_HTTP or PROXY_HTTPS
+        * proxy_type - either PROXY_HTTP or PROXY_HTTPS
         """
         self.proxy_string = proxy_string
         self.proxy_type = proxy_type
-
+    
     def setUseHttps(self, bool):
         if bool == True:
             self.use_https = True
@@ -81,7 +83,7 @@ class HttpClient:
             self.use_https = False
         else:
             raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
-
+    
     def setAuthCredentials(self, auth_credentials_dict):
         """Set the authentication credentials used later when making a request.
 
@@ -101,7 +103,7 @@ class HttpClient:
             if k not in auth_credentials_dict:
                 raise Exception('Invalid auth credentials. Field %s is not present' % k)
         self.auth_credentials = auth_credentials_dict
-
+    
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
         if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:
