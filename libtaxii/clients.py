@@ -196,7 +196,7 @@ class HttpClient:
             if (self.auth_type == HttpClient.AUTH_CERT or
                self.auth_type == HttpClient.AUTH_CERT_BASIC):
                 key_file = self.auth_credentials['key_file']
-                cert_file = self.auth_credentials['key_file']
+                cert_file = self.auth_credentials['cert_file']
             else:
                 key_file = None
                 cert_file = None
