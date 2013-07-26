@@ -14,8 +14,9 @@ import urllib
 import urllib2
 import base64
 import uuid
+import socket
+import ssl
 import libtaxii
-
 
 class HttpClient:
 
@@ -35,6 +36,8 @@ class HttpClient:
         self.use_https = False
         self.proxy_type = None
         self.proxy_string = None
+        self.verify_server = False
+        self.ca_file = None
 
     def setAuthType(self, auth_type):
         """Set the authentication type.
@@ -55,6 +58,17 @@ class HttpClient:
             self.auth_type = HttpClient.AUTH_CERT_BASIC
         else:
             raise Exception('Invalid auth_type specified. Must be one of HttpClient AUTH_NONE, AUTH_BASIC, or AUTH_CERT')
+
+    def setVerifyServer(self, verify_server=False, ca_file=None):
+        """
+        Tell libtaxii whether to verify the server's ssl certificate 
+        using the provided ca_file.
+        """
+        if verify_server and ca_file is None:
+            raise ValueError('If verify_server is True, ca_file must not be None.')
+        
+        self.verify_server=verify_server
+        self.ca_file=ca_file
 
     @property
     def basic_auth_header(self):
@@ -178,20 +192,27 @@ class HttpClient:
 
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTPS_10
-
-            if self.auth_type == HttpClient.AUTH_NONE:
-                handler_list.append(urllib2.HTTPSHandler())
-            elif self.auth_type == HttpClient.AUTH_BASIC:
+            
+            if (self.auth_type == HttpClient.AUTH_CERT or
+               self.auth_type == HttpClient.AUTH_CERT_BASIC):
+                key_file = self.auth_credentials['key_file']
+                cert_file = self.auth_credentials['cert_file']
+            else:
+                key_file = None
+                cert_file = None
+            
+            if (self.auth_type == HttpClient.AUTH_BASIC or
+               self.auth_type == HttpClient.AUTH_CERT_BASIC):
                 header_dict['Authorization'] = self.basic_auth_header
-            elif self.auth_type == HttpClient.AUTH_CERT:
-                k = self.auth_credentials['key_file']
-                c = self.auth_credentials['cert_file']
-                handler_list.append(HTTPSClientAuthHandler(k, c))
-            elif self.auth_type == HttpClient.AUTH_CERT_BASIC:
-                header_dict['Authorization'] = self.basic_auth_header
-                k = self.auth_credentials['key_file']
-                c = self.auth_credentials['cert_file']
-                handler_list.append(HTTPSClientAuthHandler(k, c))
+            
+            verify_server = self.verify_server
+            ca_file = self.ca_file
+            
+            handler_list.append(LibtaxiiHTTPSHandler(key_file=key_file, 
+                                                     cert_file=cert_file, 
+                                                     verify_server=verify_server, 
+                                                     ca_certs=ca_file))
+            
         else:  # Not using https
             header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTP_10
 
@@ -242,20 +263,24 @@ class HttpClient:
         except urllib2.HTTPError, error:
             return error
 
-
 #http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
-class HTTPSClientAuthHandler(urllib2.HTTPSHandler):
-    def __init__(self, key, cert):
+class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
+    def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
         urllib2.HTTPSHandler.__init__(self)
-        self.key = key
-        self.cert = cert
+        self.key_file = key_file
+        self.cert_file = cert_file
+        self.verify_server = verify_server
+        self.ca_certs = ca_certs
 
     def https_open(self, req):
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host, timeout=0):
-        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert)
-
+        return VerifiableHTTPSConnection(host, 
+                                       key_file=self.key_file, 
+                                       cert_file=self.cert_file, 
+                                       verify_server=self.verify_server, 
+                                       ca_certs=self.ca_certs)
 
 class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
     def __init__(self, key, cert):
@@ -268,3 +293,39 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
 
     def getConnection(self, host, timeout=0):
         return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
+
+class VerifiableHTTPSConnection(httplib.HTTPSConnection):
+    """
+    The default httplib HTTPSConnection does not verify certificates.
+    This class extends HTTPSConnection and requires certificate verification.
+    Borrowed from http://thejosephturner.com/blog/2011/03/19/https-certificate-verification-in-python-with-urllib2/
+    """
+    
+    def __init__(self, host, port=None, key_file=None, cert_file=None,
+                     strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+                     source_address=None, verify_server=False, ca_certs=None):
+        httplib.HTTPSConnection.__init__(self, host, port, key_file, 
+                                         cert_file, strict, timeout, 
+                                         source_address)
+        
+        if verify_server:
+            self.cert_reqs = ssl.CERT_REQUIRED
+        else:
+            self.cert_reqs = ssl.CERT_NONE
+        self.ca_certs = ca_certs
+    
+    def connect(self):
+        #overrides the version in httplib so that we do 
+        #certificate verification
+        sock = socket.create_connection((self.host, self.port), 
+                                         self.timeout,
+                                         self.source_address)
+        if self._tunnel_host:
+            self.sock = sock
+            self._tunnel()
+        
+        self.sock = ssl.wrap_socket(sock,
+                        keyfile=self.key_file,
+                        certfile=self.cert_file,
+                        cert_reqs=self.cert_reqs,
+                        ca_certs=self.ca_certs)
