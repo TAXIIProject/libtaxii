@@ -81,6 +81,8 @@ SVC_POLL = 'POLL'
 SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
 #: Constant identifying a Service Type of Discovery
 SVC_DISCOVERY = 'DISCOVERY'
+# Tuple of all service types 
+SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_FEED_MANAGEMENT, SVC_DISCOVERY)
 
 ns_map = {
             'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
@@ -802,6 +804,17 @@ class DiscoveryResponse(TAXIIMessage):
                 self.inbox_service_accepted_content = inbox_service_accepted_content
             self.available = available
             self.message = message
+
+        @property
+        def service_type(self):
+            return self._service_type
+        
+        @service_type.setter
+        def service_type(self, value):
+            if value not in SVC_TYPES:
+                raise ValueError('value must be one of [%s]' % ', '.join(SVC_TYPES))
+            
+            self._service_type = value
 
         def to_etree(self):
             si = etree.Element('{%s}Service_Instance' % ns_map['taxii'])
