@@ -79,7 +79,7 @@ ACT_SUBSCRIBE = 'SUBSCRIBE'
 ACT_UNSUBSCRIBE = 'UNSUBSCRIBE'
 #: Constant identifying an Action of Status
 ACT_STATUS = 'STATUS'
-# Tuple of all Actions
+# Tuple of all actions
 ACT_TYPES = (ACT_SUBSCRIBE, ACT_UNSUBSCRIBE, ACT_STATUS)
 
 #Service types
