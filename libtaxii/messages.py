@@ -100,6 +100,79 @@ ns_map = {
 
 ### General purpose helper methods ###
 
+_uri_regex = ("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
+_message_id_regex = ("[0-9]+", "Numbers only")
+
+def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none=False):
+    """
+    Checks supplied var against all of the supplied checks using the following
+    process:
+    
+    1. If var is a list, call this function for every item in the list
+    2. If the var is none and can be none, return
+    3. If the var is none and cannot be none, raise ValueError
+    4. If a type is specified, and the var is not of the specified type, raise ValueError
+    5. If a regex is specified, and the var doesn't match the regex, raise ValueError
+    6. If a value_tuple is specified, and the var is not in the value_tuple, raise ValueError
+    
+    varname is used in the error messages
+    
+    """
+    
+    if isinstance(var, list):
+        x = 0
+        for item in var:
+            do_check(item, "%s[%s]" % (varname, x), type_check, regex, value_tuple, can_be_none)
+            x = x+1
+        return
+    
+    if var is None and can_be_none:
+        return
+    
+    if var is None and not can_be_none:
+        raise ValueError(none_error % varname)
+    
+    if type is not None:
+        if not isinstance(var, type):
+            bad_type = var.__class__.__name__
+            raise ValueError(type_error % (varname, type, bad_type))
+    
+    if regex is not None:
+        regex_string = regex[0]
+        title = regex[1]
+        
+        if re.match(regex_string, var) is None:
+        raise ValueError(regex_error % (varname, title, var))
+    
+    if value_tuple is not None:
+        if not var in value_tuple:
+            raise ValueError(tuple_error % (varname, value_tuple, var))
+    return
+
+def _check_timestamplabel(timestamp_label, varname, can_be_none=False):
+    """
+    Checks the timestamp_label to see if it is a valid timestamp label
+    using the following process:
+    
+    1. If the timestamp_label is None and is allowed to be None, Pass
+    2. If the timestamp_label is None and is not allowed to be None, Fail
+    3. If the timestamp_label does not have a tzinfo attribute, Fail
+    4. Pass
+    """
+    
+    if timestamp_label is None and can_be_none:
+        return
+    
+    if timestamp_label is None and not can_be_none:
+        raise ValueError("%s is not allowed to be None and the provided \
+                          value was None" % (varname))
+
+    _do_check(timestamp_label, varname, type=datetime.datetime, can_be_none)
+    
+    if timestamp_label.tzinfo is None:
+        raise ValueError('%s.tzinfo must not be None!' % varname)
+    
+    return
 
 def generate_message_id(maxlen=5):
     """Generate a TAXII Message ID with a max length of `maxlen`."""
@@ -308,7 +381,7 @@ class BaseNonMessage(object):
 
 
 class DeliveryParameters(BaseNonMessage):
-
+        #TODO: Should the default arguments of these change? I'm not sure these are actually optional
         def __init__(self, inbox_protocol=None, inbox_address=None, delivery_message_binding=None, content_bindings=None):
             """Set up Delivery Parameters.
 
@@ -332,6 +405,23 @@ class DeliveryParameters(BaseNonMessage):
                 self.content_bindings = []
             else:
                 self.content_bindings = content_bindings
+
+        @inbox_protocol.setter
+        def inbox_protocol(self, value):
+            _do_check(value, 'inbox_protocol', regex=_uri_regex)
+            self.inbox_protocol = value
+        
+        #TODO: Can inbox_address be validated?
+        
+        @delivery_message_binding.setter
+        def delivery_message_binding(self, value):
+            _do_check(value, 'delivery_message_binding', regex=_uri_regex)
+            self.delivery_message_binding = value
+        
+        @content_bindings.setter
+        def content_bindings(self, value):
+            _do_check(value, 'content_bindings', regex=_uri_regex)
+            self.content_bindings = value
 
         def to_etree(self):
             xml = etree.Element('{%s}Push_Parameters' % ns_map['taxii'])
@@ -438,6 +528,22 @@ class TAXIIMessage(BaseNonMessage):
         else:
             self.extended_headers = extended_headers
 
+    @message_id.setter
+    def message_id(self, value):
+        _do_check(value, 'message_id', regex=_message_id_regex)
+        self.message_id = value
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        _do_check(value, 'in_response_to', regex=_message_id_regex, can_be_none=True)
+        self.in_response_to = value
+    
+    @extended_headers.setter
+    def extended_headers(self, value):
+        _do_check(extended_headers.keys(), 'extended_headers', regex=_uri_regex)
+        self.extended_headers = value
+    
+    
     def to_etree(self):
         """Creates the base etree for the TAXII Message.
 
@@ -586,12 +692,24 @@ class ContentBlock(BaseNonMessage):
         """
         self.content_binding = content_binding
         self.content = self._stringify_content(content)
-        if timestamp_label is not None:
-            if timestamp_label.tzinfo is None:
-                raise ValueError('timestamp_label.tzinfo must not be None')
         self.timestamp_label = timestamp_label
         self.padding = padding
 
+    @content_binding.setter
+    def content_binding(self, value):
+        _do_check(value, 'content_binding', regex=_uri_regex)
+        self.content_binding = value
+    
+    @content.setter
+    def content(self, value):
+        _do_check(value, 'content')#Just check for not None
+        self.content = value
+    
+    @timestamp_label.setter
+    def timestamp_label(self, value):
+        _check_timestamplabel(value, 'timestamp_label', can_be_none=True)
+        self.timestamp_label = value
+    
     def _stringify_content(self, content):
         """Always a string or raises an error."""
         if isinstance(content, basestring):
@@ -723,7 +841,14 @@ class DiscoveryResponse(TAXIIMessage):
             self.service_instances = []
         else:
             self.service_instances = service_instances
-
+    
+    #TODO: Validate the in_response_to?
+    
+    @service_instances.setter
+    def service_instances(self, value):
+        _do_check(service_instances, 'service_instances', type=DiscoveryResponse.ServiceInstance)
+        self.service_instances = value
+    
     def to_etree(self):
         xml = super(DiscoveryResponse, self).to_etree()
         for service_instance in self.service_instances:
@@ -815,6 +940,37 @@ class DiscoveryResponse(TAXIIMessage):
             self.available = available
             self.message = message
 
+        
+        @service_type.setter
+        def service_type(self, value):
+            _do_check(value, 'service_type', value_tuple=SVC_TYPES)
+            self.service_type = value
+        
+        @services_version.setter
+        def services_version(self, value):
+            _do_check(value, 'services_version', regex=_uri_regex)
+            self.services_version = value
+        
+        @protocol_binding.setter
+        def protocol_binding(self, value):
+            _do_check(value, 'protocol_binding', regex=_uri_regex)
+            self.protocol_binding = value
+        
+        @message_bindings.setter
+        def message_bindings(self, value):
+            _do_check(value, 'message_bindings', regex=_uri_regex)
+            self.message_bindings = value
+        
+        @inbox_service_accepted_content.setter
+        def inbox_service_accepted_content(self, value):
+            _do_check(value, 'inbox_service_accepted_content', regex=_uri_regex)
+            self.inbox_service_accepted_content = value
+        
+        @available.setter
+        def available(self, value):
+            _do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
+            self.available = value
+        
         @property
         def service_type(self):
             return self._service_type
@@ -940,6 +1096,11 @@ class FeedInformationResponse(TAXIIMessage):
         else:
             self.feed_informations = feed_informations
 
+    @feed_informations.setter
+    def feed_informations(self, value):
+        _do_check(value, 'feed_informations', type=FeedInformationResponse.FeedInformation)
+        self.feed_informations = value
+    
     def to_etree(self):
         xml = super(FeedInformationResponse, self).to_etree()
         for feed in self.feed_informations:
@@ -1030,6 +1191,37 @@ class FeedInformationResponse(TAXIIMessage):
             else:
                 self.subscription_methods = subscription_methods
 
+        @feed_name.setter
+        def feed_name(self, value):
+            _do_check(value, 'feed_name', regex=_uri_regex)
+            self.feed_name = value
+        
+        @available.setter
+        def available(self, value):
+            _do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
+            self.available = value
+        
+        @supported_contents.setter
+        def supported_contents(self, value):
+            _do_check(value, 'supported_contents', regex=_uri_regex)
+            self.supported_contents = value
+        
+        @push_methods.setter
+        def push_methods(self, value):
+            _do_check(value, 'push_methods', type=PushMethod)
+            self.push_methods = value
+        
+        @polling_service_instances.setter
+        def polling_service_instances(self, value):
+            _do_check(value, 'polling_service_instances', type=PollingServiceInstance)
+            self.polling_service_instances = value
+        
+        @subscription_methods.setter
+        def subscription_methods(self, value):
+            _do_check(value, 'subscription_methods', type=SubscriptionMethod)
+            self.subscription_methods = value
+        
+        
         def to_etree(self):
             f = etree.Element('{%s}Feed' % ns_map['taxii'])
             f.attrib['feed_name'] = self.feed_name
@@ -1162,6 +1354,16 @@ class FeedInformationResponse(TAXIIMessage):
                 self.push_protocol = push_protocol
                 self.push_message_bindings = push_message_bindings
 
+            @push_protocol.setter
+            def push_protocol(self, value):
+                _do_check(value, 'push_protocol', regex=_uri_regex)
+                self.push_protocol = value
+            
+            @push_message_bindings.setter
+            def push_message_bindings(self, value):
+                _do_check(value, 'push_message_bindings', regex=_uri_regex)
+                self.push_message_bindings = value
+            
             def to_etree(self):
                 x = etree.Element('{%s}Push_Method' % ns_map['taxii'])
                 proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
@@ -1222,6 +1424,16 @@ class FeedInformationResponse(TAXIIMessage):
                 self.poll_address = poll_address
                 self.poll_message_bindings = poll_message_bindings
 
+            @poll_protocol.setter
+            def poll_protocol(self, value):
+                _do_check(value, 'poll_protocol', regex=_uri_regex)
+                self.poll_protocol = value
+            
+            @poll_message_bindings.setter
+            def poll_message_bindings(self, value)
+                _do_check(value, 'poll_message_bindings', regex=_uri_regex)
+                self.poll_message_bindings = value
+            
             def to_etree(self):
                 x = etree.Element('{%s}Polling_Service' % ns_map['taxii'])
                 proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
@@ -1285,6 +1497,16 @@ class FeedInformationResponse(TAXIIMessage):
                 self.subscription_address = subscription_address
                 self.subscription_message_bindings = subscription_message_bindings
 
+            @subscription_protocol.setter
+            def subscription_protocol(self, value):
+                _do_check(value, 'subscription_protocol', regex=_uri_regex)
+                self.subscription_protocol = value
+            
+            @subscription_message_bindings.setter
+            def subscription_message_bindings(self, value):
+                _do_check(value, 'subscription_message_bindings', regex=_uri_regex)
+                self.subscription_message_bindings = value
+            
             def to_etree(self):
                 x = etree.Element('{%s}%s' % (ns_map['taxii'], self.NAME))
                 proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii'])
@@ -1365,13 +1587,7 @@ class PollRequest(TAXIIMessage):
         """
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
-        if exclusive_begin_timestamp_label is not None:
-            if exclusive_begin_timestamp_label.tzinfo is None:
-                raise ValueError('exclusive_begin_timestamp_label.tzinfo must not be None')
         self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
-        if inclusive_end_timestamp_label is not None:
-            if inclusive_end_timestamp_label.tzinfo is None:
-                raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
         self.subscription_id = subscription_id
         if content_bindings is None:
@@ -1379,6 +1595,31 @@ class PollRequest(TAXIIMessage):
         else:
             self.content_bindings = content_bindings
 
+    @feed_name.setter
+    def feed_name(self, value):
+        _do_check(value, 'feed_name', regex=_uri_regex)
+        self.feed_name = value
+    
+    @exclusive_begin_timestamp_label.setter
+    def exclusive_begin_timestamp_label(self, value):
+        _check_timestamplabel(value, 'exclusive_begin_timestamp_label', can_be_none=True)
+        self.exclusive_begin_timestamp_label = value
+    
+    @inclusive_end_timestamp_label.setter
+    def inclusive_end_timestamp_label(self, value):
+        _check_timestamplabel(value, 'inclusive_end_timestamp_label', can_be_none=True)
+        self.inclusive_end_timestamp_label = value
+    
+    @subscription_id.setter
+    def subscription_id(self, value):
+        _do_check(value, 'subscription_id', regex=_uri_regex)
+        self.subscription_id = value
+    
+    @content_bindings.setter
+    def content_bindings(self, value):
+        _do_check(value, 'content_bindings', regex=_uri_regex)
+        self.content_bindings = value
+    
     def to_etree(self):
         xml = super(PollRequest, self).to_etree()
         xml.attrib['feed_name'] = self.feed_name
@@ -1514,13 +1755,7 @@ class PollResponse(TAXIIMessage):
         """
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.feed_name = feed_name
-        if inclusive_end_timestamp_label is not None:
-            if inclusive_end_timestamp_label.tzinfo is None:
-                raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
-        if inclusive_begin_timestamp_label is not None:
-            if inclusive_begin_timestamp_label.tzinfo is None:
-                raise ValueError('inclusive_begin_timestamp_label.tzinfo must not be None')
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.subscription_id = subscription_id
         self.message = message
@@ -1529,6 +1764,31 @@ class PollResponse(TAXIIMessage):
         else:
             self.content_blocks = content_blocks
 
+    @feed_name.setter
+    def feed_name(self, value):
+        _do_check(value, 'feed_name', regex=_uri_regex)
+        self.feed_name = value
+    
+    @inclusive_end_timestamp_label.setter
+    def inclusive_end_timestamp_label(self, value):
+        _check_timestamplabel(value, 'inclusive_end_timestamp_label')
+        self.inclusive_end_timestamp_label = value
+    
+    @inclusive_begin_timestamp_label.setter
+    def inclusive_begin_timestamp_label(self, value):
+        _check_timestamplabel(value, 'inclusive_begin_timestamp_label', can_be_none=True)
+        self.inclusive_begin_timestamp_label = value
+    
+    @subscription_id.setter
+    def subscription_id(self, value):
+        _do_check(value, 'subscription_id', regex=_uri_regex)
+        self.subscription_id = value
+    
+    @content_blocks.setter
+    def content_blocks(self, value):
+        _do_check(value, 'content_blocks', type=ContentBlock)
+        self.content_blocks = value
+    
     def to_etree(self):
         xml = super(PollResponse, self).to_etree()
         xml.attrib['feed_name'] = self.feed_name
@@ -1659,6 +1919,13 @@ class StatusMessage(TAXIIMessage):
         self.status_detail = status_detail
         self.message = message
 
+    @status_type.setter
+    def status_type(self, value):
+        _do_check(value, 'status_type', value_tuple=ST_TYPES)
+        self.status_type = value
+    
+    #TODO: is it possible to check the status detail?
+    
     def to_etree(self):
         xml = super(StatusMessage, self).to_etree()
         xml.attrib['status_type'] = self.status_type
@@ -1745,6 +2012,16 @@ class InboxMessage(TAXIIMessage):
         else:
             self.content_blocks = content_blocks
 
+    @subscription_information.setter
+    def subscription_information(self, value):
+        _do_check(value, 'subscription_information', type=SubscriptionInformation)
+        self.subscription_information = value
+    
+    @content_blocks.setter
+    def content_blocks(self, value):
+        _do_check(value, 'content_blocks', type=ContentBlock)
+        self.content_blocks = value
+    
     def to_etree(self):
         xml = super(InboxMessage, self).to_etree()
         if self.message is not None:
@@ -1850,15 +2127,29 @@ class InboxMessage(TAXIIMessage):
             """
             self.feed_name = feed_name
             self.subscription_id = subscription_id
-            if inclusive_begin_timestamp_label is not None:
-                if inclusive_begin_timestamp_label.tzinfo is None:
-                    raise ValueError('inclusive_begin_timestamp_label.tzinfo must not be None')
             self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
-            if inclusive_end_timestamp_label is not None:
-                if inclusive_end_timestamp_label.tzinfo is None:
-                    raise ValueError('inclusive_end_timestamp_label.tzinfo must not be None')
             self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
 
+        @feed_name.setter
+        def feed_name(self, value):
+            _do_check(value, 'feed_name', regex=_uri_regex)
+            self.feed_name = value
+        
+        @subscription_id.setter
+        def subscription_id(self, value):
+            _do_check(value, 'subscription_id', regex=_uri_regex)
+            self.subscription_id = value
+        
+        @inclusive_begin_timestamp_label.setter
+        def inclusive_begin_timestamp_label(self, value):
+            _check_timestamp(value, 'inclusive_begin_timestamp_label')
+            self.inclusive_begin_timestamp_label = value
+        
+        @inclusive_end_timestamp_label.setter
+        def inclusive_end_timestamp_label(self, value):
+            _check_timestamp(value, 'inclusive_end_timestamp_label')
+            self.inclusive_end_timestamp_label = value`
+        
         def to_etree(self):
             xml = etree.Element('{%s}Source_Subscription' % ns_map['taxii'])
             xml.attrib['feed_name'] = self.feed_name
@@ -1928,6 +2219,27 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         self.subscription_id = subscription_id
         self.delivery_parameters = delivery_parameters
 
+    @feed_name.setter
+    def feed_name(self, value):
+        _do_check(value, 'feed_name', regex=_uri_regex)
+        self.feed_name = value
+    
+    @action.setter
+    def action(self, value):
+        _do_check(value, 'action', value_tuple=ACT_TYPES)
+        self.action = value
+    
+    @subscription_id.setter
+    def subscription_id(self, value):
+        _do_check(value, 'subscription_id', regex=_uri_regex)
+        self.subscription_id = value
+    
+    @delivery_parameters.setter
+    def delivery_parameters(self, value):
+        _do_check(value, 'delivery_parameters', type=DeliveryParameters)
+        self.delivery_parameters = value
+    
+    
     def to_etree(self):
         xml = super(ManageFeedSubscriptionRequest, self).to_etree()
         xml.attrib['feed_name'] = self.feed_name
@@ -1995,6 +2307,16 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         else:
             self.subscription_instances = subscription_instances
 
+    @feed_name.setter
+    def feed_name(self, value):
+        _do_check(value, 'feed_name', regex=_uri_regex)
+        self.feed_name = value
+    
+    @subscription_instances.setter
+    def subscription_instances(self, value):
+        _do_check(value, 'subscription_instances', type=SubscriptionInstances)
+        self.subscription_instances = value
+    
     def to_etree(self):
         xml = super(ManageFeedSubscriptionResponse, self).to_etree()
         xml.attrib['feed_name'] = self.feed_name
@@ -2093,6 +2415,17 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             else:
                 self.poll_instances = poll_instances
 
+        
+        @delivery_parameters.setter
+        def delivery_parameters(self, value):
+            _do_check(value, 'delivery_parameters', type=DeliveryParameters)
+            self.delivery_parameters = value
+        
+        @poll_instances.setter
+        def poll_instances(self, value):
+            _do_check(value, 'poll_instances', type=PollInstance)
+            self.poll_instances = value
+        
         def to_etree(self):
             xml = etree.Element('{%s}Subscription' % ns_map['taxii'])
             xml.attrib['subscription_id'] = self.subscription_id
@@ -2179,6 +2512,16 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             else:
                 self.poll_message_bindings = poll_message_bindings
 
+        @poll_protocol.setter
+        def poll_protocol(self, value):
+            _do_check(value, 'poll_protocol', regex=_uri_regex)
+            self.poll_protocol = value
+        
+        @poll_message_bindings.setter
+        def poll_message_bindings(self, value):
+            _do_check(value, 'poll_message_bindings', regex=_uri_regex)
+            self.poll_message_bindings = value
+        
         def to_etree(self):
             xml = etree.Element('{%s}Poll_Instance' % ns_map['taxii'])
 
