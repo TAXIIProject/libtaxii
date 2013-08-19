@@ -577,7 +577,7 @@ class TAXIIMessage(BaseNonMessage):
     
     @extended_headers.setter
     def extended_headers(self, value):
-        _do_check(value.keys(), 'extended_headers', regex=_uri_regex)
+        _do_check(value.keys(), 'extended_headers.keys()', regex=_uri_regex)
         self._extended_headers = value
     
     
@@ -1200,6 +1200,15 @@ class FeedInformationResponse(TAXIIMessage):
             self.feed_informations = feed_informations
 
     @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        _do_check(value, 'in_response_to', regex=_uri_regex)
+        self._in_response_to = value
+    
+    @property
     def feed_informations(self):
         return self._feed_informations
     
@@ -1749,7 +1758,6 @@ class PollRequest(TAXIIMessage):
         else:
             self.content_bindings = content_bindings
 
-    
     @property
     def feed_name(self):
         return self._feed_name
@@ -1942,6 +1950,15 @@ class PollResponse(TAXIIMessage):
             self.content_blocks = content_blocks
 
     @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        _do_check(value, 'in_response_to', regex=_uri_regex)
+        self._in_response_to = value
+    
+    @property
     def feed_name(self):
         return self._feed_name
     
@@ -2118,6 +2135,15 @@ class StatusMessage(TAXIIMessage):
         self.status_detail = status_detail
         self.message = message
 
+    @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        _do_check(value, 'in_response_to', regex=_uri_regex)
+        self._in_response_to = value
+    
     @property
     def status_type(self):
         return self._status_type
@@ -2676,6 +2702,15 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
                 self.poll_instances = []
             else:
                 self.poll_instances = poll_instances
+        
+        @property
+        def subscription_id(self):
+            return self._subscription_id
+        
+        @subscription_id.setter
+        def subscription_id(self, value):
+            _do_check(value, 'subscription_id', regex=_uri_regex)
+            self._subscription_id = value
         
         @property
         def delivery_parameters(self):
