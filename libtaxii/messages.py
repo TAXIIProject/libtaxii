@@ -170,8 +170,7 @@ def _check_timestamplabel(timestamp_label, varname, can_be_none=False):
         return
     
     if timestamp_label is None and not can_be_none:
-        raise ValueError("%s is not allowed to be None and the provided \
-                          value was None" % (varname))
+        raise ValueError(_none_error % varname)
 
     _do_check(timestamp_label, varname, type=datetime.datetime, can_be_none=can_be_none)
     
