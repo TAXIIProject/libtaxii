@@ -883,11 +883,7 @@ class ContentBlock(BaseNonMessage):
 class DiscoveryRequest(TAXIIMessage):
     message_type = MSG_DISCOVERY_REQUEST
 
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         if value is not None:
             raise ValueError('in_response_to must be None')
@@ -914,11 +910,7 @@ class DiscoveryResponse(TAXIIMessage):
         else:
             self.service_instances = service_instances
     
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         _do_check(value, 'in_response_to', regex=_uri_regex)
         self._in_response_to = value
@@ -1187,11 +1179,7 @@ class DiscoveryResponse(TAXIIMessage):
 class FeedInformationRequest(TAXIIMessage):
     message_type = MSG_FEED_INFORMATION_REQUEST
     
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         if value is not None:
             raise ValueError('in_response_to must be None')
@@ -1217,12 +1205,8 @@ class FeedInformationResponse(TAXIIMessage):
             self.feed_informations = []
         else:
             self.feed_informations = feed_informations
-
-    @property
-    def in_response_to(self):
-        return self._in_response_to
     
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         _do_check(value, 'in_response_to', regex=_message_id_regex)
         self._in_response_to = value
@@ -1777,11 +1761,7 @@ class PollRequest(TAXIIMessage):
         else:
             self.content_bindings = content_bindings
 
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         if value is not None:
             raise ValueError('in_response_to must be None')
@@ -1978,11 +1958,7 @@ class PollResponse(TAXIIMessage):
         else:
             self.content_blocks = content_blocks
     
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         _do_check(value, 'in_response_to', regex=_uri_regex)
         self._in_response_to = value
@@ -2164,11 +2140,7 @@ class StatusMessage(TAXIIMessage):
         self.status_detail = status_detail
         self.message = message
     
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         _do_check(value, 'in_response_to', regex=_uri_regex)
         self._in_response_to = value
@@ -2274,11 +2246,7 @@ class InboxMessage(TAXIIMessage):
         else:
             self.content_blocks = content_blocks
     
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         if value is not None:
             raise ValueError('in_response_to must be None')
@@ -2516,11 +2484,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         self.subscription_id = subscription_id
         self.delivery_parameters = delivery_parameters
 
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         if value is not None:
             raise ValueError('in_response_to must be None')
@@ -2633,11 +2597,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         else:
             self.subscription_instances = subscription_instances
 
-    @property
-    def in_response_to(self):
-        return self._in_response_to
-    
-    @in_response_to.setter
+    @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         _do_check(value, 'in_response_to', regex=_uri_regex)
         self._in_response_to = value
