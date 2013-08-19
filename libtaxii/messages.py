@@ -883,6 +883,15 @@ class ContentBlock(BaseNonMessage):
 class DiscoveryRequest(TAXIIMessage):
     message_type = MSG_DISCOVERY_REQUEST
 
+    @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        if value is not None:
+            raise ValueError('in_response_to must be None')
+        self._in_response_to = value
 
 class DiscoveryResponse(TAXIIMessage):
     message_type = MSG_DISCOVERY_RESPONSE
@@ -1177,7 +1186,16 @@ class DiscoveryResponse(TAXIIMessage):
 
 class FeedInformationRequest(TAXIIMessage):
     message_type = MSG_FEED_INFORMATION_REQUEST
-
+    
+    @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        if value is not None:
+            raise ValueError('in_response_to must be None')
+        self._in_response_to = value
 
 class FeedInformationResponse(TAXIIMessage):
     message_type = MSG_FEED_INFORMATION_RESPONSE
@@ -1206,7 +1224,7 @@ class FeedInformationResponse(TAXIIMessage):
     
     @in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_uri_regex)
+        _do_check(value, 'in_response_to', regex=_message_id_regex)
         self._in_response_to = value
     
     @property
@@ -1760,6 +1778,16 @@ class PollRequest(TAXIIMessage):
             self.content_bindings = content_bindings
 
     @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        if value is not None:
+            raise ValueError('in_response_to must be None')
+        self._in_response_to = value
+    
+    @property
     def feed_name(self):
         return self._feed_name
     
@@ -1949,7 +1977,7 @@ class PollResponse(TAXIIMessage):
             self.content_blocks = []
         else:
             self.content_blocks = content_blocks
-
+    
     @property
     def in_response_to(self):
         return self._in_response_to
@@ -2135,7 +2163,7 @@ class StatusMessage(TAXIIMessage):
         self.status_type = status_type
         self.status_detail = status_detail
         self.message = message
-
+    
     @property
     def in_response_to(self):
         return self._in_response_to
@@ -2245,7 +2273,17 @@ class InboxMessage(TAXIIMessage):
             self.content_blocks = []
         else:
             self.content_blocks = content_blocks
-
+    
+    @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        if value is not None:
+            raise ValueError('in_response_to must be None')
+        self._in_response_to = value
+    
     @property
     def subscription_information(self):
         return self._subscription_information
@@ -2479,6 +2517,16 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         self.delivery_parameters = delivery_parameters
 
     @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        if value is not None:
+            raise ValueError('in_response_to must be None')
+        self._in_response_to = value
+    
+    @property
     def feed_name(self):
         return self._feed_name
     
@@ -2508,7 +2556,6 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     @property
     def delivery_parameters(self):
         return self._delivery_parameters
-
     
     @delivery_parameters.setter
     def delivery_parameters(self, value):
@@ -2586,6 +2633,15 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         else:
             self.subscription_instances = subscription_instances
 
+    @property
+    def in_response_to(self):
+        return self._in_response_to
+    
+    @in_response_to.setter
+    def in_response_to(self, value):
+        _do_check(value, 'in_response_to', regex=_uri_regex)
+        self._in_response_to = value
+    
     @property
     def feed_name(self):
         return self._feed_name
@@ -2719,7 +2775,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         
         @delivery_parameters.setter
         def delivery_parameters(self, value):
-            _do_check(value, 'delivery_parameters', type=DeliveryParameters)
+            _do_check(value, 'delivery_parameters', type=DeliveryParameters, can_be_none=False)
             self._delivery_parameters = value
         
         @property
@@ -2728,7 +2784,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         
         @poll_instances.setter
         def poll_instances(self, value):
-            _do_check(value, 'poll_instances', type=ManageFeedSubscriptionResponse.PollInstance)
+            _do_check(value, 'poll_instances', type=ManageFeedSubscriptionResponse.PollInstance, can_be_none=False)
             self._poll_instances = value
         
         def to_etree(self):
