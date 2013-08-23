@@ -115,7 +115,7 @@ def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none
     Checks supplied var against all of the supplied checks using the following
     process:
     
-    1. If var is a list, call this function for every item in the list
+    1. If var is iterable, call this function for every item in the iterable object
     2. If the var is none and can be none, return
     3. If the var is none and cannot be none, raise ValueError
     4. If a type is specified, and the var is not of the specified type, raise ValueError
@@ -126,7 +126,7 @@ def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none
     
     """
     
-    if isinstance(var, list):
+    if isinstance(var, list) or isinstance(var, set):
         x = 0
         for item in var:
             _do_check(item, "%s[%s]" % (varname, x), type, regex, value_tuple, can_be_none)
