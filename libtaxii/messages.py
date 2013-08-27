@@ -1800,7 +1800,7 @@ class PollRequest(TAXIIMessage):
     
     @subscription_id.setter
     def subscription_id(self, value):
-        _do_check(value, 'subscription_id', regex=_uri_regex)
+        _do_check(value, 'subscription_id', regex=_uri_regex, can_be_none=True)
         self._subscription_id = value
     
     @property
