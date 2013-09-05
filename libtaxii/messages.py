@@ -692,7 +692,7 @@ class TAXIIMessage(BaseNonMessage):
         return cls.from_etree(etree_xml)
 
     @classmethod
-    def from_dict(cls, d, kwargs=None):
+    def from_dict(cls, d, **kwargs):
         """Pulls properties of a TAXII Message from a dictionary.
 
         Message-specific constructs must be pulled by each Message class. In
@@ -704,12 +704,7 @@ class TAXIIMessage(BaseNonMessage):
             raise ValueError('%s != %s' % (message_type, cls.message_type))
         message_id = d['message_id']
         extended_headers = d['extended_headers']
-        in_response_to = None
-        if 'in_response_to' in d:
-            in_response_to = d['in_response_to']
-        
-        if kwargs is None:
-            kwargs = {}
+        in_response_to = d.get('in_response_to')
         
         return cls(message_id, 
                    in_response_to, 
@@ -861,8 +856,7 @@ class ContentBlock(BaseNonMessage):
     def from_dict(d):
         kwargs = {}
         kwargs['content_binding'] = d['content_binding']
-        if 'padding' in d:
-            kwargs['padding'] = d['padding']
+        kwargs['padding'] = d.get('padding')
         if 'timestamp_label' in d:
             kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
 
@@ -1451,30 +1445,24 @@ class FeedInformationResponse(TAXIIMessage):
         def from_dict(d):
             kwargs = {}
             kwargs['feed_name'] = d['feed_name']
-            kwargs['available'] = None
-            if 'available' in d:
-                kwargs['available'] = d['available']
+            kwargs['available'] = d.get('available')
 
             kwargs['feed_description'] = d['feed_description']
             kwargs['supported_contents'] = []
-            if 'supported_contents' in d:
-                for binding in d['supported_contents']:
-                    kwargs['supported_contents'].append(binding)
+            for binding in d.get('supported_contents', []):
+                kwargs['supported_contents'].append(binding)
 
             kwargs['push_methods'] = []
-            if 'push_methods' in d:
-                for push_method in d['push_methods']:
-                    kwargs['push_methods'].append(FeedInformationResponse.FeedInformation.PushMethod.from_dict(push_method))
+            for push_method in d.get('push_methods', []):
+                kwargs['push_methods'].append(FeedInformationResponse.FeedInformation.PushMethod.from_dict(push_method))
 
             kwargs['polling_service_instances'] = []
-            if 'polling_service_instances' in d:
-                for polling in d['polling_service_instances']:
-                    kwargs['polling_service_instances'].append(FeedInformationResponse.FeedInformation.PollingServiceInstance.from_dict(polling))
+            for polling in d.get('polling_service_instances', []):
+                kwargs['polling_service_instances'].append(FeedInformationResponse.FeedInformation.PollingServiceInstance.from_dict(polling))
 
             kwargs['subscription_methods'] = []
-            if 'subscription_methods' in d:
-                for subscription_method in d['subscription_methods']:
-                    kwargs['subscription_methods'].append(FeedInformationResponse.FeedInformation.SubscriptionMethod.from_dict(subscription_method))
+            for subscription_method in d.get('subscription_methods', []):
+                kwargs['subscription_methods'].append(FeedInformationResponse.FeedInformation.SubscriptionMethod.from_dict(subscription_method))
 
             return FeedInformationResponse.FeedInformation(**kwargs)
 
@@ -1891,9 +1879,7 @@ class PollRequest(TAXIIMessage):
         kwargs = {}
         kwargs['feed_name'] = d['feed_name']
 
-        kwargs['subscription_id'] = None
-        if 'subscription_id' in d:
-            kwargs['subscription_id'] = d['subscription_id']
+        kwargs['subscription_id'] = d.get('subscription_id')
 
         kwargs['exclusive_begin_timestamp_label'] = None
         if 'exclusive_begin_timestamp_label' in d:
@@ -1903,11 +1889,9 @@ class PollRequest(TAXIIMessage):
         if 'inclusive_end_timestamp_label' in d:
             kwargs['inclusive_end_timestamp_label'] = _str2datetime(d['inclusive_end_timestamp_label'])
 
-        kwargs['content_bindings'] = []
-        if 'content_bindings' in d:
-            kwargs['content_bindings'] = d['content_bindings']
+        kwargs['content_bindings'] = d.get('content_bindings', [])
 
-        msg = super(PollRequest, cls).from_dict(d, kwargs)
+        msg = super(PollRequest, cls).from_dict(d, **kwargs)
         return msg
 
 
@@ -2095,9 +2079,7 @@ class PollResponse(TAXIIMessage):
         if 'message' in d:
             kwargs['message'] = d['message']
 
-        kwargs['subscription_id'] = None
-        if 'subscription_id' in d:
-            kwargs['subscription_id'] = d['subscription_id']
+        kwargs['subscription_id'] = d.get('subscription_id')
 
         kwargs['inclusive_begin_timestamp_label'] = None
         if 'inclusive_begin_timestamp_label' in d:
@@ -2108,7 +2090,7 @@ class PollResponse(TAXIIMessage):
         kwargs['content_blocks'] = []
         for block in d['content_blocks']:
             kwargs['content_blocks'].append(ContentBlock.from_dict(block))
-        msg = super(PollResponse, cls).from_dict(d, kwargs)
+        msg = super(PollResponse, cls).from_dict(d, **kwargs)
         return msg
 
 
@@ -2205,17 +2187,11 @@ class StatusMessage(TAXIIMessage):
     @classmethod
     def from_dict(cls, d):
         kwargs = {}
-        
         kwargs['status_type'] = d['status_type']
-        kwargs['status_detail'] = None
-        if 'status_detail' in d:
-            kwargs['status_detail'] = d['status_detail']
-
-        kwargs['message'] = None
-        if 'message' in d:
-            kwargs['message'] = d['message']
+        kwargs['status_detail'] = d.get('status_detail')
+        kwargs['message'] = d.get('message')
             
-        msg = super(StatusMessage, cls).from_dict(d, kwargs)
+        msg = super(StatusMessage, cls).from_dict(d, **kwargs)
         return msg
 
 
@@ -2340,9 +2316,7 @@ class InboxMessage(TAXIIMessage):
     def from_dict(cls, d):
         msg = super(InboxMessage, cls).from_dict(d)
 
-        msg.message = None
-        if 'message' in d:
-            msg.message = d['message']
+        msg.message = d.get('message')
 
         msg.subscription_information = None
         if 'subscription_information' in d:
@@ -2564,7 +2538,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         kwargs['subscription_id'] = d['subscription_id']
         kwargs['delivery_parameters'] = DeliveryParameters.from_dict(d['delivery_parameters'])
         
-        msg = super(ManageFeedSubscriptionRequest, cls).from_dict(d, kwargs)
+        msg = super(ManageFeedSubscriptionRequest, cls).from_dict(d, **kwargs)
         return msg
 
 
@@ -2679,15 +2653,13 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         kwargs = {}
         kwargs['feed_name'] = d['feed_name']
 
-        kwargs['message'] = None
-        if 'message' in d:
-            kwargs['message'] = d['message']
+        kwargs['message'] = d.get('message')
 
         kwargs['subscription_instances'] = []
         for instance in d['subscription_instances']:
             kwargs['subscription_instances'].append(ManageFeedSubscriptionResponse.SubscriptionInstance.from_dict(instance))
 
-        msg = super(ManageFeedSubscriptionResponse, cls).from_dict(d, kwargs)
+        msg = super(ManageFeedSubscriptionResponse, cls).from_dict(d, **kwargs)
         return msg
 
     class SubscriptionInstance(BaseNonMessage):
