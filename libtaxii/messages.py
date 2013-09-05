@@ -641,7 +641,7 @@ class TAXIIMessage(BaseNonMessage):
         return not self.__eq__(other, debug)
 
     @classmethod
-    def from_etree(cls, src_etree, kwargs=None):
+    def from_etree(cls, src_etree, **kwargs):
         """Pulls properties of a TAXII Message from an etree.
 
         Message-specific constructs must be pulled by each Message class. In
@@ -670,9 +670,6 @@ class TAXIIMessage(BaseNonMessage):
             eh_name = header.xpath('./@name')[0]
             eh_value = header.text
             extended_headers[eh_name] = eh_value
-
-        if kwargs is None:
-            kwargs = {}
         
         return cls(message_id, 
                    in_response_to, 
@@ -1886,7 +1883,7 @@ class PollRequest(TAXIIMessage):
         for binding in content_binding_set:
             kwargs['content_bindings'].append(binding.text)
 
-        msg = super(PollRequest, cls).from_etree(etree_xml, kwargs)
+        msg = super(PollRequest, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
@@ -2086,7 +2083,7 @@ class PollResponse(TAXIIMessage):
         for block in blocks:
             kwargs['content_blocks'].append(ContentBlock.from_etree(block))
 
-        msg = super(PollResponse, cls).from_etree(etree_xml, kwargs)
+        msg = super(PollResponse, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
@@ -2202,7 +2199,7 @@ class StatusMessage(TAXIIMessage):
         if len(m_set) > 0:
             kwargs['message'] = m_set[0].text
             
-        msg = super(StatusMessage, cls).from_etree(etree_xml, kwargs)
+        msg = super(StatusMessage, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
@@ -2556,7 +2553,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         kwargs['subscription_id'] = etree_xml.xpath('./@subscription_id', namespaces=ns_map)[0]
         kwargs['delivery_parameters'] = DeliveryParameters.from_etree(etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map)[0])
         
-        msg = super(ManageFeedSubscriptionRequest, cls).from_etree(etree_xml, kwargs)
+        msg = super(ManageFeedSubscriptionRequest, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
@@ -2674,7 +2671,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         for si in subscription_instance_set:
             kwargs['subscription_instances'].append(ManageFeedSubscriptionResponse.SubscriptionInstance.from_etree(si))
             
-        msg = super(ManageFeedSubscriptionResponse, cls).from_etree(etree_xml, kwargs)
+        msg = super(ManageFeedSubscriptionResponse, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
