@@ -126,7 +126,7 @@ def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none
     
     """
     
-    if isinstance(var, list) or isinstance(var, set):
+    if isinstance(var, list) or isinstance(var, set) or isinstance(var, tuple):
         x = 0
         for item in var:
             _do_check(item, "%s[%s]" % (varname, x), type, regex, value_tuple, can_be_none)
