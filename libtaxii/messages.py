@@ -16,6 +16,7 @@ import StringIO
 import datetime
 import dateutil.parser
 import re
+import collections
 from lxml import etree
 try:
     import simplejson as json
@@ -102,15 +103,17 @@ ns_map = {
 
 ### General purpose helper methods ###
 
-_uri_regex = ("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
-_message_id_regex = ("[0-9]+", "Numbers only")
+_RegexTuple = collections.namedtuple('_RegexTuple', ['regex','title'])
+#URI regex per http://tools.ietf.org/html/rfc3986
+_uri_regex = _RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
+_message_id_regex = _RegexTuple("[0-9]+", "Numbers only")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
 _type_error = "%s must be of type %s. The incorrect value was of type %s"
 _regex_error = "%s must be a string conforming to %s. The incorrect value was: %s"
 _tuple_error = "%s must be one of %s. The incorrect value was %s"
 
-def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none=False):
+def _do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be_none=False):
     """
     Checks supplied var against all of the supplied checks using the following
     process:
@@ -129,7 +132,7 @@ def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none
     if isinstance(var, list) or isinstance(var, set) or isinstance(var, tuple):
         x = 0
         for item in var:
-            _do_check(item, "%s[%s]" % (varname, x), type, regex, value_tuple, can_be_none)
+            _do_check(item, "%s[%s]" % (varname, x), type, regex_tuple, value_tuple, can_be_none)
             x = x+1
         return
     
@@ -144,12 +147,9 @@ def _do_check(var, varname, type=None, regex=None, value_tuple=None, can_be_none
             bad_type = var.__class__.__name__
             raise ValueError(_type_error % (varname, type, bad_type))
     
-    if regex is not None:
-        regex_string = regex[0]
-        title = regex[1]
-        
-        if re.match(regex_string, var) is None:
-            raise ValueError(_regex_error % (varname, title, var))
+    if regex_tuple is not None:
+        if re.match(regex_tuple.regex, var) is None:
+            raise ValueError(_regex_error % (varname, regex_tuple.title, var))
     
     if value_tuple is not None:
         if not var in value_tuple:
@@ -418,7 +418,7 @@ class DeliveryParameters(BaseNonMessage):
         
         @inbox_protocol.setter
         def inbox_protocol(self, value):
-            _do_check(value, 'inbox_protocol', regex=_uri_regex)
+            _do_check(value, 'inbox_protocol', regex_tuple=_uri_regex)
             self._inbox_protocol = value
         
         @property
@@ -436,7 +436,7 @@ class DeliveryParameters(BaseNonMessage):
         
         @delivery_message_binding.setter
         def delivery_message_binding(self, value):
-            _do_check(value, 'delivery_message_binding', regex=_uri_regex)
+            _do_check(value, 'delivery_message_binding', regex_tuple=_uri_regex)
             self._delivery_message_binding = value
         
         @property
@@ -445,7 +445,7 @@ class DeliveryParameters(BaseNonMessage):
         
         @content_bindings.setter
         def content_bindings(self, value):
-            _do_check(value, 'content_bindings', regex=_uri_regex)
+            _do_check(value, 'content_bindings', regex_tuple=_uri_regex)
             self._content_bindings = value
 
         def to_etree(self):
@@ -560,7 +560,7 @@ class TAXIIMessage(BaseNonMessage):
     
     @message_id.setter
     def message_id(self, value):
-        _do_check(value, 'message_id', regex=_message_id_regex)
+        _do_check(value, 'message_id', regex_tuple=_message_id_regex)
         self._message_id = value
     
     @property
@@ -569,7 +569,7 @@ class TAXIIMessage(BaseNonMessage):
     
     @in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_message_id_regex, can_be_none=True)
+        _do_check(value, 'in_response_to', regex_tuple=_message_id_regex, can_be_none=True)
         self._in_response_to = value
     
     @property
@@ -578,7 +578,7 @@ class TAXIIMessage(BaseNonMessage):
     
     @extended_headers.setter
     def extended_headers(self, value):
-        _do_check(value.keys(), 'extended_headers.keys()', regex=_uri_regex)
+        _do_check(value.keys(), 'extended_headers.keys()', regex_tuple=_uri_regex)
         self._extended_headers = value
     
     
@@ -752,7 +752,7 @@ class ContentBlock(BaseNonMessage):
     
     @content_binding.setter
     def content_binding(self, value):
-        _do_check(value, 'content_binding', regex=_uri_regex)
+        _do_check(value, 'content_binding', regex_tuple=_uri_regex)
         self._content_binding = value
     
     @property
@@ -912,7 +912,7 @@ class DiscoveryResponse(TAXIIMessage):
     
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_uri_regex)
+        _do_check(value, 'in_response_to', regex_tuple=_uri_regex)
         self._in_response_to = value
     
     @property
@@ -1031,7 +1031,7 @@ class DiscoveryResponse(TAXIIMessage):
         
         @services_version.setter
         def services_version(self, value):
-            _do_check(value, 'services_version', regex=_uri_regex)
+            _do_check(value, 'services_version', regex_tuple=_uri_regex)
             self._services_version = value
         
         @property
@@ -1040,7 +1040,7 @@ class DiscoveryResponse(TAXIIMessage):
         
         @protocol_binding.setter
         def protocol_binding(self, value):
-            _do_check(value, 'protocol_binding', regex=_uri_regex)
+            _do_check(value, 'protocol_binding', regex_tuple=_uri_regex)
             self._protocol_binding = value
         
         @property
@@ -1057,7 +1057,7 @@ class DiscoveryResponse(TAXIIMessage):
         
         @message_bindings.setter
         def message_bindings(self, value):
-            _do_check(value, 'message_bindings', regex=_uri_regex)
+            _do_check(value, 'message_bindings', regex_tuple=_uri_regex)
             self._message_bindings = value
         
         @property
@@ -1066,7 +1066,7 @@ class DiscoveryResponse(TAXIIMessage):
         
         @inbox_service_accepted_content.setter
         def inbox_service_accepted_content(self, value):
-            _do_check(value, 'inbox_service_accepted_content', regex=_uri_regex)
+            _do_check(value, 'inbox_service_accepted_content', regex_tuple=_uri_regex)
             self._inbox_service_accepted_content = value
         
         @property
@@ -1208,7 +1208,7 @@ class FeedInformationResponse(TAXIIMessage):
     
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_message_id_regex)
+        _do_check(value, 'in_response_to', regex_tuple=_message_id_regex)
         self._in_response_to = value
     
     @property
@@ -1316,7 +1316,7 @@ class FeedInformationResponse(TAXIIMessage):
         
         @feed_name.setter
         def feed_name(self, value):
-            _do_check(value, 'feed_name', regex=_uri_regex)
+            _do_check(value, 'feed_name', regex_tuple=_uri_regex)
             self._feed_name = value
         
         @property
@@ -1334,7 +1334,7 @@ class FeedInformationResponse(TAXIIMessage):
         
         @supported_contents.setter
         def supported_contents(self, value):
-            _do_check(value, 'supported_contents', regex=_uri_regex)
+            _do_check(value, 'supported_contents', regex_tuple=_uri_regex)
             self._supported_contents = value
         
         @property
@@ -1502,7 +1502,7 @@ class FeedInformationResponse(TAXIIMessage):
             
             @push_protocol.setter
             def push_protocol(self, value):
-                _do_check(value, 'push_protocol', regex=_uri_regex)
+                _do_check(value, 'push_protocol', regex_tuple=_uri_regex)
                 self._push_protocol = value
             
             @property
@@ -1511,7 +1511,7 @@ class FeedInformationResponse(TAXIIMessage):
             
             @push_message_bindings.setter
             def push_message_bindings(self, value):
-                _do_check(value, 'push_message_bindings', regex=_uri_regex)
+                _do_check(value, 'push_message_bindings', regex_tuple=_uri_regex)
                 self._push_message_bindings = value
             
             def to_etree(self):
@@ -1580,7 +1580,7 @@ class FeedInformationResponse(TAXIIMessage):
             
             @poll_protocol.setter
             def poll_protocol(self, value):
-                _do_check(value, 'poll_protocol', regex=_uri_regex)
+                _do_check(value, 'poll_protocol', regex_tuple=_uri_regex)
                 self._poll_protocol = value
             
             @property
@@ -1589,7 +1589,7 @@ class FeedInformationResponse(TAXIIMessage):
             
             @poll_message_bindings.setter
             def poll_message_bindings(self, value):
-                _do_check(value, 'poll_message_bindings', regex=_uri_regex)
+                _do_check(value, 'poll_message_bindings', regex_tuple=_uri_regex)
                 self._poll_message_bindings = value
             
             def to_etree(self):
@@ -1661,7 +1661,7 @@ class FeedInformationResponse(TAXIIMessage):
             
             @subscription_protocol.setter
             def subscription_protocol(self, value):
-                _do_check(value, 'subscription_protocol', regex=_uri_regex)
+                _do_check(value, 'subscription_protocol', regex_tuple=_uri_regex)
                 self._subscription_protocol = value
             
             @property
@@ -1670,7 +1670,7 @@ class FeedInformationResponse(TAXIIMessage):
             
             @subscription_message_bindings.setter
             def subscription_message_bindings(self, value):
-                _do_check(value, 'subscription_message_bindings', regex=_uri_regex)
+                _do_check(value, 'subscription_message_bindings', regex_tuple=_uri_regex)
                 self._subscription_message_bindings = value
             
             def to_etree(self):
@@ -1773,7 +1773,7 @@ class PollRequest(TAXIIMessage):
     
     @feed_name.setter
     def feed_name(self, value):
-        _do_check(value, 'feed_name', regex=_uri_regex)
+        _do_check(value, 'feed_name', regex_tuple=_uri_regex)
         self._feed_name = value
     
     @property
@@ -1800,7 +1800,7 @@ class PollRequest(TAXIIMessage):
     
     @subscription_id.setter
     def subscription_id(self, value):
-        _do_check(value, 'subscription_id', regex=_uri_regex, can_be_none=True)
+        _do_check(value, 'subscription_id', regex_tuple=_uri_regex, can_be_none=True)
         self._subscription_id = value
     
     @property
@@ -1809,7 +1809,7 @@ class PollRequest(TAXIIMessage):
     
     @content_bindings.setter
     def content_bindings(self, value):
-        _do_check(value, 'content_bindings', regex=_uri_regex)
+        _do_check(value, 'content_bindings', regex_tuple=_uri_regex)
         self._content_bindings = value
     
     def to_etree(self):
@@ -1960,7 +1960,7 @@ class PollResponse(TAXIIMessage):
     
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_uri_regex)
+        _do_check(value, 'in_response_to', regex_tuple=_uri_regex)
         self._in_response_to = value
     
     @property
@@ -1969,7 +1969,7 @@ class PollResponse(TAXIIMessage):
     
     @feed_name.setter
     def feed_name(self, value):
-        _do_check(value, 'feed_name', regex=_uri_regex)
+        _do_check(value, 'feed_name', regex_tuple=_uri_regex)
         self._feed_name = value
     
     @property
@@ -1996,7 +1996,7 @@ class PollResponse(TAXIIMessage):
     
     @subscription_id.setter
     def subscription_id(self, value):
-        _do_check(value, 'subscription_id', regex=_uri_regex, can_be_none=True)
+        _do_check(value, 'subscription_id', regex_tuple=_uri_regex, can_be_none=True)
         self._subscription_id = value
     
     @property
@@ -2142,7 +2142,7 @@ class StatusMessage(TAXIIMessage):
     
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_uri_regex)
+        _do_check(value, 'in_response_to', regex_tuple=_uri_regex)
         self._in_response_to = value
     
     @property
@@ -2385,7 +2385,7 @@ class InboxMessage(TAXIIMessage):
         
         @feed_name.setter
         def feed_name(self, value):
-            _do_check(value, 'feed_name', regex=_uri_regex)
+            _do_check(value, 'feed_name', regex_tuple=_uri_regex)
             self._feed_name = value
         
         @property
@@ -2394,7 +2394,7 @@ class InboxMessage(TAXIIMessage):
         
         @subscription_id.setter
         def subscription_id(self, value):
-            _do_check(value, 'subscription_id', regex=_uri_regex)
+            _do_check(value, 'subscription_id', regex_tuple=_uri_regex)
             self._subscription_id = value
         
         @property
@@ -2496,7 +2496,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     
     @feed_name.setter
     def feed_name(self, value):
-        _do_check(value, 'feed_name', regex=_uri_regex)
+        _do_check(value, 'feed_name', regex_tuple=_uri_regex)
         self._feed_name = value
     
     @property
@@ -2514,7 +2514,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     
     @subscription_id.setter
     def subscription_id(self, value):
-        _do_check(value, 'subscription_id', regex=_uri_regex)
+        _do_check(value, 'subscription_id', regex_tuple=_uri_regex)
         self._subscription_id = value
     
     @property
@@ -2599,7 +2599,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        _do_check(value, 'in_response_to', regex=_uri_regex)
+        _do_check(value, 'in_response_to', regex_tuple=_uri_regex)
         self._in_response_to = value
     
     @property
@@ -2608,7 +2608,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
     
     @feed_name.setter
     def feed_name(self, value):
-        _do_check(value, 'feed_name', regex=_uri_regex)
+        _do_check(value, 'feed_name', regex_tuple=_uri_regex)
         self._feed_name = value
     
     @property
@@ -2726,7 +2726,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         
         @subscription_id.setter
         def subscription_id(self, value):
-            _do_check(value, 'subscription_id', regex=_uri_regex)
+            _do_check(value, 'subscription_id', regex_tuple=_uri_regex)
             self._subscription_id = value
         
         @property
@@ -2839,7 +2839,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         
         @poll_protocol.setter
         def poll_protocol(self, value):
-            _do_check(value, 'poll_protocol', regex=_uri_regex)
+            _do_check(value, 'poll_protocol', regex_tuple=_uri_regex)
             self._poll_protocol = value
         
         @property
@@ -2848,7 +2848,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         
         @poll_message_bindings.setter
         def poll_message_bindings(self, value):
-            _do_check(value, 'poll_message_bindings', regex=_uri_regex)
+            _do_check(value, 'poll_message_bindings', regex_tuple=_uri_regex)
             self._poll_message_bindings = value
         
         def to_etree(self):
