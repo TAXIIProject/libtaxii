@@ -152,7 +152,7 @@ def _do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_b
             raise ValueError(_regex_error % (varname, regex_tuple.title, var))
     
     if value_tuple is not None:
-        if not var in value_tuple:
+        if var not in value_tuple:
             raise ValueError(_tuple_error % (varname, value_tuple, var))
     return
 
