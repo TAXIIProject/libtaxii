@@ -30,10 +30,13 @@ class HttpClient:
     PROXY_HTTP = 'http'
     PROXY_HTTPS = 'https'
 
-    def __init__(self):
-        self.auth_type = HttpClient.AUTH_NONE
+    def __init__(self, auth_type=HttpClient.AUTH_NONE, auth_credentials=None, use_https=False):
+        self.use_https = use_https
+        self.auth_type = auth_type
         self.auth_credentials = {}
-        self.use_https = False
+        if auth_credentials is not None:
+            self.setAuthCredentials(auth_credentials)
+        #These cannot currently be set in the constructor
         self.proxy_type = None
         self.proxy_string = None
         self.verify_server = False
