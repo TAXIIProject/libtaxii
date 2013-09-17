@@ -30,7 +30,7 @@ class HttpClient:
     PROXY_HTTP = 'http'
     PROXY_HTTPS = 'https'
 
-    def __init__(self, auth_type=HttpClient.AUTH_NONE, auth_credentials=None, use_https=False):
+    def __init__(self, auth_type=AUTH_NONE, auth_credentials=None, use_https=False):
         self.use_https = use_https
         self.auth_type = auth_type
         self.auth_credentials = {}
