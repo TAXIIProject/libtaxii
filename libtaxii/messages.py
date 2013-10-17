@@ -754,6 +754,10 @@ class ContentBlock(BaseNonMessage):
     @content.setter
     def content(self, value):
         _do_check(value, 'content')#Just check for not None
+        if isinstance(value, str):
+            value = value.decode('utf-8')
+        elif not isinstance(value, unicode):
+            value = unicode(value)
         self._content = value
     
     @property
@@ -787,7 +791,6 @@ class ContentBlock(BaseNonMessage):
                 c.append(xml)
             except:
                 c.text = self.content
-                pass  # Keep calm and carry on
         else:
             c.text = self.content
 
