@@ -120,7 +120,7 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
 
 def get_message_from_httplib_http_response(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
-    taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
+    taxii_content_type = http_response.getheaders('X-TAXII-Content-Type')
     response_message = http_response.read()
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
