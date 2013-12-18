@@ -1086,7 +1086,7 @@ class DiscoveryResponse(TAXIIMessage):
             si.attrib['service_type'] = self.service_type
             si.attrib['service_version'] = self.services_version
             if self.available is not None:
-                si.attrib['available'] = str(self.available)
+                si.attrib['available'] = str(self.available).lower()
 
             protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii'])
             protocol_binding.text = self.protocol_binding
@@ -1362,7 +1362,7 @@ class FeedInformationResponse(TAXIIMessage):
             f = etree.Element('{%s}Feed' % ns_map['taxii'])
             f.attrib['feed_name'] = self.feed_name
             if self.available is not None:
-                f.attrib['available'] = str(self.available)
+                f.attrib['available'] = str(self.available).lower()
             feed_description = etree.SubElement(f, '{%s}Description' % ns_map['taxii'])
             feed_description.text = self.feed_description
 
@@ -2833,7 +2833,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             a.text = self.poll_address
 
             for binding in self.poll_message_bindings:
-                b = etree.SubElement(xml, '{%s}Message_Bindingx' % ns_map['taxii'])
+                b = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii'])
                 b.text = binding
 
             return xml
