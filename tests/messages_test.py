@@ -30,8 +30,8 @@ def message_tests(taxii_message):
 
     xml_string = taxii_message.to_xml()
     valid = tm.validate_xml(xml_string)
-    if not valid:
-        raise Exception('\tFailure of test #1 - XML not schema valid')
+    if valid is not True:
+        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
     msg_from_xml = tm.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()
     msg_from_dict = tm.get_message_from_dict(dictionary)
