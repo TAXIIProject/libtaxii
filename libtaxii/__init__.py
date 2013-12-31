@@ -35,6 +35,11 @@ VID_CERT_EU_JSON_10 = 'urn:cert.europa.eu:message:json:1.0'
 #TAXII Content Bindings
 #: Content Binding ID for STIX XML 1.0
 CB_STIX_XML_10 = 'urn:stix.mitre.org:xml:1.0'
+#: Content Binding ID for STIX XML 1.0.1
+CB_STIX_XML_101 = 'urn:stix.mitre.org:xml:1.0.1'
+#: Content Binding ID for STIX XML 1.1
+CB_STIX_XML_11 = 'urn:stix.mitre.org:xml:1.1'
+
 #: Content Binding ID for CAP 1.1
 CB_CAP_11 = 'urn:oasis:names:tc:emergency:cap:1.1'
 #: Content Binding ID for XML Encryption
