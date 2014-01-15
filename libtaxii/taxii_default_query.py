@@ -341,6 +341,10 @@ class DefaultQueryInfo(tm11.SupportedQuery):
             self.allowed_scope = allowed_scope or []
         
         @property
+        def sort_key(self):
+            return self.targeting_expression_id
+        
+        @property
         def targeting_expression_id(self):
             return self._targeting_expression_id
         
@@ -388,26 +392,26 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         def __hash__(self):
             return hash(str(self.to_dict()))
         
-        def __eq__(self, other, debug=False):
-            if not isinstance(other, DefaultQueryInfo.TargetingExpressionInfo):
-                if debug:
-                    print 'other is not of similar type'
-                return False
+        # def __eq__(self, other, debug=False):
+            # if not isinstance(other, DefaultQueryInfo.TargetingExpressionInfo):
+                # if debug:
+                    # print 'other is not of similar type'
+                # return False
             
-            if not self._checkPropertiesEq(other, ['_targeting_expression_id'], debug):
-                return False
+            # if not self._checkPropertiesEq(other, ['_targeting_expression_id'], debug):
+                # return False
             
-            if set(self.preferred_scope) != set(other.preferred_scope):
-                if debug:
-                    print 'preferred_scopes not equal: %s != %s' % (self.preferred_scope, other.preferred_scope)
-                return False
+            # if set(self.preferred_scope) != set(other.preferred_scope):
+                # if debug:
+                    # print 'preferred_scopes not equal: %s != %s' % (self.preferred_scope, other.preferred_scope)
+                # return False
             
-            if set(self.allowed_scope) != set(other.allowed_scope):
-                if debug:
-                    print 'allowed_scopes not equal: %s != %s' % (self.allowed_scope, other.allowed_scope)
-                return False
+            # if set(self.allowed_scope) != set(other.allowed_scope):
+                # if debug:
+                    # print 'allowed_scopes not equal: %s != %s' % (self.allowed_scope, other.allowed_scope)
+                # return False
             
-            return True
+            # return True
         
         @staticmethod
         def from_etree(etree_xml):

@@ -777,9 +777,12 @@ pf1 = tm11.PollFulfillmentRequest(
         result_id = '123',#Required
         result_part_number = 1)#Required
 
-message_tests(pf1, True)
+message_tests(pf1)
 
 ## End 3.11 - Poll Fulfillment Request Tests ##
+
+#TODO: Content block tests
+
 sys.exit(0)
 
 
