@@ -2819,57 +2819,63 @@ class InboxMessage(TAXIIMessage):
     
     @classmethod
     def from_etree(cls, etree_xml):
-        msg = super(InboxMessage, cls).from_etree(etree_xml)
+        kwargs = {}
         
         result_id_set = etree_xml.xpath('./@result_id')
         if len(result_id_set) > 0:
-            msg.result_id = result_id_set[0]
+            kwargs['result_id'] = result_id_set[0]
         
+        kwargs['destination_collection_names'] = []
         dcn_set = etree_xml.xpath('./taxii_11:Destination_Collection_Name', namespaces=ns_map)
         for dcn in dcn_set:
-            msg.destination_collection_names.append(dcn.text)
+            kwargs['destination_collection_names'].append(dcn.text)
         
         msg_set = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)
         if len(msg_set) > 0:
-            msg.message = msg_set[0].text
+            kwargs['message'] = msg_set[0].text
 
         subs_infos = etree_xml.xpath('./taxii_11:Source_Subscription', namespaces=ns_map)
         if len(subs_infos) > 0:
-            msg.subscription_information = InboxMessage.SubscriptionInformation.from_etree(subs_infos[0])
+            kwargs['subscription_information'] = InboxMessage.SubscriptionInformation.from_etree(subs_infos[0])
         
         record_count_set = etree_xml.xpath('./taxii_11:Record_Count', namespaces=ns_map)
         if len(record_count_set) > 0:
-            msg.record_count = RecordCount.from_etree(record_count_set[0])
+            kwargs['record_count'] = RecordCount.from_etree(record_count_set[0])
         
         content_blocks = etree_xml.xpath('./taxii_11:Content_Block', namespaces=ns_map)
-        msg.content_blocks = []
+        kwargs['content_blocks'] = []
         for block in content_blocks:
-            msg.content_blocks.append(ContentBlock.from_etree(block))
-
+            kwargs['content_blocks'].append(ContentBlock.from_etree(block))
+        
+        msg = super(InboxMessage, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
     def from_dict(cls, d):
-        msg = super(InboxMessage, cls).from_dict(d)
-        msg.result_id = d.get('result_id')
         
+        kwargs = {}
+        
+        kwargs['result_id'] = d.get('result_id')
+        
+        kwargs['destination_collection_names'] = []
         if 'destination_collection_names' in d:
             for dcn in d['destination_collection_names']:
-                msg.destination_collection_names.append(dcn)
+                kwargs['destination_collection_names'].append(dcn)
         
-        msg.message = d.get('message')
+        kwargs['message'] = d.get('message')
 
-        msg.subscription_information = None
+        kwargs['subscription_information'] = None
         if 'subscription_information' in d:
-            msg.subscription_information = InboxMessage.SubscriptionInformation.from_dict(d['subscription_information'])
+            kwargs['subscription_information'] = InboxMessage.SubscriptionInformation.from_dict(d['subscription_information'])
         
         if 'record_count' in d:
-            msg.record_count = RecordCount.from_dict(d['record_count'])
+            kwargs['record_count'] = RecordCount.from_dict(d['record_count'])
         
-        msg.content_blocks = []
+        kwargs['content_blocks'] = []
         for block in d['content_blocks']:
-            msg.content_blocks.append(ContentBlock.from_dict(block))
-
+            kwargs['content_blocks'].append(ContentBlock.from_dict(block))
+        
+        msg = super(InboxMessage, cls).from_dict(d, **kwargs)
         return msg
 
     class SubscriptionInformation(BaseNonMessage):
