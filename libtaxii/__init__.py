@@ -21,8 +21,12 @@ import libtaxii.clients as tc
 #TAXII Version IDs
 #: Version ID for the TAXII Services Specification 1.0
 VID_TAXII_SERVICES_10 = 'urn:taxii.mitre.org:services:1.0'
+#: Version ID for the TAXII Services Specification 1.1
+VID_TAXII_SERVICES_11 = 'urn:taxii.mitre.org:services:1.1'
 #: Version ID for the TAXII XML Message Binding Specification 1.0
 VID_TAXII_XML_10 = 'urn:taxii.mitre.org:message:xml:1.0'
+#: Version ID for the TAXII XML Message Binding Specification 1.1
+VID_TAXII_XML_11 = 'urn:taxii.mitre.org:message:xml:1.1'
 #: Version ID for the TAXII HTTP Protocol Binding Specification 1.0
 VID_TAXII_HTTP_10 = 'urn:taxii.mitre.org:protocol:http:1.0'
 #: Version ID for the TAXII HTTPS Protocol Binding Specification 1.0
