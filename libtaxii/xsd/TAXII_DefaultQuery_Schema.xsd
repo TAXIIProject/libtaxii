@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    targetNamespace="http://taxii.mitre.org/query/taxii_default_query-1"
+    xmlns:tdq="http://taxii.mitre.org/query/taxii_default_query-1">
+
+    <xs:complexType name="DefaultQueryType">
+        <xs:sequence>
+            <xs:element name="Criteria" type="tdq:CriteriaType">
+                <xs:annotation>
+                    <xs:documentation>An XML element. Its body consists only of the indicated XML fields.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="targeting_expression_id" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>An XML AnyURI indicating the Targeting Expression Vocabulary that will be used in this query’s Target field(s).</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="DefaultQueryInfoType">
+        <xs:sequence>
+            <xs:element name="Targeting_Expression_Info" type="tdq:TargetingExpressionInfoType">
+                <xs:annotation>
+                    <xs:documentation>The element name indicates that this is a Targeting Expression Information field. Its body consists only of the indicated XML Fields.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" name="Capability_Module" type="xs:anyURI">
+                <xs:annotation>
+                    <xs:documentation>An XML AnyURI indicating a Capability Module.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="CriteriaType">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element maxOccurs="1" minOccurs="1" name="Criteria" type="tdq:CriteriaType">
+                <xs:annotation>
+                    <xs:documentation>An XML element. This element MUST consist only of the indicated XML fields. The subfields of this Criteria are the same as the parent Criteria (e.g., this is a recursive field), though they are not listed here.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="1" minOccurs="1" name="Criterion" type="tdq:CriterionType">
+                <xs:annotation>
+                    <xs:documentation>An XML element. This element MUST consist only of the indicated XML fields.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:choice>
+        <xs:attribute name="operator" use="required">
+            <xs:annotation>
+                <xs:documentation>An XML string containing an operator. Must be one of "AND" or "OR".</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="OR"/>
+                    <xs:pattern value="AND"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="CriterionType">
+        <xs:sequence>
+            <xs:element name="Target" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>An XML string containing a Targeting Expression identifying the region of the record that is being targeted.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Test" type="tdq:TestType">
+                <xs:annotation>
+                    <xs:documentation>An XML element containing the Test. This element MUST consist only of the indicated XML fields.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute default="false" name="negate" type="xs:boolean">
+            <xs:annotation>
+                <xs:documentation>An XML boolean indicating whether the result of the Criterion should be negated. The default value for this field is ‘false’.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="TestType">
+        <xs:sequence minOccurs="0">
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="Parameter"
+                type="tdq:ParameterType">
+                <xs:annotation>
+                    <xs:documentation>An XML string containing the value of this parameter.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="capability_id" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>An XML AnyURI indicating the Capability Module used in this Test.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="relationship" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>An XML string containing the relationship.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="ParameterType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" type="xs:string" use="required">
+                    <xs:annotation>
+                        <xs:documentation>An XML string containing the name of this parameter.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="TargetingExpressionInfoType">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="Preferred_Scope" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>An XML String containing a Targeting Expression. At least one of Preferred_Scope or Allowed_Scope MUST be present (though this is not schema enforced).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="Allowed_Scope" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>An XML String containing a Targeting Expression. At least one of Preferred_Scope or Allowed_Scope MUST be present (though this is not schema enforced).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="targeting_expression_id" type="xs:anyURI">
+            <xs:annotation>
+                <xs:documentation>An XML AnyURI containing a Targeting Expression Vocabulary ID.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:element name="Default_Query" type="tdq:DefaultQueryType">
+        <xs:annotation>
+            <xs:documentation>The element name indicates that this is a TAXII Default Query. Its body MUST consist of only the indicated XML Fields.</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Default_Query_Info" type="tdq:DefaultQueryInfoType">
+        <xs:annotation>
+            <xs:documentation>The element name indicates that this is a query information structure. Its body consists only of the indicated fields.</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+</xs:schema>
