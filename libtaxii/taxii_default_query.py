@@ -183,58 +183,6 @@ cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte,
 
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
 
-# cm_info = {CM_CORE: 
-            # {'equals': 
-                # {'match_type': {'value_tuple': ('case_sensitive_string','case_insensitive_string','number')},
-                 # 'value': {'type': basestring}
-                # },
-            # 'not_equals': 
-                # {'match_type': {'value_tuple': ('case_sensitive_string','case_insensitive_string','number')},
-                 # 'value': {'type': basestring}
-                # },
-            # 'greater_than': 
-                # {'value': {}},#TODO: Number
-            # 'greater_than_or_equal': 
-                # {'value': {}},#TODO: Number
-            # 'less_than': 
-                # {'value': {}},#TODO: Number
-            # 'less_than_or_equal': 
-                # {'value': {}},#TODO: Number
-            # 'does_not_exist': {},#No parameters for this check
-            # 'exists': {},#No parameters for this check
-            # 'begins_with': 
-                # {'case_sensitive': {'value_tuple': (True, False)},
-                 # 'value': {'type': basestring}
-                # },
-            # 'contains': 
-                # {'case_sensitive': {'value_tuple': (True, False)},
-                 # 'value': {'type': basestring}
-                # },
-            # 'ends_with': 
-                # {'case_sensitive': {'value_tuple': (True, False)},
-                 # 'value': {'type': basestring}
-                # },
-            # },
-           # CM_REGEX:
-             # {'matches':
-                # {'case_sensitive': {'value_tuple': (True, False)},
-                 # 'value': {'type': basestring}
-                # }
-             # },
-           # CM_TIMESTAMP:
-             # {'equals': 
-                # {'value': {'type': datetime.datetime}},
-              # 'greater_than': 
-                # {'value': {'type': datetime.datetime}},
-              # 'greater_than_or_equals':
-                # {'value': {'type': datetime.datetime}},
-              # 'less_than':
-                # {'value': {'type': datetime.datetime}},
-              # 'less_than_or_equals':
-                # {'value': {'type': datetime.datetime}}
-              # }
-      # }
-
 class DefaultQueryInfo(tm11.SupportedQuery):
     def __init__(self, format_id, targeting_expression_infos, capability_modules):
         super(DefaultQueryInfo, self).__init__(format_id)
