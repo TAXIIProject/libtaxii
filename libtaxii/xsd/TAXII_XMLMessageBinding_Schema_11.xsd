@@ -1,0 +1,1322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
+    xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    targetNamespace="http://taxii.mitre.org/messages/taxii_xml_binding-1.1"
+    elementFormDefault="qualified" version="1.1">
+    <xs:annotation>
+        <xs:appinfo>
+            <schema>TAXII XML Message Binding Schema</schema>
+            <version>1.1 RC 1</version>
+            <date>12/20/2013</date>
+            <short_description>The following specifies the fields and types of the TAXII XML Message Binding.</short_description>
+            <terms_of_use>Copyright (c) 2012 - 2013, The MITRE Corporation. All rights reserved. The contents of this file are subject to the terms of the TAXII License located at http://taxii.mitre.org/about/termsofuse.html. See the TAXII License for the specific language governing permissions and limitations for use of this schema. When distributing copies of the TAXII XML Message Binding Schema, this license header must be included.</terms_of_use>
+        </xs:appinfo>
+        <xs:documentation>XML schema associated with the TAXII XML Message Binding Specification. Note that in case of conflict, the specification is considered normative.</xs:documentation>
+    </xs:annotation>
+
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
+        schemaLocation="xmldsig-core-schema.xsd">
+        <xs:annotation>
+            <xs:documentation>XML Digital Signature schema imported to support signatures of messages and contents.</xs:documentation>
+        </xs:annotation>
+    </xs:import>
+
+    <!-- GLOBAL TYPES -->
+
+    <xs:complexType name="MessageType">
+        <xs:annotation>
+            <xs:documentation>The root of all TAXII messages. This is used to define header fields. This will never be instantiated directly but the TAXII Message Body types all extend this type.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Extended_Headers" minOccurs="0" maxOccurs="1"
+                type="ExtendedHeadersType">
+                <xs:annotation>
+                    <xs:documentation>Represents any number of extended headers for this message.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="message_id" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>Hold the message-id value for this message.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="ExtendedHeadersType">
+        <xs:annotation>
+            <xs:documentation>Holds one or more extended headers for the message.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Extended_Header" type="ExtendedHeaderType" minOccurs="1"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Each instance of Extended_Header represents one extended header for the message.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ExtendedHeaderType" mixed="true">
+        <xs:annotation>
+            <xs:documentation>Holds a single extended header value.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="AnyMixedContentType">
+                <xs:attribute name="name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>The name of the extended header.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RequestMessageType" abstract="true">
+        <xs:annotation>
+            <xs:documentation>The base type of request messages.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="MessageType"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ResponseMessageType" abstract="true">
+        <xs:annotation>
+            <xs:documentation>The base type of response messages.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="MessageType">
+                <xs:attribute name="in_response_to" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>All responses must include an in_response_to attribute indicating the message id to which they are responding.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ContentBindingIDType">
+        <xs:annotation>
+            <xs:documentation>Identifies a content binding and multiple possible subtypes</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Subtype" type="SubtypeType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Identifies one or more Content Binding Subtypes</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="binding_id" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>A Content Binding ID.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="SubtypeType">
+        <xs:annotation>
+            <xs:documentation>Identifies a Content Binding Subtype</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="subtype_id" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>A Content Binding Subtype ID</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:group name="BindingsGroup">
+        <xs:annotation>
+            <xs:documentation>The Protocol Binding, network address, and one or more Message Bindings. This set of information frequently appears together.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Protocol_Binding" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The supported protocol, identified using a TAXII Protocol Binding Version ID string or some other string value denoting a non-standard protocol.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Address" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The address used to contact the identified service using the given protocol. Should be a valid address using the identified protocol binding.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Message_Binding" type="xs:anyURI" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>One or more supported message bindings, identified using a TAXII Message Binding Version ID string or some other string value denoting a non-standard message binding.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:group>
+
+    <xs:complexType name="ServiceContactInfoType">
+        <xs:annotation>
+            <xs:documentation>Information on how to contact a particular service.</xs:documentation>
+        </xs:annotation>
+        <xs:group ref="BindingsGroup"/>
+    </xs:complexType>
+
+    <xs:simpleType name="TimestampLabelType">
+        <xs:restriction base="xs:dateTime">
+            <xs:pattern
+                value="-?[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?(((\+|-)[0-9]{2}:[0-9]{2})|Z)"
+            />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="AnyMixedContentType" mixed="true">
+        <xs:annotation>
+            <xs:documentation>Type for fields that may contain any string and may contain additional XML.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ContentBlockType">
+        <xs:annotation>
+            <xs:documentation>Contains one piece of content as a content.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Content_Binding" type="ContentInstanceType" minOccurs="1"
+                maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Indicates the binding of the contents in the Content field.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Content" type="AnyMixedContentType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The content being transported.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Timestamp_Label" type="TimestampLabelType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>An optional field containing the timestamp label assigned to this specific piece of content.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Message" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>This field contains prose information for the message recipient. This message is not required to be machine readable and is usually a message for a human operator.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Padding" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Optional padding to obfuscate the size of the content.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>An XML Digital Signature scoped to this Content_Block.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="QueryType">
+        <xs:annotation>
+            <xs:documentation>Contains a Query expression</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="AnyMixedContentType">
+                <xs:attribute name="format_id" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Contains the Query Format ID of a particular Query Format</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RecordCountType">
+        <xs:annotation>
+            <xs:documentation>Contains information about the number of applicable records in a
+                result set.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="xs:nonNegativeInteger">
+                <xs:attribute name="partial_count" type="xs:boolean" use="optional" default="false">
+                    <xs:annotation>
+                        <xs:documentation>If true, indicats that the true number of applicable
+                            records in this result set may exceed the number provided.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="SubscriptionParametersType">
+        <xs:sequence>
+            <xs:element name="Response_Type" type="ResponseTypeEnum" minOccurs="0" maxOccurs="1"
+                default="FULL">
+                <xs:annotation>
+                    <xs:documentation>Indicate the type of response (full content or count only).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="Content_Binding"
+                type="ContentBindingIDType">
+                <xs:annotation>
+                    <xs:documentation>Indicate the acceptable Content Bindings for this subscription</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Query" type="QueryType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A Query expression associated with this subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="ResponseTypeEnum">
+        <xs:annotation>
+            <xs:documentation>The possible types of responses to a poll/subscription.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="COUNT_ONLY">
+                <xs:annotation>
+                    <xs:documentation>A request for only the number of applicable records.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FULL">
+                <xs:annotation>
+                    <xs:documentation>A request for the full content of all applicable records.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- TAXII Status Message -->
+
+    <xs:complexType name="TAXIIStatusMessageType">
+        <xs:annotation>
+            <xs:documentation>Type used by TAXII Status Messages.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ResponseMessageType">
+                <xs:sequence>
+                    <xs:element name="Status_Detail" minOccurs="0" maxOccurs="1"
+                        type="StatusDetailType">
+                        <xs:annotation>
+                            <xs:documentation>Machine-readable information about this message. See the specification for details.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Message" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An additional message intended for human consumption.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="status_type" type="StatusTypeType" use="required">
+                    <xs:annotation>
+                        <xs:documentation>This identifies the type of status conveyed in this message. Can either be one of the defined Status Types or a user-defined value.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="StatusTypeType">
+        <xs:annotation>
+            <xs:documentation>This identifies the type of status conveyed in this Status Message. Can either be one of the defined Status Types or a user-defined value.</xs:documentation>
+        </xs:annotation>
+        <xs:union memberTypes="taxii:StatusTypeEnum taxii:CustomStatusType"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="CustomStatusType">
+        <xs:annotation>
+            <xs:documentation>A status type defined by a third party. All must conform to URI syntax.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:anyURI"/>
+    </xs:simpleType>
+
+    <xs:simpleType name="StatusTypeEnum">
+        <xs:annotation>
+            <xs:documentation>The defined TAXII status message types.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ASYNCHRONOUS_POLL_ERROR">
+                <xs:annotation>
+                    <xs:documentation>Asynchronous Poll Error - An error was detected while creating
+                        an Asynchronous Poll result.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="BAD_MESSAGE">
+                <xs:annotation>
+                    <xs:documentation>Bad Message - Recipient could not interpret the message.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DENIED">
+                <xs:annotation>
+                    <xs:documentation>Denied - Rejected for reasons other than authentication failure.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DESTINATION_COLLECTION_ERROR">
+                <xs:annotation>
+                    <xs:documentation>Destination Collection Error - indicates an error in the
+                        specification of a destination Data Collection</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FAILURE">
+                <xs:annotation>
+                    <xs:documentation>Failure - General indication of failure.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="INVALID_RESPONSE_PART">
+                <xs:annotation>
+                    <xs:documentation>Invalid Response Part - Indicates that a request was made for
+                        an invalid response part.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="NETWORK_ERROR">
+                <xs:annotation>
+                    <xs:documentation>Network Error - Encapsulates an error encountered at the
+                        network transport layer.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="NOT_FOUND">
+                <xs:annotation>
+                    <xs:documentation>Not Found - Request was for an unknown target.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PENDING">
+                <xs:annotation>
+                    <xs:documentation>Pending - Indicates that a result set was not immediately
+                        available but will be created and made available at a later time.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="POLLING_UNSUPPORTED">
+                <xs:annotation>
+                    <xs:documentation>Polling Not Supported - Request for polling of content cannot be supported.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="RETRY">
+                <xs:annotation>
+                    <xs:documentation>Retry - Unable to respond within current session but may be successfuly at a later time.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SUCCESS">
+                <xs:annotation>
+                    <xs:documentation>Success - Message successfully received and processed.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNAUTHORIZED">
+                <xs:annotation>
+                    <xs:documentation>Unauthorized - Authentication missing or incorrect.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSUPPORTED_MESSAGE">
+                <xs:annotation>
+                    <xs:documentation>Unsupported Message Binding - Requested Message Binding not supported.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSUPPORTED_CONTENT">
+                <xs:annotation>
+                    <xs:documentation>Unsupported Content Binding - Requested Content Binding not supported.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSUPPORTED_PROTOCOL">
+                <xs:annotation>
+                    <xs:documentation>Unsupported Protocol - Requested Protocol Binding not supported.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSUPPORTED_QUERY">
+                <xs:annotation>
+                    <xs:documentation>Unsupported Query - Indicates the presence of a Query
+                        expression that used an unsupported Query Format.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="StatusDetailType">
+        <xs:annotation>
+            <xs:documentation>Contains machine readable information about a Status Message.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Detail" type="StatusDetailDetailType" minOccurs="1"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Contains one piece of machine-readable information about a
+                        Status Message</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="StatusDetailDetailType">
+        <xs:annotation>
+            <xs:documentation>Contains one piece of machine readable information about a Status
+                Message</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="AnyMixedContentType">
+                <xs:attribute name="name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Contains the name of this status detail.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <!-- TAXII Discovery Request -->
+
+    <xs:complexType name="TAXIIDiscoveryRequestType">
+        <xs:annotation>
+            <xs:documentation>Request to a Discovery Service for a listing of services.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="RequestMessageType">
+                <xs:sequence>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- TAXII Discovery Response -->
+
+    <xs:complexType name="TAXIIDiscoveryResponseType">
+        <xs:annotation>
+            <xs:documentation>Response to a Discovery Request. Contains 0 or more Service records.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ResponseMessageType">
+                <xs:sequence>
+                    <xs:element name="Service_Instance" minOccurs="0" maxOccurs="unbounded"
+                        type="taxii:ServiceInstanceType">
+                        <xs:annotation>
+                            <xs:documentation>Each instance holds one service record.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ServiceInstanceType">
+        <xs:annotation>
+            <xs:documentation>Describes one TAXII service.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:group ref="BindingsGroup">
+                <xs:annotation>
+                    <xs:documentation>The Protocol and Message bindings supported by this service.</xs:documentation>
+                </xs:annotation>
+            </xs:group>
+            <xs:element name="Supported_Query" type="SupportedQueryType" minOccurs="0"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Identifies a supported query format and specifies parameters
+                        for that format.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Content_Binding" type="ContentBindingIDType" minOccurs="0"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Ignored if @service_version has a value other than INBOX. If @service_version=INBOX and these fields are present, indicates a list of supported content bindings and version, identified using the appropriate Content Binding IDs. If @service_version=INBOX and these fields are not present, this indicates that the Inbox Service accepts all content types.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Message" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A message with regard to the named service.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="service_type" type="taxii:ServiceTypeEnum" use="required">
+            <xs:annotation>
+                <xs:documentation>The type of the service.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="available" type="xs:boolean" use="optional">
+            <xs:annotation>
+                <xs:documentation>True if the requester is known to be allowed to use the given service. False if the requester is not allowed. If attribute is absent, treat access as unknown.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="service_version" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>Identify the TAXII Services version that defines this service using a TAXII Services Version ID value.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name="ServiceTypeEnum">
+        <xs:annotation>
+            <xs:documentation>The defined TAXII services.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DISCOVERY">
+                <xs:annotation>
+                    <xs:documentation>Discovery Service</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="COLLECTION_MANAGEMENT">
+                <xs:annotation>
+                    <xs:documentation>Collection Management Service</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="INBOX">
+                <xs:annotation>
+                    <xs:documentation>Inbox Service</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="POLL">
+                <xs:annotation>
+                    <xs:documentation>Poll Service</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="SupportedQueryType">
+        <xs:annotation>
+            <xs:documentation>Contains paramters for a particular Query Format</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="AnyMixedContentType">
+                <xs:attribute name="format_id" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Contains the Query Format ID of a particular Query Format</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- TAXII Collection Information Request -->
+
+    <xs:complexType name="TAXIICollectionInformationRequestType">
+        <xs:annotation>
+            <xs:documentation>A request for information about offered collection from a Collection Management Service.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="RequestMessageType">
+                <xs:sequence>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- TAXII Collection Information Response -->
+
+    <xs:complexType name="TAXIICollectionInformationResponseType">
+        <xs:annotation>
+            <xs:documentation>A response to a Collection Information Request. Contains 0 or more Collection records.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ResponseMessageType">
+                <xs:sequence>
+                    <xs:element name="Collection" minOccurs="0" maxOccurs="unbounded"
+                        type="taxii:CollectionRecordType">
+                        <xs:annotation>
+                            <xs:documentation>One element provided for each Data Collection in the response.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="CollectionRecordType">
+        <xs:annotation>
+            <xs:documentation>A record for a data collection.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Description" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A prose description of this TAXII Data Collection.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="Collection_Volume" type="xs:nonNegativeInteger"
+                maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>This field indicates the typical number of daily records subscribers can expect to receive from this Data Collection.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Content_Binding" type="ContentBindingIDType" minOccurs="0"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The content bindings used in this Data Collection as indicated by Content Binding Identifiers.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Push_Method" minOccurs="0" maxOccurs="unbounded" type="PushMethodType">
+                <xs:annotation>
+                    <xs:documentation>Identify ways that content from this Data Collection can be pushed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Polling_Service" minOccurs="0" maxOccurs="unbounded"
+                type="ServiceContactInfoType">
+                <xs:annotation>
+                    <xs:documentation>Identify ways to contact a Poll service to collect information for this Data Collection.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Subscription_Service" minOccurs="0" maxOccurs="unbounded"
+                type="ServiceContactInfoType">
+                <xs:annotation>
+                    <xs:documentation>Identify Collection Management Services to use when establishing a subscription to this Data Collection.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Receiving_Inbox_Service" type="InboxServiceBindingsType" minOccurs="0"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Identify Inbox Services to which content bound for
+                    this Data Collection may be pushed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>A locally unique name for this TAXII Data Collection.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="collection_type" type="CollectionTypeEnum" use="optional"
+            default="DATA_FEED">
+            <xs:annotation>
+                <xs:documentation>The type of this Data Collection (Data Feed or Data Set).</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="available" type="xs:boolean" use="optional">
+            <xs:annotation>
+                <xs:documentation>True if the requester is known to be allowed to use the given service. False if the requester is not allowed access. If attribute is absent, treat access as unknown.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="InboxServiceBindingsType">
+        <xs:annotation>
+            <xs:documentation>Contains binding information for an Inbox Service</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:group ref="BindingsGroup"/>
+            <xs:element name="Content_Binding" type="ContentBindingIDType" minOccurs="0"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Identify Content Bindings acceptable to this Inbox Service</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="CollectionTypeEnum">
+        <xs:annotation>
+            <xs:documentation>The types of Data Collections supported by TAXII</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DATA_FEED">
+                <xs:annotation>
+                    <xs:documentation>An ordered Data Collection</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DATA_SET">
+                <xs:annotation>
+                    <xs:documentation>An unordered Data Collection</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="PushMethodType">
+        <xs:annotation>
+            <xs:documentation>Information on the protocols and message types that can be used to
+                push content from a TAXII Data Collection.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Protocol_Binding" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The supported protocol, identified using a TAXII Protocol
+                        Binding Version ID string or some other URI value denoting a non-standard protocol.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Message_Binding" type="xs:anyURI" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The supported message bindings, identified using a TAXII
+                        Message Binding Version ID string or some other URI value denoting a non-standard message binding.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- TAXII Manage Collection Subscription Request Message -->
+
+    <xs:complexType name="TAXIISubscriptionManagementRequestType">
+        <xs:annotation>
+            <xs:documentation>Request management of a Data Collection subscription (including creation of a new subscription).</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="RequestMessageType">
+                <xs:sequence>
+                    <xs:element name="Subscription_ID" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>The subscription ID being managed. This attribute MUST
+                                be present if the action is UNSUBSCRIBE, PAUSE, or RESUME. It MAY be
+                                present if the action is STATUS. It is ignored if the action is
+                                SUBSCRIBE.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Subscription_Parameters" type="SubscriptionParametersType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Parameters associated with this subscription.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Push_Parameters" type="PushParameterType" minOccurs="0"
+                        maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>This field is only relevant if the action type is
+                                SUBSCRIBE and is ignored otherwise. If action type is SUBSCRIBE, and
+                                this field is present, its sub-fields indicate how the subscriber
+                                wishes to have Data Collection content pushed to their Inbox
+                                Service. If action type is SUBSCRIBE and this field is not present,
+                                this indicates that the subscriber does not wish to have content pushed and instead will poll for content.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="action" type="CollectionActionEnum" use="required">
+                    <xs:annotation>
+                        <xs:documentation>The action to take on this collection.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>A locally unique name for this TAXII Data Collection.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="CollectionActionEnum">
+        <xs:annotation>
+            <xs:documentation>A list of possible subscription management actions.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SUBSCRIBE">
+                <xs:annotation>
+                    <xs:documentation>Create a new subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSUBSCRIBE">
+                <xs:annotation>
+                    <xs:documentation>Delete an existing subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PAUSE">
+                <xs:annotation>
+                    <xs:documentation>Pause delivery of an existing subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="RESUME">
+                <xs:annotation>
+                    <xs:documentation>Resume delivery of an existing subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="STATUS">
+                <xs:annotation>
+                    <xs:documentation>Ask about the requester's established subscriptions for this collection.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="PushParameterType">
+        <xs:annotation>
+            <xs:documentation>Parameters describing how Data Collection content is to be pushed to a Consumer's Inbox Service.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Protocol_Binding" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The supported protocol, identified using a TAXII Protocol Binding Version ID string or some other string value denoting a non-standard protocol.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Address" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The address used to contact the Inbox service using the given protocol. Should be a valid address using the identified protocol binding.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Message_Binding" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The supported message binding, identified using a TAXII Message Binding Version ID string or some other string value denoting a non-standard message binding.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- TAXII Subscription Management Response Message -->
+
+    <xs:complexType name="TAXIISubscriptionManagementResponseType">
+        <xs:annotation>
+            <xs:documentation>Indicates a successful response to a Collection Management Request message.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ResponseMessageType">
+                <xs:sequence>
+                    <xs:element name="Message" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An additional message intended for human consumption.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Subscription" type="SubscriptionRecordType" minOccurs="0"
+                        maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>If this message is in response to a message with an
+                                action type of SUBSCRIBE or UNSUBSCRIBE, this element MUST be
+                                present exactly once. If this message is in response to a message
+                                with an action type of STATUS, this element may appear 0 or more
+                                times, with each instance describing a different subscription the
+                                requester has to the named Data Collection.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>A locally unique name for this TAXII Data Collection.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="SubscriptionRecordType">
+        <xs:annotation>
+            <xs:documentation>Contains a description of an established (or formerly established if
+                there was an UNSUBSCRIBE action) subscription to a Data Collection.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Subscription_ID" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The Subscription ID associated with this subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Subscription_Parameters" type="SubscriptionParametersType"
+                minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The parameters associated with this subscription</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Push_Parameters" type="PushParameterType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>This field describes the push parameters (if any) associated
+                        with this subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Poll_Instance" type="ServiceContactInfoType" minOccurs="0"
+                maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Identifies relevant Poll Service(s) that can be contacted for
+                    fulfillment of this subscription.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="status" type="SubscriptionStatusEnum" use="optional" default="ACTIVE">
+            <xs:annotation>
+                <xs:documentation>Identify the current status of the subscription</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name="SubscriptionStatusEnum">
+        <xs:annotation>
+            <xs:documentation>Describe the current status of a subscription.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ACTIVE">
+                <xs:annotation>
+                    <xs:documentation>The subscription is in an active state</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PAUSED">
+                <xs:annotation>
+                    <xs:documentation>The subscription is in a paused state</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSUBSCRIBED">
+                <xs:annotation>
+                    <xs:documentation>The subscription has just been unsubscribed</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- TAXII Poll Request Message -->
+    <xs:complexType name="TAXIIPollRequestType">
+        <xs:annotation>
+            <xs:documentation>A request to Poll a data collection.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="RequestMessageType">
+                <xs:sequence>
+                    <xs:element name="Exclusive_Begin_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>The earliest timestamp of content to retrieve.
+                                Irrelevant on a Data Set. If absent when polling a Data Feed, this
+                                indicates no lower bound.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>The latest timestamp of content to retrieve.
+                                Irrelevant on a Data Set. If absent when polling a Data Feed, this
+                                indicates no upper bound.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:choice minOccurs="1" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Exactly one of Subscription_ID or Poll_Parameters MUST
+                            be present to provide the parameters for this request.</xs:documentation>
+                        </xs:annotation>
+                        <xs:element name="Subscription_ID" type="xs:anyURI" minOccurs="1"
+                            maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>The subscription ID of the subscription that is
+                                    being polled.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="Poll_Parameters" type="PollParametersType" minOccurs="1"
+                            maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation>Parameters associated with this Poll Request.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:choice>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>A locally unique name for this TAXII Data Collection.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="PollParametersType">
+        <xs:annotation>
+            <xs:documentation>Contains parameters for a Poll Request</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Response_Type" type="ResponseTypeEnum" minOccurs="0" maxOccurs="1"
+                default="FULL">
+                <xs:annotation>
+                    <xs:documentation>Indicate the type of response (full content or count only).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="Content_Binding"
+                type="ContentBindingIDType">
+                <xs:annotation>
+                    <xs:documentation>Indicate the acceptable Content Bindings for the response</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Query" type="QueryType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>A Query expression associated with this poll request.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Delivery_Parameters" type="PushParameterType" minOccurs="0"
+                maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Parameters for the delivery of Asynchronous Poll results, if this is
+                        supported and necessary.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="allow_asynch" type="xs:boolean" use="optional" default="false">
+            <xs:annotation>
+                <xs:documentation>Indicate whether the requester supports Asynchronous Polling.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <!-- TAXII Poll Response Message -->
+
+    <xs:complexType name="TAXIIPollResponseType">
+        <xs:annotation>
+            <xs:documentation>Type for the Poll Response Messages.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ResponseMessageType">
+                <xs:sequence>
+                    <xs:element name="Subscription_ID" type="xs:anyURI" maxOccurs="1" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>The Subscription ID of the subscription associated
+                                with this Poll Response (if applicable)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Exclusive_Begin_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>The earliest timestamp of content considered.
+                                Irrelevant if polling a Data Set. If absent when polling a Data
+                                Feed, this indicates the earliest content in the Data Feed was
+                                considered.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>The latest timestamp of content considered. Irrelevant
+                            if polling a Data Set. This field MUST be present if a Data Feed was
+                            polled.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Record_Count" type="RecordCountType" minOccurs="0"
+                        maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Information about the number of applicable records in
+                                the result set.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Message" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An additional message intended for human consumption.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Content_Block" type="ContentBlockType" minOccurs="0"
+                        maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>Returned content.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>A locally unique name for this TAXII Data Collection.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="more" type="xs:boolean" use="optional" default="false">
+                    <xs:annotation>
+                        <xs:documentation>A flag to indicate whether there are more parts to this
+                            result set to be retrieved.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="result_id" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>Identifies the Result ID of the result set, if applicable.
+                        This attribute MUST be present if the more field is set to true.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="result_part_number" type="xs:positiveInteger" use="optional"
+                    default="1">
+                    <xs:annotation>
+                        <xs:documentation>Contains the part number of a multi-part response.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ContentInstanceType">
+        <xs:annotation>
+            <xs:documentation>Identifies a content binding and possible single subtype</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Subtype" type="SubtypeType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>Identifies zero or one Content Binding Subtypes</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="binding_id" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>A Content Binding ID.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <!-- TAXII Inbox Message -->
+
+    <xs:complexType name="TAXIIInboxMessageType">
+        <xs:annotation>
+            <xs:documentation>Push message to exchange content.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="RequestMessageType">
+                <xs:sequence>
+                    <xs:element name="Destination_Collection_Name" type="xs:anyURI"
+                        maxOccurs="unbounded" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>This field indicates the name of the TAXII Data
+                                Collection(s) to which this message’s content is being sent.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Message" type="xs:string" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An additional message intended for human consumption.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Source_Subscription" type="SourceSubscriptionType"
+                        minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>If this message is being sent in service of an existing subscription, this field SHOULD be present and provide information about the subscription being serviced.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Record_Count" type="RecordCountType" minOccurs="0"
+                        maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>A count of the number of applicable records.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Content_Block" type="ContentBlockType" minOccurs="0"
+                        maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation>Returned content.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="result_id" type="xs:anyURI" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>The Result ID for the result set of which this content is
+                            a part.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="SourceSubscriptionType">
+        <xs:annotation>
+            <xs:documentation>Describes a subscription to a collection, and the portion of that
+                collection that is being serviced by a message.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Subscription_ID" type="xs:anyURI" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The Subscription ID of the subscription being fulfilled by
+                        this message.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Exclusive_Begin_Timestamp" type="TimestampLabelType" minOccurs="0"
+                maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The earliest timestamp of content considered. This field is
+                        irrelevant if the content comes from a Data Set. If absent for content sent
+                        from a Data Feed, indicates the earliest content in the Data Feed was considered.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType" minOccurs="0"
+                maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>The latest timestamp of content considered. This field is
+                        irrelevant if the content comes from a Data Set. This field MUST be present
+                        if the message is servicing a subscription to a Data Feed.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation>A locally unique name for this TAXII Data Collection.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <!-- TAXII Poll Fulfillment Message -->
+
+    <xs:complexType name="TAXIIPollFulfillmentType">
+        <xs:annotation>
+            <xs:documentation>A request to to collect a prepared result set.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="RequestMessageType">
+                <xs:sequence>
+                    <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>An XML Digital Signature scoped to this message.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="collection_name" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Contains the name of the TAXII Data Collection associated with
+                        this request.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="result_id" type="xs:anyURI" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Contains the Result ID of the result set being collected.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="result_part_number" type="xs:positiveInteger" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>The portion of the result set that is being requested.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <!-- GLOBAL ELEMENTS -->
+    <xs:element name="TAXII_Message" abstract="true" type="MessageType">
+        <xs:annotation>
+            <xs:documentation>Abstract super-type of all message elements.</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Status_Message" type="TAXIIStatusMessageType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Discovery_Request" type="TAXIIDiscoveryRequestType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Discovery_Response" type="TAXIIDiscoveryResponseType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Collection_Information_Request" type="TAXIICollectionInformationRequestType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Collection_Information_Response" type="TAXIICollectionInformationResponseType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Subscription_Management_Request" type="TAXIISubscriptionManagementRequestType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Subscription_Management_Response"
+        type="TAXIISubscriptionManagementResponseType" substitutionGroup="TAXII_Message"/>
+    <xs:element name="Poll_Request" type="TAXIIPollRequestType" substitutionGroup="TAXII_Message"/>
+    <xs:element name="Poll_Response" type="TAXIIPollResponseType" substitutionGroup="TAXII_Message"/>
+    <xs:element name="Inbox_Message" type="TAXIIInboxMessageType" substitutionGroup="TAXII_Message"/>
+    <xs:element name="Poll_Fulfillment" type="TAXIIPollFulfillmentType"
+        substitutionGroup="TAXII_Message"/>
+</xs:schema>
