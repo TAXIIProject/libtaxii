@@ -14,6 +14,7 @@ import datetime
 import dateutil.parser
 from lxml import etree
 import StringIO
+import collections
 import os
 from libtaxii.validation import (do_check, uri_regex, check_timestamp_label)
 
@@ -110,14 +111,13 @@ CT_TYPES = (CT_DATA_FEED, CT_DATA_SET)
 
 #Import service types that haven't changed
 from libtaxii.messages_10 import (SVC_INBOX, SVC_POLL, SVC_DISCOVERY)
-#No new services in TAXII 1.1
+#No new services in TAXII 1.1; Feed Management renamed to Collection Management
 SVC_COLLECTION_MANAGEMENT = 'COLLECTION_MANAGEMENT'
 
 #A tuple of all service types
 SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_COLLECTION_MANAGEMENT, SVC_DISCOVERY)
 
 ns_map = {
-            #'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',#Not sure this is needed
             'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
          }
 
@@ -256,6 +256,14 @@ def get_message_from_json(json_string):
 query_deserializers = {}
 
 def register_query_format(format_id, query, query_info, schema=None):
+    """
+    This function registers a query format with libtaxii.messages_11.
+    Arguments:
+        format_id (string) - The format ID of the query
+        query (messages_11.Query subclass) - the Query object associated with the format_id
+        query_info (messages_11.SupportedQuery subclass) - the SupportedQuery object associated with the format_id
+        schema (xml schema) - The XML schema for validating the query
+    """
     query_deserializers[format_id] = {'query': query, 'query_info': query_info, 'schema': schema}
     
 def get_deserializer(format_id, type):
@@ -267,11 +275,54 @@ def get_deserializer(format_id, type):
     
     return query_deserializers[format_id][type]
 
-class BaseNonMessage(object):
-    """This class should not be used directly by libtaxii users.  
+#TODO: Consider using this
+# def _create_element(name, namespace=ns_map['taxii_11'], value=None, attrs=None, parent=None):
+    # """
+    # Helper method for appending a new element to an existing element.
     
-    Base class for non-TAXII Message objects"""
+    # Assumes the namespace is TAXII 1.1
+    
+    # Arguments:
+        # name (string) - The name of the element
+        # namespace (string) - The namespace of the element
+        # value (string) - The text value of the element
+        # attrs (dict) - A dictionary of attributes
+        # parent (Element) - The parent element
+    # """
+    # if value is None and attrs is None:
+        # return
+    
+    # if parent is None:
+        # elt = etree.Element('{%s}%s' % (namespace, name), nsmap=ns_map)
+    # else:
+        # elt = etree.SubElement(parent, '{%s}%s' % (namespace, name), nsmap=ns_map)
+    
+    # if value is not None:
+        # elt.text = value
+    
+    # if attrs is not None:
+        # for k, v in attrs.items():
+            # elt.attrib[k] = v
+    
+    # return elt
+    
 
+class BaseNonMessage(object):
+    """
+    This class should not be used directly by libtaxii users.  
+    Base class for non-TAXII Message objects
+    
+    """
+    
+    @property
+    def sort_key(self):
+        """
+        This property allows list of BaseNonMessage objects to 
+        be compared efficiently. The __eq__ method uses this 
+        property to sort the lists before comparisons are made
+        """
+        raise Exception('Method not implemented by child class!')
+    
     def to_etree(self):
         """Create an etree representation of this class.
 
@@ -287,7 +338,9 @@ class BaseNonMessage(object):
         raise Exception('Method not implemented by child class!')
 
     def to_xml(self):
-        """Create an XML representation of this class."""
+        """Create an XML representation of this class.
+        subclasses should not need to implement this method
+        """
         return etree.tostring(self.to_etree())
 
     @classmethod
@@ -308,7 +361,9 @@ class BaseNonMessage(object):
 
     @classmethod
     def from_xml(cls, xml):
-
+        """Create an instance of this class from XML.
+        subclasses should not need to implement this method
+        """
         if isinstance(xml, basestring):
             f = StringIO.StringIO(xml)
         else:
@@ -317,11 +372,18 @@ class BaseNonMessage(object):
         etree_xml = etree.parse(f, get_xml_parser()).getroot()
         return cls.from_etree(etree_xml)
     
-    @property
-    def sort_key(self):
-        raise Exception('Method not implemented by child class!')
-    
     def __eq__(self, other, debug=False):
+        """
+        A general equals method that works for all subclasses of this object,
+        as long as the subclasses do the following:
+        1. All class properties start with one underscore
+        2. The sort_key property is implemented
+        
+        Arguments:
+        self (object) - this object
+        other (object) - the object to compare self against
+        debug (bool) - Whether or not to print debug statements as the evaluation is made
+        """
         if other is None:
             if debug:
                 print 'other was None!'
@@ -376,7 +438,17 @@ class BaseNonMessage(object):
         return not self.__eq__(other, debug)
 
 class SupportedQuery(BaseNonMessage):
+    """
+    This class contains an instance of a supported query. It
+    is expected that, generally, messages_11.SupportedQuery
+    subclasses will be used in place of this class
+    to represent a query
+    """
     def __init__(self, format_id):
+        """
+        Arguments:
+            format_id (string) - The format_id of this supported query
+        """
         self.format_id = format_id
     
     @property
@@ -389,7 +461,7 @@ class SupportedQuery(BaseNonMessage):
     
     @format_id.setter
     def format_id(self, value):
-        #TODO: Check the value
+        do_check(value, 'format_id', regex_tuple=uri_regex)
         self._format_id = value
     
     def to_etree(self):
@@ -410,7 +482,17 @@ class SupportedQuery(BaseNonMessage):
         return SupportedQuery(**d)
 
 class Query(BaseNonMessage):
+    """
+    This class contains an instance of a query. It
+    is expected that, generally, messages_11.Query 
+    subclasses will be used in place of this class
+    to represent a query
+    """
     def __init__(self, format_id):
+        """
+        Arguments:
+            format_id (string) - The format_id of this query
+        """
         self.format_id = format_id
     
     @property
@@ -419,7 +501,7 @@ class Query(BaseNonMessage):
     
     @format_id.setter
     def format_id(self, value):
-        #TODO: Check the value
+        do_check(value, 'format_id', regex_tuple=uri_regex)
         self._format_id = value
     
     def to_etree(self):
@@ -431,13 +513,13 @@ class Query(BaseNonMessage):
         return {'format_id': self.format_id}
     
     @classmethod
-    def from_etree(etree_xml):
+    def from_etree(cls, etree_xml, kwargs):
         format_id = etree_xml.xpath('./@format_id', ns_map = nsmap)[0]
-        return SupportedQuery(format_id)
+        return cls(format_id, **kwargs)
     
     @classmethod
-    def from_dict(d):
-        return SupportedQuery(**d)
+    def from_dict(cls, d, kwargs):
+        return cls(d, **kwargs)
 
 #A value can be one of:
 # - a dictionary, where each key is a content_binding_id and each value is a list of subtypes
@@ -477,7 +559,7 @@ class ContentBinding(BaseNonMessage):
     
     @binding_id.setter
     def binding_id(self, value):
-        #TODO: check the value
+        do_check(value, 'binding_id', regex_tuple=uri_regex)
         self._binding_id = value
     
     @property
@@ -486,7 +568,7 @@ class ContentBinding(BaseNonMessage):
     
     @subtype_ids.setter
     def subtype_ids(self, value):
-        #TODO: Check the value
+        do_check(value, 'subtype_ids', regex_tuple=uri_regex)
         self._subtype_ids = value
     
     def to_etree(self):
@@ -834,10 +916,9 @@ class ContentBlock(BaseNonMessage):
 
 class PushParameters(BaseNonMessage):
         name = 'Push_Parameters'
-        #TODO: Should the default arguments of these change? I'm not sure these are actually optional
-        def __init__(self, inbox_protocol=None, inbox_address=None, delivery_message_binding=None):#, content_bindings=None):
+        def __init__(self, inbox_protocol, inbox_address, delivery_message_binding):
             """Set up Delivery Parameters.
-
+            
             Arguments
             - inbox_protocol (string) - identifies the protocol to be used when
                 pushing TAXII Data Collection content to a Consumer's TAXII Inbox
@@ -847,14 +928,10 @@ class PushParameters(BaseNonMessage):
                 content  for this TAXII Data Collection to be delivered.
             - delivery_message_binding (string) - identifies the message
                 binding to be used to send pushed content for this subscription.
-            - content_bindings (list of strings) - contains Content Binding IDs
-                indicating which types of contents the Consumer requests to
-                receive for this TAXII  Data Collection
             """
             self.inbox_protocol = inbox_protocol
             self.inbox_address = inbox_address
             self.delivery_message_binding = delivery_message_binding
-            #self.content_bindings = content_bindings or []
 
         @property
         def inbox_protocol(self):
@@ -871,7 +948,6 @@ class PushParameters(BaseNonMessage):
         
         @inbox_address.setter
         def inbox_address(self, value):
-            #TODO: Can inbox_address be validated?
             self._inbox_address = value
         
         @property
@@ -885,18 +961,15 @@ class PushParameters(BaseNonMessage):
         
         def to_etree(self):
             xml = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.name))
+            
+            pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
+            pb.text = self.inbox_protocol
 
-            if self.inbox_protocol is not None:
-                pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
-                pb.text = self.inbox_protocol
+            a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
+            a.text = self.inbox_address
 
-            if self.inbox_address is not None:
-                a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
-                a.text = self.inbox_address
-
-            if self.delivery_message_binding is not None:
-                mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
-                mb.text = self.delivery_message_binding
+            mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
+            mb.text = self.delivery_message_binding
             
             return xml
 
@@ -911,7 +984,6 @@ class PushParameters(BaseNonMessage):
 
             if self.delivery_message_binding is not None:
                 d['delivery_message_binding'] = self.delivery_message_binding
-            
             
             return d
         
@@ -2103,8 +2175,7 @@ class PollRequest(TAXIIRequestMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        if value is not None:#TODO: do a call to _do_check
-            raise ValueError('in_response_to must be None')
+        do_check(value, 'in_response_to', value_tuple=(None, None), can_be_none=True)
         self._in_response_to = value
     
     @property
@@ -2552,6 +2623,42 @@ class PollResponse(TAXIIMessage):
         msg = super(PollResponse, cls).from_dict(d, **kwargs)
         return msg
 
+_StatusDetail = collections.namedtuple('_StatusDetail', ['name','required','type','multiple'])
+_DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
+_IRP_MaxPartNumber =         _StatusDetail('MAX_PART_NUMBER',        True,  int,        False)
+_NF_Item =                   _StatusDetail('ITEM',                   False, str, False)
+_P_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         True,  int, False)
+_P_ResultId =                _StatusDetail('RESULT_ID',              True,  str, False)
+_P_WillPush =                _StatusDetail('WILL_PUSH',              True,  bool, False)
+_R_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         False, int, False)
+_UM_SupportedBinding =       _StatusDetail('SUPPORTED_BINDING',      False, str, True)
+_UC_SupportedContent =       _StatusDetail('SUPPORTED_CONTENT',      False, str, True)
+_UP_SupportedProtocol =      _StatusDetail('SUPPORTED_PROTOCOL',     False, str, True)
+_UQ_SupportedQuery =         _StatusDetail('SUPPORTED_QUERY',        False, str, True)
+
+
+status_details = {
+    ST_ASYNCHRONOUS_POLL_ERROR: {}, 
+    ST_BAD_MESSAGE: {}, 
+    ST_DENIED: {}, 
+    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination}, 
+    ST_FAILURE: {}, 
+    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber}, 
+    ST_NETWORK_ERROR: {}, 
+    ST_NOT_FOUND: {'ITEM': _NF_Item}, 
+    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait, 
+                 'RESULT_ID': _P_ResultId, 
+                 'WILL_PUSH': _P_WillPush}, 
+    ST_POLLING_UNSUPPORTED: {}, 
+    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait}, 
+    ST_SUCCESS: {},
+    ST_UNAUTHORIZED: {}, 
+    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding}, 
+    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent}, 
+    ST_UNSUPPORTED_PROTOCOL: {'SUPPORTED_PROTOCOL': _UP_SupportedProtocol},
+    ST_UNSUPPORTED_QUERY: {'SUPPORTED_QUERY': _UQ_SupportedQuery}
+}
+
 class StatusMessage(TAXIIMessage):
     message_type = MSG_STATUS_MESSAGE
 
@@ -2637,30 +2744,27 @@ class StatusMessage(TAXIIMessage):
     def from_etree(cls, etree_xml):
         kwargs = {}
         
-        kwargs['status_type'] = etree_xml.attrib['status_type']
+        status_type = etree_xml.attrib['status_type']
+        kwargs['status_type'] = status_type
 
         kwargs['status_detail'] = {}
         detail_set = etree_xml.xpath('./taxii_11:Status_Detail/taxii_11:Detail', namespaces=ns_map)
         for detail in detail_set:
             #TODO: This seems kind of hacky and should probably be improved
-            k = detail.attrib['name']
-            #TODO: This really should be dependant on the status type as well
-            if k == 'SUPPORTED_CONTENT':#Expect serialized ContentBinding objects
-                v = ContentBinding.from_string(detail.text)
-            elif k == 'WILL_PUSH':#This is a boolean
-                v = detail.text == 'true'
-            elif k in ('MAX_PART_NUMBER', 'ESTIMATED_WAIT'):#These are integers
-                v = int(detail.text)
+            name = detail.attrib['name']
+            
+            if status_type in status_details and name in status_details[status_type]:#We have information for this status detail
+                detail_info = status_details[status_type][name]
+            else:#We don't have information, so make something up
+                detail_info = _StatusDetail('PlaceholderDetail', False, str, True)
+            
+            v = detail_info.type(detail.text)
+            if detail_info.multiple:#There can be multiple instances of this item
+                if name not in kwargs['status_detail']:
+                    kwargs['status_detail'][name] = []
+                kwargs['status_detail'][name].append(v)
             else:
-                v = detail.text
-            if k not in kwargs['status_detail']:#This is the first (and possibly only) entry
-                kwargs['status_detail'][k] = v
-            elif isinstance(kwargs['status_detail'][k], list):#A list exists, just append
-                kwargs['status_detail'][k].append(v)
-            else:#A value but no list. Make a list
-                kwargs['status_detail'][k] = [kwargs['status_detail'][k]]
-                kwargs['status_detail'][k].append(v)
-        
+                kwargs['status_detail'][name] = v
 
         kwargs['message'] = None
         m_set = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)

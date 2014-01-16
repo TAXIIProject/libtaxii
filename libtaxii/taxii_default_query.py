@@ -12,6 +12,7 @@ import libtaxii.messages_11 as tm11
 import libtaxii as t
 from libtaxii.validation import (do_check, uri_regex)
 
+from operator import attrgetter
 from lxml import etree
 import datetime
 import os
@@ -85,14 +86,8 @@ class CapabilityModule(object):
         for item in value:
             self._relationships[item.name] = item
     
-    def __hash__(self):
-        return hash(self.capability_module_id)
-    
-    def __eq__(self, other):
-        if not isinstance(other, CapabilityModule):
-            return False
-        
-        return self.capability_module_id == other.capability_module_id
+    #def __hash__(self):
+    #    return hash(self.capability_module_id)
     
 class Relationship(object):
     def __init__(self, name, parameters=None):
@@ -119,14 +114,9 @@ class Relationship(object):
         for item in value:
             self._parameters[item.name] = item
     
-    def __hash__(self):
-        return hash(self.name)
+    #def __hash__(self):
+    #    return hash(self.name)
     
-    def __eq__(self, other):
-        if not isinstance(other, Relationship):
-            return False
-        
-        return self.name == other.name
         
 class Parameter(object):
     def __init__(self, name, type, value_tuple=None):
@@ -291,22 +281,6 @@ class DefaultQueryInfo(tm11.SupportedQuery):
     def __hash__(self):
         return hash(str(self.to_dict()))
     
-    def __eq__(self, other, debug=False):
-        if not super(DefaultQueryInfo, self).__eq__(other, debug):
-            return False
-        
-        if set(self.capability_modules) != set(other.capability_modules):
-            if debug:
-                print 'capability_modules not equal: %s != %s' % (self.capability_modules, other.capability_modules)
-            return False
-        
-        if set(self.targeting_expression_infos) != set(other.targeting_expression_infos):
-            if debug:
-                print 'targeting expression infos not equal: (%s) != (%s)' % (self.targeting_expression_infos, other.targeting_expression_infos)
-            return False
-        
-        return True
-    
     @staticmethod
     def from_etree(etree_xml):
         format_id = etree_xml.xpath('./@format_id', namespaces = ns_map)[0]
@@ -392,27 +366,6 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         def __hash__(self):
             return hash(str(self.to_dict()))
         
-        # def __eq__(self, other, debug=False):
-            # if not isinstance(other, DefaultQueryInfo.TargetingExpressionInfo):
-                # if debug:
-                    # print 'other is not of similar type'
-                # return False
-            
-            # if not self._checkPropertiesEq(other, ['_targeting_expression_id'], debug):
-                # return False
-            
-            # if set(self.preferred_scope) != set(other.preferred_scope):
-                # if debug:
-                    # print 'preferred_scopes not equal: %s != %s' % (self.preferred_scope, other.preferred_scope)
-                # return False
-            
-            # if set(self.allowed_scope) != set(other.allowed_scope):
-                # if debug:
-                    # print 'allowed_scopes not equal: %s != %s' % (self.allowed_scope, other.allowed_scope)
-                # return False
-            
-            # return True
-        
         @staticmethod
         def from_etree(etree_xml):
             kwargs = {}
@@ -473,19 +426,6 @@ class DefaultQuery(tm11.Query):
         d['criteria'] = self.criteria.to_dict()
         return d
     
-    def __eq__(self, other, debug=False):
-        #TODO: Implement a better equals, including debug stuff
-        if not isinstance(other, DefaultQuery):
-            return False
-        
-        if self.targeting_expression_id != other.targeting_expression_id:
-            return False
-        
-        if self.criteria != other.criteria:
-            return False
-        
-        return True
-    
     @staticmethod
     def from_etree(etree_xml):
         tei = etree_xml.xpath('./tdq:Default_Query/@targeting_expression_id', namespaces=ns_map)[0]#attrib['targeting_expression_id']
@@ -503,6 +443,17 @@ class DefaultQuery(tm11.Query):
             self.operator = operator
             self.criteria = criteria or []
             self.criterion = criterion or []
+        
+        @property
+        def sort_key(self):
+            key_list = []
+            ia = sorted(self.criteria, key=attrgetter('sort_key'))
+            ion = sorted(self.criterion, key=attrgetter('sort_key'))
+            for i in ia:
+                key_list.append(i.sort_key)
+            for i in ion:
+                key_list.append(i.sort_key)
+            return ''.join(key_list)
         
         @property
         def operator(self):
@@ -556,18 +507,6 @@ class DefaultQuery(tm11.Query):
             
             return d
         
-        def __eq__(self, other, debug=False):
-            #TODO: Implement a better equals, including debug stuff
-            if not isinstance(other, DefaultQuery.Criteria):
-                return False
-            
-            if self.operator != other.operator:
-                return False
-            
-            #TODO: Compare criteria and criterion
-            
-            return True
-        
         @staticmethod
         def from_etree(etree_xml):
             kwargs = {}
@@ -607,6 +546,10 @@ class DefaultQuery(tm11.Query):
             self.negate = negate
             self.target = target
             self.test = test
+        
+        @property
+        def sort_key(self):
+            return self.target
         
         @property
         def negate(self):
@@ -656,12 +599,6 @@ class DefaultQuery(tm11.Query):
             d['test'] = self.test.to_dict()
             
             return d
-        
-        def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['_negate', '_test', '_target'], debug):
-                return False
-            
-            return True
         
         @staticmethod
         def from_etree(etree_xml):
@@ -762,22 +699,6 @@ class DefaultQuery(tm11.Query):
                 d['relationship'] = self.relationship
                 d['parameters'] = self.parameters
                 return d
-            
-            def __eq__(self, other, debug=False):
-                #TODO: Implement the debug portion
-                if not isinstance(other, DefaultQuery):
-                    return False
-                
-                if self.capability_id != other.capability_id:
-                    return False
-                
-                if self.relationship != other.relationship:
-                    return False
-                
-                if self.parameters != other.parameters:
-                    return False
-                
-                return True
             
             @staticmethod
             def from_etree(etree_xml):
