@@ -680,7 +680,7 @@ message_tests(poll_req5)
 
 cb001 = tm11.ContentBlock(
         content_binding = tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['test1']),#Required
-        content = '<STIX_Package/>',#Required
+        content = '<STIX_Package/>',#Required (This isn't real STIX)
         timestamp_label = datetime.datetime.now(tzutc()),#Optional
         message = 'Hullo!',#Optional
         padding = 'The quick brown fox jumped over the lazy dogs.')#Optional

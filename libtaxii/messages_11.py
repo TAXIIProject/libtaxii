@@ -529,6 +529,10 @@ class Query(BaseNonMessage):
 
 class ContentBinding(BaseNonMessage):
     def __init__(self, binding_id, subtype_ids = None):
+        """
+        - binding_id (string) - The content binding id
+        - subtype_ids (list of strings) - the subtype IDs
+        """
         self.binding_id = binding_id
         self.subtype_ids = subtype_ids or []
     
@@ -600,6 +604,10 @@ class ContentBinding(BaseNonMessage):
 
 class RecordCount(BaseNonMessage):
         def __init__(self, record_count, partial_count=False):
+            """
+            - record_count (int) - The number of records
+            - partial_count (bool) - Whether the number of records is a partial count
+            """
             self.record_count = record_count
             self.partial_count = partial_count
         
@@ -653,6 +661,11 @@ class _GenericParameters(BaseNonMessage):
     name = 'Generic_Parameters'
     
     def __init__(self, response_type = RT_FULL, content_bindings = None, query = None):
+        """
+        - response_type (RT_FULL or RT_COUNT_ONLY) - indicates the requested response type
+        - content_bindings (a list of ContentBinding objects) - indicates the requested content bindings
+        - query - (a Query object) - indicates the query associated with this request
+        """
         self.response_type = response_type
         self.content_bindings = content_bindings or []
         self.query = query
@@ -761,7 +774,7 @@ class ContentBlock(BaseNonMessage):
         """Create a ContentBlock.
 
         Arguments:
-        - content_binding (string) - a Content Binding ID or nesting expression
+        - content_binding (a ContentBinding object) - a Content Binding ID or nesting expression
           indicating the type of content contained in the Content field of this
           Content Block
         - content (string or etree) - a piece of content of the type specified
@@ -770,6 +783,7 @@ class ContentBlock(BaseNonMessage):
           Content Block.
         - padding (string) - an arbitrary amount of padding for this Content
           Block.
+        - message (string) - a message associated with this ContentBlock
         """
         self.content_binding = content_binding
         self.content = self._stringify_content(content)
@@ -1192,10 +1206,7 @@ class DiscoveryResponse(TAXIIMessage):
           service instances that this response contains
         """
         super(DiscoveryResponse, self).__init__(message_id, in_response_to, extended_headers)
-        if service_instances is None:
-            self.service_instances = []
-        else:
-            self.service_instances = service_instances
+        self.service_instances = service_instances or []
     
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -1247,7 +1258,16 @@ class DiscoveryResponse(TAXIIMessage):
 
     class ServiceInstance(BaseNonMessage):
 
-        def __init__(self, service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content=None, available=None, message=None, supported_query=None):
+        def __init__(self, 
+                     service_type, 
+                     services_version, 
+                     protocol_binding, 
+                     service_address, 
+                     message_bindings, 
+                     inbox_service_accepted_content=None, 
+                     available=None, 
+                     message=None, 
+                     supported_query=None):
             """Create a new ServiceInstance.
 
             Arguments:
@@ -2026,6 +2046,13 @@ class CollectionInformationResponse(TAXIIMessage):
         
         class ReceivingInboxService(BaseNonMessage):
             def __init__(self, inbox_protocol, inbox_address, inbox_message_bindings, supported_contents=None):
+                """
+                Creates a ReceivingInboxService message
+                inbox_protocol (string) - Indicates the protocol this Inbox Service uses
+                inbox address (string) - Indicates the address of this Inbox Service
+                inbox_message_bindings (list of strings) - Each string indicates a message binding that this inbox service uses
+                supported_contents (list of ContentBinding objects) - Each content binding indicates a Content Binding this inbox service can receive
+                """
                 self.inbox_protocol = inbox_protocol
                 self.inbox_address = inbox_address
                 self.inbox_message_bindings = inbox_message_bindings
@@ -2158,8 +2185,7 @@ class PollRequest(TAXIIRequestMessage):
           requester wishes to receive.
         - subscription_id (string) - the existing subscription the Consumer
           wishes to poll.
-        - content_bindings (list of strings) - the type of content that is
-          requested in the response to this poll.
+        - poll_parameters (list of poll_parameters objects) - the poll parameters for this request.
         """
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.collection_name = collection_name
@@ -2314,6 +2340,13 @@ class PollRequest(TAXIIRequestMessage):
         name = 'Poll_Parameters'
         
         def __init__(self, response_type = RT_FULL, content_bindings = None, query = None, allow_asynch=False, delivery_parameters = None):
+            """
+            response_type (RT_FULL or RT_COUNT_ONLY) - The requested response type
+            content_bindings (a list of ContentBinding objects) - A list of ContentBindings acceptable in response
+            query (Query object) - The query for this poll parameters
+            allow_asynch (bool) - Indicates whether the client supports asynchronous polling
+            delivery_parameters (a DeliveryParameters object) - The requested delivery parameters for this object
+            """
             super(PollRequest.PollParameters, self).__init__(response_type, content_bindings, query)
             self.allow_asynch = allow_asynch
             self.delivery_parameters = delivery_parameters
@@ -2412,7 +2445,7 @@ class PollResponse(TAXIIMessage):
         - extended_headers (dictionary) - A dictionary of name/value pairs for
           use as Extended Headers
         - collection_name (string) - the name of the TAXII Data Collection that was polled
-        - inclusive_begin_timestamp_label (datetime) - a Timestamp Label
+        - exclusive_begin_timestamp_label (datetime) - a Timestamp Label
           indicating the beginning of the time range this Poll Response covers
         - inclusive_end_timestamp_label (datetime) - a Timestamp Label
           indicating the end of the time range this Poll Response covers.
@@ -2421,6 +2454,10 @@ class PollResponse(TAXIIMessage):
         - message (string) - additional information for the message recipient
         - content_blocks (list of ContentBlock objects) - a piece of content
           and additional information related to the content.
+        - more (bool) - Whether there are more result parts
+        - result_id (string) - The ID of this result
+        - result_part_number (int) - The result part number of this response
+        - record_count (a RecordCount object) - indicates the number of records and whether the count is a lower bound
         """
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.collection_name = collection_name
@@ -2805,9 +2842,12 @@ class InboxMessage(TAXIIMessage):
         - extended_headers (dictionary) - A dictionary of name/value pairs for
           use as Extended Headers
         - message (string) - prose information for the message recipient.
+        - result_id (string) - the result id
+        - destination_collection_name (list of strings) - Each string indicates a destination collection name
         - subscription_information (a SubscriptionInformation object) - This
           field is only present if this message is being sent to provide
           content in accordance with an existing TAXII Data Collection subscription.
+        - record_count (A RecordCount object) - indicates how many records are contained in the response, and whether the count is a lower bound
         - content_blocks (a list of ContentBlock objects)
         """
         super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
@@ -2990,9 +3030,9 @@ class InboxMessage(TAXIIMessage):
             Arguments:
             - collection_name (string) - the name of the TAXII Data Collection from which
               this content is being provided.
-            - subcription_id (string) - the Subscription ID for which this
+            - subscription_id (string) - the Subscription ID for which this
               content is being provided.
-            - inclusive_begin_timestamp_label (datetime) - a Timestamp Label
+            - exclusive_begin_timestamp_label (datetime) - a Timestamp Label
               indicating the beginning of the time range this Inbox Message
               covers.
             - inclusive_end_timestamp_label (datetime) - a Timestamp Label
@@ -3086,7 +3126,15 @@ class InboxMessage(TAXIIMessage):
 class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
     message_type = MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None, collection_name=None, action=None, subscription_id=None, subscription_parameters=None, push_parameters=None):
+    def __init__(self, 
+                 message_id, 
+                 in_response_to=None, 
+                 extended_headers=None, 
+                 collection_name=None, 
+                 action=None, 
+                 subscription_id=None, 
+                 subscription_parameters=None, 
+                 push_parameters=None):
         """Create a new ManageCollectionSubscriptionRequest
 
         Arguments:
@@ -3098,6 +3146,7 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
         - action (string) - the requested action to take.
         - subscription_id (string) - the ID of a previously created
           subscription
+        - subscription_parameters (SubscriptionParameters object) - The parameters for this subscriptions
         - push_parameters (a list of PushParameter objects) - the
           push parameters for this request.
         """
@@ -3338,6 +3387,13 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
     class SubscriptionInstance(BaseNonMessage):
 
         def __init__(self, subscription_id, status=SS_ACTIVE, subscription_parameters=None, push_parameters=None, poll_instances=None):
+            """
+            - subscription_id (string) - the id of the subscription
+            - status (SS_ACTIVE, SS_PAUSED, or SS_UNSUBSCRIBED) - the status of the subscription
+            - subscription_parameters (a SubscriptionParameters object) - the parameters for this subscription
+            - push_parameters (a PushParameters object) - the push parameters for this subscription
+            - poll_instances (a list of PollInstance objects) - The Poll Services that can be polled to fulfill this subscription
+            """
             self.subscription_id = subscription_id
             self.status = status
             self.subscription_parameters = subscription_parameters
@@ -3561,6 +3617,16 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
     message_type = MSG_POLL_FULFILLMENT_REQUEST
     
     def __init__(self, message_id, in_response_to = None, extended_headers = None, collection_name = None, result_id = None, result_part_number = None):
+        """Create a new PollFulfillmentRequest.
+
+        Arguments:
+        - message_id (string) - A value identifying this message.
+        - extended_headers (dictionary) - A dictionary of name/value pairs for
+          use as Extended Headers
+        - collection_name (string) - The colletion of the request
+        - result_id (string) - The result_id of the requested result
+        - result_part_number (int) - The part number being requested
+        """
         super(PollFulfillmentRequest, self).__init__(message_id, in_response_to, extended_headers)
         self.collection_name = collection_name
         self.result_id = result_id
