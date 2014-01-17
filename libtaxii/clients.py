@@ -182,6 +182,7 @@ class HttpClient:
                        }
 
         content_type_map = {libtaxii.VID_TAXII_XML_10: 'application/xml',
+                            libtaxii.VID_TAXII_XML_11: 'application/xml',
                             libtaxii.VID_CERT_EU_JSON_10: 'application/json'}
 
         if content_type is not None:
