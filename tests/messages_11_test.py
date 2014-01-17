@@ -199,22 +199,20 @@ message_tests(discovery_request1)
 
 #Create query information to use in the ServiceInstances
 tei_01 = tdq.DefaultQueryInfo.TargetingExpressionInfo(
-            targeting_expression_id = tdq.TEV_STIX_10, #Required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
+            targeting_expression_id = t.CB_STIX_XML_10, #Required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
             preferred_scope=[], #At least one of Preferred/Allowed must be present. Indicates Preferred and allowed search scope.
             allowed_scope=['**'])#This example has no preferred scope, and allows any scope
 
 tei_02 = tdq.DefaultQueryInfo.TargetingExpressionInfo(
-            targeting_expression_id = tdq.TEV_STIX_11,  #required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
+            targeting_expression_id = t.CB_STIX_XML_11,  #required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
             preferred_scope=['STIX_Package/Indicators/Indicator/**'], #At least one of Preferred/Allowed must be present. Indicates Preferred and allowed search scope.
             allowed_scope=[])#This example prefers the Indicator scope and allows no other scope
 
 tdq1 = tdq.DefaultQueryInfo(
-            format_id = tdq.FID_TAXII_DEFAULT_QUERY_10, #Required - indicates the format of the query
             targeting_expression_infos = [tei_01, tei_02], #Required, 1-n. Indicates what targeting expressions are supported
             capability_modules = [tdq.CM_CORE])#Required, 1-n. Indicates which capability modules can be used.
 
 tdq2 = tdq.DefaultQueryInfo(
-            format_id = tdq.FID_TAXII_DEFAULT_QUERY_10, #Required - indicates the format of the query
             targeting_expression_infos = [tei_02], #Required, 1-n. Indicates what targeting expressions are supported
             capability_modules = [tdq.CM_REGEX])#Required, 1-n. Indicates which capability modules can be used.
 

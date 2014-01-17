@@ -22,11 +22,11 @@ FID_TAXII_DEFAULT_QUERY_10 = 'urn:taxii.mitre.org:query:default:1.0'
 
 #Targeting Expression Vocabulary IDs
 #: Targeting Expression Vocabulary ID for STIX XML 1.0
-TEV_STIX_10 = t.CB_STIX_XML_10
+#TEV_STIX_10 = t.CB_STIX_XML_10
 #: Targeting Expression Vocabulary ID for STIX XML 1.0.1
-TEV_STIX_101 = t.CB_STIX_XML_101
+#TEV_STIX_101 = t.CB_STIX_XML_101
 #: Targeting Expression Vocabulary ID for STIX XML 1.1
-TEV_STIX_11 = t.CB_STIX_XML_11
+#TEV_STIX_11 = t.CB_STIX_XML_11
 
 #Capability Module IDs
 #: Capability Module ID for Core
@@ -52,14 +52,6 @@ ns_map = {'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'}
 
 #A Capability Module has valid relationships
 #Each relationship has 0-n valid parameters
-
-#The cm_info structure is:
-# Key = Capability Module ID (identifying a capability module)
-# Value = dict, keys/values as described below
-#    Key = Relationship
-#    Value = dict, keys/values as described below
-#       Key = parameter name
-#       Value = kwargs for do_check for the value. None if no check should be applied
 
 class CapabilityModule(object):
     def __init__(self, capability_module_id, relationships):
@@ -184,8 +176,13 @@ cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte,
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
 
 class DefaultQueryInfo(tm11.SupportedQuery):
-    def __init__(self, format_id, targeting_expression_infos, capability_modules):
-        super(DefaultQueryInfo, self).__init__(format_id)
+    def __init__(self, targeting_expression_infos, capability_modules):
+        """
+        Arguments:
+        - targeting_expression_infos (a list of TargetingExpressionInfo objects) - Describe the supported targeting expressions
+        - capability_modules (a list of strings) - Indicate the supported capability modules
+        """
+        super(DefaultQueryInfo, self).__init__(FID_TAXII_DEFAULT_QUERY_10)
         self.targeting_expression_infos = targeting_expression_infos
         self.capability_modules = capability_modules
     
@@ -231,7 +228,6 @@ class DefaultQueryInfo(tm11.SupportedQuery):
     
     @staticmethod
     def from_etree(etree_xml):
-        format_id = etree_xml.xpath('./@format_id', namespaces = ns_map)[0]
         texpr_infos = etree_xml.xpath('./tdq:Default_Query_Info/tdq:Targeting_Expression_Info', namespaces = ns_map)
         texpr_info_list = []
         for texpr_info in texpr_infos:
@@ -241,12 +237,11 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         cms_list = []
         for cm in cms:
             cms_list.append(cm.text)
-        return DefaultQueryInfo(format_id, texpr_info_list, cms_list)
+        return DefaultQueryInfo(texpr_info_list, cms_list)
     
     @staticmethod
     def from_dict(d):
         kwargs = {}
-        kwargs['format_id'] = d['format_id']
         
         kwargs['targeting_expression_infos'] = []
         for expression_info in d['targeting_expression_infos']:
@@ -258,6 +253,12 @@ class DefaultQueryInfo(tm11.SupportedQuery):
     
     class TargetingExpressionInfo(tm11.BaseNonMessage):
         def __init__(self, targeting_expression_id, preferred_scope = None, allowed_scope = None):
+            """
+            Arguments:
+            - targeting_expression_id (string) - The supported targeting expression ID
+            - preferred_scope (list of strings) - indicates the preferred scope of queries
+            - allowed_scope (list of string) - indicates the allowed scope of queries
+            """
             self.targeting_expression_id = targeting_expression_id
             self.preferred_scope = preferred_scope or []
             self.allowed_scope = allowed_scope or []
@@ -339,6 +340,11 @@ class DefaultQueryInfo(tm11.SupportedQuery):
 
 class DefaultQuery(tm11.Query):
     def __init__(self, targeting_expression_id, criteria):
+        """
+        Arguments:
+        - targeting_expression_id (string) - the targeting_expression used in the query
+        - criteria (Criteria object) - The criteria of the query
+        """
         super(DefaultQuery, self).__init__(FID_TAXII_DEFAULT_QUERY_10)
         self.targeting_expression_id = targeting_expression_id
         self.criteria = criteria
@@ -388,6 +394,13 @@ class DefaultQuery(tm11.Query):
     
     class Criteria(tm11.BaseNonMessage):
         def __init__(self, operator, criteria=None, criterion=None):
+            """
+            Arguments:
+            - operator (OP_AND or OP_OR) - The operator
+            - criteria (list of Criteria objects) - The criteria for the query
+            - criterion (list of Criteria objects) - The criterion for the query
+            At least one criterion OR criteria MUST be present
+            """
             self.operator = operator
             self.criteria = criteria or []
             self.criterion = criterion or []
@@ -491,6 +504,12 @@ class DefaultQuery(tm11.Query):
     
     class Criterion(tm11.BaseNonMessage):
         def __init__(self, target, test, negate=False):
+            """
+            Arguments:
+            - target (string) - A targeting expression identifying the target
+            - test (Test object) - The test to be applied to the target
+            - negate (bool) - Whether the result of applying the test to the target should be negated
+            """
             self.negate = negate
             self.target = target
             self.test = test
@@ -570,6 +589,12 @@ class DefaultQuery(tm11.Query):
         
         class Test(tm11.BaseNonMessage):
             def __init__(self, capability_id, relationship, parameters=None):
+                """
+                Arguments:
+                capability_id (string) - The ID of the capability module that defines the relationship & parameters
+                relationship (string) - The relationship (e.g., equals)
+                parameters (dict of key/value pairs) - the parameters for the relationship.
+                """
                 self.capability_id = capability_id
                 self.relationship = relationship
                 self.parameters = parameters or {}
