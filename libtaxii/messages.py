@@ -2479,7 +2479,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     
     @action.setter
     def action(self, value):
-        _do_check(value, 'action', value_tuple=ACT_TYPES)
+        _do_check(value, 'action', value_tuple=ACT_TYPES, can_be_none=True)
         self._action = value
     
     @property
