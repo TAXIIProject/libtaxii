@@ -2504,8 +2504,11 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         xml = super(ManageFeedSubscriptionRequest, self).to_etree()
         xml.attrib['feed_name'] = self.feed_name
         xml.attrib['action'] = self.action
-        xml.attrib['subscription_id'] = self.subscription_id
-        xml.append(self.delivery_parameters.to_etree())
+        if self.subscription_id is not None:
+            xml.attrib['subscription_id'] = self.subscription_id
+        
+        if self.delivery_parameters is not None:
+            xml.append(self.delivery_parameters.to_etree())
         return xml
 
     def to_dict(self):
@@ -2513,7 +2516,9 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         d['feed_name'] = self.feed_name
         d['action'] = self.action
         d['subscription_id'] = self.subscription_id
-        d['delivery_parameters'] = self.delivery_parameters.to_dict()
+        d['delivery_parameters'] = None
+        if self.delivery_parameters is not None:
+            d['delivery_parameters'] = self.delivery_parameters.to_dict()
         return d
 
     def __eq__(self, other, debug=False):
