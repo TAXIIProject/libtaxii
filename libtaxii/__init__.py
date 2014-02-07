@@ -110,8 +110,9 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
         message = []
-        header_tuples = http_response.getheaders()
-        for k, v in header_tuples:
+        #header_tuples = http_response.getheaders()
+        header_dict = http_response.info().dict.iteritems()
+        for k, v in header_dict:#header_tuples:
             message.append(k + ': ' + v + '\r\n')
         message.append('\r\n')
         message.append(response_message)
