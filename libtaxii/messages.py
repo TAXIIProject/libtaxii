@@ -2497,7 +2497,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     
     @delivery_parameters.setter
     def delivery_parameters(self, value):
-        _do_check(value, 'delivery_parameters', type=DeliveryParameters)
+        _do_check(value, 'delivery_parameters', type=DeliveryParameters, can_be_none=True)
         self._delivery_parameters = value
     
     def to_etree(self):
