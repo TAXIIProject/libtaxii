@@ -2479,7 +2479,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     
     @action.setter
     def action(self, value):
-        _do_check(value, 'action', value_tuple=ACT_TYPES, can_be_none=True)
+        _do_check(value, 'action', value_tuple=ACT_TYPES)
         self._action = value
     
     @property
@@ -2488,7 +2488,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     
     @subscription_id.setter
     def subscription_id(self, value):
-        _do_check(value, 'subscription_id', regex_tuple=_uri_regex)
+        _do_check(value, 'subscription_id', regex_tuple=_uri_regex, can_be_none=True)
         self._subscription_id = value
     
     @property
