@@ -238,7 +238,7 @@ class HttpClient:
         #If the X-TAXII-Services header is not set by the user,
         #Attempt to use the library's default mapping
         services_map = {t.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_10,
-                        t.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_11,
+                        t.VID_TAXII_XML_11: t.VID_TAXII_SERVICES_11,
                         t.VID_CERT_EU_JSON_10: t.VID_TAXII_SERVICES_10}
         if header_dict.get(HttpClient.HEADER_X_TAXII_SERVICES) is None:#The X-TAXII-Services header was not set by the user
             if message_binding not in services_map:
