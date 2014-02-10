@@ -227,6 +227,16 @@ class HttpClient:
             header_dict['Accept'] = header_dict['Content-Type']
             header_dict['X-TAXII-Accept'] = header_dict['X-TAXII-Content-Type']
         
+        #If the X-TAXII-Services header is not set by the user,
+        #Attempt to use the library's default mapping
+        services_map = {libtaxii.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_10,
+                        libtaxii.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_11,
+                        libtaxii.VID_CERT_EU_JSON_10: t.VID_TAXII_SERVICES_10}
+        if header_dict.get('x-taxii-services') is None:#The X-TAXII-Services header was not set by the user
+            if message_binding not in services_map:
+                raise ValueError('x-taxii-services header not specified, and the message_binding is unrecognized')
+            header_dict['X-TAXII-Services'] = services_map[message_binding]
+        
         handler_list = []
 
         if self.use_https:
