@@ -170,28 +170,60 @@ class HttpClient:
         return response
 
     def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
-                          content_type=None):
+                          content_type=None, headers=None):
         """New method of calling a TAXII Service
 
         Note: this uses urllib2 instead of httplib, and therefore returns
         a different kind of object than callTaxiiService.
         """
-
-        header_dict = {'User-Agent': 'libtaxii.httpclient',
-                       'X-TAXII-Content-Type': message_binding
-                       }
+        
+        header_dict = {}
+        
+        if headers is not None:
+            for k, v in headers.iteritems():
+                header_dict[k.lower()] = v
+            
+        
+        header_dict['User-Agent'] = 'libtaxii.httpclient'
+        header_dict['X-TAXII-Content-Type'] = message_binding
 
         content_type_map = {libtaxii.VID_TAXII_XML_10: 'application/xml',
                             libtaxii.VID_TAXII_XML_11: 'application/xml',
                             libtaxii.VID_CERT_EU_JSON_10: 'application/json'}
-
-        if content_type is not None:
+        
+        if content_type is not None:#Set the content type to the user-provided value
             header_dict['Content-Type'] = content_type
-        else:
+        else:#If the user did not provide a value, attempt to find a known value
             if message_binding not in content_type_map:
                 raise ValueError("content_type not specified, and the message_binding is unrecognized")
             header_dict['Content-Type'] = content_type_map[message_binding]
-
+        
+        #States of Accept and X-TAXII-Accept headers:
+        #
+        # 1. Accept and X-TAXII-Accept headers both set.
+        #    - Do nothing. Assume user knows what they are doing
+        #
+        # 2. Accept header set and X-TAXII-Accept header not set
+        #    - Do nothing. Assume user knows what they are doing
+        #
+        # 3. Accept header not set and X-TAXII-Accept header set
+        #    - Do nothing. Bad practice, but not invalid. 
+        #      Assume user knows what they are doing.
+        #
+        # 4. Accept header not set and X-TAXII-Accept header not set
+        #    - User hasn't specified anything. Assume they want the 
+        #      Accept = Content-Type and
+        #      X-TAXII-Accept = X-TAXII-Content-Type.
+        #      This means that the client will only accept messages
+        #      in the same format that was sent.
+        
+        accept_set = header_dict.get('accept') is not None
+        x_taxii_accept_set = header_dict.get('x-taxii-accept') is not None
+        
+        if not accept_set and not x_taxii_accept_set:
+            header_dict['Accept'] = header_dict['Content-Type']
+            header_dict['X-TAXII-Accept'] = header_dict['X-TAXII-Content-Type']
+        
         handler_list = []
 
         if self.use_https:
