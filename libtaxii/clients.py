@@ -211,11 +211,14 @@ class HttpClient:
         #      Assume user knows what they are doing.
         #
         # 4. Accept header not set and X-TAXII-Accept header not set
-        #    - User hasn't specified anything. Assume they want the 
+        #    - User hasn't specified anything. In this case, default behavior is: 
         #      Accept = Content-Type and
         #      X-TAXII-Accept = X-TAXII-Content-Type.
         #      This means that the client will only accept messages
         #      in the same format that was sent.
+        #
+        # 5. Users of libtaxii that wish to accept everything should set the 
+        #    Accept header to '*/*'.
         
         accept_set = header_dict.get('accept') is not None
         x_taxii_accept_set = header_dict.get('x-taxii-accept') is not None
