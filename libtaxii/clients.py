@@ -35,7 +35,7 @@ class HttpClient:
     HEADER_CONTENT_TYPE = 'content-type'
     HEADER_X_TAXII_ACCEPT = 'x-taxii-accept'
     HEADER_X_TAXII_CONTENT_TYPE = 'x-taxii-content-type'
-    HEDAER_X_TAXII_PROTOCOL = 'x-taxii-protocol'
+    HEADER_X_TAXII_PROTOCOL = 'x-taxii-protocol'
     HEADER_X_TAXII_SERVICES = 'x-taxii-services'
 
     def __init__(self, auth_type=AUTH_NONE, auth_credentials=None, use_https=False):
