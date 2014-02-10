@@ -193,18 +193,18 @@ class HttpClient:
             
         
         header_dict['User-Agent'] = 'libtaxii.httpclient'
-        header_dict['X-TAXII-Content-Type'] = message_binding
+        header_dict[HEADER_X_TAXII_CONTENT_TYPE] = message_binding
 
         content_type_map = {libtaxii.VID_TAXII_XML_10: 'application/xml',
                             libtaxii.VID_TAXII_XML_11: 'application/xml',
                             libtaxii.VID_CERT_EU_JSON_10: 'application/json'}
         
         if content_type is not None:#Set the content type to the user-provided value
-            header_dict['Content-Type'] = content_type
+            header_dict[HEADER_CONTENT_TYPE] = content_type
         else:#If the user did not provide a value, attempt to find a known value
             if message_binding not in content_type_map:
                 raise ValueError("content_type not specified, and the message_binding is unrecognized")
-            header_dict['Content-Type'] = content_type_map[message_binding]
+            header_dict[HEADER_CONTENT_TYPE] = content_type_map[message_binding]
         
         #States of Accept and X-TAXII-Accept headers:
         #
@@ -228,27 +228,27 @@ class HttpClient:
         # 5. Users of libtaxii that wish to accept everything should set the 
         #    Accept header to '*/*'.
         
-        accept_set = header_dict.get('accept') is not None
-        x_taxii_accept_set = header_dict.get('x-taxii-accept') is not None
+        accept_set = header_dict.get(HEADER_ACCEPT) is not None
+        x_taxii_accept_set = header_dict.get(HEADER_X_TAXII_ACCEPT) is not None
         
         if not accept_set and not x_taxii_accept_set:
-            header_dict['Accept'] = header_dict['Content-Type']
-            header_dict['X-TAXII-Accept'] = header_dict['X-TAXII-Content-Type']
+            header_dict[HEADER_ACCEPT] = header_dict[HEADER_CONTENT_TYPE]
+            header_dict[HEADER_X_TAXII_ACCEPT] = header_dict[HEADER_X_TAXII_CONTENT_TYPE]
         
         #If the X-TAXII-Services header is not set by the user,
         #Attempt to use the library's default mapping
         services_map = {libtaxii.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_10,
                         libtaxii.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_11,
                         libtaxii.VID_CERT_EU_JSON_10: t.VID_TAXII_SERVICES_10}
-        if header_dict.get('x-taxii-services') is None:#The X-TAXII-Services header was not set by the user
+        if header_dict.get(HEADER_X_TAXII_SERVICES) is None:#The X-TAXII-Services header was not set by the user
             if message_binding not in services_map:
                 raise ValueError('x-taxii-services header not specified, and the message_binding is unrecognized')
-            header_dict['X-TAXII-Services'] = services_map[message_binding]
+            header_dict[HEADER_X_TAXII_SERVICES] = services_map[message_binding]
         
         handler_list = []
 
         if self.use_https:
-            header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTPS_10
+            header_dict[HEADER_X_TAXII_PROTOCOL] = libtaxii.VID_TAXII_HTTPS_10
             
             if (self.auth_type == HttpClient.AUTH_CERT or
                self.auth_type == HttpClient.AUTH_CERT_BASIC):
@@ -271,7 +271,7 @@ class HttpClient:
                                                      ca_certs=ca_file))
             
         else:  # Not using https
-            header_dict['X-TAXII-Protocol'] = libtaxii.VID_TAXII_HTTP_10
+            header_dict[HEADER_X_TAXII_PROTOCOL] = libtaxii.VID_TAXII_HTTP_10
 
             if self.auth_type == HttpClient.AUTH_NONE:
                 handler_list.append(urllib2.HTTPHandler())
