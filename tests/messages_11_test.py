@@ -79,7 +79,7 @@ def contentblock_tests(content_block):
 
     if content_block != block_from_xml:
         print '\t Failure of test #1 - running equals w/ debug:'
-        content_block.__equals(block_from_xml, True)
+        content_block.__eq__(block_from_xml, True)
         raise Exception('Test #1 failed - content_block != block_from_xml')
 
     if content_block != block_from_dict:
