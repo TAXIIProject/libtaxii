@@ -811,11 +811,6 @@ class ContentBlock(BaseNonMessage):
     @content.setter
     def content(self, value):
         do_check(value, 'content')#Just check for not None
-        #if isinstance(value, str):
-        #    value = value.decode('utf-8')
-        #elif not isinstance(value, unicode):
-        #    value = unicode(value)
-        #self._content = value
         self._content, self.content_is_xml = _self._stringify_content(content)
     
     @property
