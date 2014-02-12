@@ -875,7 +875,7 @@ class ContentBlock(BaseNonMessage):
         block['content_binding'] = self.content_binding.to_dict()
         
         block['content'] = self.content
-        block{'content_is_xml'] = self.content_is_xml
+        block['content_is_xml'] = self.content_is_xml
 
         if self.timestamp_label is not None:
             block['timestamp_label'] = self.timestamp_label.isoformat()
