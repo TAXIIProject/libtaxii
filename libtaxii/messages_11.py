@@ -811,7 +811,7 @@ class ContentBlock(BaseNonMessage):
     @content.setter
     def content(self, value):
         do_check(value, 'content')#Just check for not None
-        self._content, self.content_is_xml = _self._stringify_content(content)
+        self._content, self.content_is_xml = self._stringify_content(value)
     
     @property
     def content_is_xml(self):
