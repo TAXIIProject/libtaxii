@@ -757,13 +757,13 @@ class ContentBlock(BaseNonMessage):
         self._content, self.content_is_xml = self._stringify_content(value)
     
     @property
-    def content_ix_xml(self):
+    def content_is_xml(self):
         return self._content_is_xml
     
     @content_is_xml.setter
     def content_is_xml(self, value):
-        do_check(value, 'content_is_xml', value_tuple=(True, False))
-        self.content_is_xml = value
+        _do_check(value, 'content_is_xml', value_tuple=(True, False))
+        self._content_is_xml = value
     
     @property
     def timestamp_label(self):
