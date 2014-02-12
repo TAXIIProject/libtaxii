@@ -403,7 +403,7 @@ class BaseNonMessage(object):
             if debug:
                 print 'member name: %s' % member
             self_value = self.__dict__[member]
-            other_value = self.__dict__[member]
+            other_value = other.__dict__[member]
             
             if isinstance(self_value, BaseNonMessage):#A debuggable equals comparison can be made
                 eq = self_value.__eq__(other_value, debug)
