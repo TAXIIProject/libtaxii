@@ -786,7 +786,7 @@ class ContentBlock(BaseNonMessage):
         - message (string) - a message associated with this ContentBlock
         """
         self.content_binding = content_binding
-        self.content = self._stringify_content(content)
+        self.content, self.content_is_xml = self._stringify_content(content)
         self.timestamp_label = timestamp_label
         self.message = message
         self.padding = padding
@@ -811,11 +811,21 @@ class ContentBlock(BaseNonMessage):
     @content.setter
     def content(self, value):
         do_check(value, 'content')#Just check for not None
-        if isinstance(value, str):
-            value = value.decode('utf-8')
-        elif not isinstance(value, unicode):
-            value = unicode(value)
-        self._content = value
+        #if isinstance(value, str):
+        #    value = value.decode('utf-8')
+        #elif not isinstance(value, unicode):
+        #    value = unicode(value)
+        #self._content = value
+        self._content, self.content_is_xml = _self._stringify_content(content)
+    
+    @property
+    def content_is_xml(self):
+        return self._content_is_xml
+    
+    @content_is_xml.setter
+    def content_is_xml(self, value):
+        do_check(value, 'content_is_xml', value_tuple=(True, False))
+        self._content_is_xml = value
     
     @property
     def timestamp_label(self):
@@ -827,14 +837,13 @@ class ContentBlock(BaseNonMessage):
         self._timestamp_label = value
     
     def _stringify_content(self, content):
-        """Always a string or raises an error."""
-        if isinstance(content, basestring):
-            return content
-
+        """Always a string or raises an error.
+        Returns the string representation and whether the data is XML.
+        """
         if isinstance(content, etree._ElementTree) or isinstance(content, etree._Element):
-            return etree.tostring(content)
+            return etree.tostring(content), True
 
-        return str(content)
+        return str(content), False
     
     @property
     def message(self):
@@ -849,13 +858,10 @@ class ContentBlock(BaseNonMessage):
         block = etree.Element('{%s}Content_Block' % ns_map['taxii_11'], nsmap=ns_map)
         block.append(self.content_binding.to_etree())
         c = etree.SubElement(block, '{%s}Content' % ns_map['taxii_11'])
-
-        if self.content.startswith('<'):  # It might be XML
-            try:
-                xml = etree.parse(StringIO.StringIO(self.content), get_xml_parser()).getroot()
-                c.append(xml)
-            except:
-                c.text = self.content
+        
+        if self.content_is_xml:
+            xml = etree.parse(StringIO.StringIO(self.content), get_xml_parser()).getroot()
+            c.append(xml)
         else:
             c.text = self.content
 
@@ -872,11 +878,9 @@ class ContentBlock(BaseNonMessage):
     def to_dict(self):
         block = {}
         block['content_binding'] = self.content_binding.to_dict()
-
-        if isinstance(self.content, etree._Element):  # For XML
-            block['content'] = etree.tostring(self.content)
-        else:
-            block['content'] = self.content
+        
+        block['content'] = self.content
+        block{'content_is_xml'] = self.content_is_xml
 
         if self.timestamp_label is not None:
             block['timestamp_label'] = self.timestamp_label.isoformat()
@@ -920,8 +924,9 @@ class ContentBlock(BaseNonMessage):
             kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
 
         kwargs['content'] = d['content']
-
-        return ContentBlock(**kwargs)
+        cb = ContentBlock(**kwargs)
+        cb.content_is_xml = d.get('content_is_xml', False)
+        return cb
     
     @classmethod
     def from_json(cls, json_string):
