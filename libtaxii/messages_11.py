@@ -424,6 +424,17 @@ class BaseNonMessage(object):
                             eq = s.__eq__(o, debug)
                     else:#Assume they don't... just do a set comparison
                         eq = set(self_value) == set(other_value)
+            elif isinstance(self_value, dict):#Dictionary to compare
+                if len(set(self_value.keys()) - set(other_value.keys())) != 0:
+                    if debug:
+                        print 'dict keys not equal: %s != %s' % (self_value, other_value)
+                    eq = False
+                for k, v in self_value.iteritems():
+                    if other_value[k] != v:
+                        if debug:
+                            print 'dict values not equal: %s != %s' % (v, other_value[k])
+                        eq = False
+                eq = True
             else:#Do a direct comparison
                 eq = self_value == other_value
             
@@ -1437,7 +1448,7 @@ class DiscoveryResponse(TAXIIMessage):
             available = None
             if 'available' in etree_xml.attrib:
                 tmp_available = etree_xml.attrib['available']
-                available = tmp_available == 'True'
+                available = tmp_available == 'true'
 
             protocol_binding = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
             service_address = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
@@ -1737,9 +1748,9 @@ class CollectionInformationResponse(TAXIIMessage):
             for push_method in self.push_methods:
                 d['push_methods'].append(push_method.to_dict())
             
-            d['polling_services'] = []
+            d['polling_service_instances'] = []
             for polling_service in self.polling_service_instances:
-                d['polling_services'].append(polling_service.to_dict())
+                d['polling_service_instances'].append(polling_service.to_dict())
             
             d['subscription_methods'] = []
             for subscription_method in self.subscription_methods:
@@ -1790,7 +1801,7 @@ class CollectionInformationResponse(TAXIIMessage):
             
             
             kwargs['receiving_inbox_services'] = []
-            receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Services', namespaces=ns_map)
+            receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Service', namespaces=ns_map)
             for receiving_inbox_service in receiving_inbox_services_set:
                 kwargs['receiving_inbox_services'].append(CollectionInformationResponse.CollectionInformation.ReceivingInboxService.from_etree(receiving_inbox_service))
             
@@ -2068,7 +2079,7 @@ class CollectionInformationResponse(TAXIIMessage):
             
             @inbox_protocol.setter
             def inbox_protocol(self, value):
-                do_check(value, 'inbox_protocol', regex_tuple=uri_regex)
+                do_check(value, 'inbox_protocol', type=basestring, regex_tuple=uri_regex)
                 self._inbox_protocol = value
             
             @property
@@ -2129,8 +2140,8 @@ class CollectionInformationResponse(TAXIIMessage):
             
             @staticmethod
             def from_etree(etree_xml):
-                proto = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)
-                addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)
+                proto = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+                addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
                 
                 message_bindings = []
                 message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
@@ -2559,6 +2570,12 @@ class PollResponse(TAXIIMessage):
     def to_etree(self):
         xml = super(PollResponse, self).to_etree()
         xml.attrib['collection_name'] = self.collection_name
+        if self.result_id is not None:
+            xml.attrib['result_id'] = self.result_id
+        
+        if self.more is not None:
+            xml.attrib['more'] = str(self.more).lower()
+        
         if self.subscription_id is not None:
             si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
             si.text = self.subscription_id
@@ -2587,6 +2604,10 @@ class PollResponse(TAXIIMessage):
         d = super(PollResponse, self).to_dict()
 
         d['collection_name'] = self.collection_name
+        d['more'] = self.more
+        d['result_id'] = self.result_id
+        if self.record_count is not None:
+            d['record_count'] = self.record_count.to_dict()
         if self.subscription_id is not None:
             d['subscription_id'] = self.subscription_id
         if self.message is not None:
@@ -2606,11 +2627,12 @@ class PollResponse(TAXIIMessage):
         kwargs = {}
         
         kwargs['collection_name'] = etree_xml.xpath('./@collection_name', namespaces=ns_map)[0]
-
+        kwargs['more'] = etree_xml.attrib.get('more', 'false') == 'true'
         kwargs['subscription_id'] = None
-        subs_ids = etree_xml.xpath('./@subscription_id', namespaces=ns_map)
+        kwargs['result_id'] = etree_xml.attrib.get('result_id')
+        subs_ids = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)
         if len(subs_ids) > 0:
-            kwargs['subscription_id'] = subs_ids[0]
+            kwargs['subscription_id'] = subs_ids[0].text
 
         kwargs['message'] = None
         messages = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)
@@ -2631,6 +2653,11 @@ class PollResponse(TAXIIMessage):
         blocks = etree_xml.xpath('./taxii_11:Content_Block', namespaces=ns_map)
         for block in blocks:
             kwargs['content_blocks'].append(ContentBlock.from_etree(block))
+        
+        kwargs['record_count'] = None
+        record_counts = etree_xml.xpath('./taxii_11:Record_Count', namespaces=ns_map)
+        if len(record_counts) > 0:
+            kwargs['record_count'] = RecordCount.from_etree(record_counts[0])
 
         msg = super(PollResponse, cls).from_etree(etree_xml, **kwargs)
         return msg
@@ -2639,16 +2666,22 @@ class PollResponse(TAXIIMessage):
     def from_dict(cls, d):
         kwargs = {}
         kwargs['collection_name'] = d['collection_name']
-
+        kwargs['result_id'] = d.get('result_id')
+        
         kwargs['message'] = None
         if 'message' in d:
             kwargs['message'] = d['message']
 
         kwargs['subscription_id'] = d.get('subscription_id')
+        kwargs['more'] = d.get('more', False)
 
         kwargs['exclusive_begin_timestamp_label'] = None
         if 'exclusive_begin_timestamp_label' in d:
             kwargs['exclusive_begin_timestamp_label'] = _str2datetime(d['exclusive_begin_timestamp_label'])
+        
+        kwargs['record_count'] = None
+        if 'record_count' in d:
+            kwargs['record_count'] = RecordCount.from_dict(d['record_count'])
         
         kwargs['inclusive_end_timestamp_label'] = None
         if 'inclusive_end_timestamp_label' in d:
@@ -2669,7 +2702,7 @@ _P_ResultId =                _StatusDetail('RESULT_ID',              True,  str,
 _P_WillPush =                _StatusDetail('WILL_PUSH',              True,  bool, False)
 _R_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         False, int, False)
 _UM_SupportedBinding =       _StatusDetail('SUPPORTED_BINDING',      False, str, True)
-_UC_SupportedContent =       _StatusDetail('SUPPORTED_CONTENT',      False, str, True)
+_UC_SupportedContent =       _StatusDetail('SUPPORTED_CONTENT',      False, ContentBinding, True)
 _UP_SupportedProtocol =      _StatusDetail('SUPPORTED_PROTOCOL',     False, str, True)
 _UQ_SupportedQuery =         _StatusDetail('SUPPORTED_QUERY',        False, str, True)
 
@@ -2795,11 +2828,17 @@ class StatusMessage(TAXIIMessage):
             else:#We don't have information, so make something up
                 detail_info = _StatusDetail('PlaceholderDetail', False, str, True)
             
-            v = detail_info.type(detail.text)
+            if detail_info.type == bool:
+                v = detail.text.lower() == 'true'
+            else:
+                v = detail_info.type(detail.text)
             if detail_info.multiple:#There can be multiple instances of this item
                 if name not in kwargs['status_detail']:
-                    kwargs['status_detail'][name] = []
-                kwargs['status_detail'][name].append(v)
+                    kwargs['status_detail'][name] = v
+                else: #It already exists
+                    if not isinstance(kwargs['status_detail'], list):
+                        kwargs['status_detail'][name] = [kwargs['status_detail'][name]]#Make it a list
+                    kwargs['status_detail'][name].append(v)
             else:
                 kwargs['status_detail'][name] = v
 
@@ -3507,9 +3546,9 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
                 push_parameters = PushParameters.from_etree(push_parameters_set[0])
             
             poll_instances = []
-            poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instances', namespaces = ns_map)
-            if len(poll_instance_set) > 0:
-                poll_instances.append(ManageCollectionSubscriptionResponse.PollInstance.from_etree(poll_instance_set[0]))
+            poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instance', namespaces = ns_map)
+            for pi in poll_instance_set:
+                poll_instances.append(ManageCollectionSubscriptionResponse.PollInstance.from_etree(pi))
             
             return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
         
