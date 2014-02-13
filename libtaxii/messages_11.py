@@ -252,6 +252,30 @@ def get_message_from_json(json_string):
     """
     return get_message_from_dict(json.loads(json_string))
 
+def _sanitize_content_binding(binding):
+    """
+    Takes in one of:
+    1. ContentBinding object
+    2. string
+    and returns a ContentBinding object.
+    
+    This supports function calls where a string or ContentBinding can be 
+    used to specify a content binding.
+    """
+    if isinstance(binding, ContentBinding):#It's already good to go
+        return binding
+    elif isinstance(binding, basestring):#Convert it to a ContentBinding
+        return ContentBinding.from_string(binding)
+    else:#Don't know what to do with it.
+        raise ValueError('Type cannot be converted to ContentBinding: %s' % binding.__class__.__name__)
+
+def _sanitize_content_bindings(binding_list):
+    bindings = []
+    for item in binding_list:
+        bindings.append(_sanitize_content_binding(item))
+        
+    return bindings
+
 class UnsupportedQueryException(Exception):
      def __init__(self, value):
          self.value = value
@@ -703,6 +727,7 @@ class _GenericParameters(BaseNonMessage):
     
     @content_bindings.setter
     def content_bindings(self, value):
+        value = _sanitize_content_bindings(value)
         do_check(value, 'content_bindings', type=ContentBinding)
         self._content_bindings = value
     
@@ -819,6 +844,7 @@ class ContentBlock(BaseNonMessage):
     
     @content_binding.setter
     def content_binding(self, value):
+        value = _sanitize_content_binding(value)
         do_check(value, 'content_binding', type=ContentBinding)
         self._content_binding = value
     
@@ -1404,6 +1430,7 @@ class DiscoveryResponse(TAXIIMessage):
         
         @inbox_service_accepted_content.setter
         def inbox_service_accepted_content(self, value):
+            value = _sanitize_content_bindings(value)
             do_check(value, 'inbox_service_accepted_content', type=ContentBinding)
             self._inbox_service_accepted_content = value
         
@@ -1667,6 +1694,7 @@ class CollectionInformationResponse(TAXIIMessage):
         
         @supported_contents.setter
         def supported_contents(self, value):
+            value = _sanitize_content_bindings(value)
             do_check(value, 'supported_contents', type=ContentBinding)
             self._supported_contents = value
         
@@ -2128,6 +2156,7 @@ class CollectionInformationResponse(TAXIIMessage):
             
             @supported_contents.setter
             def supported_contents(self, value):
+                value = _sanitize_content_bindings(value)
                 do_check(value, 'supported_contents', type=ContentBinding)
                 self._supported_contents = value
             
