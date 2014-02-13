@@ -775,10 +775,34 @@ class ContentBlock(BaseNonMessage):
         self._timestamp_label = value
     
     def _stringify_content(self, content):
-        """Always a string or raises an error."""
+        """Always a string or raises an error.
+        Returns the string representation and whether the data is XML.
+        """
+        #If it's an etree, it's definitely XML
         if isinstance(content, etree._ElementTree) or isinstance(content, etree._Element):
             return etree.tostring(content), True
-
+        
+        #It might be a string representation of XML
+        #There is an edge case here where a string that looks like XML
+        # (e.g., '<Hello/>') but isn't actually XML (and, honestly, in the
+        #  string representation the difference is somewhat academic)
+        # will get interpreted as XML.
+        try:
+            etree.parse(content, get_xml_parser())
+            return str(content), True
+        except IOError:#This error happens if the content is not a file-like object (e.g., StringIO.StringIO)
+            pass
+        except etree.XMLSyntaxError:#This happens when it is a file like object, but does not contain well formed XML
+            pass
+        
+        try:
+            sio_content = StringIO.StringIO(content)
+            etree.parse(sio_content, get_xml_parser())
+            return str(content), True
+        except etree.XMLSyntaxError:#This happens if the content is not well formed XML
+            pass
+        
+        #The default is that it's not XML
         return str(content), False
 
     def to_etree(self):
