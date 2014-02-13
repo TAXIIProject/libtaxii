@@ -252,7 +252,14 @@ def get_message_from_json(json_string):
     """
     return get_message_from_dict(json.loads(json_string))
 
+class UnsupportedQueryException(Exception):
+     def __init__(self, value):
+         self.value = value
+     
+     def __str__(self):
+         return repr(self.value)
 
+#Start with the 'default' deserializer
 query_deserializers = {}
 
 def register_query_format(format_id, query, query_info, schema=None):
@@ -265,13 +272,13 @@ def register_query_format(format_id, query, query_info, schema=None):
         schema (xml schema) - The XML schema for validating the query
     """
     query_deserializers[format_id] = {'query': query, 'query_info': query_info, 'schema': schema}
-    
+
+
 def get_deserializer(format_id, type):
-    if type not in ['query','query_info']:
-        return None#TODO: Raise error
+    do_check(type, 'type', value_tuple=('query','query_info'))
     
     if format_id not in query_deserializers:
-        return None#TODO: Raise error
+        raise UnsupportedQueryException('A deserializer for the query format \'%s\' is not registered.' % format_id)
     
     return query_deserializers[format_id][type]
 
@@ -1467,11 +1474,8 @@ class DiscoveryResponse(TAXIIMessage):
             supported_query_set = etree_xml.xpath('./taxii_11:Supported_Query', namespaces=ns_map)
             for sq in supported_query_set:
                 format_id = sq.xpath('./@format_id')[0]
-                if format_id in query_deserializers:
-                    query_obj = get_deserializer(format_id, 'query_info').from_etree(sq)
-                    supported_query.append(query_obj)
-                else:
-                    raise Error('No query deserializer registered for %s' % format_id)
+                query_obj = get_deserializer(format_id, 'query_info').from_etree(sq)
+                supported_query.append(query_obj)
             
             message = None
             message_set = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)
@@ -1492,11 +1496,8 @@ class DiscoveryResponse(TAXIIMessage):
             if sq_list is not None:
                 for sq in sq_list:
                     format_id = sq['format_id']
-                    if format_id in query_deserializers:
-                        query_obj = get_deserializer(format_id, 'query_info').from_dict(sq)
-                        supported_query.append(query_obj)
-                    else:#The query format is unregistered
-                        raise Error('No query deserializer registered for %s' % format_id)
+                    query_obj = get_deserializer(format_id, 'query_info').from_dict(sq)
+                    supported_query.append(query_obj)
             inbox_service_accepted_content = d.get('inbox_service_accepted_content')
             available = d.get('available')
             message = d.get('message')
