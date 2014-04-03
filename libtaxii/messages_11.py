@@ -7,6 +7,7 @@
 * Alex Ciobanu - calex@cert.europa.eu  
 * Mark Davidson - mdavidson@mitre.org  
 * Bryan Worrell - bworrell@mitre.org
+* Benjamin Yates – byates@dtcc.com
 
 """
 
@@ -1822,7 +1823,7 @@ class CollectionInformationResponse(TAXIIMessage):
             kwargs['available'] = None
             if 'available' in etree_xml.attrib:
                 tmp = etree_xml.attrib['available']
-                kwargs['available'] = tmp == 'True'
+                kwargs['available'] = tmp.lower() == 'true'
 
             kwargs['collection_description'] = etree_xml.xpath('./taxii_11:Description', namespaces=ns_map)[0].text
             

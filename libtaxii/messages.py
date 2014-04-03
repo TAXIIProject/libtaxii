@@ -7,6 +7,7 @@
 * Alex Ciobanu - calex@cert.europa.eu  
 * Mark Davidson - mdavidson@mitre.org  
 * Bryan Worrell - bworrell@mitre.org
+* Benjamin Yates – byates@dtcc.com
 
 """
 
@@ -1165,7 +1166,7 @@ class DiscoveryResponse(TAXIIMessage):
             available = None
             if 'available' in etree_xml.attrib:
                 tmp_available = etree_xml.attrib['available']
-                available = tmp_available == 'True'
+                available = tmp_available.lower() == 'true'
 
             protocol_binding = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
             service_address = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
@@ -1441,7 +1442,7 @@ class FeedInformationResponse(TAXIIMessage):
             kwargs['available'] = None
             if 'available' in etree_xml.attrib:
                 tmp = etree_xml.attrib['available']
-                kwargs['available'] = tmp == 'True'
+                kwargs['available'] = tmp.lower() == 'true'
 
             kwargs['feed_description'] = etree_xml.xpath('./taxii:Description', namespaces=ns_map)[0].text
             kwargs['supported_contents'] = []
