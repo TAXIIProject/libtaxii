@@ -7,7 +7,7 @@
 * Alex Ciobanu - calex@cert.europa.eu  
 * Mark Davidson - mdavidson@mitre.org  
 * Bryan Worrell - bworrell@mitre.org
-* Benjamin Yates – byates@dtcc.com
+* Benjamin Yates - byates@dtcc.com
 
 """
 
@@ -893,7 +893,7 @@ class ContentBlock(BaseNonMessage):
             pass
         
         #The default is that it's not XML
-        if isinstance(content, unicode)
+        if isinstance(content, unicode):
             return content, False
         else:
             return str(content), False
