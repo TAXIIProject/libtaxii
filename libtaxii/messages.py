@@ -783,20 +783,23 @@ class ContentBlock(BaseNonMessage):
         if isinstance(content, etree._ElementTree) or isinstance(content, etree._Element):
             return etree.tostring(content), True
         
-        #It might be a string representation of XML
-        try:
-            sio_content = StringIO.StringIO(content)
-            etree.parse(sio_content, get_xml_parser())
-            return content, True
-        except etree.XMLSyntaxError:#This happens if the content is not well formed XML
-            pass
-        
-        #The default is that it's not XML
-        if isinstance(content, unicode):
-            return content, False
-        else:
-            return str(content), False
-
+        if hasattr(content, 'read'):#The content is file-like
+            try:#Try to parse as XML
+                etree.parse(content, get_xml_parser())
+                return content.read(), True
+            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+                return content.read(), False
+        else: # The Content is not file-like
+            try:#Attempt to parse string as XML
+                sio_content = StringIO.StringIO(content)
+                etree.parse(sio_content, get_xml_parser())
+                return content, True
+            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+                if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
+                    return content, False
+                else:#It's some other datatype that needs casting to string
+                    return str(content), False
+    
     def to_etree(self):
         block = etree.Element('{%s}Content_Block' % ns_map['taxii'], nsmap=ns_map)
         cb = etree.SubElement(block, '{%s}Content_Binding' % ns_map['taxii'])
