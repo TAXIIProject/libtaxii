@@ -780,20 +780,23 @@ class ContentBlock(BaseNonMessage):
         Returns the string representation and whether the data is XML.
         """
         #If it's an etree, it's definitely XML
-        if isinstance(content, etree._ElementTree) or isinstance(content, etree._Element):
-            return etree.tostring(content), True
+        if isinstance(content, etree._ElementTree):
+            return content.getroot(), True
+        
+        if isinstance(content, etree._Element):
+            return content, True
         
         if hasattr(content, 'read'):#The content is file-like
             try:#Try to parse as XML
-                etree.parse(content, get_xml_parser())
-                return content.read(), True
+                xml = etree.parse(content, get_xml_parser()).getroot()
+                return xml, True
             except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
                 return content.read(), False
         else: # The Content is not file-like
             try:#Attempt to parse string as XML
                 sio_content = StringIO.StringIO(content)
-                etree.parse(sio_content, get_xml_parser())
-                return content, True
+                xml = etree.parse(sio_content, get_xml_parser()).getroot()
+                return xml, True
             except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
                 if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
                     return content, False
@@ -807,8 +810,7 @@ class ContentBlock(BaseNonMessage):
         c = etree.SubElement(block, '{%s}Content' % ns_map['taxii'])
 
         if self.content_is_xml:
-            xml = etree.parse(StringIO.StringIO(self.content), get_xml_parser()).getroot()
-            c.append(xml)
+            c.append(self.content)
         else:
             c.text = self.content
 
@@ -825,8 +827,11 @@ class ContentBlock(BaseNonMessage):
     def to_dict(self):
         block = {}
         block['content_binding'] = self.content_binding
-
-        block['content'] = self.content
+        
+        if self.content_is_xml:
+            block['content'] = etree.tostring(self.content)
+        else:
+            block['content'] = self.content
         block['content_is_xml'] = self.content_is_xml
 
         if self.timestamp_label is not None:
@@ -878,10 +883,14 @@ class ContentBlock(BaseNonMessage):
         kwargs['padding'] = d.get('padding')
         if 'timestamp_label' in d:
             kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
-
-        kwargs['content'] = d['content']
+        
+        is_xml = d.get('content_is_xml', False)
+        if is_xml:
+            kwargs['content'] = etree.parse(StringIO.StringIO(d['content']), get_xml_parser()).getroot()
+        else:
+            kwargs['content'] = d['content']
+        
         cb = ContentBlock(**kwargs)
-        cb.content_is_xml = d.get('content_is_xml', False)
         return cb
 
     @classmethod
