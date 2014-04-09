@@ -883,10 +883,14 @@ class ContentBlock(BaseNonMessage):
         kwargs['padding'] = d.get('padding')
         if 'timestamp_label' in d:
             kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
-
-        kwargs['content'] = d['content']
+        
+        is_xml = d.get('content_is_xml', False)
+        if is_xml:
+            kwargs['content'] = etree.parse(StringIO.StringIO(d['content']), get_xml_parser()).getroot()
+        else:
+            kwargs['content'] = d['content']
+        
         cb = ContentBlock(**kwargs)
-        cb.content_is_xml = d.get('content_is_xml', False)
         return cb
 
     @classmethod
