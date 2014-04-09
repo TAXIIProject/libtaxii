@@ -302,3 +302,6 @@ contentblock_tests(cb4)
 cb5 = tm10.ContentBlock(content_binding=t.CB_STIX_XML_10,
                       content='Something thats not XML <xml/>')
 contentblock_tests(cb5)
+
+cb6 = tm10.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
+contentblock_tests(cb6)

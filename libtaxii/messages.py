@@ -7,7 +7,7 @@
 * Alex Ciobanu - calex@cert.europa.eu  
 * Mark Davidson - mdavidson@mitre.org  
 * Bryan Worrell - bworrell@mitre.org
-* Benjamin Yates – byates@dtcc.com
+* Benjamin Yates - byates@dtcc.com
 
 """
 
@@ -783,29 +783,23 @@ class ContentBlock(BaseNonMessage):
         if isinstance(content, etree._ElementTree) or isinstance(content, etree._Element):
             return etree.tostring(content), True
         
-        #It might be a string representation of XML
-        #There is an edge case here where a string that looks like XML
-        # (e.g., '<Hello/>') but isn't actually XML (and, honestly, in the
-        #  string representation the difference is somewhat academic)
-        # will get interpreted as XML.
-        try:
-            etree.parse(content, get_xml_parser())
-            return str(content), True
-        except IOError:#This error happens if the content is not a file-like object (e.g., StringIO.StringIO)
-            pass
-        except etree.XMLSyntaxError:#This happens when it is a file like object, but does not contain well formed XML
-            pass
-        
-        try:
-            sio_content = StringIO.StringIO(content)
-            etree.parse(sio_content, get_xml_parser())
-            return str(content), True
-        except etree.XMLSyntaxError:#This happens if the content is not well formed XML
-            pass
-        
-        #The default is that it's not XML
-        return str(content), False
-
+        if hasattr(content, 'read'):#The content is file-like
+            try:#Try to parse as XML
+                etree.parse(content, get_xml_parser())
+                return content.read(), True
+            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+                return content.read(), False
+        else: # The Content is not file-like
+            try:#Attempt to parse string as XML
+                sio_content = StringIO.StringIO(content)
+                etree.parse(sio_content, get_xml_parser())
+                return content, True
+            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+                if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
+                    return content, False
+                else:#It's some other datatype that needs casting to string
+                    return str(content), False
+    
     def to_etree(self):
         block = etree.Element('{%s}Content_Block' % ns_map['taxii'], nsmap=ns_map)
         cb = etree.SubElement(block, '{%s}Content_Binding' % ns_map['taxii'])
