@@ -641,9 +641,8 @@ class DefaultQuery(tm11.Query):
                 for name, value in self.parameters.items():
                     param = relationship.parameters.get(name)
                     if param is None:
-                        raise Exception('name not valid. %s not in %s' % (name, cm_info[self.capability_id][self.relationship].keys()))
+                        raise Exception('name not valid. %s not in %s' % (name, relationship.parameters.keys()))
                     param.verify(value)
-                    #do_check(value, name, **cm_info[self.capability_id][self.relationship][name])
             
             def to_etree(self):
                 t = etree.Element('{%s}Test' % ns_map['tdq'], nsmap = ns_map)
