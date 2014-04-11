@@ -2162,7 +2162,7 @@ class StatusMessage(TAXIIMessage):
     
     @status_type.setter
     def status_type(self, value):
-        _do_check(value, 'status_type', value_tuple=ST_TYPES)
+        _do_check(value, 'status_type')
         self._status_type = value
     
     #TODO: is it possible to check the status detail?

@@ -2824,7 +2824,7 @@ class StatusMessage(TAXIIMessage):
     
     @status_type.setter
     def status_type(self, value):
-        do_check(value, 'status_type', value_tuple=ST_TYPES)
+        do_check(value, 'status_type')
         self._status_type = value
     
     @property
