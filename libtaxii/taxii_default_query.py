@@ -20,14 +20,6 @@ import os
 #: Format ID for this version of TAXII Default Query
 FID_TAXII_DEFAULT_QUERY_10 = 'urn:taxii.mitre.org:query:default:1.0'
 
-#Targeting Expression Vocabulary IDs
-#: Targeting Expression Vocabulary ID for STIX XML 1.0
-#TEV_STIX_10 = t.CB_STIX_XML_10
-#: Targeting Expression Vocabulary ID for STIX XML 1.0.1
-#TEV_STIX_101 = t.CB_STIX_XML_101
-#: Targeting Expression Vocabulary ID for STIX XML 1.1
-#TEV_STIX_11 = t.CB_STIX_XML_11
-
 #Capability Module IDs
 #: Capability Module ID for Core
 CM_CORE = 'urn:taxii.mitre.org:query:capability:core-1'
@@ -47,6 +39,10 @@ OP_AND = 'AND'
 
 #Tuple of all operators
 OP_TYPES = (OP_OR, OP_AND)
+
+ST_UNSUPPORTED_CAPABILITY_MODULE = 'UNSUPPORTED_CAPABILITY_MODULE'
+ST_UNSUPPORTED_TARGETING_EXPRESSION = 'UNSUPPORTED_TARGETING_EXPRESSION'
+ST_UNSUPPORTED_TARGETING_EXPRESSION_ID = 'UNSUPPORTED_TARGETING_EXPRESSION_ID'
 
 ns_map = {'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'}
 
