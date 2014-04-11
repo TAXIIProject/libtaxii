@@ -852,7 +852,7 @@ class ContentBlock(BaseNonMessage):
     @property
     def content(self):
         if self.content_is_xml:
-            etree.tostring(self._content)
+            return etree.tostring(self._content)
         else:
             return self._content
     
