@@ -750,7 +750,10 @@ class ContentBlock(BaseNonMessage):
     
     @property
     def content(self):
-        return self._content
+        if self.content_is_xml:
+            return etree.tostring(self._content)
+        else:
+            return self._content
     
     @content.setter
     def content(self, value):
@@ -810,9 +813,9 @@ class ContentBlock(BaseNonMessage):
         c = etree.SubElement(block, '{%s}Content' % ns_map['taxii'])
 
         if self.content_is_xml:
-            c.append(self.content)
+            c.append(self._content)
         else:
-            c.text = self.content
+            c.text = self._content
 
         if self.timestamp_label is not None:
             tl = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii'])
