@@ -14,6 +14,12 @@ install_requires = ['lxml>=2.3.2', 'python-dateutil>=1.5']
 with open(os.path.join(os.path.dirname(__file__), "README.md")) as f:
     long_description = f.read()
 
+extras_require = {
+    'docs': [
+        'Sphinx==1.2.1',
+    ],
+}
+
 setup(name='libtaxii',
       description='TAXII Library.',
       author='Mark Davidson',
@@ -22,6 +28,7 @@ setup(name='libtaxii',
       version='1.1.101',
       packages=find_packages(),
       install_requires=install_requires,
+      extras_require=extras_require,
       package_data={'libtaxii': ['xsd/*.xsd']},
       long_description=long_description,
       keywords="taxii libtaxii",

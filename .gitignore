@@ -5,3 +5,5 @@ build/
 dist/
 libtaxii.egg-info/
 venv/
+
+docs/_build/
