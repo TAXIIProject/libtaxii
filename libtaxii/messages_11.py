@@ -369,11 +369,11 @@ class BaseNonMessage(object):
         """
         raise Exception('Method not implemented by child class!')
 
-    def to_xml(self):
+    def to_xml(self, pretty_print=False):
         """Create an XML representation of this class.
         subclasses should not need to implement this method
         """
-        return etree.tostring(self.to_etree())
+        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
 
     @classmethod
     def from_etree(cls, src_etree):
