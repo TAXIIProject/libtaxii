@@ -9,7 +9,7 @@
 
 """
 
-
+__version__ = "1.1.101"
 
 import httplib
 import urllib
