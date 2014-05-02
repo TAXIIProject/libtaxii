@@ -331,9 +331,9 @@ class BaseNonMessage(object):
         """
         raise Exception('Method not implemented by child class!')
 
-    def to_xml(self):
+    def to_xml(self, pretty_print=False):
         """Create an XML representation of this class."""
-        return etree.tostring(self.to_etree())
+        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
 
     @classmethod
     def from_etree(cls, src_etree):
@@ -605,13 +605,13 @@ class TAXIIMessage(BaseNonMessage):
                 h.text = value
         return root_elt
 
-    def to_xml(self):
+    def to_xml(self, pretty_print=False):
         """Convert a message to XML.
 
         Subclasses shouldn't implement this method, as it is mainly a wrapper
         for cls.to_etree.
         """
-        return etree.tostring(self.to_etree())
+        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
 
     def to_dict(self):
         """Create the base dictionary for the TAXII Message.
