@@ -1,14 +1,14 @@
-""" 
-| Copyright (C) 2013 - The MITRE Corporation
-| For license information, see the LICENSE.txt file
+# Copyright (C) 2013 - The MITRE Corporation
+# For license information, see the LICENSE.txt file
 
-| Contributors:
- 
-* Alex Ciobanu - calex@cert.europa.eu  
-* Mark Davidson - mdavidson@mitre.org  
-* Bryan Worrell - bworrell@mitre.org
-* Benjamin Yates - byates@dtcc.com
+# Contributors:
+# * Alex Ciobanu - calex@cert.europa.eu
+# * Mark Davidson - mdavidson@mitre.org
+# * Bryan Worrell - bworrell@mitre.org
+# * Benjamin Yates - byates@dtcc.com
 
+"""
+Creating, handling, and parsing TAXII 1.0 messages.
 """
 
 import random

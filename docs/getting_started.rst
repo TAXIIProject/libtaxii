@@ -1,83 +1,116 @@
 Getting Started
-====================================
+===============
 
-This page gives an introduction to libtaxii and how to use it. Please note that this page is being actively worked on and feedback is welcome.
+This page gives an introduction to **libtaxii** and how to use it.  Please note
+that this page is being actively worked on and feedback is welcome.
 
-libtaxii Components
----------
-libtaxii contains the following components:
 
-* **libtaxii\\__init__.py** - Interface for methods that span messages.py and clients.py. Defines constants applicable to both TAXII Messages and TAXII Clients.
-* **libtaxii\\messages.py** - Interface for handling TAXII Messages, creating the XML representation of a TAXII Message, and parsing the XML representation of a TAXII Message. Defines constants relevant to TAXII Messages.
-* **libtaxii\\clients.py** - Interface for a TAXII HTTP and HTTPS client. Defines constants relevant to TAXII HTTP Clients
+Modules
+-------
 
-Messages Class Structure (messages.py)
---------------------------------------
-In messages.py, each TAXII Message has a corresponding class (e.g., There is a DiscoveryRequest class for the Discovery Request message). In addition, other classes exist where appropriate. If a class can only exist with the context of a specific TAXII Message (e.g., a ServiceInstance can only exist in a DiscoveryResponse), that class (ServiceInstance) is a subclass of the message class (DiscoveryResponse). If a class can exist across multiple messages (e.g., ContentBlock can exist in both PollResponse and InboxMessage) it exists as a peer to TAXII Messages.
+The libtaxii library contains the following modules:
 
-This example demonstrates how classes in messages.py are organized. This code won't work unless proper constructor arguments are used:
+* **libtaxii** - Code and constants needed for both TAXII messages and TAXII
+  clients. (Implemented in ``libtaxii/__init__.py``)
+* **libtaxii.messages_10** - Creating, handling, and parsing TAXII 1.0
+  messages. (Implemented in ``libtaxii/messages_10.py``)
+* **libtaxii.messages_11** - Creating, handling, and parsing TAXII 1.1
+  messages. (Implemented in ``libtaxii/messages_11.py``)
+* **libtaxii.messages** - An alias for **libtaxii.messages_10**. *Deprecated as
+  of libtaxii 1.1.100*.
+* **libtaxii.clients.** - TAXII HTTP and HTTPS clients. (Implemented in
+  ``libtaxii/clients.py``)
+* **libtaxii.taxii_default_query** - Creating, handling and parsing TAXII
+  Default Queries. (Implemented in ``libtaxii/taxii_default_query.py``) *New in
+  libtaxii 1.1.100*.
+* **libtaxii.validation** - Common data validation functions used across
+  libtaxii. (Implemented in ``libtaxii/validation.py``)
 
-.. code:: python
-    
-    import libtaxii.messages as tm
-    # Constructor arguments omitted for brevity. See tests/messages_test.py for real code examples
-    discovery_request = tm.DiscoveryRequest( ... ) # Message classes are first-order
-    service_instance = tm.DiscoveryRequest.ServiceInstance( ... ) # Message specific classes are 
-                                                                  # a child class of the message class
-    content_block = tm.ContentBlock( ... ) # Classes not specific to one message are peers to TAXII Messages
+TAXII Messages Module Structure
+-------------------------------
 
-Messages Serialization and Deserialization (messages.py)
---------------------------------------------------------
+In the TAXII message modules (**libtaxii.messages_10** and
+**libtaxii.messages_11**), there is a class corresponding to each type of TAXII
+message.  For example, there is a ``DiscoveryRequest`` class for the Discovery
+Request message.  Other types that are exclusive to a particular TAXII message
+type are defined as nested classes.  For example, a Service Instance can only
+exist as part of a Discovery Response message, so the class representing a
+Service Instance is ``DiscoveryResponse.ServiceInstance``.  If a type is used
+across multiple messages (e.g., a Content Block can exist in both Poll Response
+and Inbox Message), the corresponding class (``ContentBlock``) is defined at
+the module level.
 
-Each class in messages.py has serialization/deserializatoin methods that support XML Strings, Python 
-Dictionaries, and LXML Etrees. All ``from_<format>()`` (e.g., ``from_xml()``) methods are class methods 
-and should be called on the class (e.g., ``tm.DiscoveryRequest.from_xml(xml_string)``). All 
-``to_<format>()`` (e.g., ``to_xml()``) methods are instance methods and should be 
-called on a particular instance of an object (e.g., ``discovery_request.to_xml()``)  
-
-Each class in messages.py has the following:  
-
-* ``from_xml(xml_string)`` - Creates an instance of the class from an XML String
-* ``to_xml()`` - Creates the XML representation of an instance of a class
-* ``from_dict(dictionary)`` - Creates an instance of the class from a Python dictionary
-* ``to_dict()`` - Creates the Python dictionary representation of an instance of a class
-* ``from_etree(lxml_etree)`` - Creates an instance of the class from an LXML Etree
-* ``to_etree()`` - Creates the LXML Etree representation of an instance of a class
-
-To create a TAXII Message from XML:  
+See below for example of how to instantiate the various types described above.
+Note that constructor arguments are omitted for clarity.  See the API
+documentation for proper constructor arguments.
 
 .. code:: python
 
-    xml_string = '<taxii:Discovery_Response ... />'#Not real XML
-    discovery_response = tm.DiscoveryResponse.from_xml(xml_string)
+    import libtaxii.messages_11 as tm11
+    # Message classes are at the top level of the module
+    discovery_request = tm11.DiscoveryRequest( ... )
+    # Message-specific classes are nested within the corresponding message class
+    service_instance = tm11.DiscoveryRequest.ServiceInstance( ... )
+    # Classes shared by multiple messages are also at the module level.
+    content_block = tm11.ContentBlock( ... )
 
 
-To create an XML string from a TAXII Message:  
+TAXII Message Serialization and Deserialization
+-----------------------------------------------
+
+Each class in the message modules has serialization and deserialization methods
+for XML Strings, Python dictionaries, and LXML ElementTrees.  All serialization
+methods (``to_*()``) are instance methods called on specific objects (e.g.,
+``discovery_request.to_xml()``). Deserialization methods (``from_*()``) are
+class methods and should be called on the class itself (e.g.,
+``tm11.DiscoveryRequest.from_xml(xml_string)``).
+
+Each class in messages.py defines the following:
+
+* ``from_xml(xml_string)`` - Creates an instance of the class from an XML String.
+* ``to_xml()`` - Creates the XML representation of an instance of a class.
+* ``from_dict(dictionary)`` - Creates an instance of the class from a Python dictionary.
+* ``to_dict()`` - Creates the Python dictionary representation of an instance of a class.
+* ``from_etree(lxml_etree)`` - Creates an instance of the class from an LXML Etree.
+* ``to_etree()`` - Creates the LXML Etree representation of an instance of a class.
+
+To create a TAXII Message from XML:
 
 .. code:: python
 
-    new_xml_string = discovery_response.to_xml()  
+    xml_string = '<taxii:Discovery_Response ... />'  # Note: Invalid XML
+    discovery_response = tm11.DiscoveryResponse.from_xml(xml_string)
 
-The same paradigm applies for Python dictionaries:
+To create an XML string from a TAXII Message:
 
 .. code:: python
 
-    msg_dict = { ... }#Not a real dictionary
-    discovery_response = tm.DiscoveryResponse.from_dict(msg_dict)
+    new_xml_string = discovery_response.to_xml()
+
+The same approach can be used for Python dictionaries:
+
+.. code:: python
+
+    msg_dict = { ... }  # Note: Invalid dictionary syntax
+    discovery_response = tm11.DiscoveryResponse.from_dict(msg_dict)
     new_dict = discovery_response.to_dict()
 
-and lxml etrees:
+and for LXML ElementTrees:
 
 .. code:: python
 
-    msg_etree = etree.Element( ... ) #Not a real etree
-    discovery_response = tm.DiscoveryResponse.from_etree(msg_etree)
+    msg_etree = etree.Element( ... )  # Note: Invalid Element constructor
+    discovery_response = tm11.DiscoveryResponse.from_etree(msg_etree)
     new_etree = discovery_response.to_etree()
 
-Clients (clients.py)
---------------------
-clients.py contains a single class, HttpClient. The HttpClient class is capable of invoking TAXII Services both over HTTP and HTTPS. Additionally, HttpClient provides a mechanism for using HTTP Basic and TLS Certificate authentication.  
-The Clients portion of libtaxii is a fairly straightforward wrapper around httplib.
+
+TAXII Clients
+-------------
+
+The **libtaxii.clients** module defines a single class ``HttpClient`` capable
+of invoking TAXII services over both HTTP and HTTPS.  The client is a fairly
+straighforward wrapper around Python's builtin ``httplib`` and supports the use
+of of both HTTP Basic and TLS Certificate authentication.
 
 Example usage of clients:
 
@@ -85,14 +118,14 @@ Example usage of clients:
 
     import libtaxii as t
     import libtaxii.clients as tc
-    import libtaxii.messages as tm
+    import libtaxii.messages_11 as tm11
 
     client = tc.HttpClient()
     client.setAuthType(tc.AUTH_BASIC)
     client.setUseHttps(True)
     client.setAuthCredentials({'username': 'MyUsername', 'password': 'MyPassword'})
 
-    discovery_request = tm.DiscoveryRequest(tm.generate_message_id())
+    discovery_request = tm11.DiscoveryRequest(tm11.generate_message_id())
     discovery_xml = discovery_request.to_xml()
 
     http_resp = client.callTaxiiService2('example.com', '/pollservice/', t.VID_TAXII_XML_10, discovery_xml)

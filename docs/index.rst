@@ -1,20 +1,23 @@
-.. libtaxii documentation master file, created by
-   sphinx-quickstart on Fri Jul 12 08:26:53 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to libtaxii's documentation!
 ====================================
 
-Contents:
+**libtaxii** is a Python library that provides (1) an object representation of
+TAXII Messages, (2) serialization/deserialization to and from XML and Python
+dictionaries, and (3) an HTTP/HTTPS TAXII Client.
 
 .. toctree::
    :maxdepth: 2
-    
-   Overview <overview>
+
    Install <install>
    Getting Started <getting_started>
-   API Documentation <libtaxii>
+
+API Reference
+=============
+
+.. toctree::
+   :maxdepth: 2
+
+   api/modules
 
 Indices and tables
 ==================

@@ -1,14 +1,11 @@
-""" 
-| Copyright (C) 2013 - The MITRE Corporation
-| For license information, see the LICENSE.txt file
+# Copyright (C) 2013 - The MITRE Corporation
+# For license information, see the LICENSE.txt file
 
-| Contributors:
- 
-* Mark Davidson - mdavidson@mitre.org  
+# Contributors:
+# * Mark Davidson - mdavidson@mitre.org
 
-validation.py is for common data validation functions used
-across various TAXII classes. 
-
+"""
+Common data validation functions used across libtaxii
 """
 
 import collections

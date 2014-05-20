@@ -13,7 +13,9 @@ extensions = [
     'sphinxcontrib.napoleon',
 ]
 
-intersphinx_mapping = {'http://docs.python.org/': None}
+intersphinx_mapping = {
+    'python': ('http://docs.python.org/', None),
+}
 
 templates_path = ['_templates']
 source_suffix = '.rst'

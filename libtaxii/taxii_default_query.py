@@ -1,11 +1,11 @@
-""" 
-| Copyright (C) 2013 - The MITRE Corporation
-| For license information, see the LICENSE.txt file
+# Copyright (C) 2013 - The MITRE Corporation
+# For license information, see the LICENSE.txt file
 
-| Contributors:
-  
-* Mark Davidson - mdavidson@mitre.org
+# Contributors:
+# * Mark Davidson - mdavidson@mitre.org
 
+"""
+Creating, handling, and parsing TAXII Default Queries.
 """
 
 import libtaxii.messages_11 as tm11
