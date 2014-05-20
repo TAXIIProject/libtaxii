@@ -8,8 +8,8 @@ dictionaries, and (3) an HTTP/HTTPS TAXII Client.
 .. toctree::
    :maxdepth: 2
 
-   Install <install>
-   Getting Started <getting_started>
+   installation
+   getting_started
 
 API Reference
 =============
