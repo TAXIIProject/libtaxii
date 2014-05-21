@@ -2,8 +2,11 @@
 =======================
 .. module:: libtaxii
 
+Constants
+---------
+
 Version IDs
------------
+***********
 
 The following constants can be used as TAXII Version IDs
 
@@ -20,7 +23,7 @@ The following are third-party Version IDs included in libtaxii for convenience.
 
 
 Content Binding IDs
--------------------
+*******************
 
 The following constants should be used as the Content Binding ID for STIX XML.
 
