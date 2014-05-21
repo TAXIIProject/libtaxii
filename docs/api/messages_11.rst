@@ -12,22 +12,53 @@
         import libtaxii.messages_11 as tm11
 
 
+Classes
+-------
+
 Message Classes
----------------
+***************
 
 .. autoclass:: TAXIIMessage
 
-
+.. autoclass:: DiscoveryRequest
+.. autoclass:: DiscoveryResponse
+.. autoclass:: CollectionInformationRequest
+.. autoclass:: CollectionInformationResponse
+.. autoclass:: PollRequest
+.. autoclass:: PollResponse
 .. autoclass:: StatusMessage
+.. autoclass:: InboxMessage
 .. autoclass:: ManageCollectionSubscriptionRequest
 .. autoclass:: ManageCollectionSubscriptionResponse
+.. autoclass:: PollFulfillmentRequest
 
+
+Message Nested Classes
+*********************
+
+.. autoclass:: libtaxii.messages_11::DiscoveryResponse.ServiceInstance
+.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation
+.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.PushMethod
+.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.PollingServiceInstance
+.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.SubscriptionMethod
+.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.ReceivingInboxService
+.. autoclass:: libtaxii.messages_11::PollRequest.PollParameters
+.. autoclass:: libtaxii.messages_11::InboxMessage.SubscriptionInformation
+.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.SubscriptionInstance
+.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.PollInstance
 
 
 Other Classes
--------------
+*************
 
 .. autoclass:: BaseNonMessage
+
+.. autoclass:: ContentBlock
+.. autoclass:: DeliveryParameters
+.. autoclass:: ContentBinding
+.. autoclass:: RecordCount
+.. autoclass:: SubscriptionParameters
+.. autoclass:: PushParameters
 
 
 Functions
