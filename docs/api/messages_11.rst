@@ -59,6 +59,8 @@ Message Types
 .. autodata:: MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST
 .. autodata:: MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE
 
+.. autodata:: MSG_TYPES
+
 
 Status Types
 ************
@@ -83,6 +85,8 @@ These constants are used in :py:class:`StatusMessage`.
 .. autodata:: ST_UNSUPPORTED_PROTOCOL
 .. autodata:: ST_UNSUPPORTED_QUERY
 
+.. autodata:: ST_TYPES
+
 
 Subscription Actions
 ********************
@@ -95,6 +99,8 @@ These constants are used in :py:class:`ManageCollectionSubscriptionRequest`
 .. autodata:: ACT_PAUSE
 .. autodata:: ACT_RESUME
 
+.. autodata:: ACT_TYPES
+
 
 Subscription Statuses
 *********************
@@ -105,6 +111,8 @@ These constants are used in :py:class:`ManageCollectionSubscriptionResponse`
 .. autodata:: SS_PAUSED
 .. autodata:: SS_UNSUBSCRIBED
 
+.. autodata:: SS_TYPES
+
 
 Response Types
 **************
@@ -114,6 +122,8 @@ These constants are used to indicate the type of response returned.
 .. autodata:: RT_FULL
 .. autodata:: RT_COUNT_ONLY
 
+.. autodata:: RT_TYPES
+
 
 Collection Types
 ****************
@@ -122,6 +132,8 @@ These constants are used to indicate the type of collection.
 
 .. autodata:: CT_DATA_FEED
 .. autodata:: CT_DATA_SET
+
+.. autodata:: CT_TYPES
 
 
 Service Types
@@ -134,3 +146,4 @@ These constants are used to indicate the type of service.
 .. autodata:: SVC_COLLECTION_MANAGEMENT
 .. autodata:: SVC_DISCOVERY
 
+.. autodata:: SVC_TYPES

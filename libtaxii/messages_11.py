@@ -11,26 +11,47 @@
 Creating, handling, and parsing TAXII 1.1 messages.
 """
 
-import datetime
-import dateutil.parser
-from lxml import etree
-import StringIO
 import collections
-import os
-from libtaxii.validation import (do_check, uri_regex, check_timestamp_label)
-
 try:
     import simplejson as json
 except ImportError:
     import json
-
 from operator import attrgetter
+import os
+import StringIO
 
-#Import the message names that haven't changed
-from libtaxii.messages_10 import (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE, MSG_POLL_REQUEST,
-    MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE)
+import dateutil.parser
+from lxml import etree
 
-#Define the new message name
+import libtaxii.messages_10 as tm10
+from libtaxii.validation import do_check, uri_regex, check_timestamp_label
+
+
+# TAXII 1.0 Message Types
+
+#:Constant identifying a Status Message
+MSG_STATUS_MESSAGE = tm10.MSG_STATUS_MESSAGE
+#:Constant identifying a Discovery Request Message
+MSG_DISCOVERY_REQUEST = tm10.MSG_DISCOVERY_REQUEST
+#:Constant identifying a Discovery Response Message
+MSG_DISCOVERY_RESPONSE = tm10.MSG_DISCOVERY_RESPONSE
+#:Constant identifying a Feed Information Request Message
+MSG_FEED_INFORMATION_REQUEST = tm10.MSG_FEED_INFORMATION_REQUEST
+#:Constant identifying a Feed Information Response Message
+MSG_FEED_INFORMATION_RESPONSE = tm10.MSG_FEED_INFORMATION_RESPONSE
+#:Constant identifying a Subscription Management Request Message
+MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
+#:Constant identifying a Subscription Management Response Message
+MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
+#:Constant identifying a Poll Request Message
+MSG_POLL_REQUEST = tm10.MSG_POLL_REQUEST
+#:Constant identifying a Poll Response Message
+MSG_POLL_RESPONSE = tm10.MSG_POLL_RESPONSE
+#:Constant identifying a Inbox Message
+MSG_INBOX_MESSAGE = tm10.MSG_INBOX_MESSAGE
+
+# New Message Types in TAXII 1.1
+
 #:Constant identifying a Status Message
 MSG_POLL_FULFILLMENT_REQUEST = 'Poll_Fulfillment'
 #:Constant identifying a Collection Information Request
@@ -42,16 +63,41 @@ MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
 #:Constant identifying a Subscription Response
 MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
 
-# Tuple of all message types
-MSG_TYPES = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE, MSG_COLLECTION_INFORMATION_REQUEST, 
-             MSG_COLLECTION_INFORMATION_RESPONSE, MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST, MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE,
-             MSG_POLL_REQUEST, MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE, MSG_POLL_FULFILLMENT_REQUEST)
+#: Tuple of all TAXII 1.1 Message Types
+MSG_TYPES = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE,
+        MSG_COLLECTION_INFORMATION_REQUEST, MSG_COLLECTION_INFORMATION_RESPONSE,
+        MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST,
+        MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE, MSG_POLL_REQUEST,
+        MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE, MSG_POLL_FULFILLMENT_REQUEST)
 
-#Import the status types that haven't changed
-from libtaxii.messages_10 import (ST_BAD_MESSAGE, ST_DENIED, ST_FAILURE, ST_NOT_FOUND, ST_POLLING_UNSUPPORTED, ST_RETRY, 
-            ST_SUCCESS, ST_UNAUTHORIZED, ST_UNSUPPORTED_MESSAGE_BINDING, ST_UNSUPPORTED_CONTENT_BINDING, ST_UNSUPPORTED_PROTOCOL)
 
-#Define the new status types
+# TAXII 1.0 Status Types
+
+#: Constant identifying a Status Type of Bad Message
+ST_BAD_MESSAGE = tm10.ST_BAD_MESSAGE
+#: Constant identifying a Status Type of Denied
+ST_DENIED = tm10.ST_DENIED
+#: Constant identifying a Status Type of Failure
+ST_FAILURE = tm10.ST_FAILURE
+#: Constant identifying a Status Type of Not Found
+ST_NOT_FOUND = tm10.ST_NOT_FOUND
+#: Constant identifying a Status Type of Polling Unsupported
+ST_POLLING_UNSUPPORTED = tm10.ST_POLLING_UNSUPPORTED
+#: Constant identifying a Status Type of Retry
+ST_RETRY = tm10.ST_RETRY
+#: Constant identifying a Status Type of Success
+ST_SUCCESS = tm10.ST_SUCCESS
+#: Constant identifying a Status Type of Unauthorized
+ST_UNAUTHORIZED = tm10.ST_UNAUTHORIZED
+#: Constant identifying a Status Type of Unsupported Message Binding
+ST_UNSUPPORTED_MESSAGE_BINDING = tm10.ST_UNSUPPORTED_MESSAGE_BINDING
+#: Constant identifying a Status Type of Unsupported Content Binding
+ST_UNSUPPORTED_CONTENT_BINDING = tm10.ST_UNSUPPORTED_CONTENT_BINDING
+#: Constant identifying a Status Type of Unsupported Protocol Binding
+ST_UNSUPPORTED_PROTOCOL = tm10.ST_UNSUPPORTED_PROTOCOL
+
+# New Status Types in TAXII 1.1
+
 #: Constant identifying a Status Type of Asynchronous Poll Error
 ST_ASYNCHRONOUS_POLL_ERROR = 'ASYNCHRONOUS_POLL_ERROR'
 #: Constant identifying a Status Type of Destination Collection Error
@@ -65,58 +111,87 @@ ST_PENDING = 'PENDING'
 #: Constant identifying a Status Type of Unsupported Query Format
 ST_UNSUPPORTED_QUERY = 'UNSUPPORTED_QUERY'
 
-#Tuple of all status types
-ST_TYPES = (ST_ASYNCHRONOUS_POLL_ERROR, ST_BAD_MESSAGE, ST_DENIED, ST_DESTINATION_COLLECTION_ERROR, ST_FAILURE, 
-            ST_INVALID_RESPONSE_PART, ST_NETWORK_ERROR, ST_NOT_FOUND, ST_PENDING, ST_POLLING_UNSUPPORTED, ST_RETRY, ST_SUCCESS,
-            ST_UNAUTHORIZED, ST_UNSUPPORTED_MESSAGE_BINDING, ST_UNSUPPORTED_CONTENT_BINDING, ST_UNSUPPORTED_PROTOCOL,
-            ST_UNSUPPORTED_QUERY)
+#: Tuple of all TAXII 1.1 Status types
+ST_TYPES = (ST_ASYNCHRONOUS_POLL_ERROR, ST_BAD_MESSAGE, ST_DENIED,
+        ST_DESTINATION_COLLECTION_ERROR, ST_FAILURE, ST_INVALID_RESPONSE_PART,
+        ST_NETWORK_ERROR, ST_NOT_FOUND, ST_PENDING, ST_POLLING_UNSUPPORTED,
+        ST_RETRY, ST_SUCCESS, ST_UNAUTHORIZED, ST_UNSUPPORTED_MESSAGE_BINDING,
+        ST_UNSUPPORTED_CONTENT_BINDING, ST_UNSUPPORTED_PROTOCOL,
+        ST_UNSUPPORTED_QUERY)
 
-#Import actions that haven't changed
-from libtaxii.messages_10 import (ACT_SUBSCRIBE, ACT_UNSUBSCRIBE, ACT_STATUS)
 
-#Define the new actions
+# TAXII 1.0 Action Types
+
+#: Constant identifying an Action of Subscribe
+ACT_SUBSCRIBE = tm10.ACT_SUBSCRIBE
+#: Constant identifying an Action of Unsubscribe
+ACT_UNSUBSCRIBE = tm10.ACT_UNSUBSCRIBE
+#: Constant identifying an Action of Status
+ACT_STATUS = tm10.ACT_STATUS
+
+# New Action Types in TAXII 1.1
+
 #: Constant identifying an Action of Pause
 ACT_PAUSE = 'PAUSE'
 #: Constant identifying an Action of Resume
 ACT_RESUME = 'RESUME'
-# Tuple of all actions
+
+#: Tuple of all TAXII 1.1 Action types
 ACT_TYPES = (ACT_SUBSCRIBE, ACT_PAUSE, ACT_RESUME, ACT_UNSUBSCRIBE, ACT_STATUS)
 
-#Define the subscription status
+
+# TAXII 1.1 Subscription Statuses
+
 #: Subscription Status of Active
 SS_ACTIVE = 'ACTIVE'
 #: Subscription Status of Paused
 SS_PAUSED = 'PAUSED'
 #: Subscription Status of Unsubscribed
 SS_UNSUBSCRIBED = 'UNSUBSCRIBED'
-#Tuple of all subscription statuses
+
+#: Tuple of all TAXII 1.1 Subscription Statues
 SS_TYPES = (SS_ACTIVE, SS_PAUSED, SS_UNSUBSCRIBED)
 
-#Define the response types
+
+# TAXII 1.1 Response Types
+
 #: Constant identifying a response type of Full
 RT_FULL = 'FULL'
 #: Constant identifying a response type of Count only
 RT_COUNT_ONLY = 'COUNT_ONLY'
 
-#Tuple of all Response Types
+#: Tuple of all TAXII 1.1 Response Types
 RT_TYPES = (RT_FULL, RT_COUNT_ONLY)
 
-#Define the Collection Types
+
+# TAXII 1.1 Response Types
+
 #: Constant identifying a collection type of Data Feed
 CT_DATA_FEED = 'DATA_FEED'
 #: Constant identifying a collection type of Data Set
 CT_DATA_SET = 'DATA_SET'
 
-#Tuple of all Collection Types
+#: Tuple of all TAXII 1.1 Collection Types
 CT_TYPES = (CT_DATA_FEED, CT_DATA_SET)
 
-#Import service types that haven't changed
-from libtaxii.messages_10 import (SVC_INBOX, SVC_POLL, SVC_DISCOVERY)
-#No new services in TAXII 1.1; Feed Management renamed to Collection Management
+
+# TAXII 1.0 Service Types
+
+#: Constant identifying a Service Type of Inbox
+SVC_INBOX = tm10.SVC_INBOX
+#: Constant identifying a Service Type of Poll
+SVC_POLL = tm10.SVC_POLL
+#: Constant identifying a Service Type of Discovery
+SVC_DISCOVERY = tm10.SVC_DISCOVERY
+
+# Renamed Status Types in TAXII 1.1
+#: Constant identifying a Service Type of Collection Management.
+#: "Feed Management" was renamed to "Collection Management" in TAXII 1.1.
 SVC_COLLECTION_MANAGEMENT = 'COLLECTION_MANAGEMENT'
 
-#A tuple of all service types
+#: Tuple of all TAXII 1.1 Service Types
 SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_COLLECTION_MANAGEMENT, SVC_DISCOVERY)
+
 
 ns_map = {
             'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',

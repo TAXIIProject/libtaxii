@@ -11,20 +11,23 @@
 Creating, handling, and parsing TAXII 1.0 messages.
 """
 
-import random
-import os
-import StringIO
-import datetime
-import dateutil.parser
-import re
 import collections
-from lxml import etree
+import datetime
 try:
     import simplejson as json
 except ImportError:
     import json
+import os
+import random
+import re
+import StringIO
 
-#Message Types
+import dateutil.parser
+from lxml import etree
+
+
+# TAXII 1.0 Message Types
+
 #:Constant identifying a Status Message
 MSG_STATUS_MESSAGE = 'Status_Message'
 #:Constant identifying a Discovery Request Message
@@ -45,12 +48,17 @@ MSG_POLL_REQUEST = 'Poll_Request'
 MSG_POLL_RESPONSE = 'Poll_Response'
 #:Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = 'Inbox_Message'
-# Tuple of all message types
-MSG_TYPES = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE, MSG_FEED_INFORMATION_REQUEST, 
-             MSG_FEED_INFORMATION_RESPONSE, MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST, MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE,
-             MSG_POLL_REQUEST, MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE)
 
-#Status Types
+#: Tuple of all TAXII 1.0 Message Types
+MSG_TYPES = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE,
+        MSG_FEED_INFORMATION_REQUEST, MSG_FEED_INFORMATION_RESPONSE,
+        MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST,
+        MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE, MSG_POLL_REQUEST,
+        MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE)
+
+
+# TAXII 1.0 Status Types
+
 #: Constant identifying a Status Type of Bad Message
 ST_BAD_MESSAGE = 'BAD_MESSAGE'
 #: Constant identifying a Status Type of Denied
@@ -73,9 +81,15 @@ ST_UNSUPPORTED_MESSAGE_BINDING = 'UNSUPPORTED_MESSAGE'
 ST_UNSUPPORTED_CONTENT_BINDING = 'UNSUPPORTED_CONTENT'
 #: Constant identifying a Status Type of Unsupported Protocol Binding
 ST_UNSUPPORTED_PROTOCOL = 'UNSUPPORTED_PROTOCOL'
-# Tuple of all status types
-ST_TYPES = (ST_BAD_MESSAGE, ST_DENIED, ST_FAILURE, ST_NOT_FOUND, ST_POLLING_UNSUPPORTED, ST_RETRY, ST_SUCCESS,
-            ST_UNAUTHORIZED, ST_UNSUPPORTED_MESSAGE_BINDING, ST_UNSUPPORTED_CONTENT_BINDING, ST_UNSUPPORTED_PROTOCOL)
+
+#: Tuple of all TAXII 1.0 Status Types
+ST_TYPES = (ST_BAD_MESSAGE, ST_DENIED, ST_FAILURE, ST_NOT_FOUND,
+        ST_POLLING_UNSUPPORTED, ST_RETRY, ST_SUCCESS, ST_UNAUTHORIZED,
+        ST_UNSUPPORTED_MESSAGE_BINDING, ST_UNSUPPORTED_CONTENT_BINDING,
+        ST_UNSUPPORTED_PROTOCOL)
+
+
+# TAXII 1.0 Action Types
 
 #: Constant identifying an Action of Subscribe
 ACT_SUBSCRIBE = 'SUBSCRIBE'
@@ -83,10 +97,13 @@ ACT_SUBSCRIBE = 'SUBSCRIBE'
 ACT_UNSUBSCRIBE = 'UNSUBSCRIBE'
 #: Constant identifying an Action of Status
 ACT_STATUS = 'STATUS'
-# Tuple of all actions
+
+#: Tuple of all TAXII 1.0 Action Types
 ACT_TYPES = (ACT_SUBSCRIBE, ACT_UNSUBSCRIBE, ACT_STATUS)
 
-#Service types
+
+# TAXII 1.0 Service Types
+
 #: Constant identifying a Service Type of Inbox
 SVC_INBOX = 'INBOX'
 #: Constant identifying a Service Type of Poll
@@ -95,8 +112,10 @@ SVC_POLL = 'POLL'
 SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
 #: Constant identifying a Service Type of Discovery
 SVC_DISCOVERY = 'DISCOVERY'
-# Tuple of all service types 
+
+#: Tuple of all TAXII 1.0 Service Types
 SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_FEED_MANAGEMENT, SVC_DISCOVERY)
+
 
 ns_map = {
             'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
