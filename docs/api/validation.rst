@@ -1,5 +1,5 @@
 :mod:`libtaxii.validation` Module
-------------------------------
+---------------------------------
 
 .. automodule:: libtaxii.validation
     :members:

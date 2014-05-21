@@ -1,5 +1,5 @@
-Welcome to libtaxii's documentation!
-====================================
+libtaxii |release| Documentation
+================================
 
 **libtaxii** is a Python library that provides:
 
