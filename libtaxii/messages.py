@@ -182,7 +182,19 @@ def _check_timestamplabel(timestamp_label, varname, can_be_none=False):
     return
 
 def generate_message_id(maxlen=5):
-    """Generate a TAXII Message ID with a max length of `maxlen`."""
+    """Generate a TAXII Message ID.
+
+    Args:
+        maxlen (int): maximum length of the ID, in characters
+
+    Example:
+        .. code-block:: python
+
+            msg_id = tm11.generate_message_id()
+            message = tm11.DiscoveryRequest(msg_id)
+            # Or...
+            message = tm11.DiscoveryRequest(tm11.generate_message_id())
+    """
     message_id = random.randint(1, 10 ** maxlen)
     return str(message_id)
 

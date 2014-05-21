@@ -148,12 +148,21 @@ def set_xml_parser(xml_parser=None):
     global_xml_parser = xml_parser
 
 def validate_xml(xml_string):
-    """Validate XML with the TAXII XML Schema 1.1."""
+    """Validate XML with the TAXII XML Schema 1.1.
+
+    Args:
+        xml_string (str): The XML to validate.
+
+    Example:
+        .. code-block:: python
+
+            is_valid = tm11.validate_xml(message.to_xml())
+    """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
     else:
         f = xml_string
-    
+
     etree_xml = etree.parse(f, get_xml_parser())
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema_11.xsd")
@@ -166,10 +175,19 @@ def validate_xml(xml_string):
     return valid
 
 def get_message_from_xml(xml_string):
-    """Create a TAXII Message object from an XML string.
+    """Create a TAXIIMessage object from an XML string.
 
-    Note: This function auto-detects which TAXII Message should be created from
-    the XML.
+    This function automatically detects which type of Message should be created
+    based on the XML.
+
+    Args:
+        xml_string (str): The XML to parse into a TAXII message.
+
+    Example:
+        .. code-block:: python
+
+            message_xml = message.to_xml()
+            new_message = tm11.get_message_from_xml(message_xml)
     """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -210,10 +228,19 @@ def get_message_from_xml(xml_string):
 
 
 def get_message_from_dict(d):
-    """Create a TAXII Message object from a dictionary.
+    """Create a TAXIIMessage object from a dictonary.
 
-    Note: This function auto-detects which TAXII Message should be created from
-    the dictionary.
+    This function automatically detects which type of Message should be created
+    based on the 'message_type' key in the dictionary.
+
+    Args:
+        d (dict): The dictionary to build the TAXII message from.
+
+    Example:
+        .. code-block:: python
+
+            message_dict = message.to_dict()
+            new_message = tm11.get_message_from_dict(message_dict)
     """
     if 'message_type' not in d:
         raise ValueError('message_type is a required field!')
@@ -246,10 +273,13 @@ def get_message_from_dict(d):
 
 
 def get_message_from_json(json_string):
-    """Create a TAXII Message object from a json string.
-    
-    Note: This function auto-detects which TAXII Message should be created form
-    the JSON string.
+    """Create a TAXIIMessage object from a JSON string.
+
+    This function automatically detects which type of Message should be created
+    based on the JSON.
+
+    Args:
+        json_string (str): The JSON to parse into a TAXII message.
     """
     return get_message_from_dict(json.loads(json_string))
 
