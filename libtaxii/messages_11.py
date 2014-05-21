@@ -3307,12 +3307,14 @@ class InboxMessage(TAXIIMessage):
             xml.attrib['collection_name'] = self.collection_name
             si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
             si.text = self.subscription_id
-
-            ebtl = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'])
-            ebtl.text = self.exclusive_begin_timestamp_label.isoformat()
-
-            ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'])
-            ietl.text = self.inclusive_end_timestamp_label.isoformat()
+            
+            if self.exclusive_begin_timestamp_label is not None:
+                ebtl = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'])
+                ebtl.text = self.exclusive_begin_timestamp_label.isoformat()
+            
+            if self.inclusive_end_timestamp_label is not None:
+                ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'])
+                ietl.text = self.inclusive_end_timestamp_label.isoformat()
 
             return xml
 
