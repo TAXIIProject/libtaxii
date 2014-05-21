@@ -44,6 +44,7 @@ ST_UNSUPPORTED_CAPABILITY_MODULE = 'UNSUPPORTED_CAPABILITY_MODULE'
 ST_UNSUPPORTED_TARGETING_EXPRESSION = 'UNSUPPORTED_TARGETING_EXPRESSION'
 ST_UNSUPPORTED_TARGETING_EXPRESSION_ID = 'UNSUPPORTED_TARGETING_EXPRESSION_ID'
 
+#: TAXII namespace map for default queries
 ns_map = {'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'}
 
 #A Capability Module has valid relationships
