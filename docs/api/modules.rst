@@ -4,8 +4,8 @@ API Documentation
 .. toctree::
 
     libtaxii
+    clients
     messages_10
     messages_11
-    clients
     query
     validation
