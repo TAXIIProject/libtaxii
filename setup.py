@@ -30,6 +30,10 @@ extras_require = {
         # included as sphinx.ext.napoleon
         'sphinxcontrib-napoleon==0.2.4',
     ],
+    'test': [
+        "nose==1.3.0",
+        "tox==1.6.1"
+    ],
 }
 
 setup(name='libtaxii',
