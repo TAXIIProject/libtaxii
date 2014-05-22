@@ -93,10 +93,10 @@ class HttpClient:
         Set the proxy settings to use when making a connection.
 
         Arguments:
-        * proxy_string - a string like 'http://proxy.example.com:80'
-          If set to None, use the system proxy.
-          If set to 'noproxy', don't use a proxy (even the system proxy)
-        * proxy_type - either PROXY_HTTP or PROXY_HTTPS
+            proxy_string - a string like 'http://proxy.example.com:80'
+                If set to None, use the system proxy.
+                If set to 'noproxy', don't use a proxy (even the system proxy)
+            proxy_type - either PROXY_HTTP or PROXY_HTTPS
         """
         self.proxy_string = proxy_string
         self.proxy_type = proxy_type
