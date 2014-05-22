@@ -173,12 +173,15 @@ cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte,
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
 
 class DefaultQueryInfo(tm11.SupportedQuery):
+    """ Used to describe the TAXII Default Queries that are supported. 
+		
+    	:param targeting_expression_infos: Describe the supported targeting expressions
+    	:type targeting_expression_infos: :class:`list` of :class:`TargetingExpressionInfo` objects
+    	:param capability_modules: Indicate the supported capability modules
+    	:type capability_modules: :class:`list` of :class:`str`
+    """
+    
     def __init__(self, targeting_expression_infos, capability_modules):
-        """
-        Arguments:
-        - targeting_expression_infos (a list of TargetingExpressionInfo objects) - Describe the supported targeting expressions
-        - capability_modules (a list of strings) - Indicate the supported capability modules
-        """
         super(DefaultQueryInfo, self).__init__(FID_TAXII_DEFAULT_QUERY_10)
         self.targeting_expression_infos = targeting_expression_infos
         self.capability_modules = capability_modules
@@ -249,6 +252,14 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         return DefaultQueryInfo(**kwargs)
     
     class TargetingExpressionInfo(tm11.BaseNonMessage):
+        """This class describes supported Targeting Expressions
+	
+        	:param string targeting_expression_id: The supported targeting expression ID
+        	:param preferred_scope: Indicates the preferred scope of queries
+        	:type preferred_scope: :class:`list` of :class:`str`
+        	:param allowed_scope: Indicates the allowed scope of queries
+        	:type allowed_scope: :class:`list` of :class:`str`
+        """
         def __init__(self, targeting_expression_id, preferred_scope = None, allowed_scope = None):
             """
             Arguments:
@@ -336,12 +347,15 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         
 
 class DefaultQuery(tm11.Query):
+    """ 
+        Conveys a TAXII Default Query. 
+        
+    	:param string targeting_expression_id: The targeting_expression used in the query
+    	:param criteria: The criteria of the query
+    	:type criteria: :class:`DefaultQuery.Criteria`
+    """
+    
     def __init__(self, targeting_expression_id, criteria):
-        """
-        Arguments:
-        - targeting_expression_id (string) - the targeting_expression used in the query
-        - criteria (Criteria object) - The criteria of the query
-        """
         super(DefaultQuery, self).__init__(FID_TAXII_DEFAULT_QUERY_10)
         self.targeting_expression_id = targeting_expression_id
         self.criteria = criteria
@@ -390,14 +404,16 @@ class DefaultQuery(tm11.Query):
         return DefaultQuery(tei, criteria)
     
     class Criteria(tm11.BaseNonMessage):
+        """Represents criteria for a :class:`DefaultQuery`. **Note**: At least one criterion OR criteria MUST be present
+        
+        :param str operator: The logical operator (should be one of `OP_AND` or `OP_OR`)
+        :param criteria: The criteria for the query
+        :type criteria: :class:`DefaultQuery.Criteria`
+        :param criterion: The criterion for the query
+        :type criterion: :class:`DefaultQuery.Criterion`
+        """
+        
         def __init__(self, operator, criteria=None, criterion=None):
-            """
-            Arguments:
-            - operator (OP_AND or OP_OR) - The operator
-            - criteria (list of Criteria objects) - The criteria for the query
-            - criterion (list of Criteria objects) - The criterion for the query
-            At least one criterion OR criteria MUST be present
-            """
             self.operator = operator
             self.criteria = criteria or []
             self.criterion = criterion or []
@@ -500,13 +516,15 @@ class DefaultQuery(tm11.Query):
             return DefaultQuery.Criteria(**kwargs)
     
     class Criterion(tm11.BaseNonMessage):
+        """Represents criterion for a :class:`DefaultQuery.Criteria`
+		
+        	:param string target: A targeting expression identifying the target
+        	:param test: The test to be applied to the target
+        	:type test: :class:`DefaultQuery.Criterion.Test`
+        	:param bool negate: Whether the result of applying the test to the target should be negated
+        """
+        
         def __init__(self, target, test, negate=False):
-            """
-            Arguments:
-            - target (string) - A targeting expression identifying the target
-            - test (Test object) - The test to be applied to the target
-            - negate (bool) - Whether the result of applying the test to the target should be negated
-            """
             self.negate = negate
             self.target = target
             self.test = test
@@ -585,13 +603,14 @@ class DefaultQuery(tm11.Query):
             return DefaultQuery.Criterion(target, test, negate)
         
         class Test(tm11.BaseNonMessage):
+            """
+            	:param string capability_id: The ID of the capability module that defines the relationship & parameters
+            	:param string relationship: The relationship (e.g., equals)
+            	:param parameters: The parameters for the relationship.
+            	:type parameters: :class:`dict` of key/value pairs
+            """
+            
             def __init__(self, capability_id, relationship, parameters=None):
-                """
-                Arguments:
-                capability_id (string) - The ID of the capability module that defines the relationship & parameters
-                relationship (string) - The relationship (e.g., equals)
-                parameters (dict of key/value pairs) - the parameters for the relationship.
-                """
                 self.capability_id = capability_id
                 self.relationship = relationship
                 self.parameters = parameters or {}

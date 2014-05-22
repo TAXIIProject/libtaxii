@@ -1,6 +1,6 @@
 :mod:`libtaxii.taxii_default_query` Module
 ==========================================
-.. module:: libtaxii.taxii_default_query
+.. automodule:: libtaxii.taxii_default_query
 
 Constants
 ---------
@@ -29,70 +29,13 @@ Constants
 Classes
 -------
 
-.. class:: DefaultQuery
-
-	This class is a subclass of ``messages_11.Query``, and is used to convey a TAXII Default Query.
-	
-	.. method:: __init__(targeting_expression_id, criteria)
+.. autoclass:: DefaultQuery
+	:show-inheritance:
+	:members:
 			
-			:param string targeting_expression_id: The targeting_expression used in the query
-			:param criteria: The criteria of the query
-			:type criteria: :class:`DefaultQuery.Criteria`
-
-.. class:: DefaultQuery.Criteria
-	
-	Represents criteria for a :class:`DefaultQuery`
-		
-	.. method:: __init__(operator, criteria=None, criterion=None)
-			
-		**Note**: At least one criterion OR criteria MUST be present
-			
-		:param string operator: The operator to use
-		:param list criteria: List of Criteria objects for the query
-		:param list criterion: List of Criterion objects for the query	
-					
-.. class:: DefaultQuery.Criterion
-	
-	Represents criterion for a :class:`DefaultQuery.Criteria`
-		
-	.. method:: __init__(target, test, negate=False)
-			
-		:param string target: A targeting expression identifying the target
-		:param test: The test to be applied to the target
-		:type test: :class:`DefaultQuery.Criterion.Test`
-		:param bool negate: Whether the result of applying the test to the target should be negated
-			
-.. class:: DefaultQuery.Criterion.Test
-		
-	.. method:: __init__(capability_id, relationship, parameters=None)
-	
-		:param string capability_id: The ID of the capability module that defines the relationship & parameters
-		:param string relationship: The relationship (e.g., equals)
-		:param parameters: The parameters for the relationship.
-		:type parameters: :class:`dict` of key/value pairs
-		
-.. class:: DefaultQueryInfo
-
-	This class is a subclass of the messages_11.SupportedQuery Class, and is used to describe the TAXII Default Queries that are supported.
-		
-	.. method:: __init__(targeting_expression_infos, capability_modules):
-	
-		:param targeting_expression_infos: Describe the supported targeting expressions
-		:type targeting_expression_infos: :class:`list` of :class:`TargetingExpressionInfo` objects
-		:param capability_modules: Indicate the supported capability modules
-		:type capability_modules: :class:`list` of :class:`str`
-	
-.. class:: DefaultQueryInfo.TargetingExpressionInfo
-	
-	This class describes supported Targeting Expressions
-		
-	.. method:: __init__(targeting_expression_id, preferred_scope = None, allowed_scope = None)
-	
-		:param string targeting_expression_id: The supported targeting expression ID
-		:param preferred_scope: Indicates the preferred scope of queries
-		:type preferred_scope: :class:`list` of :class:`str`
-		:param allowed_scope: Indicates the allowed scope of queries
-		:type allowed_scope: :class:`list` of :class:`str`
+.. autoclass:: DefaultQueryInfo
+	:show-inheritance:
+	:members:
 	
 Examples
 --------
