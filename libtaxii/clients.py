@@ -21,10 +21,10 @@ import libtaxii as t
 class HttpClient:
 
     #Constants for authentication types
-    AUTH_NONE = 0  # Do not offer any authentication credentials to the server
-    AUTH_BASIC = 1  # Offer HTTP Basic authentication credentials to the server
-    AUTH_CERT = 2  # Offer certificate based authentication credentials to the server
-    AUTH_CERT_BASIC = 3  # Offer certificate based auth and HTTP Basic credentials
+    AUTH_NONE = 0  #: Do not offer any authentication credentials to the server
+    AUTH_BASIC = 1  #: Offer HTTP Basic authentication credentials to the server
+    AUTH_CERT = 2  #: Offer certificate based authentication credentials to the server
+    AUTH_CERT_BASIC = 3  #: Offer certificate based auth and HTTP Basic credentials
 
     #Proxy Constants
     PROXY_HTTP = 'http'
@@ -51,9 +51,9 @@ class HttpClient:
         self.ca_file = None
 
     def setAuthType(self, auth_type):
-        """Set the authentication type.
+        """Set the authentication type for this client.
 
-        Must be one of AUTH_NONE, AUTH_BASIC, or AUTH_CERT
+        :param string auth_type: Must be one of :attr:`AUTH_NONE`, :attr:`AUTH_BASIC`, or :attr:`AUTH_CERT`
         """
         #If this isn't a change, don't do anything
         if self.auth_type == auth_type:
@@ -74,6 +74,8 @@ class HttpClient:
         """
         Tell libtaxii whether to verify the server's ssl certificate 
         using the provided ca_file.
+        
+        :param bool verify_server: Flag indicating whether or not libtaxii should verify the server.
         """
         if verify_server and ca_file is None:
             raise ValueError('If verify_server is True, ca_file must not be None.')
@@ -92,16 +94,17 @@ class HttpClient:
         """
         Set the proxy settings to use when making a connection.
 
-        Arguments:
-            proxy_string - a string like 'http://proxy.example.com:80'
-                If set to None, use the system proxy.
-                If set to 'noproxy', don't use a proxy (even the system proxy)
-            proxy_type - either PROXY_HTTP or PROXY_HTTPS
+        :param string proxy_string: Proxy address formatted like http://proxy.example.com:80. Set to `None` to use the system proxy; set to `noproxy` to use no proxy.
+        :param string proxy_type: Either :attr:`PROXY_HTTP` or :attr:`PROXY_HTTPS`
         """
         self.proxy_string = proxy_string
         self.proxy_type = proxy_type
     
     def setUseHttps(self, bool):
+        """Indicate whether the HttpClient should use HTTP or HTTPs. The default is HTTP.
+        
+        :param bool bool: The new use_https value.
+        """
         if bool == True:
             self.use_https = True
         elif bool == False:
@@ -130,6 +133,12 @@ class HttpClient:
         self.auth_credentials = auth_credentials_dict
     
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
+        """ **DEPRECATED.** May be removed in the next version of `libtaxii`. 
+            Use :func:`callTaxiiService2` instead.
+            
+            Call a TAXII service.
+        """
+        
         if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:
                 port = 443
@@ -179,10 +188,12 @@ class HttpClient:
 
     def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
                           content_type=None, headers=None):
-        """New method of calling a TAXII Service
+        """Call a TAXII service.
 
-        Note: this uses urllib2 instead of httplib, and therefore returns
-        a different kind of object than callTaxiiService.
+        **Note:** this uses urllib2 instead of httplib, and therefore returns
+        a different kind of object than :func:`callTaxiiService`.
+        
+        :return: :class:`urllib2.Response`
         """
         
         header_dict = {}
