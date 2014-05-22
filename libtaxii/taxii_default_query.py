@@ -256,17 +256,12 @@ class DefaultQueryInfo(tm11.SupportedQuery):
 	
         	:param string targeting_expression_id: The supported targeting expression ID
         	:param preferred_scope: Indicates the preferred scope of queries
-        	:type preferred_scope: :class:`list` of :class:`str`
+        	:type preferred_scope: :class:`list` of :class:`string`
         	:param allowed_scope: Indicates the allowed scope of queries
-        	:type allowed_scope: :class:`list` of :class:`str`
+        	:type allowed_scope: :class:`list` of :class:`string`
         """
+        
         def __init__(self, targeting_expression_id, preferred_scope = None, allowed_scope = None):
-            """
-            Arguments:
-            - targeting_expression_id (string) - The supported targeting expression ID
-            - preferred_scope (list of strings) - indicates the preferred scope of queries
-            - allowed_scope (list of string) - indicates the allowed scope of queries
-            """
             self.targeting_expression_id = targeting_expression_id
             self.preferred_scope = preferred_scope or []
             self.allowed_scope = allowed_scope or []
