@@ -197,30 +197,42 @@ ns_map = {
             'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
          }
 
+
 def _str2datetime(date_string):
-    """ Users of libtaxii should not use this function.
-    Takes a date string and creates a datetime object
+    """Parse a string into a :py:class:`datetime.datetime`.
+
+    This function should not be called by libtaxii users directly.
     """
     return dateutil.parser.parse(date_string)
+
 
 #Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
 
+
 global_xml_parser = None
 def get_xml_parser():
-    """ Get the XML Parser being used by libtaxii.messages. 
-    This method instantiates an XML Parser with no_network=True and
-    huge_tree=True if the XML Parser has not already been set via 
-    set_xml_parser() """
+    """Return the XML parser currently in use.
+
+    If one has not already been set (via :py:func:`set_xml_parser()`), a new
+    ``etree.XMLParser`` is constructed with ``no_network=True`` and
+    ``huge_tree=True``.
+    """
     global global_xml_parser
     if global_xml_parser is None:
         global_xml_parser = etree.XMLParser(no_network=True, huge_tree=True)
     return global_xml_parser
 
+
 def set_xml_parser(xml_parser=None):
-    """ Set the libtaxii.messages XML parser. """
+    """Set the libtaxii.messages XML parser.
+
+    Args:
+        xml_parser (etree.XMLParser): The parser to use to parse TAXII XML.
+    """
     global global_xml_parser
     global_xml_parser = xml_parser
+
 
 def validate_xml(xml_string):
     """Validate XML with the TAXII XML Schema 1.1.
@@ -248,6 +260,7 @@ def validate_xml(xml_string):
     if not valid:
         return xml_schema.error_log.last_error
     return valid
+
 
 def get_message_from_xml(xml_string):
     """Create a TAXIIMessage object from an XML string.
@@ -358,6 +371,7 @@ def get_message_from_json(json_string):
     """
     return get_message_from_dict(json.loads(json_string))
 
+
 def _sanitize_content_binding(binding):
     """
     Takes in one of:
@@ -375,6 +389,7 @@ def _sanitize_content_binding(binding):
     else:#Don't know what to do with it.
         raise ValueError('Type cannot be converted to ContentBinding: %s' % binding.__class__.__name__)
 
+
 def _sanitize_content_bindings(binding_list):
     bindings = []
     for item in binding_list:
@@ -382,15 +397,19 @@ def _sanitize_content_bindings(binding_list):
 
     return bindings
 
+
 class UnsupportedQueryException(Exception):
+
      def __init__(self, value):
          self.value = value
 
      def __str__(self):
          return repr(self.value)
 
+
 #Start with the 'default' deserializer
 query_deserializers = {}
+
 
 def register_query_format(format_id, query, query_info, schema=None):
     """
