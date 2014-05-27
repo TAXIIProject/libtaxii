@@ -458,21 +458,21 @@ class BaseNonMessage(object):
         be compared efficiently. The __eq__ method uses this 
         property to sort the lists before comparisons are made
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     def to_etree(self):
         """Create an etree representation of this class.
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     def to_dict(self):
         """Create a dictionary representation of this class.
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     def to_xml(self, pretty_print=False):
         """Create an XML representation of this class.
@@ -486,7 +486,7 @@ class BaseNonMessage(object):
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     @classmethod
     def from_dict(cls, d):
@@ -494,7 +494,7 @@ class BaseNonMessage(object):
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     @classmethod
     def from_xml(cls, xml):
