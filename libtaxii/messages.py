@@ -863,9 +863,9 @@ class ContentBlock(BaseNonMessage):
         block['content_binding'] = self.content_binding
 
         if self.content_is_xml:
-            block['content'] = etree.tostring(self.content)
+            block['content'] = etree.tostring(self._content)
         else:
-            block['content'] = self.content
+            block['content'] = self._content
         block['content_is_xml'] = self.content_is_xml
 
         if self.timestamp_label is not None:
