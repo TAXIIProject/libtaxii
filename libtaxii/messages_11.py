@@ -593,6 +593,8 @@ class BaseNonMessage(object):
                             print 'dict values not equal: %s != %s' % (v, other_value[k])
                         eq = False
                 eq = True
+            elif isinstance(self_value, etree._Element): # Non-TAXII etree element (i.e. STIX)
+                eq = (etree.tostring(self_value) == etree.tostring(other_value))
             else:#Do a direct comparison
                 eq = self_value == other_value
 
