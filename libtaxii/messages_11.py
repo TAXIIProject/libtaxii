@@ -203,6 +203,8 @@ def _str2datetime(date_string):
 
     This function should not be called by libtaxii users directly.
     """
+    if not date_string:
+        return None
     return dateutil.parser.parse(date_string)
 
 
@@ -3322,8 +3324,10 @@ class InboxMessage(TAXIIMessage):
             d = {}
             d['collection_name'] = self.collection_name
             d['subscription_id'] = self.subscription_id
-            d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
-            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
+            if self.exclusive_begin_timestamp_label:
+                d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
+            if self.inclusive_end_timestamp_label:
+                d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
             return d
 
         @staticmethod
@@ -3331,18 +3335,27 @@ class InboxMessage(TAXIIMessage):
             collection_name = etree_xml.attrib['collection_name']
             subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)[0].text
 
-            ibtl = _str2datetime(etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)[0].text)
-            ietl = _str2datetime(etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+            begin_ts = etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)
+            if begin_ts:
+                ebtl = _str2datetime(begin_ts[0].text)
+            else:
+                ebtl = None
 
-            return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ibtl, ietl)
+            end_ts = etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)
+            if end_ts:
+                ietl = _str2datetime(end_ts[0].text)
+            else:
+                ietl = None
+
+            return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 
         @staticmethod
         def from_dict(d):
             collection_name = d['collection_name']
             subscription_id = d['subscription_id']
 
-            ebtl = _str2datetime(d['exclusive_begin_timestamp_label'])
-            ietl = _str2datetime(d['inclusive_end_timestamp_label'])
+            ebtl = _str2datetime(d.get('exclusive_begin_timestamp_label'))
+            ietl = _str2datetime(d.get('inclusive_end_timestamp_label'))
 
             return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 
