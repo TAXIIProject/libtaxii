@@ -18,14 +18,14 @@ def main():
     args = parser.parse_args()
 
     discovery_req = tm11.DiscoveryRequest(message_id=tm11.generate_message_id())
-    discovery_req_xml = discovery_req.to_xml()
+    discovery_req_xml = discovery_req.to_xml(pretty_print=True)
 
     print "Discovery Request: \r\n", discovery_req_xml
     client = tc.HttpClient()
     client.setProxy(None) 
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, discovery_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
-    print "Response Message: \r\n", response_message.to_xml()
+    print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()

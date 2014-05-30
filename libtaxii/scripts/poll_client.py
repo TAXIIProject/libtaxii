@@ -47,13 +47,13 @@ def main():
                               inclusive_end_timestamp_label=end_ts,
                               poll_parameters=tm11.PollRequest.PollParameters())
 
-    poll_req_xml = poll_req.to_xml()
+    poll_req_xml = poll_req.to_xml(pretty_print=True)
     print "Poll Request: \r\n", poll_req_xml
     client = tc.HttpClient()
     client.setProxy(None) 
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
-    print "Response Message: \r\n", response_message.to_xml()
+    print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()

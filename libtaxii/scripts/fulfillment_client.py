@@ -28,13 +28,13 @@ def main():
                               result_id=args.result_id,
                               result_part_number=args.result_part_number)
 
-    poll_fulf_req_xml = poll_fulf_req.to_xml()
+    poll_fulf_req_xml = poll_fulf_req.to_xml(pretty_print=True)
     print "Poll Fulfillment Request: \r\n", poll_fulf_req_xml
     client = tc.HttpClient()
     client.setProxy(None) 
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_fulf_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
-    print "Response Message: \r\n", response_message.to_xml()
+    print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()
