@@ -20,7 +20,7 @@ if sys.version_info < (2, 6):
 
 install_requires = ['lxml>=2.3.2', 'python-dateutil>=1.5']
 
-with open("README.md") as f:
+with open("README.rst") as f:
     long_description = f.read()
 
 extras_require = {
