@@ -12,45 +12,135 @@
         import libtaxii.messages_11 as tm11
 
 
-Classes
--------
-
-Message Classes
-***************
-
-.. autoclass:: TAXIIMessage
+Discovery Request
+-----------------
 
 .. autoclass:: DiscoveryRequest
+
+**Example:**
+
+.. code-block:: python
+
+    headers={'ext_header1': 'value1', 'ext_header2': 'value2'}
+    discovery_request = tm11.DiscoveryRequest(
+            message_id=tm11.generate_message_id(),
+            extended_headers=headers)
+
+
+Discovery Response
+------------------
+
 .. autoclass:: DiscoveryResponse
-.. autoclass:: CollectionInformationRequest
-.. autoclass:: CollectionInformationResponse
-.. autoclass:: PollRequest
-.. autoclass:: PollResponse
-.. autoclass:: StatusMessage
-.. autoclass:: InboxMessage
-.. autoclass:: ManageCollectionSubscriptionRequest
-.. autoclass:: ManageCollectionSubscriptionResponse
-.. autoclass:: PollFulfillmentRequest
-
-
-Message Nested Classes
-*********************
-
 .. autoclass:: libtaxii.messages_11::DiscoveryResponse.ServiceInstance
+
+**Example:**
+
+.. code-block:: python
+
+    discovery_request = tm11.DiscoveryResponse(
+            message_id=tm11.generate_message_id(),
+            in_response_to=discovery_request.message_id)
+
+    service_instance= tm11.DiscoveryResponse.ServiceInstance(
+            service_type=tm11.SVC_POLL,
+            services_version=t.VID_TAXII_SERVICES_11,
+            protocol_binding=t.VID_TAXII_HTTP_10,
+            service_address='http://example.com/poll/',
+            message_bindings=[t.VID_TAXII_XML_11],
+            available=True,
+            message='This is a message.',
+            supported_query=[tdq1])
+
+    discovery_response.service_instances.append(service_instance)
+
+Alternatively, you could define the service instance(s) first and use the
+following:
+
+.. code-block:: python
+
+    service_instance_list = [service_instance]
+    discovery_response = tm11.DiscoveryResponse(
+            message_id=tm11.generate_message_id(),
+            in_response_to=discovery_request.message_id,
+            service_instances=service_instance_list)
+
+
+Collection Information Request
+------------------------------
+
+.. autoclass:: CollectionInformationRequest
+
+**Example:**
+
+.. code-block:: python
+
+    ext_headers = {'name1': 'val1', 'name2': 'val2'}
+    collection_information_request = tm11.CollectionInformationRequest(
+            message_id='CIReq01',
+            extended_headers=ext_headers)
+
+
+Collection Information Response
+-------------------------------
+
+.. autoclass:: CollectionInformationResponse
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.PushMethod
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.PollingServiceInstance
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.SubscriptionMethod
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.ReceivingInboxService
+
+
+Poll Request
+------------
+
+.. autoclass:: PollRequest
 .. autoclass:: libtaxii.messages_11::PollRequest.PollParameters
+
+
+Poll Response
+-------------
+
+.. autoclass:: PollResponse
+
+
+Status Message
+--------------
+
+.. autoclass:: StatusMessage
+
+
+Inbox Message
+-------------
+
+.. autoclass:: InboxMessage
 .. autoclass:: libtaxii.messages_11::InboxMessage.SubscriptionInformation
+
+
+Manage Collection Subscription Request
+--------------------------------------
+
+.. autoclass:: ManageCollectionSubscriptionRequest
+
+
+Manage Collection Subscription Response
+---------------------------------------
+
+.. autoclass:: ManageCollectionSubscriptionResponse
 .. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.SubscriptionInstance
 .. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.PollInstance
 
 
-Other Classes
-*************
+Poll Fulfillment Request
+------------------------
 
+.. autoclass:: PollFulfillmentRequest
+
+
+Other Classes
+-------------
+
+.. autoclass:: TAXIIMessage
 .. autoclass:: BaseNonMessage
 
 .. autoclass:: ContentBlock

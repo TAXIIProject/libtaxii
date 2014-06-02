@@ -1225,8 +1225,10 @@ class PushParameters(BaseNonMessage):
         def from_dict(cls, d):
             return cls(**d)
 
+
 class DeliveryParameters(PushParameters):
     name = 'Delivery_Parameters'
+
 
 class TAXIIMessage(BaseNonMessage):
     """Encapsulate properties common to all TAXII Messages (such as headers).
@@ -1240,17 +1242,16 @@ class TAXIIMessage(BaseNonMessage):
     def __init__(self, message_id, in_response_to=None, extended_headers=None):
         """Create a new TAXIIMessage
 
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
+        Args:
+            message_id (str): A value identifying this message.
+            in_response_to (str): Contains the Message ID of the message to
+                which this is a response.
+            extended_headers (dict): A dictionary of name/value pairs for
+                use as Extended Headers
         """
         self.message_id = message_id
         self.in_response_to = in_response_to
         self.extended_headers = extended_headers or {}
-
 
     @property
     def message_id(self):
@@ -1278,7 +1279,6 @@ class TAXIIMessage(BaseNonMessage):
     def extended_headers(self, value):
         do_check(value.keys(), 'extended_headers.keys()', regex_tuple=uri_regex)
         self._extended_headers = value
-
 
     def to_etree(self):
         """Creates the base etree for the TAXII Message.
@@ -1381,6 +1381,7 @@ class TAXIIMessage(BaseNonMessage):
     def from_json(cls, json_string):
         return cls.from_dict(json.loads(json_string))
 
+
 class TAXIIRequestMessage(TAXIIMessage):
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -1388,24 +1389,39 @@ class TAXIIRequestMessage(TAXIIMessage):
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
+
 class DiscoveryRequest(TAXIIRequestMessage):
+    """
+    A TAXII Discovery Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+    """
+
     message_type = MSG_DISCOVERY_REQUEST
 
+
 class DiscoveryResponse(TAXIIMessage):
+    """
+    A TAXII Discovery Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        service_instances (list of `ServiceInstance`): a list of
+            service instances that this response contains. **Optional**
+    """
+
     message_type = MSG_DISCOVERY_RESPONSE
 
     def __init__(self, message_id, in_response_to, extended_headers=None, service_instances=None):
-        """Create a DiscoveryResponse
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - the Message ID of the message to which this
-          is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - service_instances (list of ServiceInstance objects) - a list of
-          service instances that this response contains
-        """
         super(DiscoveryResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.service_instances = service_instances or []
 
@@ -1458,39 +1474,40 @@ class DiscoveryResponse(TAXIIMessage):
         return msg
 
     class ServiceInstance(BaseNonMessage):
+        """
+        The Service Instance component of a TAXII Discovery Response Message.
 
-        def __init__(self, 
-                     service_type, 
-                     services_version, 
-                     protocol_binding, 
-                     service_address, 
-                     message_bindings, 
-                     inbox_service_accepted_content=None, 
-                     available=None, 
-                     message=None, 
-                     supported_query=None):
-            """Create a new ServiceInstance.
+        Args:
+            service_type (string): identifies the Service Type of this
+                Service Instance. **Required**
+            services_version (string): identifies the TAXII Services
+                Specification to which this Service conforms. **Required**
+            protocol_binding (string): identifies the protocol binding
+                supported by this Service. **Required**
+            service_address (string): identifies the network address of the
+                TAXII Daemon that hosts this Service. **Required**
+            message_bindings (list of strings): identifies the message
+                bindings supported by this Service instance. **Required**
+            inbox_service_accepted_content (list of strings): identifies
+                content bindings that this Inbox Service is willing to accept.
+                **Optional**
+            available (boolean): indicates whether the identity of the
+                requester (authenticated or otherwise) is allowed to access this
+                TAXII Service. **Optional**
+            message (string): contains a message regarding this Service
+                instance. **Optional**
+            supported_query (SupportedQuery): contains a structure indicating a
+                supported query. **Optional**
 
-            Arguments:
-            - service_type (string) - identifies the Service Type of this
-              Service Instance.
-            - services_version (string) - identifies the TAXII Services
-              Specification to which this Service conforms.
-            - protocol_binding (string) - identifies the protocol binding
-              supported by this Service
-            - service_address (string) - identifies the network address of the
-              TAXII Daemon that hosts this Service.
-            - message_bindings (list of strings) - identifies the message
-              bindings supported by this Service instance.
-            - inbox_service_accepted_content (list of strings) - identifies
-              content bindings that this Inbox Service is willing to accept
-            - available (boolean) - indicates whether the identity of the
-              requester (authenticated or otherwise) is allowed to access this
-              TAXII  Service.
-            - message (string) - contains a message regarding this Service
-              instance.
-            - supported_query (SupportedQuery) - contains a structure indicating a supported query
-            """
+        The ``message_bindings`` list must contain at least one value. The
+        ``supported_query`` parameter is optional when
+        ``service_type`` is :py:data:`SVC_POLL`.
+        """
+
+        def __init__(self, service_type, services_version, protocol_binding,
+                     service_address, message_bindings,
+                     inbox_service_accepted_content=None, available=None,
+                     message=None, supported_query=None):
             self.service_type = service_type
             self.services_version = services_version
             self.protocol_binding = protocol_binding
@@ -1500,7 +1517,6 @@ class DiscoveryResponse(TAXIIMessage):
             self.available = available
             self.message = message
             self.supported_query = supported_query or []
-
 
         @property
         def sort_key(self):
@@ -1688,7 +1704,19 @@ class DiscoveryResponse(TAXIIMessage):
 
             return DiscoveryResponse.ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
 
+
 class CollectionInformationRequest(TAXIIRequestMessage):
+    """
+    A TAXII Collection Information Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+    """
+
     message_type = MSG_COLLECTION_INFORMATION_REQUEST
 
 class CollectionInformationResponse(TAXIIMessage):
