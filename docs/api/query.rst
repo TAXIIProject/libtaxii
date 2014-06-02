@@ -2,34 +2,6 @@
 ==========================================
 .. automodule:: libtaxii.taxii_default_query
 
-Constants
----------
-
-Capability Module IDs
-*********************
-
-.. autodata:: CM_CORE
-.. autodata:: CM_REGEX
-.. autodata:: CM_TIMESTAMP
-
-
-Operators
-*********
-
-.. autodata:: OP_OR
-.. autodata:: OP_AND
-
-
-Format IDs
-**********
-
-.. autodata:: FID_TAXII_DEFAULT_QUERY_10
-
-Namespace Map
-*************
-
-.. autodata:: ns_map
-
 Classes
 -------
 
@@ -105,3 +77,31 @@ Default Query Info
 	tdqi1 = tdq.DefaultQueryInfo(
 	            targeting_expression_infos = [tei_01, tei_02], #Required, 1-n. Indicates what targeting expressions are supported
 	            capability_modules = [tdq.CM_CORE])#Required, 1-n. Indicates which capability modules can be used.
+
+Constants
+---------
+
+Capability Module IDs
+*********************
+
+.. autodata:: CM_CORE
+.. autodata:: CM_REGEX
+.. autodata:: CM_TIMESTAMP
+
+
+Operators
+*********
+
+.. autodata:: OP_OR
+.. autodata:: OP_AND
+
+
+Format IDs
+**********
+
+.. autodata:: FID_TAXII_DEFAULT_QUERY_10
+
+Namespace Map
+*************
+
+.. autodata:: ns_map
