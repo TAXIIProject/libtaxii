@@ -90,12 +90,77 @@ Collection Information Response
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.SubscriptionMethod
 .. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.ReceivingInboxService
 
+**Example:**
+
+.. code-block:: python
+
+    push_method1 = tm11.CollectionInformationResponse.CollectionInformation.PushMethod(
+            push_protocol=t.VID_TAXII_HTTP_10,
+            push_message_bindings=[t.VID_TAXII_XML_11])
+
+    poll_service1 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_address='https://example.com/TheGreatestPollService',
+            poll_message_bindings=[t.VID_TAXII_XML_11])
+
+    #Instantiate Subscription Methods
+    subs_method1 = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
+            subscription_protocol=t.VID_TAXII_HTTPS_10,
+            subscription_address='https://example.com/TheSubscriptionService/',
+            subscription_message_bindings=[t.VID_TAXII_XML_11])
+
+    inbox_service1 = tm11.CollectionInformationResponse.CollectionInformation.ReceivingInboxService(
+            inbox_protocol=t.VID_TAXII_HTTPS_10,
+            inbox_address='https://example.com/inbox/',
+            inbox_message_bindings=[t.VID_TAXII_XML_11],
+            supported_contents=None)
+
+    collection1 = tm11.CollectionInformationResponse.CollectionInformation(
+            collection_name='collection1',
+            collection_description='This is a collection',
+            supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101)],
+            available=False,
+            push_methods=[push_method1],
+            polling_service_instances=[poll_service1, poll_service2],
+            subscription_methods=[subs_method1, subs_method2],
+            collection_volume=4,
+            collection_type=tm11.CT_DATA_FEED,
+            receiving_inbox_services=[inbox_service1, inbox_service2])
+
+    collection_response1 = tm11.CollectionInformationResponse(
+            message_id='CIR01',
+            in_response_to='0',
+            collection_informations=[collection1])
+
 
 Poll Request
 ------------
 
 .. autoclass:: PollRequest
 .. autoclass:: libtaxii.messages_11::PollRequest.PollParameters
+
+**Example:**
+
+.. code-block:: python
+
+    delivery_parameters1 = tm11.DeliveryParameters(
+            inbox_protocol = t.VID_TAXII_HTTPS_10, #Required
+            inbox_address = 'https://example.com/inboxAddress/',#Required
+            delivery_message_binding = t.VID_TAXII_XML_11)#Required
+
+    poll_params1 = tm11.PollRequest.PollParameters(
+            allow_asynch = False,#Optional, defaults to False
+            response_type = tm11.RT_COUNT_ONLY,#Optional, defaults to RT_FULL
+            content_bindings = [tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],#Optional, defaults to None, which means "all bindings are accepted in response"
+            query = query1,#Optional - defaults to None
+            delivery_parameters = delivery_parameters1)#Optional - defaults to None
+
+    poll_req3 = tm11.PollRequest(
+            message_id = 'PollReq03',#Required
+            collection_name = 'collection100',#Required
+            exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+            inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+            poll_parameters = poll_params1)#Optional - one of this or subscription_id MUST be prese
 
 
 Poll Response
@@ -143,12 +208,12 @@ Other Classes
 .. autoclass:: TAXIIMessage
 .. autoclass:: BaseNonMessage
 
+.. autoclass:: ContentBinding
 .. autoclass:: ContentBlock
 .. autoclass:: DeliveryParameters
-.. autoclass:: ContentBinding
+.. autoclass:: PushParameters
 .. autoclass:: RecordCount
 .. autoclass:: SubscriptionParameters
-.. autoclass:: PushParameters
 
 
 Functions

@@ -1130,103 +1130,118 @@ class ContentBlock(BaseNonMessage):
 
 
 class PushParameters(BaseNonMessage):
-        name = 'Push_Parameters'
-        def __init__(self, inbox_protocol, inbox_address, delivery_message_binding):
-            """Set up Delivery Parameters.
+    """Set up Push Parameters.
 
-            Arguments
-            - inbox_protocol (string) - identifies the protocol to be used when
-                pushing TAXII Data Collection content to a Consumer's TAXII Inbox
-                Service implementation.
-            - inbox_address (string) - identifies the address of the TAXII
-                Daemon hosting the Inbox Service to which the Consumer requests
-                content  for this TAXII Data Collection to be delivered.
-            - delivery_message_binding (string) - identifies the message
-                binding to be used to send pushed content for this subscription.
-            """
-            self.inbox_protocol = inbox_protocol
-            self.inbox_address = inbox_address
-            self.delivery_message_binding = delivery_message_binding
+    Args:
+        inbox_protocol (str): identifies the protocol to be used when pushing
+            TAXII Data Collection content to a Consumer's TAXII Inbox Service
+            implementation. **Required**
+        inbox_address (str): identifies the address of the TAXII Daemon hosting
+            the Inbox Service to which the Consumer requests content for this
+            TAXII Data Collection to be delivered. **Required**
+        delivery_message_binding (str): identifies the message binding to be
+             used to send pushed content for this subscription. **Required**
+    """
 
-        @property
-        def inbox_protocol(self):
-            return self._inbox_protocol
+    name = 'Push_Parameters'
+    def __init__(self, inbox_protocol, inbox_address, delivery_message_binding):
+        self.inbox_protocol = inbox_protocol
+        self.inbox_address = inbox_address
+        self.delivery_message_binding = delivery_message_binding
 
-        @inbox_protocol.setter
-        def inbox_protocol(self, value):
-            do_check(value, 'inbox_protocol', regex_tuple=uri_regex)
-            self._inbox_protocol = value
+    @property
+    def inbox_protocol(self):
+        return self._inbox_protocol
 
-        @property
-        def inbox_address(self):
-            return self._inbox_address
+    @inbox_protocol.setter
+    def inbox_protocol(self, value):
+        do_check(value, 'inbox_protocol', regex_tuple=uri_regex)
+        self._inbox_protocol = value
 
-        @inbox_address.setter
-        def inbox_address(self, value):
-            self._inbox_address = value
+    @property
+    def inbox_address(self):
+        return self._inbox_address
 
-        @property
-        def delivery_message_binding(self):
-            return self._delivery_message_binding
+    @inbox_address.setter
+    def inbox_address(self, value):
+        self._inbox_address = value
 
-        @delivery_message_binding.setter
-        def delivery_message_binding(self, value):
-            do_check(value, 'delivery_message_binding', regex_tuple=uri_regex)
-            self._delivery_message_binding = value
+    @property
+    def delivery_message_binding(self):
+        return self._delivery_message_binding
 
-        def to_etree(self):
-            xml = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.name))
+    @delivery_message_binding.setter
+    def delivery_message_binding(self, value):
+        do_check(value, 'delivery_message_binding', regex_tuple=uri_regex)
+        self._delivery_message_binding = value
 
-            pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
-            pb.text = self.inbox_protocol
+    def to_etree(self):
+        xml = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.name))
 
-            a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
-            a.text = self.inbox_address
+        pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
+        pb.text = self.inbox_protocol
 
-            mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
-            mb.text = self.delivery_message_binding
+        a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
+        a.text = self.inbox_address
 
-            return xml
+        mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
+        mb.text = self.delivery_message_binding
 
-        def to_dict(self):
-            d = {}
+        return xml
 
-            if self.inbox_protocol is not None:
-                d['inbox_protocol'] = self.inbox_protocol
+    def to_dict(self):
+        d = {}
 
-            if self.inbox_address is not None:
-                d['inbox_address'] = self.inbox_address
+        if self.inbox_protocol is not None:
+            d['inbox_protocol'] = self.inbox_protocol
 
-            if self.delivery_message_binding is not None:
-                d['delivery_message_binding'] = self.delivery_message_binding
+        if self.inbox_address is not None:
+            d['inbox_address'] = self.inbox_address
 
-            return d
+        if self.delivery_message_binding is not None:
+            d['delivery_message_binding'] = self.delivery_message_binding
 
-        @classmethod
-        def from_etree(cls, etree_xml):
-            inbox_protocol = None
-            inbox_protocol_set = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)
-            if len(inbox_protocol_set) > 0:
-                inbox_protocol = inbox_protocol_set[0].text
+        return d
 
-            inbox_address = None
-            inbox_address_set = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)
-            if len(inbox_address_set) > 0:
-                inbox_address = inbox_address_set[0].text
+    @classmethod
+    def from_etree(cls, etree_xml):
+        inbox_protocol = None
+        inbox_protocol_set = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)
+        if len(inbox_protocol_set) > 0:
+            inbox_protocol = inbox_protocol_set[0].text
 
-            delivery_message_binding = None
-            delivery_message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
-            if len(delivery_message_binding_set) > 0:
-                delivery_message_binding = delivery_message_binding_set[0].text
+        inbox_address = None
+        inbox_address_set = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)
+        if len(inbox_address_set) > 0:
+            inbox_address = inbox_address_set[0].text
 
-            return cls(inbox_protocol, inbox_address, delivery_message_binding)
+        delivery_message_binding = None
+        delivery_message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
+        if len(delivery_message_binding_set) > 0:
+            delivery_message_binding = delivery_message_binding_set[0].text
 
-        @classmethod
-        def from_dict(cls, d):
-            return cls(**d)
+        return cls(inbox_protocol, inbox_address, delivery_message_binding)
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d)
 
 
+# TODO: Check docstring
 class DeliveryParameters(PushParameters):
+    """Set up Delivery Parameters.
+
+    Args:
+        inbox_protocol (str): identifies the protocol to be used when pushing
+            TAXII Data Collection content to a Consumer's TAXII Inbox Service
+            implementation. **Required**
+        inbox_address (str): identifies the address of the TAXII Daemon hosting
+            the Inbox Service to which the Consumer requests content for this
+            TAXII Data Collection to be delivered. **Required**
+        delivery_message_binding (str): identifies the message binding to be
+             used to send pushed content for this subscription. **Required**
+    """
+
     name = 'Delivery_Parameters'
 
 
@@ -1719,21 +1734,24 @@ class CollectionInformationRequest(TAXIIRequestMessage):
 
     message_type = MSG_COLLECTION_INFORMATION_REQUEST
 
+
 class CollectionInformationResponse(TAXIIMessage):
+    """
+    A TAXII Collection Information Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        collection_informations (list of CollectionInformation objects): A list
+            of CollectionInformation objects to be contained in this response.
+            **Optional**
+    """
     message_type = MSG_COLLECTION_INFORMATION_RESPONSE
 
     def __init__(self, message_id, in_response_to, extended_headers=None, collection_informations=None):
-        """Create a new CollectionInformationResponse.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - the Message ID of the message to which this
-          is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - collection_informations (list of CollectionInformation objects) - A list of
-          CollectionInformation objects to be contained in this response
-        """
         super(CollectionInformationResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.collection_informations = collection_informations or []
 
@@ -1782,42 +1800,51 @@ class CollectionInformationResponse(TAXIIMessage):
         return msg
 
     class CollectionInformation(BaseNonMessage):
+        """
+        The Collection Information component of a TAXII Collection Information 
+        Response Message.
 
-        def __init__(self, 
-                     collection_name, 
-                     collection_description, 
-                     supported_contents=None,
-                     available=None, 
-                     push_methods=None, 
-                     polling_service_instances=None, 
-                     subscription_methods=None,
-                     collection_volume=None,
-                     collection_type=CT_DATA_FEED,
-                     receiving_inbox_services=None):
-            """Create a new CollectionInformation
+        Arguments:
+            collection_name (str): the name by which this TAXII Data Collection is
+                identified. **Required**
+            collection_description (str): a prose description of this TAXII
+                Data Collection. **Required**
+            supported_contents (list of str): Content Binding IDs
+                indicating which types of content are currently expressed in this
+                TAXII Data Collection. **Optional**
+            available (boolean): whether the identity of the requester
+                (authenticated or otherwise) is allowed to access this TAXII
+                Service. **Optional** Default: ``None``, indicating "unknown"
+            push_methods (list of PushMethod objects): the protocols that
+                can be used to push content via a subscription. **Optional**
+            polling_service_instances (list of PollingServiceInstance objects):
+                the bindings and address a Consumer can use to interact with a
+                Poll Service instance that supports this TAXII Data Collection.
+                **Optional**
+            subscription_methods (list of SubscriptionMethod objects): the
+                protocol and address of the TAXII Daemon hosting the Collection
+                Management Service that can process subscriptions for this TAXII
+                Data Collection. **Optional**
+            collection_volume (int): the typical number of messages per day.
+                **Optional**
+            collection_type (str): the type ofo this collection. **Optional**,
+                defaults to :py:data:`CT_DATA_FEED`.
+            receiving_inbox_services (list of ReceivingInboxService objects):
+                TODO: FILL THIS IN. **Optional**
 
-            Arguments:
-            - collection_name (string) - the name by which this TAXII Data Collection is
-              identified.
-            - collection_description (string) - a prose description of this TAXII
-              Data Collection.
-            - supported_contents (list of strings) - Content Binding IDs
-              indicating which types of content are currently expressed in this
-              TAXII Data Collection.
-            - available (boolean) - whether the identity of the requester
-              (authenticated or otherwise) is allowed to access this TAXII
-              Service.
-            - push_methods (list of PushMethod objects) - the protocols that
-              can be used to push content via a subscription.
-            - polling_service_instances (list of PollingServiceInstance
-              objects) - the bindings and address a Consumer can use to
-              interact with a Poll Service instance that supports this TAXII
-              Data Collection.
-            - subscription_methods (list of SubscriptionMethod objects) - the
-              protocol and address of the TAXII Daemon hosting the Collection
-              Management Service that can process subscriptions for this TAXII
-              Data Collection.
-            """
+        If ``supported_contents`` is omitted, then the collection supports all
+        content bindings.  The absense of ``push_methods`` indicates no push
+        methods.  The absense of ``polling_service_instances`` indicates no
+        polling services.  The absense of ``subscription_methods`` indicates no
+        subscription services.  The absense of ``receiving_inbox_services``
+        indicates no receiving inbox services.
+        """
+
+        def __init__(self, collection_name, collection_description,
+                    supported_contents=None, available=None, push_methods=None,
+                    polling_service_instances=None, subscription_methods=None,
+                    collection_volume=None, collection_type=CT_DATA_FEED,
+                    receiving_inbox_services=None):
             self.collection_name = collection_name
             self.available = available
             self.collection_description = collection_description
@@ -2054,17 +2081,20 @@ class CollectionInformationResponse(TAXIIMessage):
             return CollectionInformationResponse.CollectionInformation(**kwargs)
 
         class PushMethod(BaseNonMessage):
-            def __init__(self, push_protocol, push_message_bindings):
-                """Create a new PushMethod.
+            """
+            The Push Method component of a TAXII Collection Information
+            component.
 
-                Arguments:
-                - push_protocol (string) - a protocol binding that can be used
-                  to push content to an Inbox Service instance.
-                - push_message_bindings (list of strings) - the message
-                  bindings that can be used to push content to an Inbox Service
-                  instance using the protocol identified in the Push Protocol
-                  field.
-                """
+            Args:
+                push_protocol (str): a protocol binding that can be used
+                    to push content to an Inbox Service instance. **Required**
+                push_message_bindings (list of str): the message bindings that
+                    can be used to push content to an Inbox Service instance
+                    using the protocol identified in the Push Protocol field.
+                    **Required**
+            """
+
+            def __init__(self, push_protocol, push_message_bindings):
                 self.push_protocol = push_protocol
                 self.push_message_bindings = push_message_bindings
 
@@ -2122,19 +2152,21 @@ class CollectionInformationResponse(TAXIIMessage):
                 return CollectionInformationResponse.CollectionInformation.PushMethod(**d)
 
         class PollingServiceInstance(BaseNonMessage):
+            """
+            The Polling Service Instance component of a TAXII Collection
+            Information component.
+
+            Args:
+                poll_protocol (str): the protocol binding supported by
+                    this Poll Service instance. **Required**
+                poll_address (str): the address of the TAXII Daemon
+                    hosting this Poll Service instance. **Required**
+                poll_message_bindings (list of str): the message bindings
+                    supported by this Poll Service instance. **Required**
+            """
             NAME = 'Polling_Service'
 
             def __init__(self, poll_protocol, poll_address, poll_message_bindings):
-                """Create a new PollingServiceInstance.
-
-                Arguments:
-                - poll_protocol (string) - the protocol binding supported by
-                  this Poll Service instance.
-                - poll_address (string) - the address of the TAXII Daemon
-                  hosting this Poll Service instance.
-                - poll_message_bindings (list of strings) - the message
-                  bindings supported by this Poll Service instance
-                """
                 self.poll_protocol = poll_protocol
                 self.poll_address = poll_address
                 self.poll_message_bindings = poll_message_bindings
@@ -2196,19 +2228,24 @@ class CollectionInformationResponse(TAXIIMessage):
                 return cls(**d)
 
         class SubscriptionMethod(BaseNonMessage):
+            """
+            The Subscription Method component of a TAXII Collection Information
+            component.
+
+            Args:
+                subscription_protocol (str): the protocol binding supported by
+                    this Collection Management Service instance. **Required**
+                subscription_address (str): the address of the TAXII Daemon
+                    hosting this Collection Management Service instance.
+                    **Required**.
+                subscription_message_bindings (list of str): the message
+                    bindings supported by this Collection Management Service
+                    Instance. **Required**
+            """
             NAME = 'Subscription_Service'
 
-            def __init__(self, subscription_protocol, subscription_address, subscription_message_bindings):
-                """Create a new SubscriptionMethod.
-
-                Arguments:
-                - subscription_protocol (string) - the protocol binding
-                  supported by this Collection Management Service instance.
-                - subscription_address (string) - the address of the TAXII
-                  Daemon hosting this Collection Management Service instance.
-                - subscription_message_bindings (list of strings) - the message
-                  bindings supported by this Collection Management Service Instance
-                """
+            def __init__(self, subscription_protocol, subscription_address,
+                         subscription_message_bindings):
                 self.subscription_protocol = subscription_protocol
                 self.subscription_address = subscription_address
                 self.subscription_message_bindings = subscription_message_bindings
@@ -2270,14 +2307,25 @@ class CollectionInformationResponse(TAXIIMessage):
                 return cls(**d)
 
         class ReceivingInboxService(BaseNonMessage):
-            def __init__(self, inbox_protocol, inbox_address, inbox_message_bindings, supported_contents=None):
-                """
-                Creates a ReceivingInboxService message
-                inbox_protocol (string) - Indicates the protocol this Inbox Service uses
-                inbox address (string) - Indicates the address of this Inbox Service
-                inbox_message_bindings (list of strings) - Each string indicates a message binding that this inbox service uses
-                supported_contents (list of ContentBinding objects) - Each content binding indicates a Content Binding this inbox service can receive
-                """
+            """
+            The Receiving Inbox Service component of a TAXII Collection
+            Information component.
+
+            Args:
+                inbox_protocol (str): Indicates the protocol this Inbox Service
+                    uses. **Required**
+                inbox address (str): Indicates the address of this Inbox Service.
+                    **Required**
+                inbox_message_bindings (list of str): Each string indicates a
+                    message binding that this inbox service uses. **Required**
+                supported_contents (list of ContentBinding objects): Each object
+                    indicates a Content Binding this inbox service can receive.
+                    **Optional**.  Setting to ``None`` means that all Content
+                    Bindings are supported.
+            """
+
+            def __init__(self, inbox_protocol, inbox_address,
+                         inbox_message_bindings, supported_contents=None):
                 self.inbox_protocol = inbox_protocol
                 self.inbox_address = inbox_address
                 self.inbox_message_bindings = inbox_message_bindings
