@@ -40,8 +40,12 @@ OP_AND = 'AND'
 #Tuple of all operators
 OP_TYPES = (OP_OR, OP_AND)
 
+
+#: Status Type indicating an unsupported capability module
 ST_UNSUPPORTED_CAPABILITY_MODULE = 'UNSUPPORTED_CAPABILITY_MODULE'
+#: Status Type indicating an unsupported targeting expression
 ST_UNSUPPORTED_TARGETING_EXPRESSION = 'UNSUPPORTED_TARGETING_EXPRESSION'
+#: Status Type indicating an unsupported targeting expression id
 ST_UNSUPPORTED_TARGETING_EXPRESSION_ID = 'UNSUPPORTED_TARGETING_EXPRESSION_ID'
 
 #: TAXII namespace map for default queries
