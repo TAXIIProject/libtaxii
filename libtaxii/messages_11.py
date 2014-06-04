@@ -2472,7 +2472,7 @@ class PollRequest(TAXIIRequestMessage):
     """
     message_type = MSG_POLL_REQUEST
 
-    def __init__(self, message_id, extended_headers=None,
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
                  collection_name=None, exclusive_begin_timestamp_label=None,
                  inclusive_end_timestamp_label=None, subscription_id=None,
                  poll_parameters=None):
@@ -3176,8 +3176,8 @@ class InboxMessage(TAXIIMessage):
     """
     message_type = MSG_INBOX_MESSAGE
 
-    def __init__(self, message_id, extended_headers=None, message=None,
-                 result_id=None, destination_collection_names=None,
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+                 message=None, result_id=None, destination_collection_names=None,
                  subscription_information=None, record_count=None,
                  content_blocks=None):
 
