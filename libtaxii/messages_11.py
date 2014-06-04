@@ -608,6 +608,7 @@ class BaseNonMessage(object):
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
 
+
 class SupportedQuery(BaseNonMessage):
     """
     This class contains an instance of a supported query. It
@@ -652,6 +653,7 @@ class SupportedQuery(BaseNonMessage):
     def from_dict(d):
         return SupportedQuery(**d)
 
+
 class Query(BaseNonMessage):
     """
     This class contains an instance of a query. It
@@ -691,6 +693,7 @@ class Query(BaseNonMessage):
     @classmethod
     def from_dict(cls, d, kwargs):
         return cls(d, **kwargs)
+
 
 #A value can be one of:
 # - a dictionary, where each key is a content_binding_id and each value is a list of subtypes
@@ -773,6 +776,7 @@ class ContentBinding(BaseNonMessage):
     def from_dict(self, d):
         return ContentBinding(**d)
 
+
 class RecordCount(BaseNonMessage):
         def __init__(self, record_count, partial_count=False):
             """
@@ -827,6 +831,7 @@ class RecordCount(BaseNonMessage):
         @staticmethod
         def from_dict(d):
             return RecordCount(**d)
+
 
 class _GenericParameters(BaseNonMessage):
     name = 'Generic_Parameters'
@@ -934,9 +939,9 @@ class _GenericParameters(BaseNonMessage):
 
         return cls(response_type, content_bindings, query, **kwargs)
 
+
 class SubscriptionParameters(_GenericParameters):
     name = 'Subscription_Parameters'
-
 
 
 class ContentBlock(BaseNonMessage):
@@ -1411,8 +1416,6 @@ class DiscoveryRequest(TAXIIRequestMessage):
 
     Args:
         message_id (str): A value identifying this message. **Required**
-        in_response_to (str): Contains the Message ID of the message to
-            which this is a response. **Optional**
         extended_headers (dict): A dictionary of name/value pairs for
             use as Extended Headers. **Optional**
     """
@@ -1726,8 +1729,6 @@ class CollectionInformationRequest(TAXIIRequestMessage):
 
     Args:
         message_id (str): A value identifying this message. **Required**
-        in_response_to (str): Contains the Message ID of the message to
-            which this is a response. **Optional**
         extended_headers (dict): A dictionary of name/value pairs for
             use as Extended Headers. **Optional**
     """
@@ -2430,37 +2431,38 @@ class CollectionInformationResponse(TAXIIMessage):
 
                 return CollectionInformationResponse.CollectionInformation.ReceivingInboxService(**kwargs)
 
+
 class PollRequest(TAXIIRequestMessage):
+    """
+    A TAXII Poll Request message.
+
+    Arguments:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        collection_name (str): the name of the TAXII Data Collection that is being
+            polled. **Required**
+        exclusive_begin_timestamp_label (datetime): a Timestamp Label
+            indicating the beginning of the range of TAXII Data Feed content the
+            requester wishes to receive. **Optional for a Data Feed, Prohibited
+            for a Data Set**
+        inclusive_end_timestamp_label (datetime): a Timestamp Label
+            indicating the end of the range of TAXII Data Feed content the
+            requester wishes to receive. **Optional for a Data Feed, Probited
+            for a Data Set**
+        subscription_id (str): the existing subscription the Consumer
+            wishes to poll. **Optional**
+        poll_parameters (list of PollParameters objects): the poll parameters
+            for this request. **Optional**
+
+    Exactly one of ``subscription_id`` and ``poll_parameters`` is **Required**.
+    """
     message_type = MSG_POLL_REQUEST
 
-    def __init__(self,
-                 message_id,
-                 in_response_to=None,
-                 extended_headers=None,
-                 collection_name=None,
-                 exclusive_begin_timestamp_label=None,
-                 inclusive_end_timestamp_label=None,
-                 subscription_id=None,
-                 poll_parameters=None
-                 ):
-        """Create a new PollRequest.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - collection_name (string) - the name of the TAXII Data Collection that is being
-          polled.
-        - exclusive_begin_timestamp_label (datetime) - a Timestamp Label
-          indicating the beginning of the range of TAXII Data Feed content the
-          requester wishes to receive.
-        - inclusive_end_timestamp_label (datetime) - a Timestamp Label
-          indicating the end of the range of TAXII Data Feed content the
-          requester wishes to receive.
-        - subscription_id (string) - the existing subscription the Consumer
-          wishes to poll.
-        - poll_parameters (list of poll_parameters objects) - the poll parameters for this request.
-        """
+    def __init__(self, message_id, extended_headers=None,
+                 collection_name=None, exclusive_begin_timestamp_label=None,
+                 inclusive_end_timestamp_label=None, subscription_id=None,
+                 poll_parameters=None):
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.collection_name = collection_name
         self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
@@ -2611,16 +2613,28 @@ class PollRequest(TAXIIRequestMessage):
         return msg
 
     class PollParameters(_GenericParameters):
+        """
+        The Poll Parameters component of a TAXII Poll Request message.
+
+        Args:
+            response_type (str): The requested response type. Must be either
+                :py:data:`RT_FULL` or :py:data:`RT_COUNT_ONLY`. **Optional**,
+                defaults to :py:data:`RT_FULL`
+            content_bindings (list of ContentBinding objects): A list of Content
+                Bindings acceptable in response. **Optional**
+            query (Query): The query for this poll parameters. **Optional**
+            allow_asynch (bool): Indicates whether the client supports
+                asynchronous polling. **Optional**, defaults to ``False``
+            delivery_parameters (DeliveryParameters): The requested delivery
+                parameters for this object. **Optional**
+
+        If ``content_bindings`` in not provided, this indicates that all
+        bindings are accepted as a response.
+        """
         name = 'Poll_Parameters'
 
-        def __init__(self, response_type = RT_FULL, content_bindings = None, query = None, allow_asynch=False, delivery_parameters = None):
-            """
-            response_type (RT_FULL or RT_COUNT_ONLY) - The requested response type
-            content_bindings (a list of ContentBinding objects) - A list of ContentBindings acceptable in response
-            query (Query object) - The query for this poll parameters
-            allow_asynch (bool) - Indicates whether the client supports asynchronous polling
-            delivery_parameters (a DeliveryParameters object) - The requested delivery parameters for this object
-            """
+        def __init__(self, response_type=RT_FULL, content_bindings=None,
+                     query=None, allow_asynch=False, delivery_parameters=None):
             super(PollRequest.PollParameters, self).__init__(response_type, content_bindings, query)
             self.allow_asynch = allow_asynch
             self.delivery_parameters = delivery_parameters
@@ -2691,6 +2705,7 @@ class PollRequest(TAXIIRequestMessage):
                 poll_parameters.delivery_parameters = DeliveryParameters.from_dict(delivery_parameters)
 
             return poll_parameters
+
 
 class PollResponse(TAXIIMessage):
     message_type = MSG_POLL_RESPONSE
@@ -2955,6 +2970,7 @@ class PollResponse(TAXIIMessage):
             kwargs['content_blocks'].append(ContentBlock.from_dict(block))
         msg = super(PollResponse, cls).from_dict(d, **kwargs)
         return msg
+
 
 _StatusDetail = collections.namedtuple('_StatusDetail', ['name','required','type','multiple'])
 _DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
@@ -3928,6 +3944,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
         def from_dict(d):
             return ManageCollectionSubscriptionResponse.PollInstance(**d)
 
+
 class PollFulfillmentRequest(TAXIIRequestMessage):
     message_type = MSG_POLL_FULFILLMENT_REQUEST
 
@@ -4007,8 +4024,3 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
         kwargs['result_part_number'] = int(d['result_part_number'])
 
         return super(PollFulfillmentRequest, cls).from_dict(d, **kwargs)
-
-
-
-
-

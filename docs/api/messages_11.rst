@@ -103,7 +103,6 @@ Collection Information Response
             poll_address='https://example.com/TheGreatestPollService',
             poll_message_bindings=[t.VID_TAXII_XML_11])
 
-    #Instantiate Subscription Methods
     subs_method1 = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
             subscription_protocol=t.VID_TAXII_HTTPS_10,
             subscription_address='https://example.com/TheSubscriptionService/',
@@ -144,23 +143,23 @@ Poll Request
 .. code-block:: python
 
     delivery_parameters1 = tm11.DeliveryParameters(
-            inbox_protocol = t.VID_TAXII_HTTPS_10, #Required
-            inbox_address = 'https://example.com/inboxAddress/',#Required
-            delivery_message_binding = t.VID_TAXII_XML_11)#Required
+            inbox_protocol=t.VID_TAXII_HTTPS_10,
+            inbox_address='https://example.com/inboxAddress/',
+            delivery_message_binding=t.VID_TAXII_XML_11)
 
     poll_params1 = tm11.PollRequest.PollParameters(
-            allow_asynch = False,#Optional, defaults to False
-            response_type = tm11.RT_COUNT_ONLY,#Optional, defaults to RT_FULL
-            content_bindings = [tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],#Optional, defaults to None, which means "all bindings are accepted in response"
-            query = query1,#Optional - defaults to None
-            delivery_parameters = delivery_parameters1)#Optional - defaults to None
+            allow_asynch=False,
+            response_type=tm11.RT_COUNT_ONLY,
+            content_bindings=[tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],
+            query=query1,
+            delivery_parameters=delivery_parameters1)
 
     poll_req3 = tm11.PollRequest(
-            message_id = 'PollReq03',#Required
-            collection_name = 'collection100',#Required
-            exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-            inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-            poll_parameters = poll_params1)#Optional - one of this or subscription_id MUST be prese
+            message_id='PollReq03',
+            collection_name='collection100',
+            exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
+            poll_parameters=poll_params1)
 
 
 Poll Response
