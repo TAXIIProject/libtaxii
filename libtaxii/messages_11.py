@@ -702,11 +702,14 @@ class Query(BaseNonMessage):
 # - a list of "content_binding_id[>subtype]" structures
 
 class ContentBinding(BaseNonMessage):
-    def __init__(self, binding_id, subtype_ids = None):
-        """
-        - binding_id (string) - The content binding id
-        - subtype_ids (list of strings) - the subtype IDs
-        """
+    """TAXII Content Binding component
+
+    Args:
+        binding_id (str): The content binding ID. **Required**
+        subtype_ids (list of str): the subtype IDs. **Required**
+    """
+
+    def __init__(self, binding_id, subtype_ids=None):
         self.binding_id = binding_id
         self.subtype_ids = subtype_ids or []
 
@@ -778,70 +781,68 @@ class ContentBinding(BaseNonMessage):
 
 
 class RecordCount(BaseNonMessage):
-        def __init__(self, record_count, partial_count=False):
-            """
-            - record_count (int) - The number of records
-            - partial_count (bool) - Whether the number of records is a partial count
-            """
-            self.record_count = record_count
-            self.partial_count = partial_count
+    """
+    Information summarizing the number of records.
 
-        @property
-        def record_count(self):
-            return self._record_count
+    Args:
+        record_count (int): The number of records
+        partial_count (bool): Whether the number of records is a partial count
+    """
+    def __init__(self, record_count, partial_count=False):
+        self.record_count = record_count
+        self.partial_count = partial_count
 
-        @record_count.setter
-        def record_count(self, value):
-            do_check(value, 'record_count', type=int)
-            self._record_count = value
+    @property
+    def record_count(self):
+        return self._record_count
 
-        @property
-        def partial_count(self):
-            return self._partial_count
+    @record_count.setter
+    def record_count(self, value):
+        do_check(value, 'record_count', type=int)
+        self._record_count = value
 
-        @partial_count.setter
-        def partial_count(self, value):
-            do_check(value, 'partial_count', value_tuple=(True, False), can_be_none=True)
-            self._partial_count = value
+    @property
+    def partial_count(self):
+        return self._partial_count
 
-        def to_etree(self):
-            xml = etree.Element('{%s}Record_Count' % ns_map['taxii_11'], nsmap = ns_map)
-            xml.text = str(self.record_count)
+    @partial_count.setter
+    def partial_count(self, value):
+        do_check(value, 'partial_count', value_tuple=(True, False), can_be_none=True)
+        self._partial_count = value
 
-            if self.partial_count is not None:
-                xml.attrib['partial_count'] = str(self.partial_count).lower()
+    def to_etree(self):
+        xml = etree.Element('{%s}Record_Count' % ns_map['taxii_11'], nsmap = ns_map)
+        xml.text = str(self.record_count)
 
-            return xml
+        if self.partial_count is not None:
+            xml.attrib['partial_count'] = str(self.partial_count).lower()
 
-        def to_dict(self):
-            d = {}
-            d['record_count'] = self.record_count
-            if self.partial_count is not None:
-                d['partial_count'] = self.partial_count
+        return xml
 
-            return d
+    def to_dict(self):
+        d = {}
+        d['record_count'] = self.record_count
+        if self.partial_count is not None:
+            d['partial_count'] = self.partial_count
 
-        @staticmethod
-        def from_etree(etree_xml):
-            record_count = int(etree_xml.text)
-            partial_count = etree_xml.attrib.get('partial_count', 'false') == 'true'
+        return d
 
-            return RecordCount(record_count, partial_count)
+    @staticmethod
+    def from_etree(etree_xml):
+        record_count = int(etree_xml.text)
+        partial_count = etree_xml.attrib.get('partial_count', 'false') == 'true'
 
-        @staticmethod
-        def from_dict(d):
-            return RecordCount(**d)
+        return RecordCount(record_count, partial_count)
+
+    @staticmethod
+    def from_dict(d):
+        return RecordCount(**d)
 
 
 class _GenericParameters(BaseNonMessage):
     name = 'Generic_Parameters'
 
     def __init__(self, response_type = RT_FULL, content_bindings = None, query = None):
-        """
-        - response_type (RT_FULL or RT_COUNT_ONLY) - indicates the requested response type
-        - content_bindings (a list of ContentBinding objects) - indicates the requested content bindings
-        - query - (a Query object) - indicates the query associated with this request
-        """
         self.response_type = response_type
         self.content_bindings = content_bindings or []
         self.query = query
@@ -941,27 +942,39 @@ class _GenericParameters(BaseNonMessage):
 
 
 class SubscriptionParameters(_GenericParameters):
+    """
+    TAXII Subscription Parameters.
+
+    Args:
+        response_type (str): The requested response type. Must be either
+            :py:data:`RT_FULL` or :py:data:`RT_COUNT_ONLY`. **Optional**,
+            defaults to :py:data:`RT_FULL`
+        content_bindings (list of ContentBinding objects): A list of Content
+            Bindings acceptable in response. **Optional**
+        query (Query): The query for this poll parameters. **Optional**
+    """
     name = 'Subscription_Parameters'
 
 
 class ContentBlock(BaseNonMessage):
+    """A TAXII Content Block.
+
+    Args:
+        content_binding (ContentBinding): a Content Binding ID or nesting expression
+            indicating the type of content contained in the Content field of this
+            Content Block. **Required**
+        content (string or etree): a piece of content of the type specified
+            by the Content Binding. **Required**
+        timestamp_label (datetime): the Timestamp Label associated with this
+            Content Block. **Optional**
+        padding (string): an arbitrary amount of padding for this Content
+            Block. **Optional**
+        message (string): a message associated with this ContentBlock. **Optional**
+    """
     NAME = 'Content_Block'
 
-    def __init__(self, content_binding, content, timestamp_label=None, padding=None, message=None):
-        """Create a ContentBlock.
-
-        Arguments:
-        - content_binding (a ContentBinding object) - a Content Binding ID or nesting expression
-          indicating the type of content contained in the Content field of this
-          Content Block
-        - content (string or etree) - a piece of content of the type specified
-          by the Content Binding.
-        - timestamp_label (datetime) - the Timestamp Label associated with this
-          Content Block.
-        - padding (string) - an arbitrary amount of padding for this Content
-          Block.
-        - message (string) - a message associated with this ContentBlock
-        """
+    def __init__(self, content_binding, content, timestamp_label=None,
+                 padding=None, message=None):
         self.content_binding = content_binding
         self.content, self.content_is_xml = self._stringify_content(content)
         self.timestamp_label = timestamp_label
@@ -2708,46 +2721,44 @@ class PollRequest(TAXIIRequestMessage):
 
 
 class PollResponse(TAXIIMessage):
+    """
+    A TAXII Poll Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        collection_name (str): the name of the TAXII Data Collection that was
+            polled. **Required**
+        exclusive_begin_timestamp_label (datetime): a Timestamp Label
+            indicating the beginning of the range this response covers.
+            **Optional for a Data Feed, Prohibited for a Data Set**
+        inclusive_end_timestamp_label (datetime): a Timestamp Label
+            indicating the end of the range this response covers. **Optional
+            for a Data Feed, Prohibited for a Data Set**
+        subscription_id (str): the Subscription ID for which this content
+            is being provided. **Optional**
+        message (str): additional information for the message recipient.
+            **Optional**
+        content_blocks (list of ContentBlock): piece of content
+            and additional information related to the content. **Optional**
+        more (bool): Whether there are more result parts. **Optional**, defaults
+            to ``False``
+        result_id (str): The ID of this result. **Optional**
+        result_part_number (int): The result part number of this response.
+             **Optional**
+        record_count (RecordCount): The number of records and whether
+             the count is a lower bound. **Optional**
+    """
     message_type = MSG_POLL_RESPONSE
 
-    def __init__(self,
-                 message_id,
-                 in_response_to,
-                 extended_headers=None,
-                 collection_name=None,
-                 exclusive_begin_timestamp_label=None,
-                 inclusive_end_timestamp_label=None,
-                 subscription_id=None,
-                 message=None,
-                 content_blocks=None,
-                 more=False,
-                 result_id=None,
-                 result_part_number=1,
-                 record_count=None
-                 ):
-        """Create a new PollResponse:
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - collection_name (string) - the name of the TAXII Data Collection that was polled
-        - exclusive_begin_timestamp_label (datetime) - a Timestamp Label
-          indicating the beginning of the time range this Poll Response covers
-        - inclusive_end_timestamp_label (datetime) - a Timestamp Label
-          indicating the end of the time range this Poll Response covers.
-        - subscription_id (string) - the Subscription ID for which this content
-          is being provided.
-        - message (string) - additional information for the message recipient
-        - content_blocks (list of ContentBlock objects) - a piece of content
-          and additional information related to the content.
-        - more (bool) - Whether there are more result parts
-        - result_id (string) - The ID of this result
-        - result_part_number (int) - The result part number of this response
-        - record_count (a RecordCount object) - indicates the number of records and whether the count is a lower bound
-        """
+    def __init__(self, message_id, in_response_to, extended_headers=None,
+                 collection_name=None, exclusive_begin_timestamp_label=None,
+                 inclusive_end_timestamp_label=None, subscription_id=None,
+                 message=None, content_blocks=None, more=False, result_id=None,
+                 result_part_number=1, record_count=None):
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.collection_name = collection_name
         self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
@@ -3009,25 +3020,28 @@ status_details = {
 }
 
 class StatusMessage(TAXIIMessage):
+    """
+    A TAXII Status message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        status_type (str): One of the defined Status Types or a third-party-
+            defined Status Type. **Required**
+        status_detail (dict): A field for additional information about
+            this status in a machine-readable format. **Required or Optional**
+            depending on ``status_type``. See TAXII Specification for details.
+        message (str): Additional information for the status. There is no
+            expectation that this field be interpretable by a machine; it is
+            instead targeted to a human operator. **Optional**
+    """
     message_type = MSG_STATUS_MESSAGE
 
-    def __init__(self, message_id, in_response_to, extended_headers=None, status_type=None, status_detail=None, message=None):
-        """Create a new StatusMessage.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - status_type (string) - One of the defined Status Types or a third
-          partydefined Status Type.
-        - status_detail (string) - A field for additional information about
-          this status in a machine-readable format.
-        - message (string) - Additional information for the status. There is no
-          expectation that this field be interpretable by a machine; it is
-          instead targeted to a human operator.
-        """
+    def __init__(self, message_id, in_response_to, extended_headers=None,
+                 status_type=None, status_detail=None, message=None):
         super(StatusMessage, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.status_type = status_type
         self.status_detail = status_detail or {}
@@ -3141,33 +3155,32 @@ class StatusMessage(TAXIIMessage):
 
 
 class InboxMessage(TAXIIMessage):
+    """
+    A TAXII Inbox message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        message (str): prose information for the message recipient. **Optional**
+        result_id (str): the result id. **Optional**
+        destination_collection_name (list of str): Each string indicates a
+             destination collection name. **Optional**
+        subscription_information (SubscriptionInformation): This
+            field is only present if this message is being sent to provide
+            content in accordance with an existing TAXII Data Collection
+            subscription. **Optional**
+        record_count (RecordCount): The number of records and whether
+             the count is a lower bound. **Optional**
+        content_blocks (list of ContentBlock): Inbox content. **Optional**
+    """
     message_type = MSG_INBOX_MESSAGE
 
-    def __init__(self, 
-                 message_id, 
-                 in_response_to=None, 
-                 extended_headers=None, 
-                 message=None, 
-                 result_id=None, 
-                 destination_collection_names=None, 
-                 subscription_information=None,
-                 record_count=None, 
+    def __init__(self, message_id, extended_headers=None, message=None,
+                 result_id=None, destination_collection_names=None,
+                 subscription_information=None, record_count=None,
                  content_blocks=None):
-        """Create a new InboxMessage.
 
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - message (string) - prose information for the message recipient.
-        - result_id (string) - the result id
-        - destination_collection_name (list of strings) - Each string indicates a destination collection name
-        - subscription_information (a SubscriptionInformation object) - This
-          field is only present if this message is being sent to provide
-          content in accordance with an existing TAXII Data Collection subscription.
-        - record_count (A RecordCount object) - indicates how many records are contained in the response, and whether the count is a lower bound
-        - content_blocks (a list of ContentBlock objects)
-        """
         super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
         self.subscription_information = subscription_information
         self.message = message
@@ -3341,26 +3354,27 @@ class InboxMessage(TAXIIMessage):
         return msg
 
     class SubscriptionInformation(BaseNonMessage):
+        """
+        The Subscription Information component of a TAXII Inbox message.
+
+        Arguments:
+            collection_name (str): the name of the TAXII Data Collection from
+                which this content is being provided. **Required**
+            subscription_id (str): the Subscription ID for which this
+                content is being provided. **Required**
+            exclusive_begin_timestamp_label (datetime): a Timestamp Label
+                indicating the beginning of the time range this Inbox Message
+                covers. **Optional for a Data Feed, Prohibited for a Data Set**
+            inclusive_end_timestamp_label (datetime): a Timestamp Label
+                indicating the end of the time range this Inbox Message covers.
+                **Optional for a Data Feed, Prohibited for a Data Set**
+        """
 
         def __init__(self, collection_name, subscription_id, exclusive_begin_timestamp_label=None, inclusive_end_timestamp_label=None):
-            """Create a new SubscriptionInformation.
-
-            Arguments:
-            - collection_name (string) - the name of the TAXII Data Collection from which
-              this content is being provided.
-            - subscription_id (string) - the Subscription ID for which this
-              content is being provided.
-            - exclusive_begin_timestamp_label (datetime) - a Timestamp Label
-              indicating the beginning of the time range this Inbox Message
-              covers.
-            - inclusive_end_timestamp_label (datetime) - a Timestamp Label
-              indicating the end of the time range this Inbox Message covers.
-            """
             self.collection_name = collection_name
             self.subscription_id = subscription_id
             self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
             self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
-
 
         @property
         def collection_name(self):
@@ -3455,32 +3469,31 @@ class InboxMessage(TAXIIMessage):
 
 
 class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
+    """
+    A TAXII Manage Collection Subscription Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        collection_name (str): the name of the TAXII Data Collection to which the
+            action applies. **Required**
+        action (str): the requested action to take. **Required**
+        subscription_id (str): the ID of a previously created subscription.
+            **Probibited** if ``action==``:py:data:`ACT_SUBSCRIBE`, else
+            **Required**
+        subscription_parameters (SubscriptionParameters): The parameters for
+            this subscription. **Optional**
+        push_parameters (list of PushParameter): the push parameters for this
+            request. **Optional** Absence means push is not requested.
+    """
+
     message_type = MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST
 
-    def __init__(self, 
-                 message_id, 
-                 in_response_to=None, 
-                 extended_headers=None, 
-                 collection_name=None, 
-                 action=None, 
-                 subscription_id=None, 
-                 subscription_parameters=None, 
-                 push_parameters=None):
-        """Create a new ManageCollectionSubscriptionRequest
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+                 collection_name=None, action=None, subscription_id=None,
+                 subscription_parameters=None, push_parameters=None):
 
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - collection_name (string) - the name of the TAXII Data Collection to which the
-          action applies.
-        - action (string) - the requested action to take.
-        - subscription_id (string) - the ID of a previously created
-          subscription
-        - subscription_parameters (SubscriptionParameters object) - The parameters for this subscriptions
-        - push_parameters (a list of PushParameter objects) - the
-          push parameters for this request.
-        """
         super(ManageCollectionSubscriptionRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.collection_name = collection_name
         self.action = action
@@ -3615,23 +3628,24 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
 
 
 class ManageCollectionSubscriptionResponse(TAXIIMessage):
+    """
+    A TAXII Manage Collection Subscription Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        collection_name (str): the name of the TAXII Data Collection to which
+            the action applies. **Required**
+        message (str): additional information for the message recipient.
+            **Optional**
+        subscription_instances (list of SubscriptionInstance): **Optional**
+    """
     message_type = MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE
 
     def __init__(self, message_id, in_response_to, extended_headers=None, collection_name=None, message=None, subscription_instances=None):
-        """Create a new ManageCollectionSubscriptionResponse.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - Collection_name (string) - the name of the TAXII Data Collection to which the
-          action applies.
-        - message (string) - a message associated with the subscription
-          response.
-        - subscription_instances (a list of SubscriptionInstance objects)
-        """
         super(ManageCollectionSubscriptionResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.collection_name = collection_name
         self.message = message
@@ -3716,15 +3730,26 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
         return msg
 
     class SubscriptionInstance(BaseNonMessage):
+        """
+        The Subscription Instance component of the Manage Collection Subscription
+        Response message.
 
-        def __init__(self, subscription_id, status=SS_ACTIVE, subscription_parameters=None, push_parameters=None, poll_instances=None):
-            """
-            - subscription_id (string) - the id of the subscription
-            - status (SS_ACTIVE, SS_PAUSED, or SS_UNSUBSCRIBED) - the status of the subscription
-            - subscription_parameters (a SubscriptionParameters object) - the parameters for this subscription
-            - push_parameters (a PushParameters object) - the push parameters for this subscription
-            - poll_instances (a list of PollInstance objects) - The Poll Services that can be polled to fulfill this subscription
-            """
+        Args:
+            subscription_id (str): the id of the subscription. **Required**
+            status (str): One of :py:data:`SS_ACTIVE`, :py:data:`SS_PAUSED`, or
+                 :py:data:`SS_UNSUBSCRIBED`. **Optional**, defaults to "ACTIVE"
+            subscription_parameters (SubscriptionParameters): the parameters
+                for this subscription. **Optional** If provided, should match
+                the request.
+            push_parameters (PushParameters): the push parameters for this
+                subscription. **Optional** If provided, should match the request.
+            poll_instances (list of PollInstance): The Poll Services that can be
+                 polled to fulfill this subscription. **Optional**
+        """
+
+        def __init__(self, subscription_id, status=SS_ACTIVE,
+                     subscription_parameters=None, push_parameters=None,
+                     poll_instances=None):
             self.subscription_id = subscription_id
             self.status = status
             self.subscription_parameters = subscription_parameters
@@ -3865,19 +3890,21 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
             return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
     class PollInstance(BaseNonMessage):
+        """
+        The Poll Instance component of the Manage Collection Subscription
+        Response message.
+
+        Args:
+            poll_protocol (str): The protocol binding supported by this
+                instance of a Polling Service. **Required**
+            poll_address (str): the address of the TAXII Daemon hosting
+                this Poll Service. **Required**
+            poll_message_bindings (list of str): one or more message bindings
+                that can be used when interacting with this Poll Service
+                instance. **Required**
+        """
 
         def __init__(self, poll_protocol, poll_address, poll_message_bindings=None):
-            """Create a new PollInstance.
-
-            Arguments:
-            - poll_protocol (string) - The protocol binding supported by this
-              instance of a Polling Service.
-            - poll_address (string) - the address of the TAXII Daemon hosting
-              this Poll Service.
-            - poll_message_bindings (list of strings) - one or more message
-              bindings that can be used when interacting with this Poll Service
-              instance.
-            """
             self.poll_protocol = poll_protocol
             self.poll_address = poll_address
             self.poll_message_bindings = poll_message_bindings or []
@@ -3946,20 +3973,23 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
 
 class PollFulfillmentRequest(TAXIIRequestMessage):
+    """
+    A TAXII Poll Fulfillment Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        collection_name (str): the name of the TAXII Data Collection to which the
+            action applies. **Required**
+        result_id (str): The result id of the requested result. **Required**
+        result_part_number (int): The part number being requested. **Required**
+    """
     message_type = MSG_POLL_FULFILLMENT_REQUEST
 
-    def __init__(self, message_id, in_response_to = None, extended_headers = None, collection_name = None, result_id = None, result_part_number = None):
-        """Create a new PollFulfillmentRequest.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - collection_name (string) - The colletion of the request
-        - result_id (string) - The result_id of the requested result
-        - result_part_number (int) - The part number being requested
-        """
-        super(PollFulfillmentRequest, self).__init__(message_id, in_response_to, extended_headers)
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+                 collection_name=None, result_id=None, result_part_number=None):
+        super(PollFulfillmentRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.collection_name = collection_name
         self.result_id = result_id
         self.result_part_number = result_part_number

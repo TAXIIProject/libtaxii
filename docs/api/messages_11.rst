@@ -167,11 +167,40 @@ Poll Response
 
 .. autoclass:: PollResponse
 
+**Example:**
+
+.. code-block:: python
+
+    count = tm11.RecordCount(record_count=22, partial_count=False),
+
+    poll_resp1 = tm11.PollResponse(
+            message_id='PollResp1',
+            in_response_to='tmp',
+            collection_name='blah',
+            exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
+            subscription_id='24',
+            message='This is a test message',
+            content_blocks=[cb1, cb2]
+            more=True,
+            result_id='123',
+            result_part_number=1,
+            record_count=count)
 
 Status Message
 --------------
 
 .. autoclass:: StatusMessage
+
+**Example:**
+
+.. code-block:: python
+
+    sm03 = tm11.StatusMessage(
+            message_id='SM03',
+            in_response_to=tm11.generate_message_id(),
+            status_type=tm11.ST_DESTINATION_COLLECTION_ERROR,
+            status_detail={'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']})
 
 
 Inbox Message
@@ -180,11 +209,41 @@ Inbox Message
 .. autoclass:: InboxMessage
 .. autoclass:: libtaxii.messages_11::InboxMessage.SubscriptionInformation
 
+**Example:**
+
+.. code-block:: python
+
+    subs_info1 = tm11.InboxMessage.SubscriptionInformation(
+            collection_name='SomeCollectionName',
+            subscription_id='SubsId021',
+            exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))
+
+    inbox1 = tm11.InboxMessage(
+            message_id='Inbox1',
+            result_id='123',
+            destination_collection_names=['collection1','collection2'],
+            message='Hello!',
+            subscription_information=subs_info1,
+            record_count=tm11.RecordCount(22, partial_count=True),
+            content_blocks=[cb001, cb002])
+
 
 Manage Collection Subscription Request
 --------------------------------------
 
 .. autoclass:: ManageCollectionSubscriptionRequest
+
+**Example:**
+
+.. code-block:: python
+
+    subs_req1 = tm11.ManageCollectionSubscriptionRequest(
+            message_id='SubsReq01',
+            action=tm11.ACT_SUBSCRIBE,
+            collection_name='collection1',
+            subscription_parameters=subscription_parameters1,
+            push_parameters=push_parameters1)
 
 
 Manage Collection Subscription Response
@@ -194,11 +253,44 @@ Manage Collection Subscription Response
 .. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.SubscriptionInstance
 .. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.PollInstance
 
+**Example:**
+
+.. code-block:: python
+
+    poll_instance1 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_address='https://example.com/poll1/',
+            poll_message_bindings=[t.VID_TAXII_XML_11])
+
+    subs1 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+            subscription_id='Subs001',
+            status=tm11.SS_ACTIVE,
+            subscription_parameters=subscription_parameters1,
+            push_parameters=push_parameters1,
+            poll_instances=[poll_instance1])
+
+    subs_resp1 = tm11.ManageCollectionSubscriptionResponse(
+            message_id='SubsResp01',
+            in_response_to='xyz',
+            collection_name='abc123',
+            message='Hullo!',
+            subscription_instances=[subs1])
+
 
 Poll Fulfillment Request
 ------------------------
 
 .. autoclass:: PollFulfillmentRequest
+
+**Example:**
+
+.. code-block:: python
+
+    pf1 = tm11.PollFulfillmentRequest(
+            message_id='pf1',
+            collection_name='1-800-collection',
+            result_id='123',
+            result_part_number=1)
 
 
 Other Classes
@@ -209,6 +301,18 @@ Other Classes
 
 .. autoclass:: ContentBinding
 .. autoclass:: ContentBlock
+
+**Example:**
+
+.. code-block:: python
+
+    cb001 = tm11.ContentBlock(
+            content_binding=tm11.ContentBinding(t.CB_STIX_XML_11),
+            content='<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>',
+            timestamp_label=datetime.datetime.now(tzutc()),
+            message='Hullo!',
+            padding='The quick brown fox jumped over the lazy dogs.')
+
 .. autoclass:: DeliveryParameters
 .. autoclass:: PushParameters
 .. autoclass:: RecordCount
