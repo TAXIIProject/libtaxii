@@ -12,6 +12,7 @@ libtaxii |release| Documentation
 
    installation
    getting_started
+   changes
 
 API Reference
 =============
