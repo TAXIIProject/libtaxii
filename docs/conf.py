@@ -21,16 +21,6 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-rst_prolog = """
-.. warning::
-
-    This documentation is still a work in progress. If you have any issues or
-    questions, please ask on the taxii-discussion mailing list or file a bug
-    in our `issue tracker`_.
-
-.. _issue tracker: https://github.com/TAXIIProject/libtaxii/issues
-"""
-
 exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 
