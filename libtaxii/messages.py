@@ -219,22 +219,37 @@ def generate_message_id(maxlen=5):
 
 global_xml_parser = None
 def get_xml_parser():
-    """ Get the XML Parser being used by libtaxii.messages. 
-    This method instantiates an XML Parser with no_network=True and
-    huge_tree=True if the XML Parser has not already been set via 
-    set_xml_parser() """
+    """Return the XML parser currently in use.
+
+    If one has not already been set (via :py:func:`set_xml_parser()`), a new
+    ``etree.XMLParser`` is constructed with ``no_network=True`` and
+    ``huge_tree=True``.
+    """
     global global_xml_parser
     if global_xml_parser is None:
         global_xml_parser = etree.XMLParser(no_network=True, huge_tree=True)
     return global_xml_parser
 
 def set_xml_parser(xml_parser=None):
-    """ Set the libtaxii.messages XML parser. """
+    """Set the libtaxii.messages XML parser.
+
+    Args:
+        xml_parser (etree.XMLParser): The parser to use to parse TAXII XML.
+    """
     global global_xml_parser
     global_xml_parser = xml_parser
 
 def validate_xml(xml_string):
-    """Validate XML with the TAXII XML Schema 1.0."""
+    """Validate XML with the TAXII XML Schema 1.0.
+
+    Args:
+        xml_string (str): The XML to validate.
+
+    Example:
+        .. code-block:: python
+
+            is_valid = tm10.validate_xml(message.to_xml())
+    """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
     else:
@@ -252,10 +267,19 @@ def validate_xml(xml_string):
 
 
 def get_message_from_xml(xml_string):
-    """Create a TAXII Message object from an XML string.
+    """Create a TAXIIMessage object from an XML string.
 
-    Note: This function auto-detects which TAXII Message should be created from
-    the XML.
+    This function automatically detects which type of Message should be created
+    based on the XML.
+
+    Args:
+        xml_string (str): The XML to parse into a TAXII message.
+
+    Example:
+        .. code-block:: python
+
+            message_xml = message.to_xml()
+            new_message = tm10.get_message_from_xml(message_xml)
     """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -294,10 +318,19 @@ def get_message_from_xml(xml_string):
 
 
 def get_message_from_dict(d):
-    """Create a TAXII Message object from a dictionary.
+    """Create a TAXIIMessage object from a dictonary.
 
-    Note: This function auto-detects which TAXII Message should be created from
-    the dictionary.
+    This function automatically detects which type of Message should be created
+    based on the 'message_type' key in the dictionary.
+
+    Args:
+        d (dict): The dictionary to build the TAXII message from.
+
+    Example:
+        .. code-block:: python
+
+            message_dict = message.to_dict()
+            new_message = tm10.get_message_from_dict(message_dict)
     """
     if 'message_type' not in d:
         raise ValueError('message_type is a required field!')
@@ -328,10 +361,13 @@ def get_message_from_dict(d):
 
 
 def get_message_from_json(json_string):
-    """Create a TAXII Message object from a json string.
+    """Create a TAXIIMessage object from a JSON string.
 
-    Note: This function auto-detects which TAXII Message should be created form
-    the JSON string.
+    This function automatically detects which type of Message should be created
+    based on the JSON.
+
+    Args:
+        json_string (str): The JSON to parse into a TAXII message.
     """
     return get_message_from_dict(json.loads(json_string))
 
@@ -419,144 +455,147 @@ class BaseNonMessage(object):
 
 
 class DeliveryParameters(BaseNonMessage):
-        #TODO: Should the default arguments of these change? I'm not sure these are actually optional
-        def __init__(self, inbox_protocol=None, inbox_address=None, delivery_message_binding=None, content_bindings=None):
-            """Set up Delivery Parameters.
+    """Delivery Parameters.
 
-            Arguments
-            - inbox_protocol (string) - identifies the protocol to be used when
-                pushing TAXII Data Feed content to a Consumer's TAXII Inbox
-                Service implementation.
-            - inbox_address (string) - identifies the address of the TAXII
-                Daemon hosting the Inbox Service to which the Consumer requests
-                content  for this TAXII Data Feed to be delivered.
-            - delivery_message_binding (string) - identifies the message
-                binding to be used to send pushed content for this subscription.
-            - content_bindings (list of strings) - contains Content Binding IDs
-                indicating which types of contents the Consumer requests to
-                receive for this TAXII  Data Feed
-            """
-            self.inbox_protocol = inbox_protocol
-            self.inbox_address = inbox_address
-            self.delivery_message_binding = delivery_message_binding
-            if content_bindings is None:
-                self.content_bindings = []
-            else:
-                self.content_bindings = content_bindings
+    Args:
+        inbox_protocol (str): identifies the protocol to be used when pushing
+            TAXII Data Feed content to a Consumer's TAXII Inbox Service
+            implementation. **Required**
+        inbox_address (str): identifies the address of the TAXII Daemon hosting
+            the Inbox Service to which the Consumer requests content for this
+            TAXII Data Feed to be delivered. **Required**
+        delivery_message_binding (str): identifies the message binding to be
+             used to send pushed content for this subscription. **Required**
+        content_bindings (list of str): contains Content Binding IDs
+            indicating which types of contents the Consumer requests to
+            receive for this TAXII Data Feed. **Optional**
+    """
 
-        @property
-        def inbox_protocol(self):
-            return self._inbox_protocol
+    #TODO: Should the default arguments of these change? I'm not sure these are
+    # actually optional
+    def __init__(self, inbox_protocol=None, inbox_address=None,
+                 delivery_message_binding=None, content_bindings=None):
+        self.inbox_protocol = inbox_protocol
+        self.inbox_address = inbox_address
+        self.delivery_message_binding = delivery_message_binding
+        if content_bindings is None:
+            self.content_bindings = []
+        else:
+            self.content_bindings = content_bindings
 
-        @inbox_protocol.setter
-        def inbox_protocol(self, value):
-            _do_check(value, 'inbox_protocol', regex_tuple=_uri_regex)
-            self._inbox_protocol = value
+    @property
+    def inbox_protocol(self):
+        return self._inbox_protocol
 
-        @property
-        def inbox_address(self):
-            return self._inbox_address
+    @inbox_protocol.setter
+    def inbox_protocol(self, value):
+        _do_check(value, 'inbox_protocol', regex_tuple=_uri_regex)
+        self._inbox_protocol = value
 
-        @inbox_address.setter
-        def inbox_address(self, value):
-            #TODO: Can inbox_address be validated?
-            self._inbox_address = value
+    @property
+    def inbox_address(self):
+        return self._inbox_address
 
-        @property
-        def delivery_message_binding(self):
-            return self._delivery_message_binding
+    @inbox_address.setter
+    def inbox_address(self, value):
+        #TODO: Can inbox_address be validated?
+        self._inbox_address = value
 
-        @delivery_message_binding.setter
-        def delivery_message_binding(self, value):
-            _do_check(value, 'delivery_message_binding', regex_tuple=_uri_regex)
-            self._delivery_message_binding = value
+    @property
+    def delivery_message_binding(self):
+        return self._delivery_message_binding
 
-        @property
-        def content_bindings(self):
-            return self._content_bindings
+    @delivery_message_binding.setter
+    def delivery_message_binding(self, value):
+        _do_check(value, 'delivery_message_binding', regex_tuple=_uri_regex)
+        self._delivery_message_binding = value
 
-        @content_bindings.setter
-        def content_bindings(self, value):
-            _do_check(value, 'content_bindings', regex_tuple=_uri_regex)
-            self._content_bindings = value
+    @property
+    def content_bindings(self):
+        return self._content_bindings
 
-        def to_etree(self):
-            xml = etree.Element('{%s}Push_Parameters' % ns_map['taxii'])
+    @content_bindings.setter
+    def content_bindings(self, value):
+        _do_check(value, 'content_bindings', regex_tuple=_uri_regex)
+        self._content_bindings = value
 
-            if self.inbox_protocol is not None:
-                pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii'])
-                pb.text = self.inbox_protocol
+    def to_etree(self):
+        xml = etree.Element('{%s}Push_Parameters' % ns_map['taxii'])
 
-            if self.inbox_address is not None:
-                a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii'])
-                a.text = self.inbox_address
+        if self.inbox_protocol is not None:
+            pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii'])
+            pb.text = self.inbox_protocol
 
-            if self.delivery_message_binding is not None:
-                mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii'])
-                mb.text = self.delivery_message_binding
+        if self.inbox_address is not None:
+            a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii'])
+            a.text = self.inbox_address
 
-            for binding in self.content_bindings:
-                cb = etree.SubElement(xml, '{%s}Content_Binding' % ns_map['taxii'])
-                cb.text = binding
+        if self.delivery_message_binding is not None:
+            mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii'])
+            mb.text = self.delivery_message_binding
 
-            return xml
+        for binding in self.content_bindings:
+            cb = etree.SubElement(xml, '{%s}Content_Binding' % ns_map['taxii'])
+            cb.text = binding
 
-        def to_dict(self):
-            d = {}
+        return xml
 
-            if self.inbox_protocol is not None:
-                d['inbox_protocol'] = self.inbox_protocol
+    def to_dict(self):
+        d = {}
 
-            if self.inbox_address is not None:
-                d['inbox_address'] = self.inbox_address
+        if self.inbox_protocol is not None:
+            d['inbox_protocol'] = self.inbox_protocol
 
-            if self.delivery_message_binding is not None:
-                d['delivery_message_binding'] = self.delivery_message_binding
+        if self.inbox_address is not None:
+            d['inbox_address'] = self.inbox_address
 
-            d['content_bindings'] = []
-            for binding in self.content_bindings:
-                d['content_bindings'].append(binding)
+        if self.delivery_message_binding is not None:
+            d['delivery_message_binding'] = self.delivery_message_binding
 
-            return d
+        d['content_bindings'] = []
+        for binding in self.content_bindings:
+            d['content_bindings'].append(binding)
 
-        def __eq__(self, other, debug=False):
-            if not self._checkPropertiesEq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
-                return False
+        return d
 
-            if set(self.content_bindings) != set(other.content_bindings):
-                if debug:
-                    print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
-                return False
+    def __eq__(self, other, debug=False):
+        if not self._checkPropertiesEq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
+            return False
 
-            return True
+        if set(self.content_bindings) != set(other.content_bindings):
+            if debug:
+                print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
+            return False
 
-        @staticmethod
-        def from_etree(etree_xml):
-            inbox_protocol = None
-            inbox_protocol_set = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)
-            if len(inbox_protocol_set) > 0:
-                inbox_protocol = inbox_protocol_set[0].text
+        return True
 
-            inbox_address = None
-            inbox_address_set = etree_xml.xpath('./taxii:Address', namespaces=ns_map)
-            if len(inbox_address_set) > 0:
-                inbox_address = inbox_address_set[0].text
+    @staticmethod
+    def from_etree(etree_xml):
+        inbox_protocol = None
+        inbox_protocol_set = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)
+        if len(inbox_protocol_set) > 0:
+            inbox_protocol = inbox_protocol_set[0].text
 
-            delivery_message_binding = None
-            delivery_message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-            if len(delivery_message_binding_set) > 0:
-                delivery_message_binding = delivery_message_binding_set[0].text
+        inbox_address = None
+        inbox_address_set = etree_xml.xpath('./taxii:Address', namespaces=ns_map)
+        if len(inbox_address_set) > 0:
+            inbox_address = inbox_address_set[0].text
 
-            content_bindings = []
-            content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-            for binding in content_binding_set:
-                content_bindings.append(binding.text)
+        delivery_message_binding = None
+        delivery_message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
+        if len(delivery_message_binding_set) > 0:
+            delivery_message_binding = delivery_message_binding_set[0].text
 
-            return DeliveryParameters(inbox_protocol, inbox_address, delivery_message_binding, content_bindings)
+        content_bindings = []
+        content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
+        for binding in content_binding_set:
+            content_bindings.append(binding.text)
 
-        @staticmethod
-        def from_dict(d):
-            return DeliveryParameters(**d)
+        return DeliveryParameters(inbox_protocol, inbox_address, delivery_message_binding, content_bindings)
+
+    @staticmethod
+    def from_dict(d):
+        return DeliveryParameters(**d)
 
 
 class TAXIIMessage(BaseNonMessage):
@@ -749,22 +788,23 @@ class TAXIIMessage(BaseNonMessage):
 
 
 class ContentBlock(BaseNonMessage):
+    """A TAXII Content Block.
+
+    Args:
+        content_binding (str): a Content Binding ID or nesting expression
+            indicating the type of content contained in the Content field of this
+            Content Block. **Required**
+        content (string or etree): a piece of content of the type specified
+            by the Content Binding. **Required**
+        timestamp_label (datetime): the Timestamp Label associated with this
+            Content Block. **Optional**
+        padding (string): an arbitrary amount of padding for this Content
+            Block. **Optional**
+    """
+
     NAME = 'Content_Block'
 
     def __init__(self, content_binding, content, timestamp_label=None, padding=None):
-        """Create a ContentBlock.
-
-        Arguments:
-        - content_binding (string) - a Content Binding ID or nesting expression
-          indicating the type of content contained in the Content field of this
-          Content Block
-        - content (string or etree) - a piece of content of the type specified
-          by the Content Binding.
-        - timestamp_label (datetime) - the Timestamp Label associated with this
-          Content Block.
-        - padding (string) - an arbitrary amount of padding for this Content
-          Block.
-        """
         self.content_binding = content_binding
         self.content, self.content_is_xml = self._stringify_content(content)
         self.timestamp_label = timestamp_label
@@ -935,6 +975,15 @@ class ContentBlock(BaseNonMessage):
 #### TAXII Message Classes ####
 
 class DiscoveryRequest(TAXIIMessage):
+    """
+    A TAXII Discovery Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+    """
+
     message_type = MSG_DISCOVERY_REQUEST
 
     @TAXIIMessage.in_response_to.setter
@@ -944,20 +993,21 @@ class DiscoveryRequest(TAXIIMessage):
         self._in_response_to = value
 
 class DiscoveryResponse(TAXIIMessage):
+    """
+    A TAXII Discovery Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Optional**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        service_instances (list of `ServiceInstance`): a list of
+            service instances that this response contains. **Optional**
+    """
     message_type = MSG_DISCOVERY_RESPONSE
 
     def __init__(self, message_id, in_response_to, extended_headers=None, service_instances=None):
-        """Create a DiscoveryResponse
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - the Message ID of the message to which this
-          is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - service_instances (list of ServiceInstance objects) - a list of
-          service instances that this response contains
-        """
         super(DiscoveryResponse, self).__init__(message_id, in_response_to, extended_headers)
         if service_instances is None:
             self.service_instances = []
@@ -1034,29 +1084,36 @@ class DiscoveryResponse(TAXIIMessage):
         return msg
 
     class ServiceInstance(BaseNonMessage):
+        """
+        The Service Instance component of a TAXII Discovery Response Message.
 
-        def __init__(self, service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content=None, available=None, message=None):
-            """Create a new ServiceInstance.
+        Args:
+            service_type (string): identifies the Service Type of this
+                Service Instance. **Required**
+            services_version (string): identifies the TAXII Services
+                Specification to which this Service conforms. **Required**
+            protocol_binding (string): identifies the protocol binding
+                supported by this Service. **Required**
+            service_address (string): identifies the network address of the
+                TAXII Daemon that hosts this Service. **Required**
+            message_bindings (list of strings): identifies the message
+                bindings supported by this Service instance. **Required**
+            inbox_service_accepted_content (list of strings): identifies
+                content bindings that this Inbox Service is willing to accept.
+                **Optional**
+            available (boolean): indicates whether the identity of the
+                requester (authenticated or otherwise) is allowed to access this
+                TAXII Service. **Optional**
+            message (string): contains a message regarding this Service
+                instance. **Optional**
 
-            Arguments:
-            - service_type (string) - identifies the Service Type of this
-              Service Instance.
-            - services_version (string) - identifies the TAXII Services
-              Specification to which this Service conforms.
-            - protocol_binding (string) - identifies the protocol binding
-              supported by this Service
-            - service_address (string) - identifies the network address of the
-              TAXII Daemon that hosts this Service.
-            - message_bindings (list of strings) - identifies the message
-              bindings supported by this Service instance.
-            - inbox_service_accepted_content (list of strings) - identifies
-              content bindings that this Inbox Service is willing to accept
-            - available (boolean) - indicates whether the identity of the
-              requester (authenticated or otherwise) is allowed to access this
-              TAXII  Service.
-            - message (string) - contains a message regarding this Service
-              instance.
-            """
+        The ``message_bindings`` list must contain at least one value.
+        """
+
+        def __init__(self, service_type, services_version, protocol_binding,
+                     service_address, message_bindings,
+                     inbox_service_accepted_content=None, available=None,
+                     message=None):
             self.service_type = service_type
             self.services_version = services_version
             self.protocol_binding = protocol_binding
@@ -1068,7 +1125,6 @@ class DiscoveryResponse(TAXIIMessage):
                 self.inbox_service_accepted_content = inbox_service_accepted_content
             self.available = available
             self.message = message
-
 
         @property
         def service_type(self):
@@ -1231,6 +1287,15 @@ class DiscoveryResponse(TAXIIMessage):
 
 
 class FeedInformationRequest(TAXIIMessage):
+    """
+    A TAXII Feed Information Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+    """
+
     message_type = MSG_FEED_INFORMATION_REQUEST
 
     @TAXIIMessage.in_response_to.setter
@@ -1239,21 +1304,24 @@ class FeedInformationRequest(TAXIIMessage):
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
+
 class FeedInformationResponse(TAXIIMessage):
+    """
+    A TAXII Feed Information Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        feed_informations (list of FeedInformation): A list
+            of FeedInformation objects to be contained in this response.
+            **Optional**
+    """
     message_type = MSG_FEED_INFORMATION_RESPONSE
 
     def __init__(self, message_id, in_response_to, extended_headers=None, feed_informations=None):
-        """Create a new FeedInformationResponse.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - the Message ID of the message to which this
-          is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - feed_informations (list of FeedInformation objects) - A list of
-          FeedInformation objects to be contained in this response
-        """
         super(FeedInformationResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         if feed_informations is None:
             self.feed_informations = []
@@ -1319,32 +1387,43 @@ class FeedInformationResponse(TAXIIMessage):
         return msg
 
     class FeedInformation(BaseNonMessage):
+        """
+        The Feed Information component of a TAXII Feed Information Response
+        Message.
 
-        def __init__(self, feed_name, feed_description, supported_contents, available=None, push_methods=None, polling_service_instances=None, subscription_methods=None):
-            """Create a new FeedInformation
+        Arguments:
+            feed_name (str): the name by which this TAXII Data Feed is
+                identified. **Required**
+            feed_description (str): a prose description of this TAXII
+                Data Feed. **Required**
+            supported_contents (list of str): Content Binding IDs
+                indicating which types of content are currently expressed in this
+                TAXII Data Feed. **Required**
+            available (boolean): whether the identity of the requester
+                (authenticated or otherwise) is allowed to access this TAXII
+                Service. **Optional** Default: ``None``, indicating "unknown"
+            push_methods (list of PushMethod objects): the protocols that
+                can be used to push content via a subscription. **Optional**
+            polling_service_instances (list of PollingServiceInstance objects):
+                the bindings and address a Consumer can use to interact with a
+                Poll Service instance that supports this TAXII Data Feed.
+                **Optional**
+            subscription_methods (list of SubscriptionMethod objects): the
+                protocol and address of the TAXII Daemon hosting the Feed
+                Management Service that can process subscriptions for this TAXII
+                Data Feed. **Optional**
 
-            Arguments:
-            - feed_name (string) - the name by which this TAXII Data Feed is
-              identified.
-            - feed_description (string) - a prose description of this TAXII
-              Data Feed.
-            - supported_contents (list of strings) - Content Binding IDs
-              indicating which types of content are currently expressed in this
-              TAXII Data Feed.
-            - available (boolean) - whether the identity of the requester
-              (authenticated or otherwise) is allowed to access this TAXII
-              Service.
-            - push_methods (list of PushMethod objects) - the protocols that
-              can be used to push content via a subscription.
-            - polling_service_instances (list of PollingServiceInstance
-              objects) - the bindings and address a Consumer can use to
-              interact with a Poll Service instance that supports this TAXII
-              Data Feed.
-            - subscription_methods (list of SubscriptionMethod objects) - the
-              protocol and address of the TAXII Daemon hosting the Feed
-              Management Service that can process subscriptions for this TAXII
-              Data Feed.
-            """
+        The absense of ``push_methods`` indicates no push methods.  The absense
+        of ``polling_service_instances`` indicates no polling services.  At
+        least one of ``push_methods`` and ``polling_service_instances`` must not
+        be empty. The absense of ``subscription_methods`` indicates no
+        subscription services.
+        """
+
+        def __init__(self, feed_name, feed_description, supported_contents,
+                     available=None, push_methods=None,
+                     polling_service_instances=None, subscription_methods=None):
+
             self.feed_name = feed_name
             self.available = available
             self.feed_description = feed_description
@@ -1530,17 +1609,19 @@ class FeedInformationResponse(TAXIIMessage):
             return FeedInformationResponse.FeedInformation(**kwargs)
 
         class PushMethod(BaseNonMessage):
-            def __init__(self, push_protocol, push_message_bindings):
-                """Create a new PushMethod.
+            """
+            The Push Method component of a TAXII Feed Information
+            component.
 
-                Arguments:
-                - push_protocol (string) - a protocol binding that can be used
-                  to push content to an Inbox Service instance.
-                - push_message_bindings (list of strings) - the message
-                  bindings that can be used to push content to an Inbox Service
-                  instance using the protocol identified in the Push Protocol
-                  field.
-                """
+            Args:
+                push_protocol (str): a protocol binding that can be used
+                    to push content to an Inbox Service instance. **Required**
+                push_message_bindings (list of str): the message bindings that
+                    can be used to push content to an Inbox Service instance
+                    using the protocol identified in the Push Protocol field.
+                    **Required**
+            """
+            def __init__(self, push_protocol, push_message_bindings):
                 self.push_protocol = push_protocol
                 self.push_message_bindings = push_message_bindings
 
@@ -1605,19 +1686,21 @@ class FeedInformationResponse(TAXIIMessage):
                 return FeedInformationResponse.FeedInformation.PushMethod(**d)
 
         class PollingServiceInstance(BaseNonMessage):
+            """
+            The Polling Service Instance component of a TAXII Feed
+            Information component.
+
+            Args:
+                poll_protocol (str): the protocol binding supported by
+                    this Poll Service instance. **Required**
+                poll_address (str): the address of the TAXII Daemon
+                    hosting this Poll Service instance. **Required**
+                poll_message_bindings (list of str): the message bindings
+                    supported by this Poll Service instance. **Required**
+            """
             NAME = 'Polling_Service'
 
             def __init__(self, poll_protocol, poll_address, poll_message_bindings):
-                """Create a new PollingServiceInstance.
-
-                Arguments:
-                - poll_protocol (string) - the protocol binding supported by
-                  this Poll Service instance.
-                - poll_address (string) - the address of the TAXII Daemon
-                  hosting this Poll Service instance.
-                - poll_message_bindings (list of strings) - the message
-                  bindings supported by this Poll Service instance
-                """
                 self.poll_protocol = poll_protocol
                 self.poll_address = poll_address
                 self.poll_message_bindings = poll_message_bindings
@@ -1686,19 +1769,24 @@ class FeedInformationResponse(TAXIIMessage):
                 return cls(**d)
 
         class SubscriptionMethod(BaseNonMessage):
+            """
+            The Subscription Method component of a TAXII Feed Information
+            component.
+
+            Args:
+                subscription_protocol (str): the protocol binding supported by
+                    this Feed Management Service instance. **Required**
+                subscription_address (str): the address of the TAXII Daemon
+                    hosting this Feed Management Service instance.
+                    **Required**.
+                subscription_message_bindings (list of str): the message
+                    bindings supported by this Feed Management Service
+                    Instance. **Required**
+            """
             NAME = 'Subscription_Service'
 
-            def __init__(self, subscription_protocol, subscription_address, subscription_message_bindings):
-                """Create a new SubscriptionMethod.
-
-                Arguments:
-                - subscription_protocol (string) - the protocol binding
-                  supported by this Feed Management Service instance.
-                - subscription_address (string) - the address of the TAXII
-                  Daemon hosting this Feed Management Service instance.
-                - subscription_message_bindings (list of strings) - the message
-                  bindings supported by this Feed Management Service Instance
-                """
+            def __init__(self, subscription_protocol, subscription_address,
+                         subscription_message_bindings):
                 self.subscription_protocol = subscription_protocol
                 self.subscription_address = subscription_address
                 self.subscription_message_bindings = subscription_message_bindings
@@ -1768,37 +1856,33 @@ class FeedInformationResponse(TAXIIMessage):
 
 
 class PollRequest(TAXIIMessage):
+    """
+    A TAXII Poll Request message.
+
+    Arguments:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        feed_name (str): the name of the TAXII Data Feed that is being
+            polled. **Required**
+        exclusive_begin_timestamp_label (datetime): a Timestamp Label
+            indicating the beginning of the range of TAXII Data Feed content the
+            requester wishes to receive. **Optional**
+        inclusive_end_timestamp_label (datetime): a Timestamp Label
+            indicating the end of the range of TAXII Data Feed content the
+            requester wishes to receive. **Optional**
+        subscription_id (str): the existing subscription the Consumer
+            wishes to poll. **Optional**
+        content_bindings (list of str): the type of content that is
+            requested in the response to this poll. **Optional**, defaults to
+            accepting all content bindings.
+    """
     message_type = MSG_POLL_REQUEST
 
-    def __init__(self,
-                 message_id,
-                 in_response_to=None,
-                 extended_headers=None,
-                 feed_name=None,
-                 exclusive_begin_timestamp_label=None,
-                 inclusive_end_timestamp_label=None,
-                 subscription_id=None,
-                 content_bindings=None
-                 ):
-        """Create a new PollRequest.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - feed_name (string) - the name of the TAXII Data Feed that is being
-          polled.
-        - exclusive_begin_timestamp_label (datetime) - a Timestamp Label
-          indicating the beginning of the range of TAXII Data Feed content the
-          requester wishes to receive.
-        - inclusive_end_timestamp_label (datetime) - a Timestamp Label
-          indicating the end of the range of TAXII Data Feed content the
-          requester wishes to receive.
-        - subscription_id (string) - the existing subscription the Consumer
-          wishes to poll.
-        - content_bindings (list of strings) - the type of content that is
-          requested in the response to this poll.
-        """
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+                 feed_name=None, exclusive_begin_timestamp_label=None,
+                 inclusive_end_timestamp_label=None, subscription_id=None,
+                 content_bindings=None):
         super(PollRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
         self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
@@ -1959,38 +2043,35 @@ class PollRequest(TAXIIMessage):
 
 
 class PollResponse(TAXIIMessage):
+    """
+    A TAXII Poll Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        feed_name (str): the name of the TAXII Data Feed that was polled.
+            **Required**
+        inclusive_begin_timestamp_label (datetime): a Timestamp Label
+            indicating the beginning of the range this response covers.
+            **Optional**
+        inclusive_end_timestamp_label (datetime): a Timestamp Label
+            indicating the end of the range this response covers. **Required**
+        subscription_id (str): the Subscription ID for which this content
+            is being provided. **Optional**
+        message (str): additional information for the message recipient.
+            **Optional**
+        content_blocks (list of ContentBlock): piece of content
+            and additional information related to the content. **Optional**
+    """
     message_type = MSG_POLL_RESPONSE
 
-    def __init__(self,
-                 message_id,
-                 in_response_to,
-                 extended_headers=None,
-                 feed_name=None,
-                 inclusive_begin_timestamp_label=None,
-                 inclusive_end_timestamp_label=None,
-                 subscription_id=None,
-                 message=None,
-                 content_blocks=None
-                 ):
-        """Create a new PollResponse:
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - feed_name (string) - the name of the TAXII Data Feed that was polled
-        - inclusive_begin_timestamp_label (datetime) - a Timestamp Label
-          indicating the beginning of the time range this Poll Response covers
-        - inclusive_end_timestamp_label (datetime) - a Timestamp Label
-          indicating the end of the time range this Poll Response covers.
-        - subscription_id (string) - the Subscription ID for which this content
-          is being provided.
-        - message (string) - additional information for the message recipient
-        - content_blocks (list of ContentBlock objects) - a piece of content
-          and additional information related to the content.
-        """
+    def __init__(self, message_id, in_response_to, extended_headers=None,
+                 feed_name=None, inclusive_begin_timestamp_label=None,
+                 inclusive_end_timestamp_label=None, subscription_id=None,
+                 message=None, content_blocks=None):
         super(PollResponse, self).__init__(message_id, in_response_to, extended_headers)
         self.feed_name = feed_name
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
@@ -2158,25 +2239,28 @@ class PollResponse(TAXIIMessage):
 
 
 class StatusMessage(TAXIIMessage):
+    """
+    A TAXII Status message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        status_type (str): One of the defined Status Types or a third-party-
+            defined Status Type. **Required**
+        status_detail (str): A field for additional information about
+            this status in a machine-readable format. **Optional or Prohibited**
+            depending on ``status_type``. See TAXII Specification for details.
+        message (str): Additional information for the status. There is no
+            expectation that this field be interpretable by a machine; it is
+            instead targeted to a human operator. **Optional**
+    """
     message_type = MSG_STATUS_MESSAGE
 
-    def __init__(self, message_id, in_response_to, extended_headers=None, status_type=None, status_detail=None, message=None):
-        """Create a new StatusMessage.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - status_type (string) - One of the defined Status Types or a third
-          partydefined Status Type.
-        - status_detail (string) - A field for additional information about
-          this status in a machine-readable format.
-        - message (string) - Additional information for the status. There is no
-          expectation that this field be interpretable by a machine; it is
-          instead targeted to a human operator.
-        """
+    def __init__(self, message_id, in_response_to, extended_headers=None,
+                 status_type=None, status_detail=None, message=None):
         super(StatusMessage, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.status_type = status_type
         self.status_detail = status_detail
@@ -2259,21 +2343,27 @@ class StatusMessage(TAXIIMessage):
 
 
 class InboxMessage(TAXIIMessage):
+    """
+    A TAXII Inbox message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        message (str): prose information for the message recipient. **Optional**
+        subscription_information (SubscriptionInformation): This
+            field is only present if this message is being sent to provide
+            content in accordance with an existing TAXII Data Feed
+            subscription. **Optional**
+        content_blocks (list of ContentBlock): Inbox content. **Optional**
+    """
+
     message_type = MSG_INBOX_MESSAGE
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None, message=None, subscription_information=None, content_blocks=None):
-        """Create a new InboxMessage.
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+                 message=None, subscription_information=None,
+                 content_blocks=None):
 
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - message (string) - prose information for the message recipient.
-        - subscription_information (a SubscriptionInformation object) - This
-          field is only present if this message is being sent to provide
-          content in accordance with an existing TAXII Data Feed subscription.
-        - content_blocks (a list of ContentBlock objects)
-        """
         super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
         self.subscription_information = subscription_information
         self.message = message
@@ -2392,21 +2482,24 @@ class InboxMessage(TAXIIMessage):
         return msg
 
     class SubscriptionInformation(BaseNonMessage):
+        """
+        The Subscription Information component of a TAXII Inbox message.
 
-        def __init__(self, feed_name, subscription_id, inclusive_begin_timestamp_label, inclusive_end_timestamp_label):
-            """Create a new SubscriptionInformation.
-
-            Arguments:
-            - feed_name (string) - the name of the TAXII Data Feed from which
-              this content is being provided.
-            - subcription_id (string) - the Subscription ID for which this
-              content is being provided.
-            - inclusive_begin_timestamp_label (datetime) - a Timestamp Label
-              indicating the beginning of the time range this Inbox Message
-              covers.
-            - inclusive_end_timestamp_label (datetime) - a Timestamp Label
-              indicating the end of the time range this Inbox Message covers.
-            """
+        Arguments:
+            feed_name (str): the name of the TAXII Data Feed from
+                which this content is being provided. **Required**
+            subscription_id (str): the Subscription ID for which this
+                content is being provided. **Required**
+            inclusive_begin_timestamp_label (datetime): a Timestamp Label
+                indicating the beginning of the time range this Inbox Message
+                covers. **Optional**
+            inclusive_end_timestamp_label (datetime): a Timestamp Label
+                indicating the end of the time range this Inbox Message covers.
+                **Optional**
+        """
+        def __init__(self, feed_name, subscription_id,
+                     inclusive_begin_timestamp_label,
+                     inclusive_end_timestamp_label):
             self.feed_name = feed_name
             self.subscription_id = subscription_id
             self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
@@ -2495,23 +2588,28 @@ class InboxMessage(TAXIIMessage):
 
 
 class ManageFeedSubscriptionRequest(TAXIIMessage):
+    """
+    A TAXII Manage Feed Subscription Request message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        feed_name (str): the name of the TAXII Data Feed to which the
+            action applies. **Required**
+        action (str): the requested action to take. **Required**
+        subscription_id (str): the ID of a previously created subscription.
+            **Required** if ``action==``:py:data:`ACT_UNSUBSCRIBE`, else
+            **Prohibited**.
+        delivery_parameters (list of DeliveryParameters): the delivery parameters
+            for this request. **Optional** Absence means delivery is not requested.
+    """
+
     message_type = MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None, feed_name=None, action=None, subscription_id=None, delivery_parameters=None):
-        """Create a new ManageFeedSubscriptionRequest
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - feed_name (string) - the name of the TAXII Data Feed to which the
-          action applies.
-        - action (string) - the requested action to take.
-        - subscription_id (string) - the ID of a previously created
-          subscription
-        - delivery_parameters (a list of DeliveryParameter objects) - the
-          delivery parameters for this request.
-        """
+    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+                 feed_name=None, action=None, subscription_id=None,
+                 delivery_parameters=None):
         super(ManageFeedSubscriptionRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.feed_name = feed_name
         self.action = action
@@ -2611,23 +2709,26 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 
 
 class ManageFeedSubscriptionResponse(TAXIIMessage):
+    """
+    A TAXII Manage Feed Subscription Response message.
+
+    Args:
+        message_id (str): A value identifying this message. **Required**
+        in_response_to (str): Contains the Message ID of the message to
+            which this is a response. **Required**
+        extended_headers (dict): A dictionary of name/value pairs for
+            use as Extended Headers. **Optional**
+        feed_name (str): the name of the TAXII Data Feed to which
+            the action applies. **Required**
+        message (str): additional information for the message recipient.
+            **Optional**
+        subscription_instances (list of SubscriptionInstance): **Optional**
+    """
+
     message_type = MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
 
-    def __init__(self, message_id, in_response_to, extended_headers=None, feed_name=None, message=None, subscription_instances=None):
-        """Create a new ManageFeedSubscriptionResponse.
-
-        Arguments:
-        - message_id (string) - A value identifying this message.
-        - in_response_to (string) - Contains the Message ID of the message to
-          which this is a response.
-        - extended_headers (dictionary) - A dictionary of name/value pairs for
-          use as Extended Headers
-        - feed_name (string) - the name of the TAXII Data Feed to which the
-          action applies.
-        - message (string) - a message associated with the subscription
-          response.
-        - subscription_instances (a list of SubscriptionInstance objects)
-        """
+    def __init__(self, message_id, in_response_to, extended_headers=None,
+                 feed_name=None, message=None, subscription_instances=None):
         super(ManageFeedSubscriptionResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.feed_name = feed_name
         self.message = message
@@ -2731,21 +2832,23 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         return msg
 
     class SubscriptionInstance(BaseNonMessage):
+        """
+        The Subscription Instance component of the Manage Feed Subscription
+        Response message.
 
-        def __init__(self, subscription_id, delivery_parameters=None, poll_instances=None):
-            """Create a new SubscriptionInstance.
+        Args:
+            subscription_id (str): the id of the subscription. **Required**
+            delivery_parameters (DeliveryParameters): the parameters
+                for this subscription. **Required** if responding to message
+                with ``action==``:py:data:`ACT_STATUS`, otherwise **Prohibited**
+            poll_instances (list of PollInstance): Each Poll
+                Instance represents an instance of a Poll Service that can be
+                contacted to retrieve content associated with the new
+                Subscription. **Optional**
+        """
 
-            Arguments:
-            - subscription_id (string) - an identifier that is used to
-              reference the given subscription in subsequent exchanges.
-            - delivery_parameters (list of DeliveryParameter objects) - a copy
-              of the Delivery Parameters of the Manage Feed Subscription
-              Request Message that established this subscription.
-            - poll_instances (list of PollInstance objects) - Each Poll
-              Instance represents an instance of a Poll Service that can be
-              contacted to retrieve content associated with the new
-              Subscription.
-            """
+        def __init__(self, subscription_id, delivery_parameters=None,
+                     poll_instances=None):
             self.subscription_id = subscription_id
             if delivery_parameters is None:
                 self.delivery_parameters = []
@@ -2849,20 +2952,22 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
 
             return ManageFeedSubscriptionResponse.SubscriptionInstance(subscription_id, delivery_parameters, poll_instances)
 
-    class PollInstance:
+    class PollInstance(BaseNonMessage):
+        """
+        The Poll Instance component of the Manage Feed Subscription
+        Response message.
+
+        Args:
+            poll_protocol (str): The protocol binding supported by this
+                instance of a Polling Service. **Required**
+            poll_address (str): the address of the TAXII Daemon hosting
+                this Poll Service. **Required**
+            poll_message_bindings (list of str): one or more message bindings
+                that can be used when interacting with this Poll Service
+                instance. **Required**
+        """
 
         def __init__(self, poll_protocol, poll_address, poll_message_bindings=None):
-            """Create a new PollInstance.
-
-            Arguments:
-            - poll_protocol (string) - The protocol binding supported by this
-              instance of a Polling Service.
-            - poll_address (string) - the address of the TAXII Daemon hosting
-              this Poll Service.
-            - poll_message_bindings (list of strings) - one or more message
-              bindings that can be used when interacting with this Poll Service
-              instance.
-            """
             self.poll_protocol = poll_protocol
             self.poll_address = poll_address
             if poll_message_bindings is None:
