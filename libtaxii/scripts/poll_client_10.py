@@ -23,6 +23,8 @@ def main():
     parser.add_argument("--https", dest="https", default=False, type=bool, help="Whether or not to use HTTPS. Defaults to False")
     parser.add_argument("--cert", dest="cert", default=None, help="The file location of the certificate to use. Defaults to None.")
     parser.add_argument("--key", dest="key", default=None, help="The file location of the private key to use. Defaults to None.")
+    parser.add_argument("--username", dest="username", default=None, help="The username to authenticate with. Defaults to None.")
+    parser.add_argument("--pass", dest="password", default=None, help="The password to authenticate with. Defaults to None.")
     parser.add_argument("--proxy", dest="proxy", default='noproxy', help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
     parser.add_argument("--subscription-id", dest="subs_id", default=None, help="The subscription ID to use. Defaults to None")
     args = parser.parse_args()
@@ -56,9 +58,18 @@ def main():
     client = tc.HttpClient()
     client.setUseHttps(args.https)
     client.setProxy(args.proxy)
-    if args.cert is not None and args.key is not None:
+    tls = (args.cert is not None and args.key is not None)
+    basic = (args.username is not None and args.password is not None)
+    if tls and basic:
+        client.setAuthType(tc.HttpClient.AUTH_CERT_BASIC)
+        client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert, 'username': args.username, 'password': args.password})
+    elif tls:
         client.setAuthType(tc.HttpClient.AUTH_CERT)
-        client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})    
+        client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})
+    elif basic:
+        client.setAuthType(tc.HttpClient.AUTH_BASIC)
+        client.setAuthCredentials({'username': args.username, 'password': args.password})
+        
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_10, poll_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
