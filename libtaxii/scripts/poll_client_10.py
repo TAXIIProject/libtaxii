@@ -8,7 +8,7 @@ import argparse
 import dateutil.parser
 
 import libtaxii as t
-import libtaxii.messages_11 as tm11
+import libtaxii.messages_10 as tm10
 import libtaxii.clients as tc
 
 
@@ -17,14 +17,14 @@ def main():
     parser.add_argument("--host", dest="host", default="taxiitest.mitre.org", help="Host where the Poll Service is hosted. Defaults to taxiitest.mitre.org.")
     parser.add_argument("--port", dest="port", default="80", type=int, help="Port where the Poll Service is hosted. Defaults to 80.")
     parser.add_argument("--path", dest="path", default="/services/poll/", help="Path where the Poll Service is hosted. Defaults to /services/poll/.")
-    parser.add_argument("--collection", dest="collection", default="default", help="Data Collection to poll. Defaults to 'default'.")
+    parser.add_argument("--feed", dest="feed", default="default", help="Data Collection to poll. Defaults to 'default'.")
     parser.add_argument("--begin_timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
     parser.add_argument("--end_timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
     parser.add_argument("--https", dest="https", default=False, type=bool, help="Whether or not to use HTTPS. Defaults to False")
     parser.add_argument("--cert", dest="cert", default=None, help="The file location of the certificate to use. Defaults to None.")
     parser.add_argument("--key", dest="key", default=None, help="The file location of the private key to use. Defaults to None.")
     parser.add_argument("--proxy", dest="proxy", default='noproxy', help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
-    
+    parser.add_argument("--subscription-id", dest="subs_id", default=None, help="The subscription ID to use. Defaults to None")
     args = parser.parse_args()
 
     try:
@@ -45,11 +45,11 @@ def main():
         print "Unable to parse timestamp value. Timestamp should include both date and time information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll."
         sys.exit()
 
-    poll_req = tm11.PollRequest(message_id=tm11.generate_message_id(),
-                              collection_name=args.collection,
+    poll_req = tm10.PollRequest(message_id=tm10.generate_message_id(),
+                              feed_name=args.feed,
                               exclusive_begin_timestamp_label=begin_ts,
                               inclusive_end_timestamp_label=end_ts,
-                              poll_parameters=tm11.PollRequest.PollParameters())
+                              subscription_id=args.subs_id)
 
     poll_req_xml = poll_req.to_xml(pretty_print=True)
     print "Poll Request: \r\n", poll_req_xml
@@ -59,7 +59,7 @@ def main():
     if args.cert is not None and args.key is not None:
         client.setAuthType(tc.HttpClient.AUTH_CERT)
         client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})    
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req_xml, args.port)
+    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_10, poll_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
 

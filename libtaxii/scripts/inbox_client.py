@@ -69,11 +69,15 @@ stix_watchlist = '''<!--
 def main():
     parser = argparse.ArgumentParser(description="Inbox Client")
     parser.add_argument("--host", dest="host", default="taxiitest.mitre.org", help="Host where the Inbox Service is hosted. Defaults to taxiitest.mitre.org.")
-    parser.add_argument("--port", dest="port", default="80", help="Port where the Inbox Service is hosted. Defaults to 80.")
+    parser.add_argument("--port", dest="port", default="80", type=int, help="Port where the Inbox Service is hosted. Defaults to 80.")
     parser.add_argument("--path", dest="path", default="/services/inbox/default/", help="Path where the Inbox Service is hosted. Defaults to /services/inbox/default/.")
     parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_11, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_11 )
     parser.add_argument("--content-file", dest="content_file", default=stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
-
+    parser.add_argument("--https", dest="https", default=False, type=bool, help="Whether or not to use HTTPS. Defaults to False")
+    parser.add_argument("--cert", dest="cert", default=None, help="The file location of the certificate to use. Defaults to None.")
+    parser.add_argument("--key", dest="key", default=None, help="The file location of the private key to use. Defaults to None.")
+    parser.add_argument("--proxy", dest="proxy", default='noproxy', help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
+    
     args = parser.parse_args()
 
     if args.content_file is stix_watchlist:
@@ -89,7 +93,11 @@ def main():
 
     print "Inbox Message: \r\n", inbox_xml
     client = tc.HttpClient()
-    client.setProxy(None) 
+    client.setUseHttps(args.https)
+    client.setProxy(args.proxy)
+    if args.cert is not None and args.key is not None:
+        client.setAuthType(tc.HttpClient.AUTH_CERT)
+        client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)

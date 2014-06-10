@@ -49,6 +49,7 @@ setup(name='libtaxii',
                  'libtaxii/scripts/fulfillment_client.py',
                  'libtaxii/scripts/inbox_client.py',
                  'libtaxii/scripts/poll_client.py',
+                 'libtaxii/scripts/poll_client_10.py',
                  'libtaxii/scripts/query_client.py',],
       entry_points = {
           'console_scripts': [
@@ -56,6 +57,7 @@ setup(name='libtaxii',
              'fulfillment_client = libtaxii.scripts.fulfillment_client:main',
              'inbox_client = libtaxii.scripts.inbox_client:main',
              'poll_client = libtaxii.scripts.poll_client:main',
+             'poll_client_10 = libtaxii.scripts.poll_client_10:main',
              'query_client = libtaxii.scripts.query_client:main',
           ]
       },
