@@ -1,5 +1,32 @@
 Release Notes
 =============
+1.1.102
+-------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.101...1.1.102>`__
+
+The biggest change was the addition of scripts to libtaxii. Now when you install libtaxii, you get
+a number of scripts that are by default configured to hit the TAXII Test server (taxiitest.mitre.org).
+You can specify a number of parameters on the command line to change where/how the scripts connect.
+The scripts are:
+
+-  discovery_client - Calls a TAXII 1.1 Discovery Service
+-  fulfillment_client - Calls a TAXII 1.1 Poll Service for Poll Fulfillment
+-  inbox_client - Calls a TAXII 1.1 Inbox Service. Comes packaged with a STIX document to use by default.
+-  poll_client - Calls a TAXII 1.1 Poll Service
+-  poll_client_10 - Calls a TAXII 1.0 Poll Service (Note: Does not work with taxiitest.mitre.org, as taxiitest.mitre.org is TAXII 1.1 only)
+-  query_client - Calls a TAXII 1.1 Poll Service with a query on IP or File Hash (Note: As of 6/11/2014; Works with the master branch of YETI, and will work with YETI after the next release of YETI)
+
+We also had a number of bug fixes and impprovements for this version of libtaxii:
+
+-  Unicode strings work round trip (Hat tip to Ben Yates for reporting the issue)
+-  Added TONS of documentation (http://libtaxii.readthedocs.org/en/latest/index.html). Big thanks to @gtback and @slsnow!
+-  Fixed some issues in ContentBlock.content where certain data was not serializing/deserializing properly
+-  Streamlined serialization of XML documents to avoid a double-parse in certain cases
+-  Added a Content Binding ID for STIX XML 1.1.1
+-  Added an optional pretty_print argument to all to_xml() functions. e.g., to_xml(pretty_print=True)
+-  Added the three TAXII Default Query Status Type to libtaxii.taxii_default_query
+-  Fixed a bug where custom Status Types were prohibited
+-  Added Travis CI
 
 1.1.101
 -------
