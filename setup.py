@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#Copyright (C) 2013 - The MITRE Corporation
+#Copyright (C) 2014 - The MITRE Corporation
 #For license information, see the LICENSE.txt file
 
 from os.path import abspath, dirname, join

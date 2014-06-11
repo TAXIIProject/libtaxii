@@ -1,4 +1,4 @@
-# Copyright (C) 2013 - The MITRE Corporation
+# Copyright (C) 2014 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
 # Contributors:
@@ -9,7 +9,7 @@
 The main libtaxii module
 """
 
-__version__ = "1.1.101"
+__version__ = "1.1.102"
 
 import httplib
 import urllib
