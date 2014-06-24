@@ -11,10 +11,11 @@ import libtaxii as t
 import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
 import libtaxii.clients as tc
+import libtaxii.scripts as scripts
 
 
 def main():
-    parser = t.scripts.get_base_parser("Poll Query Client", path="/services/query_example/")
+    parser = scripts.get_base_parser("Poll Query Client", path="/services/query_example/")
     parser.add_argument("--collection", dest="collection", default="default_queryable", help="Data Collection to poll. Defaults to 'default_queryable'.")
     parser.add_argument("--allow_asynch", dest="allow_asynch", default=True, help="Indicate whether or not the client support Asynchronous Polling. Defaults to True")
     parser.add_argument("--ip", dest="ip", default=None, help="The IP address to query")
@@ -50,7 +51,7 @@ def main():
 
     poll_req_xml = poll_req.to_xml(pretty_print=True)
     print "Poll Request: \r\n", poll_req_xml
-    client = t.scripts.create_client(args)
+    client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
