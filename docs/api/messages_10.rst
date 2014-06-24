@@ -1,7 +1,7 @@
 :mod:`libtaxii.messages_10` Module
 ==================================
 
-.. automodule:: libtaxii.messages
+.. automodule:: libtaxii.messages_10
 
 .. note::
 
