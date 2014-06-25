@@ -325,7 +325,6 @@ Other Classes
 -------------
 
 .. autoclass:: TAXIIMessage
-.. autoclass:: BaseNonMessage
 
 .. autoclass:: ContentBinding
 .. autoclass:: ContentBlock
@@ -351,8 +350,6 @@ Functions
 ---------
 
 .. autofunction:: generate_message_id
-.. autofunction:: get_xml_parser
-.. autofunction:: set_xml_parser
 .. autofunction:: validate_xml
 .. autofunction:: get_message_from_xml
 .. autofunction:: get_message_from_dict

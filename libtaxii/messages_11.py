@@ -16,7 +16,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-from operator import attrgetter
 import os
 import StringIO
 
@@ -24,7 +23,9 @@ import dateutil.parser
 from lxml import etree
 
 import libtaxii.messages_10 as tm10
-from libtaxii.validation import do_check, uri_regex, check_timestamp_label
+
+from .common import get_xml_parser, set_xml_parser, TAXIIBase
+from .validation import do_check, uri_regex, check_timestamp_label
 
 
 # TAXII 1.0 Message Types
@@ -211,29 +212,6 @@ def _str2datetime(date_string):
 #Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
 
-
-global_xml_parser = None
-def get_xml_parser():
-    """Return the XML parser currently in use.
-
-    If one has not already been set (via :py:func:`set_xml_parser()`), a new
-    ``etree.XMLParser`` is constructed with ``no_network=True`` and
-    ``huge_tree=True``.
-    """
-    global global_xml_parser
-    if global_xml_parser is None:
-        global_xml_parser = etree.XMLParser(no_network=True, huge_tree=True)
-    return global_xml_parser
-
-
-def set_xml_parser(xml_parser=None):
-    """Set the libtaxii.messages XML parser.
-
-    Args:
-        xml_parser (etree.XMLParser): The parser to use to parse TAXII XML.
-    """
-    global global_xml_parser
-    global_xml_parser = xml_parser
 
 
 def validate_xml(xml_string):
@@ -465,151 +443,9 @@ def get_deserializer(format_id, type):
     # return elt
 
 
-class BaseNonMessage(object):
-    """
-    This class should not be used directly by libtaxii users.  
-    Base class for non-TAXII Message objects
-
-    """
-
-    @property
-    def sort_key(self):
-        """
-        This property allows list of BaseNonMessage objects to 
-        be compared efficiently. The __eq__ method uses this 
-        property to sort the lists before comparisons are made
-        """
-        raise NotImplementedError()
-
-    def to_etree(self):
-        """Create an etree representation of this class.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    def to_dict(self):
-        """Create a dictionary representation of this class.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    def to_xml(self, pretty_print=False):
-        """Create an XML representation of this class.
-        subclasses should not need to implement this method
-        """
-        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
-
-    @classmethod
-    def from_etree(cls, src_etree):
-        """Create an instance of this class from an etree.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def from_dict(cls, d):
-        """Create an instance of this class from a dictionary.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def from_xml(cls, xml):
-        """Create an instance of this class from XML.
-        subclasses should not need to implement this method
-        """
-        if isinstance(xml, basestring):
-            f = StringIO.StringIO(xml)
-        else:
-            f = xml
-
-        etree_xml = etree.parse(f, get_xml_parser()).getroot()
-        return cls.from_etree(etree_xml)
-
-    def __eq__(self, other, debug=False):
-        """
-        A general equals method that works for all subclasses of this object,
-        as long as the subclasses do the following:
-        1. All class properties start with one underscore
-        2. The sort_key property is implemented
-
-        Arguments:
-        self (object) - this object
-        other (object) - the object to compare self against
-        debug (bool) - Whether or not to print debug statements as the evaluation is made
-        """
-        if other is None:
-            if debug:
-                print 'other was None!'
-            return False
-
-        if self.__class__.__name__ != other.__class__.__name__:
-            if debug:
-                print 'class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__)
-            return False
-
-        #Get all member properties that start with '_'
-        members = [attr for attr in dir(self) if not callable(attr) and attr.startswith('_') and not attr.startswith('__')]
-        for member in members:
-            if member not in self.__dict__:#TODO: The attr for attr... statement includes functions for some strange reason...
-                continue
-
-            if debug:
-                print 'member name: %s' % member
-            self_value = self.__dict__[member]
-            other_value = other.__dict__[member]
-
-            if isinstance(self_value, BaseNonMessage):#A debuggable equals comparison can be made
-                eq = self_value.__eq__(other_value, debug)
-            elif isinstance(self_value, list):#We have lists to compare
-                if len(self_value) != len(other_value):#Lengths not equal
-                    member = member + ' lengths'
-                    self_value = len(self_value)
-                    other_value = len(other_value)
-                    eq = False
-                elif len(self_value) == 0:#Both lists are of size 0, and therefore equal
-                    eq = True
-                else:#Equal sized, non-0 length lists. Might be BaseNonMessage objects, might not be
-                    #peek at the first item to see if it is a BaseNonMessage or not
-                    if isinstance(self_value[0], BaseNonMessage):#All BaseNonMessage objects have the 'sort_key' property implemented
-                        self_value = sorted(self_value, key=attrgetter('sort_key'))
-                        other_value = sorted(other_value, key=attrgetter('sort_key'))
-                        for s, o in zip(self_value, other_value):#Compare the ordered lists element by element
-                            eq = s.__eq__(o, debug)
-                    else:#Assume they don't... just do a set comparison
-                        eq = set(self_value) == set(other_value)
-            elif isinstance(self_value, dict):#Dictionary to compare
-                if len(set(self_value.keys()) - set(other_value.keys())) != 0:
-                    if debug:
-                        print 'dict keys not equal: %s != %s' % (self_value, other_value)
-                    eq = False
-                for k, v in self_value.iteritems():
-                    if other_value[k] != v:
-                        if debug:
-                            print 'dict values not equal: %s != %s' % (v, other_value[k])
-                        eq = False
-                eq = True
-            elif isinstance(self_value, etree._Element): # Non-TAXII etree element (i.e. STIX)
-                eq = (etree.tostring(self_value) == etree.tostring(other_value))
-            else:#Do a direct comparison
-                eq = self_value == other_value
-
-            if not eq:#TODO: is this duplicate?
-                if debug:
-                    print '%s was not equal: %s != %s' % (member, self_value, other_value)
-                return False
-
-        return True
-
-    def __ne__(self, other, debug=False):
-        return not self.__eq__(other, debug)
 
 
-class SupportedQuery(BaseNonMessage):
+class SupportedQuery(TAXIIBase):
     """
     This class contains an instance of a supported query. It
     is expected that, generally, messages_11.SupportedQuery
@@ -654,7 +490,7 @@ class SupportedQuery(BaseNonMessage):
         return SupportedQuery(**d)
 
 
-class Query(BaseNonMessage):
+class Query(TAXIIBase):
     """
     This class contains an instance of a query. It
     is expected that, generally, messages_11.Query 
@@ -701,7 +537,7 @@ class Query(BaseNonMessage):
 # - a "content_binding_id[>subtype]" structure
 # - a list of "content_binding_id[>subtype]" structures
 
-class ContentBinding(BaseNonMessage):
+class ContentBinding(TAXIIBase):
     """TAXII Content Binding component
 
     Args:
@@ -780,7 +616,7 @@ class ContentBinding(BaseNonMessage):
         return ContentBinding(**d)
 
 
-class RecordCount(BaseNonMessage):
+class RecordCount(TAXIIBase):
     """
     Information summarizing the number of records.
 
@@ -839,7 +675,7 @@ class RecordCount(BaseNonMessage):
         return RecordCount(**d)
 
 
-class _GenericParameters(BaseNonMessage):
+class _GenericParameters(TAXIIBase):
     name = 'Generic_Parameters'
 
     def __init__(self, response_type = RT_FULL, content_bindings = None, query = None):
@@ -956,7 +792,7 @@ class SubscriptionParameters(_GenericParameters):
     name = 'Subscription_Parameters'
 
 
-class ContentBlock(BaseNonMessage):
+class ContentBlock(TAXIIBase):
     """A TAXII Content Block.
 
     Args:
@@ -1147,7 +983,7 @@ class ContentBlock(BaseNonMessage):
         return cls.from_dict(json.loads(json_string))
 
 
-class PushParameters(BaseNonMessage):
+class PushParameters(TAXIIBase):
     """Set up Push Parameters.
 
     Args:
@@ -1263,7 +1099,7 @@ class DeliveryParameters(PushParameters):
     name = 'Delivery_Parameters'
 
 
-class TAXIIMessage(BaseNonMessage):
+class TAXIIMessage(TAXIIBase):
     """Encapsulate properties common to all TAXII Messages (such as headers).
 
     This class is extended by each Message Type (e.g., DiscoveryRequest), with
@@ -1504,7 +1340,7 @@ class DiscoveryResponse(TAXIIMessage):
             msg.service_instances.append(si)
         return msg
 
-    class ServiceInstance(BaseNonMessage):
+    class ServiceInstance(TAXIIBase):
         """
         The Service Instance component of a TAXII Discovery Response Message.
 
@@ -1813,7 +1649,7 @@ class CollectionInformationResponse(TAXIIMessage):
             msg.collection_informations.append(CollectionInformationResponse.CollectionInformation.from_dict(collection))
         return msg
 
-    class CollectionInformation(BaseNonMessage):
+    class CollectionInformation(TAXIIBase):
         """
         The Collection Information component of a TAXII Collection Information 
         Response Message.
@@ -2094,7 +1930,7 @@ class CollectionInformationResponse(TAXIIMessage):
 
             return CollectionInformationResponse.CollectionInformation(**kwargs)
 
-        class PushMethod(BaseNonMessage):
+        class PushMethod(TAXIIBase):
             """
             The Push Method component of a TAXII Collection Information
             component.
@@ -2165,7 +2001,7 @@ class CollectionInformationResponse(TAXIIMessage):
             def from_dict(d):
                 return CollectionInformationResponse.CollectionInformation.PushMethod(**d)
 
-        class PollingServiceInstance(BaseNonMessage):
+        class PollingServiceInstance(TAXIIBase):
             """
             The Polling Service Instance component of a TAXII Collection
             Information component.
@@ -2241,7 +2077,7 @@ class CollectionInformationResponse(TAXIIMessage):
             def from_dict(cls, d):
                 return cls(**d)
 
-        class SubscriptionMethod(BaseNonMessage):
+        class SubscriptionMethod(TAXIIBase):
             """
             The Subscription Method component of a TAXII Collection Information
             component.
@@ -2320,7 +2156,7 @@ class CollectionInformationResponse(TAXIIMessage):
             def from_dict(cls, d):
                 return cls(**d)
 
-        class ReceivingInboxService(BaseNonMessage):
+        class ReceivingInboxService(TAXIIBase):
             """
             The Receiving Inbox Service component of a TAXII Collection
             Information component.
@@ -3353,7 +3189,7 @@ class InboxMessage(TAXIIMessage):
         msg = super(InboxMessage, cls).from_dict(d, **kwargs)
         return msg
 
-    class SubscriptionInformation(BaseNonMessage):
+    class SubscriptionInformation(TAXIIBase):
         """
         The Subscription Information component of a TAXII Inbox message.
 
@@ -3729,7 +3565,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
         msg = super(ManageCollectionSubscriptionResponse, cls).from_dict(d, **kwargs)
         return msg
 
-    class SubscriptionInstance(BaseNonMessage):
+    class SubscriptionInstance(TAXIIBase):
         """
         The Subscription Instance component of the Manage Collection Subscription
         Response message.
@@ -3889,7 +3725,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
             return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
-    class PollInstance(BaseNonMessage):
+    class PollInstance(TAXIIBase):
         """
         The Poll Instance component of the Manage Collection Subscription
         Response message.
