@@ -1302,7 +1302,7 @@ class DiscoveryResponse(TAXIIMessage):
 
     @service_instances.setter
     def service_instances(self, value):
-        do_check(value, 'service_instances', type=DiscoveryResponse.ServiceInstance)
+        do_check(value, 'service_instances', type=ServiceInstance)
         self._service_instances = value
 
     def to_etree(self):
@@ -1324,7 +1324,7 @@ class DiscoveryResponse(TAXIIMessage):
         kwargs['service_instances'] = []
         service_instance_set = etree_xml.xpath('./taxii_11:Service_Instance', namespaces=ns_map)
         for service_instance in service_instance_set:
-            si = DiscoveryResponse.ServiceInstance.from_etree(service_instance)
+            si = ServiceInstance.from_etree(service_instance)
             kwargs['service_instances'].append(si)
 
         return super(DiscoveryResponse, cls).from_etree(etree_xml, **kwargs)
@@ -1335,7 +1335,7 @@ class DiscoveryResponse(TAXIIMessage):
         msg.service_instances = []
         service_instance_set = d['service_instances']
         for service_instance in service_instance_set:
-            si = DiscoveryResponse.ServiceInstance.from_dict(service_instance)
+            si = ServiceInstance.from_dict(service_instance)
             msg.service_instances.append(si)
         return msg
 
@@ -1549,7 +1549,7 @@ class ServiceInstance(TAXIIBase):
         if len(message_set) > 0:
             message = message_set[0].text
 
-        return DiscoveryResponse.ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
+        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
 
     @staticmethod
     def from_dict(d):
@@ -1569,7 +1569,7 @@ class ServiceInstance(TAXIIBase):
         available = d.get('available')
         message = d.get('message')
 
-        return DiscoveryResponse.ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
+        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
 
 
 class CollectionInformationRequest(TAXIIRequestMessage):
@@ -1616,7 +1616,7 @@ class CollectionInformationResponse(TAXIIMessage):
 
     @collection_informations.setter
     def collection_informations(self, value):
-        do_check(value, 'collection_informations', type=CollectionInformationResponse.CollectionInformation)
+        do_check(value, 'collection_informations', type=CollectionInformation)
         self._collection_informations = value
 
     def to_etree(self):
@@ -1638,7 +1638,7 @@ class CollectionInformationResponse(TAXIIMessage):
         msg.collection_informations = []
         collection_informations = etree_xml.xpath('./taxii_11:Collection', namespaces=ns_map)
         for collection in collection_informations:
-            msg.collection_informations.append(CollectionInformationResponse.CollectionInformation.from_etree(collection))
+            msg.collection_informations.append(CollectionInformation.from_etree(collection))
         return msg
 
     @classmethod
@@ -1646,7 +1646,7 @@ class CollectionInformationResponse(TAXIIMessage):
         msg = super(CollectionInformationResponse, cls).from_dict(d)
         msg.collection_informations = []
         for collection in d['collection_informations']:
-            msg.collection_informations.append(CollectionInformationResponse.CollectionInformation.from_dict(collection))
+            msg.collection_informations.append(CollectionInformation.from_dict(collection))
         return msg
 
 
@@ -1745,7 +1745,7 @@ class CollectionInformation(TAXIIBase):
 
     @push_methods.setter
     def push_methods(self, value):
-        do_check(value, 'push_methods', type=CollectionInformationResponse.CollectionInformation.PushMethod)
+        do_check(value, 'push_methods', type=PushMethod)
         self._push_methods = value
 
     @property
@@ -1754,7 +1754,7 @@ class CollectionInformation(TAXIIBase):
 
     @polling_service_instances.setter
     def polling_service_instances(self, value):
-        do_check(value, 'polling_service_instances', type=CollectionInformationResponse.CollectionInformation.PollingServiceInstance)
+        do_check(value, 'polling_service_instances', type=PollingServiceInstance)
         self._polling_service_instances = value
 
     @property
@@ -1763,7 +1763,7 @@ class CollectionInformation(TAXIIBase):
 
     @subscription_methods.setter
     def subscription_methods(self, value):
-        do_check(value, 'subscription_methods', type=CollectionInformationResponse.CollectionInformation.SubscriptionMethod)
+        do_check(value, 'subscription_methods', type=SubscriptionMethod)
         self._subscription_methods = value
 
     @property
@@ -1772,7 +1772,7 @@ class CollectionInformation(TAXIIBase):
 
     @receiving_inbox_services.setter
     def receiving_inbox_services(self, value):
-        do_check(value, 'receiving_inbox_services', type=CollectionInformationResponse.CollectionInformation.ReceivingInboxService)
+        do_check(value, 'receiving_inbox_services', type=ReceivingInboxService)
         self._receiving_inbox_services = value
 
     @property
@@ -1879,25 +1879,25 @@ class CollectionInformation(TAXIIBase):
         kwargs['push_methods'] = []
         push_method_set = etree_xml.xpath('./taxii_11:Push_Method', namespaces=ns_map)
         for push_method_elt in push_method_set:
-            kwargs['push_methods'].append(CollectionInformationResponse.CollectionInformation.PushMethod.from_etree(push_method_elt))
+            kwargs['push_methods'].append(PushMethod.from_etree(push_method_elt))
 
         kwargs['polling_service_instances'] = []
         polling_service_set = etree_xml.xpath('./taxii_11:Polling_Service', namespaces=ns_map)
         for polling_elt in polling_service_set:
-            kwargs['polling_service_instances'].append(CollectionInformationResponse.CollectionInformation.PollingServiceInstance.from_etree(polling_elt))
+            kwargs['polling_service_instances'].append(PollingServiceInstance.from_etree(polling_elt))
 
         kwargs['subscription_methods'] = []
         subscription_method_set = etree_xml.xpath('./taxii_11:Subscription_Service', namespaces=ns_map)
         for subscription_elt in subscription_method_set:
-            kwargs['subscription_methods'].append(CollectionInformationResponse.CollectionInformation.SubscriptionMethod.from_etree(subscription_elt))
+            kwargs['subscription_methods'].append(SubscriptionMethod.from_etree(subscription_elt))
 
 
         kwargs['receiving_inbox_services'] = []
         receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Service', namespaces=ns_map)
         for receiving_inbox_service in receiving_inbox_services_set:
-            kwargs['receiving_inbox_services'].append(CollectionInformationResponse.CollectionInformation.ReceivingInboxService.from_etree(receiving_inbox_service))
+            kwargs['receiving_inbox_services'].append(ReceivingInboxService.from_etree(receiving_inbox_service))
 
-        return CollectionInformationResponse.CollectionInformation(**kwargs)
+        return CollectionInformation(**kwargs)
 
     @staticmethod
     def from_dict(d):
@@ -1914,22 +1914,22 @@ class CollectionInformation(TAXIIBase):
 
         kwargs['push_methods'] = []
         for push_method in d.get('push_methods', []):
-            kwargs['push_methods'].append(CollectionInformationResponse.CollectionInformation.PushMethod.from_dict(push_method))
+            kwargs['push_methods'].append(PushMethod.from_dict(push_method))
 
         kwargs['polling_service_instances'] = []
         for polling in d.get('polling_service_instances', []):
-            kwargs['polling_service_instances'].append(CollectionInformationResponse.CollectionInformation.PollingServiceInstance.from_dict(polling))
+            kwargs['polling_service_instances'].append(PollingServiceInstance.from_dict(polling))
 
         kwargs['subscription_methods'] = []
         for subscription_method in d.get('subscription_methods', []):
-            kwargs['subscription_methods'].append(CollectionInformationResponse.CollectionInformation.SubscriptionMethod.from_dict(subscription_method))
+            kwargs['subscription_methods'].append(SubscriptionMethod.from_dict(subscription_method))
 
         kwargs['receiving_inbox_services'] = []
         receiving_inbox_services_set = d.get('receiving_inbox_services', [])
         for receiving_inbox_service in receiving_inbox_services_set:
-            kwargs['receiving_inbox_services'].append(CollectionInformationResponse.CollectionInformation.ReceivingInboxService.from_dict(receiving_inbox_service))
+            kwargs['receiving_inbox_services'].append(ReceivingInboxService.from_dict(receiving_inbox_service))
 
-        return CollectionInformationResponse.CollectionInformation(**kwargs)
+        return CollectionInformation(**kwargs)
 
 
 class PushMethod(TAXIIBase):
@@ -1997,11 +1997,11 @@ class PushMethod(TAXIIBase):
         message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
         for message_binding in message_binding_set:
             kwargs['push_message_bindings'].append(message_binding.text)
-        return CollectionInformationResponse.CollectionInformation.PushMethod(**kwargs)
+        return PushMethod(**kwargs)
 
     @staticmethod
     def from_dict(d):
-        return CollectionInformationResponse.CollectionInformation.PushMethod(**d)
+        return PushMethod(**d)
 
 
 class PollingServiceInstance(TAXIIBase):
@@ -2271,7 +2271,7 @@ class ReceivingInboxService(TAXIIBase):
         for cb in supported_contents_set:
             supported_contents.append(ContentBinding.from_etree(cb))
 
-        return CollectionInformationResponse.CollectionInformation.ReceivingInboxService(proto, addr, message_bindings, supported_contents)
+        return ReceivingInboxService(proto, addr, message_bindings, supported_contents)
 
     @staticmethod
     def from_dict(d):
@@ -2283,7 +2283,7 @@ class ReceivingInboxService(TAXIIBase):
         for binding in d['supported_contents']:
             kwargs['supported_contents'].append(ContentBinding.from_dict(binding))
 
-        return CollectionInformationResponse.CollectionInformation.ReceivingInboxService(**kwargs)
+        return ReceivingInboxService(**kwargs)
 
 
 class PollRequest(TAXIIRequestMessage):
@@ -2376,7 +2376,7 @@ class PollRequest(TAXIIRequestMessage):
 
     @poll_parameters.setter
     def poll_parameters(self, value):
-        do_check(value, 'poll_parameters', type=PollRequest.PollParameters, can_be_none=True)
+        do_check(value, 'poll_parameters', type=PollParameters, can_be_none=True)
         self._poll_parameters = value
 
     def to_etree(self):
@@ -2434,7 +2434,7 @@ class PollRequest(TAXIIRequestMessage):
         kwargs['poll_parameters'] = None
         poll_parameter_set = etree_xml.xpath('./taxii_11:Poll_Parameters', namespaces=ns_map)
         if len(poll_parameter_set) > 0:
-            kwargs['poll_parameters'] = PollRequest.PollParameters.from_etree(poll_parameter_set[0])
+            kwargs['poll_parameters'] = PollParameters.from_etree(poll_parameter_set[0])
 
         kwargs['subscription_id'] = None
         subscription_id_set = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)
@@ -2461,7 +2461,7 @@ class PollRequest(TAXIIRequestMessage):
 
         kwargs['poll_parameters'] = None
         if 'poll_parameters' in d and d['poll_parameters'] is not None:
-            kwargs['poll_parameters'] = PollRequest.PollParameters.from_dict(d['poll_parameters'])
+            kwargs['poll_parameters'] = PollParameters.from_dict(d['poll_parameters'])
 
         msg = super(PollRequest, cls).from_dict(d, **kwargs)
         return msg
@@ -2490,7 +2490,7 @@ class PollParameters(_GenericParameters):
 
     def __init__(self, response_type=RT_FULL, content_bindings=None,
                     query=None, allow_asynch=False, delivery_parameters=None):
-        super(PollRequest.PollParameters, self).__init__(response_type, content_bindings, query)
+        super(PollParameters, self).__init__(response_type, content_bindings, query)
         self.allow_asynch = allow_asynch
         self.delivery_parameters = delivery_parameters
 
@@ -2513,7 +2513,7 @@ class PollParameters(_GenericParameters):
         self._allow_asynch = value
 
     def to_etree(self):
-        xml = super(PollRequest.PollParameters, self).to_etree()
+        xml = super(PollParameters, self).to_etree()
 
         if self.allow_asynch is not None:
             xml.attrib['allow_asynch'] = str(self.allow_asynch).lower()
@@ -2523,7 +2523,7 @@ class PollParameters(_GenericParameters):
         return xml
 
     def to_dict(self):
-        d = super(PollRequest.PollParameters, self).to_dict()
+        d = super(PollParameters, self).to_dict()
         if self.allow_asynch is not None:
             d['allow_asynch'] = str(self.allow_asynch).lower()
         d['delivery_parameters'] = None
@@ -2533,7 +2533,7 @@ class PollParameters(_GenericParameters):
 
     @classmethod
     def from_etree(cls, etree_xml):
-        poll_parameters = super(PollRequest.PollParameters, cls).from_etree(etree_xml)
+        poll_parameters = super(PollParameters, cls).from_etree(etree_xml)
         kwargs = {}
 
         allow_asynch_set = etree_xml.xpath('./@allow_asynch')
@@ -2548,7 +2548,7 @@ class PollParameters(_GenericParameters):
 
     @classmethod
     def from_dict(cls, d):
-        poll_parameters = super(PollRequest.PollParameters, cls).from_dict(d)
+        poll_parameters = super(PollParameters, cls).from_dict(d)
         kwargs = {}
 
         aa = d.get('allow_asynch')
@@ -3046,7 +3046,7 @@ class InboxMessage(TAXIIMessage):
 
     @subscription_information.setter
     def subscription_information(self, value):
-        do_check(value, 'subscription_information', type=InboxMessage.SubscriptionInformation, can_be_none=True)
+        do_check(value, 'subscription_information', type=SubscriptionInformation, can_be_none=True)
         self._subscription_information = value
 
     @property
@@ -3154,7 +3154,7 @@ class InboxMessage(TAXIIMessage):
 
         subs_infos = etree_xml.xpath('./taxii_11:Source_Subscription', namespaces=ns_map)
         if len(subs_infos) > 0:
-            kwargs['subscription_information'] = InboxMessage.SubscriptionInformation.from_etree(subs_infos[0])
+            kwargs['subscription_information'] = SubscriptionInformation.from_etree(subs_infos[0])
 
         record_count_set = etree_xml.xpath('./taxii_11:Record_Count', namespaces=ns_map)
         if len(record_count_set) > 0:
@@ -3184,7 +3184,7 @@ class InboxMessage(TAXIIMessage):
 
         kwargs['subscription_information'] = None
         if 'subscription_information' in d:
-            kwargs['subscription_information'] = InboxMessage.SubscriptionInformation.from_dict(d['subscription_information'])
+            kwargs['subscription_information'] = SubscriptionInformation.from_dict(d['subscription_information'])
 
         if 'record_count' in d:
             kwargs['record_count'] = RecordCount.from_dict(d['record_count'])
@@ -3299,7 +3299,7 @@ class SubscriptionInformation(TAXIIBase):
         else:
             ietl = None
 
-        return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
+        return SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 
     @staticmethod
     def from_dict(d):
@@ -3309,7 +3309,7 @@ class SubscriptionInformation(TAXIIBase):
         ebtl = _str2datetime(d.get('exclusive_begin_timestamp_label'))
         ietl = _str2datetime(d.get('inclusive_end_timestamp_label'))
 
-        return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
+        return SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 
 
 class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
@@ -3515,7 +3515,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
     @subscription_instances.setter
     def subscription_instances(self, value):
-        do_check(value, 'subscription_instances', type=ManageCollectionSubscriptionResponse.SubscriptionInstance)
+        do_check(value, 'subscription_instances', type=SubscriptionInstance)
         self._subscription_instances = value
 
     def to_etree(self):
@@ -3554,7 +3554,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
         kwargs['subscription_instances'] = []
         for si in subscription_instance_set:
-            kwargs['subscription_instances'].append(ManageCollectionSubscriptionResponse.SubscriptionInstance.from_etree(si))
+            kwargs['subscription_instances'].append(SubscriptionInstance.from_etree(si))
 
         msg = super(ManageCollectionSubscriptionResponse, cls).from_etree(etree_xml, **kwargs)
         return msg
@@ -3568,7 +3568,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
         kwargs['subscription_instances'] = []
         for instance in d['subscription_instances']:
-            kwargs['subscription_instances'].append(ManageCollectionSubscriptionResponse.SubscriptionInstance.from_dict(instance))
+            kwargs['subscription_instances'].append(SubscriptionInstance.from_dict(instance))
 
         msg = super(ManageCollectionSubscriptionResponse, cls).from_dict(d, **kwargs)
         return msg
@@ -3647,7 +3647,7 @@ class SubscriptionInstance(TAXIIBase):
 
     @poll_instances.setter
     def poll_instances(self, value):
-        do_check(value, 'poll_instances', type=ManageCollectionSubscriptionResponse.PollInstance)
+        do_check(value, 'poll_instances', type=PollInstance)
         self._poll_instances = value
 
     def to_etree(self):
@@ -3710,9 +3710,9 @@ class SubscriptionInstance(TAXIIBase):
         poll_instances = []
         poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instance', namespaces = ns_map)
         for pi in poll_instance_set:
-            poll_instances.append(ManageCollectionSubscriptionResponse.PollInstance.from_etree(pi))
+            poll_instances.append(PollInstance.from_etree(pi))
 
-        return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
+        return SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
     @staticmethod
     def from_dict(d):
@@ -3730,9 +3730,9 @@ class SubscriptionInstance(TAXIIBase):
         poll_instances = []
         if 'poll_instances' in d:
             for pi in d['poll_instances']:
-                poll_instances.append(ManageCollectionSubscriptionResponse.PollInstance.from_dict(pi))
+                poll_instances.append(PollInstance.from_dict(pi))
 
-        return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
+        return SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
 
 class PollInstance(TAXIIBase):
@@ -3811,11 +3811,11 @@ class PollInstance(TAXIIBase):
         for b in etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map):
             poll_message_bindings.append(b.text)
 
-        return ManageCollectionSubscriptionResponse.PollInstance(poll_protocol, address, poll_message_bindings)
+        return PollInstance(poll_protocol, address, poll_message_bindings)
 
     @staticmethod
     def from_dict(d):
-        return ManageCollectionSubscriptionResponse.PollInstance(**d)
+        return PollInstance(**d)
 
 
 class PollFulfillmentRequest(TAXIIRequestMessage):

@@ -278,7 +278,7 @@ class DiscoveryResponseTests(unittest.TestCase):
                     capability_modules = [tdq.CM_REGEX])#Required, 1-n. Indicates which capability modules can be used.
 
         #Create ServiceInstances to use in tests
-        self.si1 = tm11.DiscoveryResponse.ServiceInstance(
+        self.si1 = tm11.ServiceInstance(
                 service_type=tm11.SVC_POLL,  # Required
                 services_version=t.VID_TAXII_SERVICES_11,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -288,7 +288,7 @@ class DiscoveryResponseTests(unittest.TestCase):
                 message='This is a message.',
                 supported_query=[tdq1])  # Optional for service_type=POLL
 
-        self.si2 = tm11.DiscoveryResponse.ServiceInstance(
+        self.si2 = tm11.ServiceInstance(
                 service_type=tm11.SVC_POLL,  # Required
                 services_version=t.VID_TAXII_SERVICES_11,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -298,7 +298,7 @@ class DiscoveryResponseTests(unittest.TestCase):
                 message='This is a message.',
                 supported_query=[tdq1, tdq2])  # Optional for service_type=POLL
 
-        self.si3 = tm11.DiscoveryResponse.ServiceInstance(
+        self.si3 = tm11.ServiceInstance(
                 service_type=tm11.SVC_INBOX,  # Required
                 services_version=t.VID_TAXII_SERVICES_11,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -310,7 +310,7 @@ class DiscoveryResponseTests(unittest.TestCase):
                 available=False,  # Optional - defaults to None, which means 'Unknown'
                 message='This is a message. Yipee!')#optional
 
-        self.si4 = tm11.DiscoveryResponse.ServiceInstance(
+        self.si4 = tm11.ServiceInstance(
                 service_type=tm11.SVC_DISCOVERY,  # Required
                 services_version=t.VID_TAXII_SERVICES_11,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -318,7 +318,7 @@ class DiscoveryResponseTests(unittest.TestCase):
                 message_bindings=[t.VID_TAXII_XML_11],  # Required, must have at least one value in the list
                 message='This is a message. Yipee!')#optional
 
-        self.si5 = tm11.DiscoveryResponse.ServiceInstance(
+        self.si5 = tm11.ServiceInstance(
                 service_type=tm11.SVC_COLLECTION_MANAGEMENT,  # Required
                 services_version=t.VID_TAXII_SERVICES_11,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -377,47 +377,47 @@ class CollectionInformationResponseTests(unittest.TestCase):
 
     def setUp(self):
         #Instantiate a push methods
-        push_method1 = tm11.CollectionInformationResponse.CollectionInformation.PushMethod(
+        push_method1 = tm11.PushMethod(
                 push_protocol=t.VID_TAXII_HTTP_10,  # Required
                 push_message_bindings=[t.VID_TAXII_XML_11])  # Required
 
         #Instantiate Poll Services
-        poll_service1 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+        poll_service1 = tm11.PollingServiceInstance(
                 poll_protocol=t.VID_TAXII_HTTPS_10,#Required
                 poll_address = 'https://example.com/TheGreatestPollService',#Required
                 poll_message_bindings=[t.VID_TAXII_XML_11])#Required, at least one item must be present in the list
 
-        poll_service2 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+        poll_service2 = tm11.PollingServiceInstance(
                 poll_protocol=t.VID_TAXII_HTTP_10,#Required
                 poll_address = 'http://example.com/TheOtherPollService',#Required
                 poll_message_bindings=[t.VID_TAXII_XML_11])#Required, at least one item must be present in the list
 
         #Instantiate Subscription Methods
-        subs_method1 = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
+        subs_method1 = tm11.SubscriptionMethod(
                 subscription_protocol = t.VID_TAXII_HTTPS_10, #Required
                 subscription_address = 'https://example.com/TheSubscriptionService/',#Required
                 subscription_message_bindings = [t.VID_TAXII_XML_11])#Required - at least one item must be present in the list
 
-        subs_method2 = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
+        subs_method2 = tm11.SubscriptionMethod(
                 subscription_protocol = t.VID_TAXII_HTTP_10, #Required
                 subscription_address = 'http://example.com/TheSubscriptionService/',#Required
                 subscription_message_bindings = [t.VID_TAXII_XML_11])#Required - at least one item must be present in the list
 
         #Instantiate Inbox Services
-        inbox_service1 = tm11.CollectionInformationResponse.CollectionInformation.ReceivingInboxService(
+        inbox_service1 = tm11.ReceivingInboxService(
                 inbox_protocol = t.VID_TAXII_HTTPS_10,#required
                 inbox_address = 'https://example.com/inbox/',#Required
                 inbox_message_bindings = [t.VID_TAXII_XML_11],#Required
                 supported_contents = None)#Optional - None means "all are supported"
 
-        inbox_service2 = tm11.CollectionInformationResponse.CollectionInformation.ReceivingInboxService(
+        inbox_service2 = tm11.ReceivingInboxService(
                 inbox_protocol = t.VID_TAXII_HTTPS_10,#required
                 inbox_address = 'https://example.com/inbox/',#Required
                 inbox_message_bindings = [t.VID_TAXII_XML_11],#Required
                 supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['exmaple1','example2'])])#Optional - None means "all are supported"
 
         #Instantiate collections
-        self.collection1 = tm11.CollectionInformationResponse.CollectionInformation(
+        self.collection1 = tm11.CollectionInformation(
                 collection_name = 'collection1',#Required
                 collection_type = tm11.CT_DATA_FEED,#Optional. Defaults to 'Data Feed'
                 available = False, #Optional. Defaults to None, which means "unknown"
@@ -429,12 +429,12 @@ class CollectionInformationResponseTests(unittest.TestCase):
                 subscription_methods = [subs_method1, subs_method2],#optional - absence means no subscription services
                 receiving_inbox_services = [inbox_service1, inbox_service2])#Optional - absence indicates no receiving inbox services
 
-        self.collection2 = tm11.CollectionInformationResponse.CollectionInformation(
+        self.collection2 = tm11.CollectionInformation(
                 collection_name = 'collection2', #Required
                 collection_type = tm11.CT_DATA_SET,#Optional. Defaults to 'Data Feed'
                 collection_description = 'Warrgghghglble.')#Required
 
-        self.collection3 = tm11.CollectionInformationResponse.CollectionInformation(
+        self.collection3 = tm11.CollectionInformation(
                 collection_name = 'collection3', #Required
                 collection_description = 'You must pay all the dollars to have this information.',#Required
                 supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_10), tm11.ContentBinding(t.CB_STIX_XML_11)],#Optional
@@ -442,7 +442,7 @@ class CollectionInformationResponseTests(unittest.TestCase):
                 subscription_methods = [subs_method2], #optional - absence means no subscription services
                 receiving_inbox_services = [inbox_service2])#Optional - absence indicates no receiving inbox services
 
-        self.collection4 = tm11.CollectionInformationResponse.CollectionInformation(
+        self.collection4 = tm11.CollectionInformation(
                 collection_name = 'collection4', #Required
                 collection_description = 'So improve information. Much amaze.',#Required
                 supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_101, subtype_ids=['ex1','ex2','ex3'])],#Optional
@@ -570,21 +570,21 @@ class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
 class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
 
     def setUp(self):
-        poll_instance1 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+        poll_instance1 = tm11.PollInstance(
                             poll_protocol = t.VID_TAXII_HTTPS_10,
                             poll_address = 'https://example.com/poll1/',
                             poll_message_bindings = [t.VID_TAXII_XML_11])
 
-        poll_instance2 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+        poll_instance2 = tm11.PollInstance(
                             poll_protocol = t.VID_TAXII_HTTPS_10,
                             poll_address = 'https://example.com/poll2/',
                             poll_message_bindings = [t.VID_TAXII_XML_11])
-        poll_instance3 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+        poll_instance3 = tm11.PollInstance(
                             poll_protocol = t.VID_TAXII_HTTPS_10,
                             poll_address = 'https://example.com/poll3/',
                             poll_message_bindings = [t.VID_TAXII_XML_11])
 
-        self.subs1 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+        self.subs1 = tm11.SubscriptionInstance(
                     status = tm11.SS_ACTIVE,#Optional, defaults to ACTIVE
                     subscription_id = 'Subs001',#Required
                     subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
@@ -595,14 +595,14 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
 
 
     def test_subs_resp1(self):
-        subs2 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+        subs2 = tm11.SubscriptionInstance(
                     status = tm11.SS_PAUSED,#Optional, defaults to ACTIVE
                     subscription_id = 'Subs001',#Required
                     subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
                     push_parameters = push_parameters1,#Optional - should be an echo of the request
                     #poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
                     )
-        subs3 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+        subs3 = tm11.SubscriptionInstance(
                     status = tm11.SS_PAUSED,#Optional, defaults to ACTIVE
                     subscription_id = 'Subs001',#Required
                     #subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
@@ -675,7 +675,7 @@ class PollRequestTests(unittest.TestCase):
             inbox_address = 'https://example.com/inboxAddress/',#Required
             delivery_message_binding = t.VID_TAXII_XML_11)#Required
 
-        poll_params1 = tm11.PollRequest.PollParameters(
+        poll_params1 = tm11.PollParameters(
                         allow_asynch = False,#Optional, defaults to False
                         response_type = tm11.RT_COUNT_ONLY,#Optional, defaults to RT_FULL
                         content_bindings = [tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],#Optional, defaults to None, which means "all bindings are accepted in response"
@@ -691,7 +691,7 @@ class PollRequestTests(unittest.TestCase):
         round_trip_message(poll_req3)
 
     def test_poll_req4(self):
-        poll_params2 = tm11.PollRequest.PollParameters()
+        poll_params2 = tm11.PollParameters()
         poll_req4 = tm11.PollRequest(
                 message_id = 'PollReq04',#Required
                 collection_name = 'collection100',#Required
@@ -700,7 +700,7 @@ class PollRequestTests(unittest.TestCase):
         round_trip_message(poll_req4)
 
     def test_poll_req5(self):
-        poll_params3 = tm11.PollRequest.PollParameters(query = query1)#Optional - defaults to None)#Optional - defaults to None
+        poll_params3 = tm11.PollParameters(query = query1)#Optional - defaults to None)#Optional - defaults to None
         poll_req5 = tm11.PollRequest(
                 message_id = 'PollReq05',#Required
                 collection_name = 'collection100',#Required
@@ -758,7 +758,7 @@ class PollResponseTests(unittest.TestCase):
 class InboxMessageTests(unittest.TestCase):
 
     def test_inbox1(self):
-        subs_info1 = tm11.InboxMessage.SubscriptionInformation(
+        subs_info1 = tm11.SubscriptionInformation(
                 collection_name='SomeCollectionName',  # Required
                 subscription_id='SubsId021',  # Required
                 exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),  # Optional for data feeds, prohibited for data sets
@@ -778,7 +778,7 @@ class InboxMessageTests(unittest.TestCase):
         round_trip_message(inbox2)
 
     def test_inbox3(self):
-        subs_info2 = tm11.InboxMessage.SubscriptionInformation(
+        subs_info2 = tm11.SubscriptionInformation(
                 collection_name='SomeCollectionName',  # Required
                 subscription_id='SubsId021') # Required
 
@@ -837,4 +837,3 @@ class ContentBlockTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
