@@ -9,7 +9,17 @@
 
     .. code-block:: python
 
+        import datetime
+        from dateutil.tz import tzutc
+        import libtaxii as t
         import libtaxii.messages_11 as tm11
+
+.. testsetup::
+
+    import datetime
+    from dateutil.tz import tzutc
+    import libtaxii as t
+    import libtaxii.messages_11 as tm11
 
 
 Status Message
@@ -19,7 +29,7 @@ Status Message
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     sm03 = tm11.StatusMessage(
             message_id='SM03',
@@ -35,7 +45,7 @@ Discovery Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     headers={'ext_header1': 'value1', 'ext_header2': 'value2'}
     discovery_request = tm11.DiscoveryRequest(
@@ -51,13 +61,13 @@ Discovery Response
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
-    discovery_request = tm11.DiscoveryResponse(
+    discovery_response = tm11.DiscoveryResponse(
             message_id=tm11.generate_message_id(),
             in_response_to=discovery_request.message_id)
 
-    service_instance= tm11.DiscoveryResponse.ServiceInstance(
+    service_instance = tm11.DiscoveryResponse.ServiceInstance(
             service_type=tm11.SVC_POLL,
             services_version=t.VID_TAXII_SERVICES_11,
             protocol_binding=t.VID_TAXII_HTTP_10,
@@ -65,14 +75,13 @@ Discovery Response
             message_bindings=[t.VID_TAXII_XML_11],
             available=True,
             message='This is a message.',
-            supported_query=[tdq1])
+            #supported_query=[tdq1],
+            )
 
     discovery_response.service_instances.append(service_instance)
 
-Alternatively, you could define the service instance(s) first and use the
-following:
-
-.. code-block:: python
+    # Alternatively, you could define the service instance(s) first and use the
+    # following:
 
     service_instance_list = [service_instance]
     discovery_response = tm11.DiscoveryResponse(
@@ -88,7 +97,7 @@ Collection Information Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     ext_headers = {'name1': 'val1', 'name2': 'val2'}
     collection_information_request = tm11.CollectionInformationRequest(
@@ -108,7 +117,7 @@ Collection Information Response
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     push_method1 = tm11.CollectionInformationResponse.CollectionInformation.PushMethod(
             push_protocol=t.VID_TAXII_HTTP_10,
@@ -116,17 +125,22 @@ Collection Information Response
 
     poll_service1 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
             poll_protocol=t.VID_TAXII_HTTPS_10,
-            poll_address='https://example.com/TheGreatestPollService',
+            poll_address='https://example.com/PollService1',
+            poll_message_bindings=[t.VID_TAXII_XML_11])
+
+    poll_service2 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_address='https://example.com/PollService2',
             poll_message_bindings=[t.VID_TAXII_XML_11])
 
     subs_method1 = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
             subscription_protocol=t.VID_TAXII_HTTPS_10,
-            subscription_address='https://example.com/TheSubscriptionService/',
+            subscription_address='https://example.com/SubscriptionService',
             subscription_message_bindings=[t.VID_TAXII_XML_11])
 
     inbox_service1 = tm11.CollectionInformationResponse.CollectionInformation.ReceivingInboxService(
             inbox_protocol=t.VID_TAXII_HTTPS_10,
-            inbox_address='https://example.com/inbox/',
+            inbox_address='https://example.com/InboxService',
             inbox_message_bindings=[t.VID_TAXII_XML_11],
             supported_contents=None)
 
@@ -137,10 +151,10 @@ Collection Information Response
             available=False,
             push_methods=[push_method1],
             polling_service_instances=[poll_service1, poll_service2],
-            subscription_methods=[subs_method1, subs_method2],
+            subscription_methods=[subs_method1],
             collection_volume=4,
             collection_type=tm11.CT_DATA_FEED,
-            receiving_inbox_services=[inbox_service1, inbox_service2])
+            receiving_inbox_services=[inbox_service1])
 
     collection_response1 = tm11.CollectionInformationResponse(
             message_id='CIR01',
@@ -155,7 +169,10 @@ Manage Collection Subscription Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
+
+    subscription_parameters1 = tm11.SubscriptionParameters()
+    push_parameters1 = tm11.PushParameters("", "", "")
 
     subs_req1 = tm11.ManageCollectionSubscriptionRequest(
             message_id='SubsReq01',
@@ -174,7 +191,11 @@ Manage Collection Subscription Response
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
+
+    subscription_parameters1 = tm11.SubscriptionParameters()
+    push_parameters1 = tm11.PushParameters("", "", "")
+
 
     poll_instance1 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
             poll_protocol=t.VID_TAXII_HTTPS_10,
@@ -204,7 +225,7 @@ Poll Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     delivery_parameters1 = tm11.DeliveryParameters(
             inbox_protocol=t.VID_TAXII_HTTPS_10,
@@ -215,7 +236,7 @@ Poll Request
             allow_asynch=False,
             response_type=tm11.RT_COUNT_ONLY,
             content_bindings=[tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],
-            query=query1,
+            #query=query1,
             delivery_parameters=delivery_parameters1)
 
     poll_req3 = tm11.PollRequest(
@@ -233,9 +254,12 @@ Poll Response
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
-    count = tm11.RecordCount(record_count=22, partial_count=False),
+    cb1 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
+    cb2 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
+
+    count = tm11.RecordCount(record_count=22, partial_count=False)
 
     poll_resp1 = tm11.PollResponse(
             message_id='PollResp1',
@@ -245,7 +269,7 @@ Poll Response
             inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
             subscription_id='24',
             message='This is a test message',
-            content_blocks=[cb1, cb2]
+            content_blocks=[cb1, cb2],
             more=True,
             result_id='123',
             result_part_number=1,
@@ -260,7 +284,10 @@ Inbox Message
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
+
+    cb1 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
+    cb2 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
 
     subs_info1 = tm11.InboxMessage.SubscriptionInformation(
             collection_name='SomeCollectionName',
@@ -275,7 +302,7 @@ Inbox Message
             message='Hello!',
             subscription_information=subs_info1,
             record_count=tm11.RecordCount(22, partial_count=True),
-            content_blocks=[cb001, cb002])
+            content_blocks=[cb1, cb2])
 
 
 Poll Fulfillment Request
@@ -285,7 +312,7 @@ Poll Fulfillment Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     pf1 = tm11.PollFulfillmentRequest(
             message_id='pf1',
@@ -305,7 +332,7 @@ Other Classes
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     cb001 = tm11.ContentBlock(
             content_binding=tm11.ContentBinding(t.CB_STIX_XML_11),
