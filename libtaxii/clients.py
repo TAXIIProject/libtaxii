@@ -117,6 +117,7 @@ class HttpClient:
 
         Note that it is possible to pass in one dict containing credentials for
         different authentication types and swap between them later.
+
         :param auth_credentials_dict dict: The dictionary containing authentication credentials. e.g.:
             - {'key_file': '/path/to/key.key', 'cert_file': '/path/to/cert.crt'}
             - {'username': 'abc', 'password': 'xyz'}
