@@ -12,6 +12,23 @@
         import libtaxii.messages_10 as tm10
 
 
+Status Message
+--------------
+
+.. autoclass:: StatusMessage
+
+**Example:**
+
+.. code-block:: python
+
+    status_message1 = tm10.StatusMessage(
+            message_id=tm10.generate_message_id(),
+            in_response_to="12345",
+            status_type=tm10.ST_SUCCESS,
+            status_detail='Machine-processable info here!',
+            message='This is a message.')
+
+
 Discovery Request
 -----------------
 
@@ -25,6 +42,7 @@ Discovery Request
     discovery_request = tm10.DiscoveryRequest(
             message_id=tm10.generate_message_id(),
             extended_headers=ext_headers)
+
 
 Discovery Response
 ------------------
@@ -65,7 +83,7 @@ following:
 
 
 Feed Information Request
-------------------------------
+------------------------
 
 .. autoclass:: FeedInformationRequest
 
@@ -80,7 +98,7 @@ Feed Information Request
 
 
 Feed Information Response
--------------------------------
+-------------------------
 
 .. autoclass:: FeedInformationResponse
 .. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation
@@ -119,84 +137,6 @@ Feed Information Response
             message_id=tm10.generate_message_id(),
             in_response_to=tm10.generate_message_id(),
             feed_informations=[feed1])
-
-
-Poll Request
-------------
-
-.. autoclass:: PollRequest
-
-**Example:**
-
-.. code-block:: python
-
-    poll_request1 = tm10.PollRequest(
-            message_id=tm10.generate_message_id(),
-            feed_name='TheFeedToPoll',
-            exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
-            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
-            subscription_id='SubsId002',
-            content_bindings=[t.CB_STIX_XML_10])
-
-
-Poll Response
--------------
-
-.. autoclass:: PollResponse
-
-**Example:**
-
-.. code-block:: python
-
-    poll_response1 = tm10.PollResponse(
-            message_id=tm10.generate_message_id(),
-            in_response_to="12345",
-            feed_name='FeedName',
-            inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
-            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
-            subscription_id='SubsId001',
-            message='This is a message.',
-            content_blocks=[])
-
-
-Status Message
---------------
-
-.. autoclass:: StatusMessage
-
-**Example:**
-
-.. code-block:: python
-
-    status_message1 = tm10.StatusMessage(
-            message_id=tm10.generate_message_id(),
-            in_response_to="12345",
-            status_type=tm10.ST_SUCCESS,
-            status_detail='Machine-processable info here!',
-            message='This is a message.')
-
-
-Inbox Message
--------------
-
-.. autoclass:: InboxMessage
-.. autoclass:: libtaxii.messages_10::InboxMessage.SubscriptionInformation
-
-**Example:**
-
-.. code-block:: python
-
-    subscription_information1 = tm10.InboxMessage.SubscriptionInformation(
-            feed_name='SomeFeedName',
-            subscription_id='SubsId021',
-            inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
-            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))
-
-    inbox_message1 = tm10.InboxMessage(
-            message_id=tm10.generate_message_id(),
-            message='This is a message.',
-            subscription_information=subscription_information1,
-            content_blocks=[xml_content_block1])
 
 
 Manage Feed Subscription Request
@@ -249,6 +189,67 @@ Manage Feed Subscription Response
             feed_name='Feed001',
             message='This is a message',
             subscription_instances=[subscription_instance1])
+
+
+Poll Request
+------------
+
+.. autoclass:: PollRequest
+
+**Example:**
+
+.. code-block:: python
+
+    poll_request1 = tm10.PollRequest(
+            message_id=tm10.generate_message_id(),
+            feed_name='TheFeedToPoll',
+            exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
+            subscription_id='SubsId002',
+            content_bindings=[t.CB_STIX_XML_10])
+
+
+Poll Response
+-------------
+
+.. autoclass:: PollResponse
+
+**Example:**
+
+.. code-block:: python
+
+    poll_response1 = tm10.PollResponse(
+            message_id=tm10.generate_message_id(),
+            in_response_to="12345",
+            feed_name='FeedName',
+            inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
+            subscription_id='SubsId001',
+            message='This is a message.',
+            content_blocks=[])
+
+
+Inbox Message
+-------------
+
+.. autoclass:: InboxMessage
+.. autoclass:: libtaxii.messages_10::InboxMessage.SubscriptionInformation
+
+**Example:**
+
+.. code-block:: python
+
+    subscription_information1 = tm10.InboxMessage.SubscriptionInformation(
+            feed_name='SomeFeedName',
+            subscription_id='SubsId021',
+            inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+            inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))
+
+    inbox_message1 = tm10.InboxMessage(
+            message_id=tm10.generate_message_id(),
+            message='This is a message.',
+            subscription_information=subscription_information1,
+            content_blocks=[xml_content_block1])
 
 
 Other Classes

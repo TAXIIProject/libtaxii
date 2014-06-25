@@ -12,6 +12,22 @@
         import libtaxii.messages_11 as tm11
 
 
+Status Message
+--------------
+
+.. autoclass:: StatusMessage
+
+**Example:**
+
+.. code-block:: python
+
+    sm03 = tm11.StatusMessage(
+            message_id='SM03',
+            in_response_to=tm11.generate_message_id(),
+            status_type=tm11.ST_DESTINATION_COLLECTION_ERROR,
+            status_detail={'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']})
+
+
 Discovery Request
 -----------------
 
@@ -132,6 +148,54 @@ Collection Information Response
             collection_informations=[collection1])
 
 
+Manage Collection Subscription Request
+--------------------------------------
+
+.. autoclass:: ManageCollectionSubscriptionRequest
+
+**Example:**
+
+.. code-block:: python
+
+    subs_req1 = tm11.ManageCollectionSubscriptionRequest(
+            message_id='SubsReq01',
+            action=tm11.ACT_SUBSCRIBE,
+            collection_name='collection1',
+            subscription_parameters=subscription_parameters1,
+            push_parameters=push_parameters1)
+
+
+Manage Collection Subscription Response
+---------------------------------------
+
+.. autoclass:: ManageCollectionSubscriptionResponse
+.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.SubscriptionInstance
+.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.PollInstance
+
+**Example:**
+
+.. code-block:: python
+
+    poll_instance1 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_address='https://example.com/poll1/',
+            poll_message_bindings=[t.VID_TAXII_XML_11])
+
+    subs1 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+            subscription_id='Subs001',
+            status=tm11.SS_ACTIVE,
+            subscription_parameters=subscription_parameters1,
+            push_parameters=push_parameters1,
+            poll_instances=[poll_instance1])
+
+    subs_resp1 = tm11.ManageCollectionSubscriptionResponse(
+            message_id='SubsResp01',
+            in_response_to='xyz',
+            collection_name='abc123',
+            message='Hullo!',
+            subscription_instances=[subs1])
+
+
 Poll Request
 ------------
 
@@ -187,21 +251,6 @@ Poll Response
             result_part_number=1,
             record_count=count)
 
-Status Message
---------------
-
-.. autoclass:: StatusMessage
-
-**Example:**
-
-.. code-block:: python
-
-    sm03 = tm11.StatusMessage(
-            message_id='SM03',
-            in_response_to=tm11.generate_message_id(),
-            status_type=tm11.ST_DESTINATION_COLLECTION_ERROR,
-            status_detail={'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']})
-
 
 Inbox Message
 -------------
@@ -227,54 +276,6 @@ Inbox Message
             subscription_information=subs_info1,
             record_count=tm11.RecordCount(22, partial_count=True),
             content_blocks=[cb001, cb002])
-
-
-Manage Collection Subscription Request
---------------------------------------
-
-.. autoclass:: ManageCollectionSubscriptionRequest
-
-**Example:**
-
-.. code-block:: python
-
-    subs_req1 = tm11.ManageCollectionSubscriptionRequest(
-            message_id='SubsReq01',
-            action=tm11.ACT_SUBSCRIBE,
-            collection_name='collection1',
-            subscription_parameters=subscription_parameters1,
-            push_parameters=push_parameters1)
-
-
-Manage Collection Subscription Response
----------------------------------------
-
-.. autoclass:: ManageCollectionSubscriptionResponse
-.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.SubscriptionInstance
-.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.PollInstance
-
-**Example:**
-
-.. code-block:: python
-
-    poll_instance1 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
-            poll_protocol=t.VID_TAXII_HTTPS_10,
-            poll_address='https://example.com/poll1/',
-            poll_message_bindings=[t.VID_TAXII_XML_11])
-
-    subs1 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
-            subscription_id='Subs001',
-            status=tm11.SS_ACTIVE,
-            subscription_parameters=subscription_parameters1,
-            push_parameters=push_parameters1,
-            poll_instances=[poll_instance1])
-
-    subs_resp1 = tm11.ManageCollectionSubscriptionResponse(
-            message_id='SubsResp01',
-            in_response_to='xyz',
-            collection_name='abc123',
-            message='Hullo!',
-            subscription_instances=[subs1])
 
 
 Poll Fulfillment Request
