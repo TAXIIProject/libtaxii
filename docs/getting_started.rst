@@ -29,6 +29,8 @@ The libtaxii library contains the following modules:
 TAXII Messages Module Structure
 -------------------------------
 
+.. TODO:  Update this description once we stop using nested classes.
+
 In the TAXII message modules (**libtaxii.messages_10** and
 **libtaxii.messages_11**), there is a class corresponding to each type of TAXII
 message.  For example, there is a ``DiscoveryRequest`` class for the Discovery

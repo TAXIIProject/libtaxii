@@ -57,7 +57,7 @@ Discovery Response
 ------------------
 
 .. autoclass:: DiscoveryResponse
-.. autoclass:: libtaxii.messages_11::DiscoveryResponse.ServiceInstance
+.. autoclass:: ServiceInstance
 
 **Example:**
 
@@ -67,7 +67,7 @@ Discovery Response
             message_id=tm11.generate_message_id(),
             in_response_to=discovery_request.message_id)
 
-    service_instance = tm11.DiscoveryResponse.ServiceInstance(
+    service_instance = tm11.ServiceInstance(
             service_type=tm11.SVC_POLL,
             services_version=t.VID_TAXII_SERVICES_11,
             protocol_binding=t.VID_TAXII_HTTP_10,
@@ -109,42 +109,42 @@ Collection Information Response
 -------------------------------
 
 .. autoclass:: CollectionInformationResponse
-.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation
-.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.PushMethod
-.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.PollingServiceInstance
-.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.SubscriptionMethod
-.. autoclass:: libtaxii.messages_11::CollectionInformationResponse.CollectionInformation.ReceivingInboxService
+.. autoclass:: CollectionInformation
+.. autoclass:: PushMethod
+.. autoclass:: PollingServiceInstance
+.. autoclass:: SubscriptionMethod
+.. autoclass:: ReceivingInboxService
 
 **Example:**
 
 .. testcode::
 
-    push_method1 = tm11.CollectionInformationResponse.CollectionInformation.PushMethod(
+    push_method1 = tm11.PushMethod(
             push_protocol=t.VID_TAXII_HTTP_10,
             push_message_bindings=[t.VID_TAXII_XML_11])
 
-    poll_service1 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+    poll_service1 = tm11.PollingServiceInstance(
             poll_protocol=t.VID_TAXII_HTTPS_10,
             poll_address='https://example.com/PollService1',
             poll_message_bindings=[t.VID_TAXII_XML_11])
 
-    poll_service2 = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+    poll_service2 = tm11.PollingServiceInstance(
             poll_protocol=t.VID_TAXII_HTTPS_10,
             poll_address='https://example.com/PollService2',
             poll_message_bindings=[t.VID_TAXII_XML_11])
 
-    subs_method1 = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
+    subs_method1 = tm11.SubscriptionMethod(
             subscription_protocol=t.VID_TAXII_HTTPS_10,
             subscription_address='https://example.com/SubscriptionService',
             subscription_message_bindings=[t.VID_TAXII_XML_11])
 
-    inbox_service1 = tm11.CollectionInformationResponse.CollectionInformation.ReceivingInboxService(
+    inbox_service1 = tm11.ReceivingInboxService(
             inbox_protocol=t.VID_TAXII_HTTPS_10,
             inbox_address='https://example.com/InboxService',
             inbox_message_bindings=[t.VID_TAXII_XML_11],
             supported_contents=None)
 
-    collection1 = tm11.CollectionInformationResponse.CollectionInformation(
+    collection1 = tm11.CollectionInformation(
             collection_name='collection1',
             collection_description='This is a collection',
             supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101)],
@@ -186,8 +186,8 @@ Manage Collection Subscription Response
 ---------------------------------------
 
 .. autoclass:: ManageCollectionSubscriptionResponse
-.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.SubscriptionInstance
-.. autoclass:: libtaxii.messages_11::ManageCollectionSubscriptionResponse.PollInstance
+.. autoclass:: SubscriptionInstance
+.. autoclass:: PollInstance
 
 **Example:**
 
@@ -197,12 +197,12 @@ Manage Collection Subscription Response
     push_parameters1 = tm11.PushParameters("", "", "")
 
 
-    poll_instance1 = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+    poll_instance1 = tm11.PollInstance(
             poll_protocol=t.VID_TAXII_HTTPS_10,
             poll_address='https://example.com/poll1/',
             poll_message_bindings=[t.VID_TAXII_XML_11])
 
-    subs1 = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+    subs1 = tm11.SubscriptionInstance(
             subscription_id='Subs001',
             status=tm11.SS_ACTIVE,
             subscription_parameters=subscription_parameters1,
@@ -221,7 +221,7 @@ Poll Request
 ------------
 
 .. autoclass:: PollRequest
-.. autoclass:: libtaxii.messages_11::PollRequest.PollParameters
+.. autoclass:: PollParameters
 
 **Example:**
 
@@ -232,7 +232,7 @@ Poll Request
             inbox_address='https://example.com/inboxAddress/',
             delivery_message_binding=t.VID_TAXII_XML_11)
 
-    poll_params1 = tm11.PollRequest.PollParameters(
+    poll_params1 = tm11.PollParameters(
             allow_asynch=False,
             response_type=tm11.RT_COUNT_ONLY,
             content_bindings=[tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],
@@ -280,7 +280,7 @@ Inbox Message
 -------------
 
 .. autoclass:: InboxMessage
-.. autoclass:: libtaxii.messages_11::InboxMessage.SubscriptionInformation
+.. autoclass:: SubscriptionInformation
 
 **Example:**
 
@@ -289,7 +289,7 @@ Inbox Message
     cb1 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
     cb2 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
 
-    subs_info1 = tm11.InboxMessage.SubscriptionInformation(
+    subs_info1 = tm11.SubscriptionInformation(
             collection_name='SomeCollectionName',
             subscription_id='SubsId021',
             exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
@@ -325,7 +325,6 @@ Other Classes
 -------------
 
 .. autoclass:: TAXIIMessage
-.. autoclass:: BaseNonMessage
 
 .. autoclass:: ContentBinding
 .. autoclass:: ContentBlock
@@ -351,8 +350,6 @@ Functions
 ---------
 
 .. autofunction:: generate_message_id
-.. autofunction:: get_xml_parser
-.. autofunction:: set_xml_parser
 .. autofunction:: validate_xml
 .. autofunction:: get_message_from_xml
 .. autofunction:: get_message_from_dict

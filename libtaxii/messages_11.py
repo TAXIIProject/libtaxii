@@ -16,7 +16,6 @@ try:
     import simplejson as json
 except ImportError:
     import json
-from operator import attrgetter
 import os
 import StringIO
 
@@ -24,7 +23,9 @@ import dateutil.parser
 from lxml import etree
 
 import libtaxii.messages_10 as tm10
-from libtaxii.validation import do_check, uri_regex, check_timestamp_label
+
+from .common import get_xml_parser, set_xml_parser, TAXIIBase
+from .validation import do_check, uri_regex, check_timestamp_label
 
 
 # TAXII 1.0 Message Types
@@ -211,29 +212,6 @@ def _str2datetime(date_string):
 #Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
 
-
-global_xml_parser = None
-def get_xml_parser():
-    """Return the XML parser currently in use.
-
-    If one has not already been set (via :py:func:`set_xml_parser()`), a new
-    ``etree.XMLParser`` is constructed with ``no_network=True`` and
-    ``huge_tree=True``.
-    """
-    global global_xml_parser
-    if global_xml_parser is None:
-        global_xml_parser = etree.XMLParser(no_network=True, huge_tree=True)
-    return global_xml_parser
-
-
-def set_xml_parser(xml_parser=None):
-    """Set the libtaxii.messages XML parser.
-
-    Args:
-        xml_parser (etree.XMLParser): The parser to use to parse TAXII XML.
-    """
-    global global_xml_parser
-    global_xml_parser = xml_parser
 
 
 def validate_xml(xml_string):
@@ -465,151 +443,7 @@ def get_deserializer(format_id, type):
     # return elt
 
 
-class BaseNonMessage(object):
-    """
-    This class should not be used directly by libtaxii users.  
-    Base class for non-TAXII Message objects
-
-    """
-
-    @property
-    def sort_key(self):
-        """
-        This property allows list of BaseNonMessage objects to 
-        be compared efficiently. The __eq__ method uses this 
-        property to sort the lists before comparisons are made
-        """
-        raise NotImplementedError()
-
-    def to_etree(self):
-        """Create an etree representation of this class.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    def to_dict(self):
-        """Create a dictionary representation of this class.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    def to_xml(self, pretty_print=False):
-        """Create an XML representation of this class.
-        subclasses should not need to implement this method
-        """
-        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
-
-    @classmethod
-    def from_etree(cls, src_etree):
-        """Create an instance of this class from an etree.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def from_dict(cls, d):
-        """Create an instance of this class from a dictionary.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def from_xml(cls, xml):
-        """Create an instance of this class from XML.
-        subclasses should not need to implement this method
-        """
-        if isinstance(xml, basestring):
-            f = StringIO.StringIO(xml)
-        else:
-            f = xml
-
-        etree_xml = etree.parse(f, get_xml_parser()).getroot()
-        return cls.from_etree(etree_xml)
-
-    def __eq__(self, other, debug=False):
-        """
-        A general equals method that works for all subclasses of this object,
-        as long as the subclasses do the following:
-        1. All class properties start with one underscore
-        2. The sort_key property is implemented
-
-        Arguments:
-        self (object) - this object
-        other (object) - the object to compare self against
-        debug (bool) - Whether or not to print debug statements as the evaluation is made
-        """
-        if other is None:
-            if debug:
-                print 'other was None!'
-            return False
-
-        if self.__class__.__name__ != other.__class__.__name__:
-            if debug:
-                print 'class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__)
-            return False
-
-        #Get all member properties that start with '_'
-        members = [attr for attr in dir(self) if not callable(attr) and attr.startswith('_') and not attr.startswith('__')]
-        for member in members:
-            if member not in self.__dict__:#TODO: The attr for attr... statement includes functions for some strange reason...
-                continue
-
-            if debug:
-                print 'member name: %s' % member
-            self_value = self.__dict__[member]
-            other_value = other.__dict__[member]
-
-            if isinstance(self_value, BaseNonMessage):#A debuggable equals comparison can be made
-                eq = self_value.__eq__(other_value, debug)
-            elif isinstance(self_value, list):#We have lists to compare
-                if len(self_value) != len(other_value):#Lengths not equal
-                    member = member + ' lengths'
-                    self_value = len(self_value)
-                    other_value = len(other_value)
-                    eq = False
-                elif len(self_value) == 0:#Both lists are of size 0, and therefore equal
-                    eq = True
-                else:#Equal sized, non-0 length lists. Might be BaseNonMessage objects, might not be
-                    #peek at the first item to see if it is a BaseNonMessage or not
-                    if isinstance(self_value[0], BaseNonMessage):#All BaseNonMessage objects have the 'sort_key' property implemented
-                        self_value = sorted(self_value, key=attrgetter('sort_key'))
-                        other_value = sorted(other_value, key=attrgetter('sort_key'))
-                        for s, o in zip(self_value, other_value):#Compare the ordered lists element by element
-                            eq = s.__eq__(o, debug)
-                    else:#Assume they don't... just do a set comparison
-                        eq = set(self_value) == set(other_value)
-            elif isinstance(self_value, dict):#Dictionary to compare
-                if len(set(self_value.keys()) - set(other_value.keys())) != 0:
-                    if debug:
-                        print 'dict keys not equal: %s != %s' % (self_value, other_value)
-                    eq = False
-                for k, v in self_value.iteritems():
-                    if other_value[k] != v:
-                        if debug:
-                            print 'dict values not equal: %s != %s' % (v, other_value[k])
-                        eq = False
-                eq = True
-            elif isinstance(self_value, etree._Element): # Non-TAXII etree element (i.e. STIX)
-                eq = (etree.tostring(self_value) == etree.tostring(other_value))
-            else:#Do a direct comparison
-                eq = self_value == other_value
-
-            if not eq:#TODO: is this duplicate?
-                if debug:
-                    print '%s was not equal: %s != %s' % (member, self_value, other_value)
-                return False
-
-        return True
-
-    def __ne__(self, other, debug=False):
-        return not self.__eq__(other, debug)
-
-
-class SupportedQuery(BaseNonMessage):
+class SupportedQuery(TAXIIBase):
     """
     This class contains an instance of a supported query. It
     is expected that, generally, messages_11.SupportedQuery
@@ -654,7 +488,7 @@ class SupportedQuery(BaseNonMessage):
         return SupportedQuery(**d)
 
 
-class Query(BaseNonMessage):
+class Query(TAXIIBase):
     """
     This class contains an instance of a query. It
     is expected that, generally, messages_11.Query 
@@ -701,7 +535,8 @@ class Query(BaseNonMessage):
 # - a "content_binding_id[>subtype]" structure
 # - a list of "content_binding_id[>subtype]" structures
 
-class ContentBinding(BaseNonMessage):
+
+class ContentBinding(TAXIIBase):
     """TAXII Content Binding component
 
     Args:
@@ -780,7 +615,7 @@ class ContentBinding(BaseNonMessage):
         return ContentBinding(**d)
 
 
-class RecordCount(BaseNonMessage):
+class RecordCount(TAXIIBase):
     """
     Information summarizing the number of records.
 
@@ -839,7 +674,7 @@ class RecordCount(BaseNonMessage):
         return RecordCount(**d)
 
 
-class _GenericParameters(BaseNonMessage):
+class _GenericParameters(TAXIIBase):
     name = 'Generic_Parameters'
 
     def __init__(self, response_type = RT_FULL, content_bindings = None, query = None):
@@ -956,7 +791,7 @@ class SubscriptionParameters(_GenericParameters):
     name = 'Subscription_Parameters'
 
 
-class ContentBlock(BaseNonMessage):
+class ContentBlock(TAXIIBase):
     """A TAXII Content Block.
 
     Args:
@@ -1147,7 +982,7 @@ class ContentBlock(BaseNonMessage):
         return cls.from_dict(json.loads(json_string))
 
 
-class PushParameters(BaseNonMessage):
+class PushParameters(TAXIIBase):
     """Set up Push Parameters.
 
     Args:
@@ -1263,7 +1098,7 @@ class DeliveryParameters(PushParameters):
     name = 'Delivery_Parameters'
 
 
-class TAXIIMessage(BaseNonMessage):
+class TAXIIMessage(TAXIIBase):
     """Encapsulate properties common to all TAXII Messages (such as headers).
 
     This class is extended by each Message Type (e.g., DiscoveryRequest), with
@@ -1467,7 +1302,7 @@ class DiscoveryResponse(TAXIIMessage):
 
     @service_instances.setter
     def service_instances(self, value):
-        do_check(value, 'service_instances', type=DiscoveryResponse.ServiceInstance)
+        do_check(value, 'service_instances', type=ServiceInstance)
         self._service_instances = value
 
     def to_etree(self):
@@ -1489,7 +1324,7 @@ class DiscoveryResponse(TAXIIMessage):
         kwargs['service_instances'] = []
         service_instance_set = etree_xml.xpath('./taxii_11:Service_Instance', namespaces=ns_map)
         for service_instance in service_instance_set:
-            si = DiscoveryResponse.ServiceInstance.from_etree(service_instance)
+            si = ServiceInstance.from_etree(service_instance)
             kwargs['service_instances'].append(si)
 
         return super(DiscoveryResponse, cls).from_etree(etree_xml, **kwargs)
@@ -1500,240 +1335,241 @@ class DiscoveryResponse(TAXIIMessage):
         msg.service_instances = []
         service_instance_set = d['service_instances']
         for service_instance in service_instance_set:
-            si = DiscoveryResponse.ServiceInstance.from_dict(service_instance)
+            si = ServiceInstance.from_dict(service_instance)
             msg.service_instances.append(si)
         return msg
 
-    class ServiceInstance(BaseNonMessage):
-        """
-        The Service Instance component of a TAXII Discovery Response Message.
 
-        Args:
-            service_type (string): identifies the Service Type of this
-                Service Instance. **Required**
-            services_version (string): identifies the TAXII Services
-                Specification to which this Service conforms. **Required**
-            protocol_binding (string): identifies the protocol binding
-                supported by this Service. **Required**
-            service_address (string): identifies the network address of the
-                TAXII Daemon that hosts this Service. **Required**
-            message_bindings (list of strings): identifies the message
-                bindings supported by this Service instance. **Required**
-            inbox_service_accepted_content (list of strings): identifies
-                content bindings that this Inbox Service is willing to accept.
-                **Optional**
-            available (boolean): indicates whether the identity of the
-                requester (authenticated or otherwise) is allowed to access this
-                TAXII Service. **Optional**
-            message (string): contains a message regarding this Service
-                instance. **Optional**
-            supported_query (SupportedQuery): contains a structure indicating a
-                supported query. **Optional**
+class ServiceInstance(TAXIIBase):
+    """
+    The Service Instance component of a TAXII Discovery Response Message.
 
-        The ``message_bindings`` list must contain at least one value. The
-        ``supported_query`` parameter is optional when
-        ``service_type`` is :py:data:`SVC_POLL`.
-        """
+    Args:
+        service_type (string): identifies the Service Type of this
+            Service Instance. **Required**
+        services_version (string): identifies the TAXII Services
+            Specification to which this Service conforms. **Required**
+        protocol_binding (string): identifies the protocol binding
+            supported by this Service. **Required**
+        service_address (string): identifies the network address of the
+            TAXII Daemon that hosts this Service. **Required**
+        message_bindings (list of strings): identifies the message
+            bindings supported by this Service instance. **Required**
+        inbox_service_accepted_content (list of strings): identifies
+            content bindings that this Inbox Service is willing to accept.
+            **Optional**
+        available (boolean): indicates whether the identity of the
+            requester (authenticated or otherwise) is allowed to access this
+            TAXII Service. **Optional**
+        message (string): contains a message regarding this Service
+            instance. **Optional**
+        supported_query (SupportedQuery): contains a structure indicating a
+            supported query. **Optional**
 
-        def __init__(self, service_type, services_version, protocol_binding,
-                     service_address, message_bindings,
-                     inbox_service_accepted_content=None, available=None,
-                     message=None, supported_query=None):
-            self.service_type = service_type
-            self.services_version = services_version
-            self.protocol_binding = protocol_binding
-            self.service_address = service_address
-            self.message_bindings = message_bindings
-            self.inbox_service_accepted_content = inbox_service_accepted_content or []
-            self.available = available
-            self.message = message
-            self.supported_query = supported_query or []
+    The ``message_bindings`` list must contain at least one value. The
+    ``supported_query`` parameter is optional when
+    ``service_type`` is :py:data:`SVC_POLL`.
+    """
 
-        @property
-        def sort_key(self):
-            return self.service_address
+    def __init__(self, service_type, services_version, protocol_binding,
+                    service_address, message_bindings,
+                    inbox_service_accepted_content=None, available=None,
+                    message=None, supported_query=None):
+        self.service_type = service_type
+        self.services_version = services_version
+        self.protocol_binding = protocol_binding
+        self.service_address = service_address
+        self.message_bindings = message_bindings
+        self.inbox_service_accepted_content = inbox_service_accepted_content or []
+        self.available = available
+        self.message = message
+        self.supported_query = supported_query or []
 
-        @property
-        def service_type(self):
-            return self._service_type
+    @property
+    def sort_key(self):
+        return self.service_address
 
-        @service_type.setter
-        def service_type(self, value):
-            do_check(value, 'service_type', value_tuple=SVC_TYPES)
-            self._service_type = value
+    @property
+    def service_type(self):
+        return self._service_type
 
-        @property
-        def services_version(self):
-            return self._services_version
+    @service_type.setter
+    def service_type(self, value):
+        do_check(value, 'service_type', value_tuple=SVC_TYPES)
+        self._service_type = value
 
-        @services_version.setter
-        def services_version(self, value):
-            do_check(value, 'services_version', regex_tuple=uri_regex)
-            self._services_version = value
+    @property
+    def services_version(self):
+        return self._services_version
 
-        @property
-        def protocol_binding(self):
-            return self._protocol_binding
+    @services_version.setter
+    def services_version(self, value):
+        do_check(value, 'services_version', regex_tuple=uri_regex)
+        self._services_version = value
 
-        @protocol_binding.setter
-        def protocol_binding(self, value):
-            do_check(value, 'protocol_binding', regex_tuple=uri_regex)
-            self._protocol_binding = value
+    @property
+    def protocol_binding(self):
+        return self._protocol_binding
 
-        @property
-        def service_address(self):
-            return self._service_address
+    @protocol_binding.setter
+    def protocol_binding(self, value):
+        do_check(value, 'protocol_binding', regex_tuple=uri_regex)
+        self._protocol_binding = value
 
-        @service_address.setter
-        def service_address(self, value):
-            self._service_address = value
+    @property
+    def service_address(self):
+        return self._service_address
 
-        @property
-        def message_bindings(self):
-            return self._message_bindings
+    @service_address.setter
+    def service_address(self, value):
+        self._service_address = value
 
-        @message_bindings.setter
-        def message_bindings(self, value):
-            do_check(value, 'message_bindings', regex_tuple=uri_regex)
-            self._message_bindings = value
+    @property
+    def message_bindings(self):
+        return self._message_bindings
 
-        @property
-        def supported_query(self):
-            return self._supported_query
+    @message_bindings.setter
+    def message_bindings(self, value):
+        do_check(value, 'message_bindings', regex_tuple=uri_regex)
+        self._message_bindings = value
 
-        @supported_query.setter
-        def supported_query(self, value):
-            do_check(value, 'supported_query', type=SupportedQuery)
-            self._supported_query = value
+    @property
+    def supported_query(self):
+        return self._supported_query
 
-        @property
-        def inbox_service_accepted_content(self):
-            return self._inbox_service_accepted_content
+    @supported_query.setter
+    def supported_query(self, value):
+        do_check(value, 'supported_query', type=SupportedQuery)
+        self._supported_query = value
 
-        @inbox_service_accepted_content.setter
-        def inbox_service_accepted_content(self, value):
-            value = _sanitize_content_bindings(value)
-            do_check(value, 'inbox_service_accepted_content', type=ContentBinding)
-            self._inbox_service_accepted_content = value
+    @property
+    def inbox_service_accepted_content(self):
+        return self._inbox_service_accepted_content
 
-        @property
-        def available(self):
-            return self._available
+    @inbox_service_accepted_content.setter
+    def inbox_service_accepted_content(self, value):
+        value = _sanitize_content_bindings(value)
+        do_check(value, 'inbox_service_accepted_content', type=ContentBinding)
+        self._inbox_service_accepted_content = value
 
-        @available.setter
-        def available(self, value):
-            do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
-            self._available = value
+    @property
+    def available(self):
+        return self._available
 
-        @property
-        def service_type(self):
-            return self._service_type
+    @available.setter
+    def available(self, value):
+        do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
+        self._available = value
 
-        @service_type.setter
-        def service_type(self, value):
-            do_check(value, 'service_type', value_tuple=SVC_TYPES)
-            self._service_type = value
+    @property
+    def service_type(self):
+        return self._service_type
 
-        def to_etree(self):
-            si = etree.Element('{%s}Service_Instance' % ns_map['taxii_11'], nsmap = ns_map)
-            si.attrib['service_type'] = self.service_type
-            si.attrib['service_version'] = self.services_version
-            if self.available is not None:
-                si.attrib['available'] = str(self.available).lower()
+    @service_type.setter
+    def service_type(self, value):
+        do_check(value, 'service_type', value_tuple=SVC_TYPES)
+        self._service_type = value
 
-            protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-            protocol_binding.text = self.protocol_binding
+    def to_etree(self):
+        si = etree.Element('{%s}Service_Instance' % ns_map['taxii_11'], nsmap = ns_map)
+        si.attrib['service_type'] = self.service_type
+        si.attrib['service_version'] = self.services_version
+        if self.available is not None:
+            si.attrib['available'] = str(self.available).lower()
 
-            service_address = etree.SubElement(si, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
-            service_address.text = self.service_address
+        protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        protocol_binding.text = self.protocol_binding
 
-            for mb in self.message_bindings:
-                message_binding = etree.SubElement(si, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                message_binding.text = mb
+        service_address = etree.SubElement(si, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
+        service_address.text = self.service_address
 
-            for sq in self.supported_query:
-                si.append(sq.to_etree())
+        for mb in self.message_bindings:
+            message_binding = etree.SubElement(si, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            message_binding.text = mb
 
-            for cb in self.inbox_service_accepted_content:
-                content_binding = cb.to_etree()
-                si.append(content_binding)
+        for sq in self.supported_query:
+            si.append(sq.to_etree())
 
-            if self.message is not None:
-                message = etree.SubElement(si, '{%s}Message' % ns_map['taxii_11'], nsmap = ns_map)
-                message.text = self.message
+        for cb in self.inbox_service_accepted_content:
+            content_binding = cb.to_etree()
+            si.append(content_binding)
 
-            return si
+        if self.message is not None:
+            message = etree.SubElement(si, '{%s}Message' % ns_map['taxii_11'], nsmap = ns_map)
+            message.text = self.message
 
-        def to_dict(self):
-            d = {}
-            d['service_type'] = self.service_type
-            d['services_version'] = self.services_version
-            d['protocol_binding'] = self.protocol_binding
-            d['service_address'] = self.service_address
-            d['message_bindings'] = self.message_bindings
-            d['supported_query'] = []
-            for sq in self.supported_query:
-                d['supported_query'].append(sq.to_dict())
-            d['inbox_service_accepted_content'] = self.inbox_service_accepted_content
-            d['available'] = self.available
-            d['message'] = self.message
-            return d
+        return si
 
-        @staticmethod
-        def from_etree(etree_xml):  # Expects a taxii_11:Service_Instance element
-            service_type = etree_xml.attrib['service_type']
-            services_version = etree_xml.attrib['service_version']
-            available = None
-            if 'available' in etree_xml.attrib:
-                tmp_available = etree_xml.attrib['available']
-                available = tmp_available == 'true'
+    def to_dict(self):
+        d = {}
+        d['service_type'] = self.service_type
+        d['services_version'] = self.services_version
+        d['protocol_binding'] = self.protocol_binding
+        d['service_address'] = self.service_address
+        d['message_bindings'] = self.message_bindings
+        d['supported_query'] = []
+        for sq in self.supported_query:
+            d['supported_query'].append(sq.to_dict())
+        d['inbox_service_accepted_content'] = self.inbox_service_accepted_content
+        d['available'] = self.available
+        d['message'] = self.message
+        return d
 
-            protocol_binding = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
-            service_address = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
+    @staticmethod
+    def from_etree(etree_xml):  # Expects a taxii_11:Service_Instance element
+        service_type = etree_xml.attrib['service_type']
+        services_version = etree_xml.attrib['service_version']
+        available = None
+        if 'available' in etree_xml.attrib:
+            tmp_available = etree_xml.attrib['available']
+            available = tmp_available == 'true'
 
-            message_bindings = []
-            message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
-            for mb in message_binding_set:
-                message_bindings.append(mb.text)
+        protocol_binding = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+        service_address = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
 
-            inbox_service_accepted_content = []
-            inbox_service_accepted_content_set = etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map)
-            for cb in inbox_service_accepted_content_set:
-                inbox_service_accepted_content.append(ContentBinding.from_etree(cb))
+        message_bindings = []
+        message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
+        for mb in message_binding_set:
+            message_bindings.append(mb.text)
 
-            supported_query = []
-            supported_query_set = etree_xml.xpath('./taxii_11:Supported_Query', namespaces=ns_map)
-            for sq in supported_query_set:
-                format_id = sq.xpath('./@format_id')[0]
-                query_obj = get_deserializer(format_id, 'query_info').from_etree(sq)
+        inbox_service_accepted_content = []
+        inbox_service_accepted_content_set = etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map)
+        for cb in inbox_service_accepted_content_set:
+            inbox_service_accepted_content.append(ContentBinding.from_etree(cb))
+
+        supported_query = []
+        supported_query_set = etree_xml.xpath('./taxii_11:Supported_Query', namespaces=ns_map)
+        for sq in supported_query_set:
+            format_id = sq.xpath('./@format_id')[0]
+            query_obj = get_deserializer(format_id, 'query_info').from_etree(sq)
+            supported_query.append(query_obj)
+
+        message = None
+        message_set = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)
+        if len(message_set) > 0:
+            message = message_set[0].text
+
+        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
+
+    @staticmethod
+    def from_dict(d):
+        service_type = d['service_type']
+        services_version = d['services_version']
+        protocol_binding = d['protocol_binding']
+        service_address = d['service_address']
+        message_bindings = d['message_bindings']
+        supported_query = []
+        sq_list = d.get('supported_query')
+        if sq_list is not None:
+            for sq in sq_list:
+                format_id = sq['format_id']
+                query_obj = get_deserializer(format_id, 'query_info').from_dict(sq)
                 supported_query.append(query_obj)
+        inbox_service_accepted_content = d.get('inbox_service_accepted_content')
+        available = d.get('available')
+        message = d.get('message')
 
-            message = None
-            message_set = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)
-            if len(message_set) > 0:
-                message = message_set[0].text
-
-            return DiscoveryResponse.ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
-
-        @staticmethod
-        def from_dict(d):
-            service_type = d['service_type']
-            services_version = d['services_version']
-            protocol_binding = d['protocol_binding']
-            service_address = d['service_address']
-            message_bindings = d['message_bindings']
-            supported_query = []
-            sq_list = d.get('supported_query')
-            if sq_list is not None:
-                for sq in sq_list:
-                    format_id = sq['format_id']
-                    query_obj = get_deserializer(format_id, 'query_info').from_dict(sq)
-                    supported_query.append(query_obj)
-            inbox_service_accepted_content = d.get('inbox_service_accepted_content')
-            available = d.get('available')
-            message = d.get('message')
-
-            return DiscoveryResponse.ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
+        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
 
 
 class CollectionInformationRequest(TAXIIRequestMessage):
@@ -1780,7 +1616,7 @@ class CollectionInformationResponse(TAXIIMessage):
 
     @collection_informations.setter
     def collection_informations(self, value):
-        do_check(value, 'collection_informations', type=CollectionInformationResponse.CollectionInformation)
+        do_check(value, 'collection_informations', type=CollectionInformation)
         self._collection_informations = value
 
     def to_etree(self):
@@ -1802,7 +1638,7 @@ class CollectionInformationResponse(TAXIIMessage):
         msg.collection_informations = []
         collection_informations = etree_xml.xpath('./taxii_11:Collection', namespaces=ns_map)
         for collection in collection_informations:
-            msg.collection_informations.append(CollectionInformationResponse.CollectionInformation.from_etree(collection))
+            msg.collection_informations.append(CollectionInformation.from_etree(collection))
         return msg
 
     @classmethod
@@ -1810,639 +1646,644 @@ class CollectionInformationResponse(TAXIIMessage):
         msg = super(CollectionInformationResponse, cls).from_dict(d)
         msg.collection_informations = []
         for collection in d['collection_informations']:
-            msg.collection_informations.append(CollectionInformationResponse.CollectionInformation.from_dict(collection))
+            msg.collection_informations.append(CollectionInformation.from_dict(collection))
         return msg
 
-    class CollectionInformation(BaseNonMessage):
-        """
-        The Collection Information component of a TAXII Collection Information 
-        Response Message.
-
-        Arguments:
-            collection_name (str): the name by which this TAXII Data Collection is
-                identified. **Required**
-            collection_description (str): a prose description of this TAXII
-                Data Collection. **Required**
-            supported_contents (list of str): Content Binding IDs
-                indicating which types of content are currently expressed in this
-                TAXII Data Collection. **Optional**
-            available (boolean): whether the identity of the requester
-                (authenticated or otherwise) is allowed to access this TAXII
-                Service. **Optional** Default: ``None``, indicating "unknown"
-            push_methods (list of PushMethod objects): the protocols that
-                can be used to push content via a subscription. **Optional**
-            polling_service_instances (list of PollingServiceInstance objects):
-                the bindings and address a Consumer can use to interact with a
-                Poll Service instance that supports this TAXII Data Collection.
-                **Optional**
-            subscription_methods (list of SubscriptionMethod objects): the
-                protocol and address of the TAXII Daemon hosting the Collection
-                Management Service that can process subscriptions for this TAXII
-                Data Collection. **Optional**
-            collection_volume (int): the typical number of messages per day.
-                **Optional**
-            collection_type (str): the type ofo this collection. **Optional**,
-                defaults to :py:data:`CT_DATA_FEED`.
-            receiving_inbox_services (list of ReceivingInboxService objects):
-                TODO: FILL THIS IN. **Optional**
-
-        If ``supported_contents`` is omitted, then the collection supports all
-        content bindings.  The absense of ``push_methods`` indicates no push
-        methods.  The absense of ``polling_service_instances`` indicates no
-        polling services.  The absense of ``subscription_methods`` indicates no
-        subscription services.  The absense of ``receiving_inbox_services``
-        indicates no receiving inbox services.
-        """
-
-        def __init__(self, collection_name, collection_description,
-                    supported_contents=None, available=None, push_methods=None,
-                    polling_service_instances=None, subscription_methods=None,
-                    collection_volume=None, collection_type=CT_DATA_FEED,
-                    receiving_inbox_services=None):
-            self.collection_name = collection_name
-            self.available = available
-            self.collection_description = collection_description
-            self.supported_contents = supported_contents or []
-            self.push_methods = push_methods or []
-            self.polling_service_instances = polling_service_instances or []
-            self.subscription_methods = subscription_methods or []
-            self.receiving_inbox_services = receiving_inbox_services or []
-            self.collection_volume = collection_volume
-            self.collection_type = collection_type
-
-        @property
-        def sort_key(self):
-            return self.collection_name
-
-        @property
-        def collection_name(self):
-            return self._collection_name
-
-        @collection_name.setter
-        def collection_name(self, value):
-            do_check(value, 'collection_name', regex_tuple=uri_regex)
-            self._collection_name = value
-
-        @property
-        def available(self):
-            return self._available
-
-        @available.setter
-        def available(self, value):
-            do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
-            self._available = value
-
-        @property
-        def supported_contents(self):
-            return self._supported_contents
-
-        @supported_contents.setter
-        def supported_contents(self, value):
-            value = _sanitize_content_bindings(value)
-            do_check(value, 'supported_contents', type=ContentBinding)
-            self._supported_contents = value
-
-        @property
-        def push_methods(self):
-            return self._push_methods
-
-        @push_methods.setter
-        def push_methods(self, value):
-            do_check(value, 'push_methods', type=CollectionInformationResponse.CollectionInformation.PushMethod)
-            self._push_methods = value
-
-        @property
-        def polling_service_instances(self):
-            return self._polling_service_instances
-
-        @polling_service_instances.setter
-        def polling_service_instances(self, value):
-            do_check(value, 'polling_service_instances', type=CollectionInformationResponse.CollectionInformation.PollingServiceInstance)
-            self._polling_service_instances = value
-
-        @property
-        def subscription_methods(self):
-            return self._subscription_methods
-
-        @subscription_methods.setter
-        def subscription_methods(self, value):
-            do_check(value, 'subscription_methods', type=CollectionInformationResponse.CollectionInformation.SubscriptionMethod)
-            self._subscription_methods = value
-
-        @property
-        def receiving_inbox_services(self):
-            return self._receiving_inbox_services
-
-        @receiving_inbox_services.setter
-        def receiving_inbox_services(self, value):
-            do_check(value, 'receiving_inbox_services', type=CollectionInformationResponse.CollectionInformation.ReceivingInboxService)
-            self._receiving_inbox_services = value
-
-        @property
-        def collection_volume(self):
-            return self._collection_volume
-
-        @collection_volume.setter
-        def collection_volume(self, value):
-            do_check(value, 'collection_volume', type=int, can_be_none=True)
-            self._collection_volume = value
-
-        @property
-        def collection_type(self):
-            return self._collection_type
-
-        @collection_type.setter
-        def collection_type(self, value):
-            do_check(value, 'collection_type', value_tuple=CT_TYPES, can_be_none=True)
-            self._collection_type = value
-
-        def to_etree(self):
-            c = etree.Element('{%s}Collection' % ns_map['taxii_11'], nsmap = ns_map)
-            c.attrib['collection_name'] = self.collection_name
-            if self.collection_type is not None:
-                c.attrib['collection_type'] = self.collection_type
-            if self.available is not None:
-                c.attrib['available'] = str(self.available).lower()
-            collection_description = etree.SubElement(c, '{%s}Description' % ns_map['taxii_11'], nsmap = ns_map)
-            collection_description.text = self.collection_description
-
-            if self.collection_volume is not None:
-                collection_volume = etree.SubElement(c, '{%s}Collection_Volume' % ns_map['taxii_11'], nsmap = ns_map)
-                collection_volume.text = str(self.collection_volume)
-
-            for binding in self.supported_contents:
-                c.append(binding.to_etree())
-
-            for push_method in self.push_methods:
-                c.append(push_method.to_etree())
-
-            for polling_service in self.polling_service_instances:
-                c.append(polling_service.to_etree())
-
-            for subscription_method in self.subscription_methods:
-                c.append(subscription_method.to_etree())
-
-            for receiving_inbox_service in self.receiving_inbox_services:
-                c.append(receiving_inbox_service.to_etree())
-
-            return c
-
-        def to_dict(self):
-            d = {}
-            d['collection_name'] = self.collection_name
-            if self.collection_type is not None:
-                d['collection_type'] = self.collection_type
-            if self.available is not None:
-                d['available'] = self.available
-            d['collection_description'] = self.collection_description
-            if self.collection_volume is not None:
-                d['collection_volume'] = self.collection_volume
-            d['supported_contents'] = self.supported_contents
-
-            d['push_methods'] = []
-            for push_method in self.push_methods:
-                d['push_methods'].append(push_method.to_dict())
-
-            d['polling_service_instances'] = []
-            for polling_service in self.polling_service_instances:
-                d['polling_service_instances'].append(polling_service.to_dict())
-
-            d['subscription_methods'] = []
-            for subscription_method in self.subscription_methods:
-                d['subscription_methods'].append(subscription_method.to_dict())
-
-            d['receiving_inbox_services'] = []
-            for receiving_inbox_service in self.receiving_inbox_services:
-                d['receiving_inbox_services'].append(receiving_inbox_service.to_dict())
-
-            return d
-
-        @staticmethod
-        def from_etree(etree_xml):
-            kwargs = {}
-            kwargs['collection_name'] = etree_xml.attrib['collection_name']
-            kwargs['collection_type'] = etree_xml.attrib.get('collection_type', None)
-
-            kwargs['available'] = None
-            if 'available' in etree_xml.attrib:
-                tmp = etree_xml.attrib['available']
-                kwargs['available'] = tmp.lower() == 'true'
-
-            kwargs['collection_description'] = etree_xml.xpath('./taxii_11:Description', namespaces=ns_map)[0].text
-
-            collection_volume_set = etree_xml.xpath('./taxii_11:Collection_Volume', namespaces=ns_map)
-            if len(collection_volume_set) > 0:
-                kwargs['collection_volume'] = int(collection_volume_set[0].text)
-
-            kwargs['supported_contents'] = []
-            supported_content_set = etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map)
-            for binding_elt in supported_content_set:
-                kwargs['supported_contents'].append(ContentBinding.from_etree(binding_elt))
-
-            kwargs['push_methods'] = []
-            push_method_set = etree_xml.xpath('./taxii_11:Push_Method', namespaces=ns_map)
-            for push_method_elt in push_method_set:
-                kwargs['push_methods'].append(CollectionInformationResponse.CollectionInformation.PushMethod.from_etree(push_method_elt))
-
-            kwargs['polling_service_instances'] = []
-            polling_service_set = etree_xml.xpath('./taxii_11:Polling_Service', namespaces=ns_map)
-            for polling_elt in polling_service_set:
-                kwargs['polling_service_instances'].append(CollectionInformationResponse.CollectionInformation.PollingServiceInstance.from_etree(polling_elt))
-
-            kwargs['subscription_methods'] = []
-            subscription_method_set = etree_xml.xpath('./taxii_11:Subscription_Service', namespaces=ns_map)
-            for subscription_elt in subscription_method_set:
-                kwargs['subscription_methods'].append(CollectionInformationResponse.CollectionInformation.SubscriptionMethod.from_etree(subscription_elt))
-
-
-            kwargs['receiving_inbox_services'] = []
-            receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Service', namespaces=ns_map)
-            for receiving_inbox_service in receiving_inbox_services_set:
-                kwargs['receiving_inbox_services'].append(CollectionInformationResponse.CollectionInformation.ReceivingInboxService.from_etree(receiving_inbox_service))
-
-            return CollectionInformationResponse.CollectionInformation(**kwargs)
-
-        @staticmethod
-        def from_dict(d):
-            kwargs = {}
-            kwargs['collection_name'] = d['collection_name']
-            kwargs['collection_type'] = d.get('collection_type')            
-            kwargs['available'] = d.get('available')
-            kwargs['collection_description'] = d['collection_description']
-            kwargs['collection_volume'] = d.get('collection_volume', None)
-
-            kwargs['supported_contents'] = []
-            for binding in d.get('supported_contents', []):
-                kwargs['supported_contents'].append(binding)
-
-            kwargs['push_methods'] = []
-            for push_method in d.get('push_methods', []):
-                kwargs['push_methods'].append(CollectionInformationResponse.CollectionInformation.PushMethod.from_dict(push_method))
-
-            kwargs['polling_service_instances'] = []
-            for polling in d.get('polling_service_instances', []):
-                kwargs['polling_service_instances'].append(CollectionInformationResponse.CollectionInformation.PollingServiceInstance.from_dict(polling))
-
-            kwargs['subscription_methods'] = []
-            for subscription_method in d.get('subscription_methods', []):
-                kwargs['subscription_methods'].append(CollectionInformationResponse.CollectionInformation.SubscriptionMethod.from_dict(subscription_method))
-
-            kwargs['receiving_inbox_services'] = []
-            receiving_inbox_services_set = d.get('receiving_inbox_services', [])
-            for receiving_inbox_service in receiving_inbox_services_set:
-                kwargs['receiving_inbox_services'].append(CollectionInformationResponse.CollectionInformation.ReceivingInboxService.from_dict(receiving_inbox_service))
-
-            return CollectionInformationResponse.CollectionInformation(**kwargs)
-
-        class PushMethod(BaseNonMessage):
-            """
-            The Push Method component of a TAXII Collection Information
-            component.
-
-            Args:
-                push_protocol (str): a protocol binding that can be used
-                    to push content to an Inbox Service instance. **Required**
-                push_message_bindings (list of str): the message bindings that
-                    can be used to push content to an Inbox Service instance
-                    using the protocol identified in the Push Protocol field.
-                    **Required**
-            """
-
-            def __init__(self, push_protocol, push_message_bindings):
-                self.push_protocol = push_protocol
-                self.push_message_bindings = push_message_bindings
-
-            @property
-            def sort_key(self):
-                return self.push_protocol
-
-            @property
-            def push_protocol(self):
-                return self._push_protocol
-
-            @push_protocol.setter
-            def push_protocol(self, value):
-                do_check(value, 'push_protocol', regex_tuple=uri_regex)
-                self._push_protocol = value
-
-            @property
-            def push_message_bindings(self):
-                return self._push_message_bindings
-
-            @push_message_bindings.setter
-            def push_message_bindings(self, value):
-                do_check(value, 'push_message_bindings', regex_tuple=uri_regex)
-                self._push_message_bindings = value
-
-            def to_etree(self):
-                x = etree.Element('{%s}Push_Method' % ns_map['taxii_11'], nsmap = ns_map)
-                proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                proto_bind.text = self.push_protocol
-                for binding in self.push_message_bindings:
-                    b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                    b.text = binding
-                return x
-
-            def to_dict(self):
-                d = {}
-                d['push_protocol'] = self.push_protocol
-                d['push_message_bindings'] = []
-                for binding in self.push_message_bindings:
-                    d['push_message_bindings'].append(binding)
-                return d
-
-            @staticmethod
-            def from_etree(etree_xml):
-                kwargs = {}
-                kwargs['push_protocol'] = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
-                kwargs['push_message_bindings'] = []
-                message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
-                for message_binding in message_binding_set:
-                    kwargs['push_message_bindings'].append(message_binding.text)
-                return CollectionInformationResponse.CollectionInformation.PushMethod(**kwargs)
-
-            @staticmethod
-            def from_dict(d):
-                return CollectionInformationResponse.CollectionInformation.PushMethod(**d)
-
-        class PollingServiceInstance(BaseNonMessage):
-            """
-            The Polling Service Instance component of a TAXII Collection
-            Information component.
-
-            Args:
-                poll_protocol (str): the protocol binding supported by
-                    this Poll Service instance. **Required**
-                poll_address (str): the address of the TAXII Daemon
-                    hosting this Poll Service instance. **Required**
-                poll_message_bindings (list of str): the message bindings
-                    supported by this Poll Service instance. **Required**
-            """
-            NAME = 'Polling_Service'
-
-            def __init__(self, poll_protocol, poll_address, poll_message_bindings):
-                self.poll_protocol = poll_protocol
-                self.poll_address = poll_address
-                self.poll_message_bindings = poll_message_bindings
-
-            @property
-            def sort_key(self):
-                return self.poll_address
-
-            @property
-            def poll_protocol(self):
-                return self._poll_protocol
-
-            @poll_protocol.setter
-            def poll_protocol(self, value):
-                do_check(value, 'poll_protocol', regex_tuple=uri_regex)
-                self._poll_protocol = value
-
-            @property
-            def poll_message_bindings(self):
-                return self._poll_message_bindings
-
-            @poll_message_bindings.setter
-            def poll_message_bindings(self, value):
-                do_check(value, 'poll_message_bindings', regex_tuple=uri_regex)
-                self._poll_message_bindings = value
-
-            def to_etree(self):
-                x = etree.Element('{%s}Polling_Service' % ns_map['taxii_11'], nsmap = ns_map)
-                proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                proto_bind.text = self.poll_protocol
-                address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
-                address.text = self.poll_address
-                for binding in self.poll_message_bindings:
-                    b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                    b.text = binding
-                return x
-
-            def to_dict(self):
-                d = {}
-                d['poll_protocol'] = self.poll_protocol
-                d['poll_address'] = self.poll_address
-                d['poll_message_bindings'] = []
-                for binding in self.poll_message_bindings:
-                    d['poll_message_bindings'].append(binding)
-                return d
-
-            @classmethod
-            def from_etree(cls, etree_xml):
-                protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
-                addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
-                bindings = []
-                message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
-                for message_binding in message_binding_set:
-                    bindings.append(message_binding.text)
-                return cls(protocol, addr, bindings)
-
-            @classmethod
-            def from_dict(cls, d):
-                return cls(**d)
-
-        class SubscriptionMethod(BaseNonMessage):
-            """
-            The Subscription Method component of a TAXII Collection Information
-            component.
-
-            Args:
-                subscription_protocol (str): the protocol binding supported by
-                    this Collection Management Service instance. **Required**
-                subscription_address (str): the address of the TAXII Daemon
-                    hosting this Collection Management Service instance.
-                    **Required**.
-                subscription_message_bindings (list of str): the message
-                    bindings supported by this Collection Management Service
-                    Instance. **Required**
-            """
-            NAME = 'Subscription_Service'
-
-            def __init__(self, subscription_protocol, subscription_address,
-                         subscription_message_bindings):
-                self.subscription_protocol = subscription_protocol
-                self.subscription_address = subscription_address
-                self.subscription_message_bindings = subscription_message_bindings
-
-            @property
-            def sort_key(self):
-                return self.subscription_address
-
-            @property
-            def subscription_protocol(self):
-                return self._subscription_protocol
-
-            @subscription_protocol.setter
-            def subscription_protocol(self, value):
-                do_check(value, 'subscription_protocol', regex_tuple=uri_regex)
-                self._subscription_protocol = value
-
-            @property
-            def subscription_message_bindings(self):
-                return self._subscription_message_bindings
-
-            @subscription_message_bindings.setter
-            def subscription_message_bindings(self, value):
-                do_check(value, 'subscription_message_bindings', regex_tuple=uri_regex)
-                self._subscription_message_bindings = value
-
-            def to_etree(self):
-                x = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.NAME))
-                proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                proto_bind.text = self.subscription_protocol
-                address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
-                address.text = self.subscription_address
-                for binding in self.subscription_message_bindings:
-                    b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
-                    b.text = binding
-                return x
-
-            def to_dict(self):
-                d = {}
-                d['subscription_protocol'] = self.subscription_protocol
-                d['subscription_address'] = self.subscription_address
-                d['subscription_message_bindings'] = []
-                for binding in self.subscription_message_bindings:
-                    d['subscription_message_bindings'].append(binding)
-                return d
-
-            @classmethod
-            def from_etree(cls, etree_xml):
-                protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
-                addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
-                bindings = []
-                message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
-                for message_binding in message_binding_set:
-                    bindings.append(message_binding.text)
-                return cls(protocol, addr, bindings)
-
-            @classmethod
-            def from_dict(cls, d):
-                return cls(**d)
-
-        class ReceivingInboxService(BaseNonMessage):
-            """
-            The Receiving Inbox Service component of a TAXII Collection
-            Information component.
-
-            Args:
-                inbox_protocol (str): Indicates the protocol this Inbox Service
-                    uses. **Required**
-                inbox address (str): Indicates the address of this Inbox Service.
-                    **Required**
-                inbox_message_bindings (list of str): Each string indicates a
-                    message binding that this inbox service uses. **Required**
-                supported_contents (list of ContentBinding objects): Each object
-                    indicates a Content Binding this inbox service can receive.
-                    **Optional**.  Setting to ``None`` means that all Content
-                    Bindings are supported.
-            """
-
-            def __init__(self, inbox_protocol, inbox_address,
-                         inbox_message_bindings, supported_contents=None):
-                self.inbox_protocol = inbox_protocol
-                self.inbox_address = inbox_address
-                self.inbox_message_bindings = inbox_message_bindings
-                self.supported_contents = supported_contents or []
-
-            @property
-            def sort_key(self):
-                return self.inbox_address
-
-            @property
-            def inbox_protocol(self):
-                return self._inbox_protocol
-
-            @inbox_protocol.setter
-            def inbox_protocol(self, value):
-                do_check(value, 'inbox_protocol', type=basestring, regex_tuple=uri_regex)
-                self._inbox_protocol = value
-
-            @property
-            def inbox_address(self):
-                return self._inbox_address
-
-            @inbox_address.setter
-            def inbox_address(self, value):
-                self._inbox_address = value
-
-            @property
-            def inbox_message_bindings(self):
-                return self._inbox_message_bindings
-
-            @inbox_message_bindings.setter
-            def inbox_message_bindings(self, value):
-                do_check(value, 'inbox_message_bindings', regex_tuple=uri_regex)
-                self._inbox_message_bindings = value
-
-            @property
-            def supported_contents(self):
-                return self._supported_contents
-
-            @supported_contents.setter
-            def supported_contents(self, value):
-                value = _sanitize_content_bindings(value)
-                do_check(value, 'supported_contents', type=ContentBinding)
-                self._supported_contents = value
-
-            def to_etree(self):
-                xml = etree.Element('{%s}Receiving_Inbox_Service' % ns_map['taxii_11'], nsmap = ns_map)
-
-                pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
-                pb.text = self.inbox_protocol
-
-                a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
-                a.text = self.inbox_address
-
-                for binding in self.inbox_message_bindings:
-                    mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
-                    mb.text = binding
-
-                for binding in self.supported_contents:
-                    xml.append(binding.to_etree())
-
-                return xml
-
-            def to_dict(self):
-                d = {}
-
-                d['inbox_protocol'] = self.inbox_protocol
-                d['inbox_address'] = self.inbox_address
-                d['inbox_message_bindings'] = self.inbox_message_bindings
-                d['supported_contents'] = []
-                for supported_content in self.supported_contents:
-                    d['supported_contents'].append(supported_content.to_dict())
-
-                return d
-
-            @staticmethod
-            def from_etree(etree_xml):
-                proto = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
-                addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
-
-                message_bindings = []
-                message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
-                for mb in message_binding_set:
-                    message_bindings.append(mb.text)
-
-                supported_contents = []
-                supported_contents_set = etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map)
-                for cb in supported_contents_set:
-                    supported_contents.append(ContentBinding.from_etree(cb))
-
-                return CollectionInformationResponse.CollectionInformation.ReceivingInboxService(proto, addr, message_bindings, supported_contents)
-
-            @staticmethod
-            def from_dict(d):
-                kwargs = {}
-                kwargs['inbox_protocol'] = d['inbox_protocol']
-                kwargs['inbox_address'] = d['inbox_address']
-                kwargs['inbox_message_bindings'] = d['inbox_message_bindings']
-                kwargs['supported_contents'] = []
-                for binding in d['supported_contents']:
-                    kwargs['supported_contents'].append(ContentBinding.from_dict(binding))
-
-                return CollectionInformationResponse.CollectionInformation.ReceivingInboxService(**kwargs)
+
+class CollectionInformation(TAXIIBase):
+    """
+    The Collection Information component of a TAXII Collection Information 
+    Response Message.
+
+    Arguments:
+        collection_name (str): the name by which this TAXII Data Collection is
+            identified. **Required**
+        collection_description (str): a prose description of this TAXII
+            Data Collection. **Required**
+        supported_contents (list of str): Content Binding IDs
+            indicating which types of content are currently expressed in this
+            TAXII Data Collection. **Optional**
+        available (boolean): whether the identity of the requester
+            (authenticated or otherwise) is allowed to access this TAXII
+            Service. **Optional** Default: ``None``, indicating "unknown"
+        push_methods (list of PushMethod objects): the protocols that
+            can be used to push content via a subscription. **Optional**
+        polling_service_instances (list of PollingServiceInstance objects):
+            the bindings and address a Consumer can use to interact with a
+            Poll Service instance that supports this TAXII Data Collection.
+            **Optional**
+        subscription_methods (list of SubscriptionMethod objects): the
+            protocol and address of the TAXII Daemon hosting the Collection
+            Management Service that can process subscriptions for this TAXII
+            Data Collection. **Optional**
+        collection_volume (int): the typical number of messages per day.
+            **Optional**
+        collection_type (str): the type ofo this collection. **Optional**,
+            defaults to :py:data:`CT_DATA_FEED`.
+        receiving_inbox_services (list of ReceivingInboxService objects):
+            TODO: FILL THIS IN. **Optional**
+
+    If ``supported_contents`` is omitted, then the collection supports all
+    content bindings.  The absense of ``push_methods`` indicates no push
+    methods.  The absense of ``polling_service_instances`` indicates no
+    polling services.  The absense of ``subscription_methods`` indicates no
+    subscription services.  The absense of ``receiving_inbox_services``
+    indicates no receiving inbox services.
+    """
+
+    def __init__(self, collection_name, collection_description,
+                supported_contents=None, available=None, push_methods=None,
+                polling_service_instances=None, subscription_methods=None,
+                collection_volume=None, collection_type=CT_DATA_FEED,
+                receiving_inbox_services=None):
+        self.collection_name = collection_name
+        self.available = available
+        self.collection_description = collection_description
+        self.supported_contents = supported_contents or []
+        self.push_methods = push_methods or []
+        self.polling_service_instances = polling_service_instances or []
+        self.subscription_methods = subscription_methods or []
+        self.receiving_inbox_services = receiving_inbox_services or []
+        self.collection_volume = collection_volume
+        self.collection_type = collection_type
+
+    @property
+    def sort_key(self):
+        return self.collection_name
+
+    @property
+    def collection_name(self):
+        return self._collection_name
+
+    @collection_name.setter
+    def collection_name(self, value):
+        do_check(value, 'collection_name', regex_tuple=uri_regex)
+        self._collection_name = value
+
+    @property
+    def available(self):
+        return self._available
+
+    @available.setter
+    def available(self, value):
+        do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
+        self._available = value
+
+    @property
+    def supported_contents(self):
+        return self._supported_contents
+
+    @supported_contents.setter
+    def supported_contents(self, value):
+        value = _sanitize_content_bindings(value)
+        do_check(value, 'supported_contents', type=ContentBinding)
+        self._supported_contents = value
+
+    @property
+    def push_methods(self):
+        return self._push_methods
+
+    @push_methods.setter
+    def push_methods(self, value):
+        do_check(value, 'push_methods', type=PushMethod)
+        self._push_methods = value
+
+    @property
+    def polling_service_instances(self):
+        return self._polling_service_instances
+
+    @polling_service_instances.setter
+    def polling_service_instances(self, value):
+        do_check(value, 'polling_service_instances', type=PollingServiceInstance)
+        self._polling_service_instances = value
+
+    @property
+    def subscription_methods(self):
+        return self._subscription_methods
+
+    @subscription_methods.setter
+    def subscription_methods(self, value):
+        do_check(value, 'subscription_methods', type=SubscriptionMethod)
+        self._subscription_methods = value
+
+    @property
+    def receiving_inbox_services(self):
+        return self._receiving_inbox_services
+
+    @receiving_inbox_services.setter
+    def receiving_inbox_services(self, value):
+        do_check(value, 'receiving_inbox_services', type=ReceivingInboxService)
+        self._receiving_inbox_services = value
+
+    @property
+    def collection_volume(self):
+        return self._collection_volume
+
+    @collection_volume.setter
+    def collection_volume(self, value):
+        do_check(value, 'collection_volume', type=int, can_be_none=True)
+        self._collection_volume = value
+
+    @property
+    def collection_type(self):
+        return self._collection_type
+
+    @collection_type.setter
+    def collection_type(self, value):
+        do_check(value, 'collection_type', value_tuple=CT_TYPES, can_be_none=True)
+        self._collection_type = value
+
+    def to_etree(self):
+        c = etree.Element('{%s}Collection' % ns_map['taxii_11'], nsmap = ns_map)
+        c.attrib['collection_name'] = self.collection_name
+        if self.collection_type is not None:
+            c.attrib['collection_type'] = self.collection_type
+        if self.available is not None:
+            c.attrib['available'] = str(self.available).lower()
+        collection_description = etree.SubElement(c, '{%s}Description' % ns_map['taxii_11'], nsmap = ns_map)
+        collection_description.text = self.collection_description
+
+        if self.collection_volume is not None:
+            collection_volume = etree.SubElement(c, '{%s}Collection_Volume' % ns_map['taxii_11'], nsmap = ns_map)
+            collection_volume.text = str(self.collection_volume)
+
+        for binding in self.supported_contents:
+            c.append(binding.to_etree())
+
+        for push_method in self.push_methods:
+            c.append(push_method.to_etree())
+
+        for polling_service in self.polling_service_instances:
+            c.append(polling_service.to_etree())
+
+        for subscription_method in self.subscription_methods:
+            c.append(subscription_method.to_etree())
+
+        for receiving_inbox_service in self.receiving_inbox_services:
+            c.append(receiving_inbox_service.to_etree())
+
+        return c
+
+    def to_dict(self):
+        d = {}
+        d['collection_name'] = self.collection_name
+        if self.collection_type is not None:
+            d['collection_type'] = self.collection_type
+        if self.available is not None:
+            d['available'] = self.available
+        d['collection_description'] = self.collection_description
+        if self.collection_volume is not None:
+            d['collection_volume'] = self.collection_volume
+        d['supported_contents'] = self.supported_contents
+
+        d['push_methods'] = []
+        for push_method in self.push_methods:
+            d['push_methods'].append(push_method.to_dict())
+
+        d['polling_service_instances'] = []
+        for polling_service in self.polling_service_instances:
+            d['polling_service_instances'].append(polling_service.to_dict())
+
+        d['subscription_methods'] = []
+        for subscription_method in self.subscription_methods:
+            d['subscription_methods'].append(subscription_method.to_dict())
+
+        d['receiving_inbox_services'] = []
+        for receiving_inbox_service in self.receiving_inbox_services:
+            d['receiving_inbox_services'].append(receiving_inbox_service.to_dict())
+
+        return d
+
+    @staticmethod
+    def from_etree(etree_xml):
+        kwargs = {}
+        kwargs['collection_name'] = etree_xml.attrib['collection_name']
+        kwargs['collection_type'] = etree_xml.attrib.get('collection_type', None)
+
+        kwargs['available'] = None
+        if 'available' in etree_xml.attrib:
+            tmp = etree_xml.attrib['available']
+            kwargs['available'] = tmp.lower() == 'true'
+
+        kwargs['collection_description'] = etree_xml.xpath('./taxii_11:Description', namespaces=ns_map)[0].text
+
+        collection_volume_set = etree_xml.xpath('./taxii_11:Collection_Volume', namespaces=ns_map)
+        if len(collection_volume_set) > 0:
+            kwargs['collection_volume'] = int(collection_volume_set[0].text)
+
+        kwargs['supported_contents'] = []
+        supported_content_set = etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map)
+        for binding_elt in supported_content_set:
+            kwargs['supported_contents'].append(ContentBinding.from_etree(binding_elt))
+
+        kwargs['push_methods'] = []
+        push_method_set = etree_xml.xpath('./taxii_11:Push_Method', namespaces=ns_map)
+        for push_method_elt in push_method_set:
+            kwargs['push_methods'].append(PushMethod.from_etree(push_method_elt))
+
+        kwargs['polling_service_instances'] = []
+        polling_service_set = etree_xml.xpath('./taxii_11:Polling_Service', namespaces=ns_map)
+        for polling_elt in polling_service_set:
+            kwargs['polling_service_instances'].append(PollingServiceInstance.from_etree(polling_elt))
+
+        kwargs['subscription_methods'] = []
+        subscription_method_set = etree_xml.xpath('./taxii_11:Subscription_Service', namespaces=ns_map)
+        for subscription_elt in subscription_method_set:
+            kwargs['subscription_methods'].append(SubscriptionMethod.from_etree(subscription_elt))
+
+
+        kwargs['receiving_inbox_services'] = []
+        receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Service', namespaces=ns_map)
+        for receiving_inbox_service in receiving_inbox_services_set:
+            kwargs['receiving_inbox_services'].append(ReceivingInboxService.from_etree(receiving_inbox_service))
+
+        return CollectionInformation(**kwargs)
+
+    @staticmethod
+    def from_dict(d):
+        kwargs = {}
+        kwargs['collection_name'] = d['collection_name']
+        kwargs['collection_type'] = d.get('collection_type')            
+        kwargs['available'] = d.get('available')
+        kwargs['collection_description'] = d['collection_description']
+        kwargs['collection_volume'] = d.get('collection_volume', None)
+
+        kwargs['supported_contents'] = []
+        for binding in d.get('supported_contents', []):
+            kwargs['supported_contents'].append(binding)
+
+        kwargs['push_methods'] = []
+        for push_method in d.get('push_methods', []):
+            kwargs['push_methods'].append(PushMethod.from_dict(push_method))
+
+        kwargs['polling_service_instances'] = []
+        for polling in d.get('polling_service_instances', []):
+            kwargs['polling_service_instances'].append(PollingServiceInstance.from_dict(polling))
+
+        kwargs['subscription_methods'] = []
+        for subscription_method in d.get('subscription_methods', []):
+            kwargs['subscription_methods'].append(SubscriptionMethod.from_dict(subscription_method))
+
+        kwargs['receiving_inbox_services'] = []
+        receiving_inbox_services_set = d.get('receiving_inbox_services', [])
+        for receiving_inbox_service in receiving_inbox_services_set:
+            kwargs['receiving_inbox_services'].append(ReceivingInboxService.from_dict(receiving_inbox_service))
+
+        return CollectionInformation(**kwargs)
+
+
+class PushMethod(TAXIIBase):
+    """
+    The Push Method component of a TAXII Collection Information
+    component.
+
+    Args:
+        push_protocol (str): a protocol binding that can be used
+            to push content to an Inbox Service instance. **Required**
+        push_message_bindings (list of str): the message bindings that
+            can be used to push content to an Inbox Service instance
+            using the protocol identified in the Push Protocol field.
+            **Required**
+    """
+
+    def __init__(self, push_protocol, push_message_bindings):
+        self.push_protocol = push_protocol
+        self.push_message_bindings = push_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.push_protocol
+
+    @property
+    def push_protocol(self):
+        return self._push_protocol
+
+    @push_protocol.setter
+    def push_protocol(self, value):
+        do_check(value, 'push_protocol', regex_tuple=uri_regex)
+        self._push_protocol = value
+
+    @property
+    def push_message_bindings(self):
+        return self._push_message_bindings
+
+    @push_message_bindings.setter
+    def push_message_bindings(self, value):
+        do_check(value, 'push_message_bindings', regex_tuple=uri_regex)
+        self._push_message_bindings = value
+
+    def to_etree(self):
+        x = etree.Element('{%s}Push_Method' % ns_map['taxii_11'], nsmap = ns_map)
+        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        proto_bind.text = self.push_protocol
+        for binding in self.push_message_bindings:
+            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            b.text = binding
+        return x
+
+    def to_dict(self):
+        d = {}
+        d['push_protocol'] = self.push_protocol
+        d['push_message_bindings'] = []
+        for binding in self.push_message_bindings:
+            d['push_message_bindings'].append(binding)
+        return d
+
+    @staticmethod
+    def from_etree(etree_xml):
+        kwargs = {}
+        kwargs['push_protocol'] = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+        kwargs['push_message_bindings'] = []
+        message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
+        for message_binding in message_binding_set:
+            kwargs['push_message_bindings'].append(message_binding.text)
+        return PushMethod(**kwargs)
+
+    @staticmethod
+    def from_dict(d):
+        return PushMethod(**d)
+
+
+class PollingServiceInstance(TAXIIBase):
+    """
+    The Polling Service Instance component of a TAXII Collection
+    Information component.
+
+    Args:
+        poll_protocol (str): the protocol binding supported by
+            this Poll Service instance. **Required**
+        poll_address (str): the address of the TAXII Daemon
+            hosting this Poll Service instance. **Required**
+        poll_message_bindings (list of str): the message bindings
+            supported by this Poll Service instance. **Required**
+    """
+    NAME = 'Polling_Service'
+
+    def __init__(self, poll_protocol, poll_address, poll_message_bindings):
+        self.poll_protocol = poll_protocol
+        self.poll_address = poll_address
+        self.poll_message_bindings = poll_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.poll_address
+
+    @property
+    def poll_protocol(self):
+        return self._poll_protocol
+
+    @poll_protocol.setter
+    def poll_protocol(self, value):
+        do_check(value, 'poll_protocol', regex_tuple=uri_regex)
+        self._poll_protocol = value
+
+    @property
+    def poll_message_bindings(self):
+        return self._poll_message_bindings
+
+    @poll_message_bindings.setter
+    def poll_message_bindings(self, value):
+        do_check(value, 'poll_message_bindings', regex_tuple=uri_regex)
+        self._poll_message_bindings = value
+
+    def to_etree(self):
+        x = etree.Element('{%s}Polling_Service' % ns_map['taxii_11'], nsmap = ns_map)
+        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        proto_bind.text = self.poll_protocol
+        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
+        address.text = self.poll_address
+        for binding in self.poll_message_bindings:
+            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            b.text = binding
+        return x
+
+    def to_dict(self):
+        d = {}
+        d['poll_protocol'] = self.poll_protocol
+        d['poll_address'] = self.poll_address
+        d['poll_message_bindings'] = []
+        for binding in self.poll_message_bindings:
+            d['poll_message_bindings'].append(binding)
+        return d
+
+    @classmethod
+    def from_etree(cls, etree_xml):
+        protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+        addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
+        bindings = []
+        message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
+        for message_binding in message_binding_set:
+            bindings.append(message_binding.text)
+        return cls(protocol, addr, bindings)
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d)
+
+
+class SubscriptionMethod(TAXIIBase):
+    """
+    The Subscription Method component of a TAXII Collection Information
+    component.
+
+    Args:
+        subscription_protocol (str): the protocol binding supported by
+            this Collection Management Service instance. **Required**
+        subscription_address (str): the address of the TAXII Daemon
+            hosting this Collection Management Service instance.
+            **Required**.
+        subscription_message_bindings (list of str): the message
+            bindings supported by this Collection Management Service
+            Instance. **Required**
+    """
+    NAME = 'Subscription_Service'
+
+    def __init__(self, subscription_protocol, subscription_address,
+                    subscription_message_bindings):
+        self.subscription_protocol = subscription_protocol
+        self.subscription_address = subscription_address
+        self.subscription_message_bindings = subscription_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.subscription_address
+
+    @property
+    def subscription_protocol(self):
+        return self._subscription_protocol
+
+    @subscription_protocol.setter
+    def subscription_protocol(self, value):
+        do_check(value, 'subscription_protocol', regex_tuple=uri_regex)
+        self._subscription_protocol = value
+
+    @property
+    def subscription_message_bindings(self):
+        return self._subscription_message_bindings
+
+    @subscription_message_bindings.setter
+    def subscription_message_bindings(self, value):
+        do_check(value, 'subscription_message_bindings', regex_tuple=uri_regex)
+        self._subscription_message_bindings = value
+
+    def to_etree(self):
+        x = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.NAME))
+        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        proto_bind.text = self.subscription_protocol
+        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
+        address.text = self.subscription_address
+        for binding in self.subscription_message_bindings:
+            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            b.text = binding
+        return x
+
+    def to_dict(self):
+        d = {}
+        d['subscription_protocol'] = self.subscription_protocol
+        d['subscription_address'] = self.subscription_address
+        d['subscription_message_bindings'] = []
+        for binding in self.subscription_message_bindings:
+            d['subscription_message_bindings'].append(binding)
+        return d
+
+    @classmethod
+    def from_etree(cls, etree_xml):
+        protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+        addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
+        bindings = []
+        message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
+        for message_binding in message_binding_set:
+            bindings.append(message_binding.text)
+        return cls(protocol, addr, bindings)
+
+    @classmethod
+    def from_dict(cls, d):
+        return cls(**d)
+
+
+class ReceivingInboxService(TAXIIBase):
+    """
+    The Receiving Inbox Service component of a TAXII Collection
+    Information component.
+
+    Args:
+        inbox_protocol (str): Indicates the protocol this Inbox Service
+            uses. **Required**
+        inbox address (str): Indicates the address of this Inbox Service.
+            **Required**
+        inbox_message_bindings (list of str): Each string indicates a
+            message binding that this inbox service uses. **Required**
+        supported_contents (list of ContentBinding objects): Each object
+            indicates a Content Binding this inbox service can receive.
+            **Optional**.  Setting to ``None`` means that all Content
+            Bindings are supported.
+    """
+
+    def __init__(self, inbox_protocol, inbox_address,
+                    inbox_message_bindings, supported_contents=None):
+        self.inbox_protocol = inbox_protocol
+        self.inbox_address = inbox_address
+        self.inbox_message_bindings = inbox_message_bindings
+        self.supported_contents = supported_contents or []
+
+    @property
+    def sort_key(self):
+        return self.inbox_address
+
+    @property
+    def inbox_protocol(self):
+        return self._inbox_protocol
+
+    @inbox_protocol.setter
+    def inbox_protocol(self, value):
+        do_check(value, 'inbox_protocol', type=basestring, regex_tuple=uri_regex)
+        self._inbox_protocol = value
+
+    @property
+    def inbox_address(self):
+        return self._inbox_address
+
+    @inbox_address.setter
+    def inbox_address(self, value):
+        self._inbox_address = value
+
+    @property
+    def inbox_message_bindings(self):
+        return self._inbox_message_bindings
+
+    @inbox_message_bindings.setter
+    def inbox_message_bindings(self, value):
+        do_check(value, 'inbox_message_bindings', regex_tuple=uri_regex)
+        self._inbox_message_bindings = value
+
+    @property
+    def supported_contents(self):
+        return self._supported_contents
+
+    @supported_contents.setter
+    def supported_contents(self, value):
+        value = _sanitize_content_bindings(value)
+        do_check(value, 'supported_contents', type=ContentBinding)
+        self._supported_contents = value
+
+    def to_etree(self):
+        xml = etree.Element('{%s}Receiving_Inbox_Service' % ns_map['taxii_11'], nsmap = ns_map)
+
+        pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
+        pb.text = self.inbox_protocol
+
+        a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
+        a.text = self.inbox_address
+
+        for binding in self.inbox_message_bindings:
+            mb = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
+            mb.text = binding
+
+        for binding in self.supported_contents:
+            xml.append(binding.to_etree())
+
+        return xml
+
+    def to_dict(self):
+        d = {}
+
+        d['inbox_protocol'] = self.inbox_protocol
+        d['inbox_address'] = self.inbox_address
+        d['inbox_message_bindings'] = self.inbox_message_bindings
+        d['supported_contents'] = []
+        for supported_content in self.supported_contents:
+            d['supported_contents'].append(supported_content.to_dict())
+
+        return d
+
+    @staticmethod
+    def from_etree(etree_xml):
+        proto = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+        addr = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
+
+        message_bindings = []
+        message_binding_set = etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map)
+        for mb in message_binding_set:
+            message_bindings.append(mb.text)
+
+        supported_contents = []
+        supported_contents_set = etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map)
+        for cb in supported_contents_set:
+            supported_contents.append(ContentBinding.from_etree(cb))
+
+        return ReceivingInboxService(proto, addr, message_bindings, supported_contents)
+
+    @staticmethod
+    def from_dict(d):
+        kwargs = {}
+        kwargs['inbox_protocol'] = d['inbox_protocol']
+        kwargs['inbox_address'] = d['inbox_address']
+        kwargs['inbox_message_bindings'] = d['inbox_message_bindings']
+        kwargs['supported_contents'] = []
+        for binding in d['supported_contents']:
+            kwargs['supported_contents'].append(ContentBinding.from_dict(binding))
+
+        return ReceivingInboxService(**kwargs)
 
 
 class PollRequest(TAXIIRequestMessage):
@@ -2535,7 +2376,7 @@ class PollRequest(TAXIIRequestMessage):
 
     @poll_parameters.setter
     def poll_parameters(self, value):
-        do_check(value, 'poll_parameters', type=PollRequest.PollParameters, can_be_none=True)
+        do_check(value, 'poll_parameters', type=PollParameters, can_be_none=True)
         self._poll_parameters = value
 
     def to_etree(self):
@@ -2593,7 +2434,7 @@ class PollRequest(TAXIIRequestMessage):
         kwargs['poll_parameters'] = None
         poll_parameter_set = etree_xml.xpath('./taxii_11:Poll_Parameters', namespaces=ns_map)
         if len(poll_parameter_set) > 0:
-            kwargs['poll_parameters'] = PollRequest.PollParameters.from_etree(poll_parameter_set[0])
+            kwargs['poll_parameters'] = PollParameters.from_etree(poll_parameter_set[0])
 
         kwargs['subscription_id'] = None
         subscription_id_set = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)
@@ -2620,104 +2461,105 @@ class PollRequest(TAXIIRequestMessage):
 
         kwargs['poll_parameters'] = None
         if 'poll_parameters' in d and d['poll_parameters'] is not None:
-            kwargs['poll_parameters'] = PollRequest.PollParameters.from_dict(d['poll_parameters'])
+            kwargs['poll_parameters'] = PollParameters.from_dict(d['poll_parameters'])
 
         msg = super(PollRequest, cls).from_dict(d, **kwargs)
         return msg
 
-    class PollParameters(_GenericParameters):
-        """
-        The Poll Parameters component of a TAXII Poll Request message.
 
-        Args:
-            response_type (str): The requested response type. Must be either
-                :py:data:`RT_FULL` or :py:data:`RT_COUNT_ONLY`. **Optional**,
-                defaults to :py:data:`RT_FULL`
-            content_bindings (list of ContentBinding objects): A list of Content
-                Bindings acceptable in response. **Optional**
-            query (Query): The query for this poll parameters. **Optional**
-            allow_asynch (bool): Indicates whether the client supports
-                asynchronous polling. **Optional**, defaults to ``False``
-            delivery_parameters (DeliveryParameters): The requested delivery
-                parameters for this object. **Optional**
+class PollParameters(_GenericParameters):
+    """
+    The Poll Parameters component of a TAXII Poll Request message.
 
-        If ``content_bindings`` in not provided, this indicates that all
-        bindings are accepted as a response.
-        """
-        name = 'Poll_Parameters'
+    Args:
+        response_type (str): The requested response type. Must be either
+            :py:data:`RT_FULL` or :py:data:`RT_COUNT_ONLY`. **Optional**,
+            defaults to :py:data:`RT_FULL`
+        content_bindings (list of ContentBinding objects): A list of Content
+            Bindings acceptable in response. **Optional**
+        query (Query): The query for this poll parameters. **Optional**
+        allow_asynch (bool): Indicates whether the client supports
+            asynchronous polling. **Optional**, defaults to ``False``
+        delivery_parameters (DeliveryParameters): The requested delivery
+            parameters for this object. **Optional**
 
-        def __init__(self, response_type=RT_FULL, content_bindings=None,
-                     query=None, allow_asynch=False, delivery_parameters=None):
-            super(PollRequest.PollParameters, self).__init__(response_type, content_bindings, query)
-            self.allow_asynch = allow_asynch
-            self.delivery_parameters = delivery_parameters
+    If ``content_bindings`` in not provided, this indicates that all
+    bindings are accepted as a response.
+    """
+    name = 'Poll_Parameters'
 
-        @property
-        def delivery_parameters(self):
-            return self._delivery_parameters
+    def __init__(self, response_type=RT_FULL, content_bindings=None,
+                    query=None, allow_asynch=False, delivery_parameters=None):
+        super(PollParameters, self).__init__(response_type, content_bindings, query)
+        self.allow_asynch = allow_asynch
+        self.delivery_parameters = delivery_parameters
 
-        @delivery_parameters.setter
-        def delivery_parameters(self, value):
-            do_check(value, 'delivery_parameters', type=DeliveryParameters, can_be_none=True)
-            self._delivery_parameters = value
+    @property
+    def delivery_parameters(self):
+        return self._delivery_parameters
 
-        @property
-        def allow_asynch(self):
-            return self._allow_asynch
+    @delivery_parameters.setter
+    def delivery_parameters(self, value):
+        do_check(value, 'delivery_parameters', type=DeliveryParameters, can_be_none=True)
+        self._delivery_parameters = value
 
-        @allow_asynch.setter
-        def allow_asynch(self, value):
-            do_check(value, 'allow_asynch', value_tuple=(True, False), can_be_none=True)
-            self._allow_asynch = value
+    @property
+    def allow_asynch(self):
+        return self._allow_asynch
 
-        def to_etree(self):
-            xml = super(PollRequest.PollParameters, self).to_etree()
+    @allow_asynch.setter
+    def allow_asynch(self, value):
+        do_check(value, 'allow_asynch', value_tuple=(True, False), can_be_none=True)
+        self._allow_asynch = value
 
-            if self.allow_asynch is not None:
-                xml.attrib['allow_asynch'] = str(self.allow_asynch).lower()
+    def to_etree(self):
+        xml = super(PollParameters, self).to_etree()
 
-            if self.delivery_parameters is not None:
-                xml.append(self.delivery_parameters.to_etree())
-            return xml
+        if self.allow_asynch is not None:
+            xml.attrib['allow_asynch'] = str(self.allow_asynch).lower()
 
-        def to_dict(self):
-            d = super(PollRequest.PollParameters, self).to_dict()
-            if self.allow_asynch is not None:
-                d['allow_asynch'] = str(self.allow_asynch).lower()
-            d['delivery_parameters'] = None
-            if self.delivery_parameters is not None:
-                d['delivery_parameters'] = self.delivery_parameters.to_dict()
-            return d
+        if self.delivery_parameters is not None:
+            xml.append(self.delivery_parameters.to_etree())
+        return xml
 
-        @classmethod
-        def from_etree(cls, etree_xml):
-            poll_parameters = super(PollRequest.PollParameters, cls).from_etree(etree_xml)
-            kwargs = {}
+    def to_dict(self):
+        d = super(PollParameters, self).to_dict()
+        if self.allow_asynch is not None:
+            d['allow_asynch'] = str(self.allow_asynch).lower()
+        d['delivery_parameters'] = None
+        if self.delivery_parameters is not None:
+            d['delivery_parameters'] = self.delivery_parameters.to_dict()
+        return d
 
-            allow_asynch_set = etree_xml.xpath('./@allow_asynch')
-            if len(allow_asynch_set) > 0:
-                poll_parameters.allow_asynch = allow_asynch_set[0] == 'true'
+    @classmethod
+    def from_etree(cls, etree_xml):
+        poll_parameters = super(PollParameters, cls).from_etree(etree_xml)
+        kwargs = {}
 
-            delivery_parameters_set = etree_xml.xpath('./taxii_11:Delivery_Parameters', namespaces = ns_map)
-            if len(delivery_parameters_set) > 0:
-                poll_parameters.delivery_parameters = DeliveryParameters.from_etree(delivery_parameters_set[0])
+        allow_asynch_set = etree_xml.xpath('./@allow_asynch')
+        if len(allow_asynch_set) > 0:
+            poll_parameters.allow_asynch = allow_asynch_set[0] == 'true'
 
-            return poll_parameters
+        delivery_parameters_set = etree_xml.xpath('./taxii_11:Delivery_Parameters', namespaces = ns_map)
+        if len(delivery_parameters_set) > 0:
+            poll_parameters.delivery_parameters = DeliveryParameters.from_etree(delivery_parameters_set[0])
 
-        @classmethod
-        def from_dict(cls, d):
-            poll_parameters = super(PollRequest.PollParameters, cls).from_dict(d)
-            kwargs = {}
+        return poll_parameters
 
-            aa = d.get('allow_asynch')
-            if aa is not None:
-                poll_parameters.allow_asynch = aa == 'true'
+    @classmethod
+    def from_dict(cls, d):
+        poll_parameters = super(PollParameters, cls).from_dict(d)
+        kwargs = {}
 
-            delivery_parameters = d.get('delivery_parameters')
-            if delivery_parameters is not None:
-                poll_parameters.delivery_parameters = DeliveryParameters.from_dict(delivery_parameters)
+        aa = d.get('allow_asynch')
+        if aa is not None:
+            poll_parameters.allow_asynch = aa == 'true'
 
-            return poll_parameters
+        delivery_parameters = d.get('delivery_parameters')
+        if delivery_parameters is not None:
+            poll_parameters.delivery_parameters = DeliveryParameters.from_dict(delivery_parameters)
+
+        return poll_parameters
 
 
 class PollResponse(TAXIIMessage):
@@ -3019,6 +2861,7 @@ status_details = {
     ST_UNSUPPORTED_QUERY: {'SUPPORTED_QUERY': _UQ_SupportedQuery}
 }
 
+
 class StatusMessage(TAXIIMessage):
     """
     A TAXII Status message.
@@ -3203,7 +3046,7 @@ class InboxMessage(TAXIIMessage):
 
     @subscription_information.setter
     def subscription_information(self, value):
-        do_check(value, 'subscription_information', type=InboxMessage.SubscriptionInformation, can_be_none=True)
+        do_check(value, 'subscription_information', type=SubscriptionInformation, can_be_none=True)
         self._subscription_information = value
 
     @property
@@ -3311,7 +3154,7 @@ class InboxMessage(TAXIIMessage):
 
         subs_infos = etree_xml.xpath('./taxii_11:Source_Subscription', namespaces=ns_map)
         if len(subs_infos) > 0:
-            kwargs['subscription_information'] = InboxMessage.SubscriptionInformation.from_etree(subs_infos[0])
+            kwargs['subscription_information'] = SubscriptionInformation.from_etree(subs_infos[0])
 
         record_count_set = etree_xml.xpath('./taxii_11:Record_Count', namespaces=ns_map)
         if len(record_count_set) > 0:
@@ -3341,7 +3184,7 @@ class InboxMessage(TAXIIMessage):
 
         kwargs['subscription_information'] = None
         if 'subscription_information' in d:
-            kwargs['subscription_information'] = InboxMessage.SubscriptionInformation.from_dict(d['subscription_information'])
+            kwargs['subscription_information'] = SubscriptionInformation.from_dict(d['subscription_information'])
 
         if 'record_count' in d:
             kwargs['record_count'] = RecordCount.from_dict(d['record_count'])
@@ -3353,119 +3196,120 @@ class InboxMessage(TAXIIMessage):
         msg = super(InboxMessage, cls).from_dict(d, **kwargs)
         return msg
 
-    class SubscriptionInformation(BaseNonMessage):
-        """
-        The Subscription Information component of a TAXII Inbox message.
 
-        Arguments:
-            collection_name (str): the name of the TAXII Data Collection from
-                which this content is being provided. **Required**
-            subscription_id (str): the Subscription ID for which this
-                content is being provided. **Required**
-            exclusive_begin_timestamp_label (datetime): a Timestamp Label
-                indicating the beginning of the time range this Inbox Message
-                covers. **Optional for a Data Feed, Prohibited for a Data Set**
-            inclusive_end_timestamp_label (datetime): a Timestamp Label
-                indicating the end of the time range this Inbox Message covers.
-                **Optional for a Data Feed, Prohibited for a Data Set**
-        """
+class SubscriptionInformation(TAXIIBase):
+    """
+    The Subscription Information component of a TAXII Inbox message.
 
-        def __init__(self, collection_name, subscription_id, exclusive_begin_timestamp_label=None, inclusive_end_timestamp_label=None):
-            self.collection_name = collection_name
-            self.subscription_id = subscription_id
-            self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
-            self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
+    Arguments:
+        collection_name (str): the name of the TAXII Data Collection from
+            which this content is being provided. **Required**
+        subscription_id (str): the Subscription ID for which this
+            content is being provided. **Required**
+        exclusive_begin_timestamp_label (datetime): a Timestamp Label
+            indicating the beginning of the time range this Inbox Message
+            covers. **Optional for a Data Feed, Prohibited for a Data Set**
+        inclusive_end_timestamp_label (datetime): a Timestamp Label
+            indicating the end of the time range this Inbox Message covers.
+            **Optional for a Data Feed, Prohibited for a Data Set**
+    """
 
-        @property
-        def collection_name(self):
-            return self._collection_name
+    def __init__(self, collection_name, subscription_id, exclusive_begin_timestamp_label=None, inclusive_end_timestamp_label=None):
+        self.collection_name = collection_name
+        self.subscription_id = subscription_id
+        self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
+        self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
 
-        @collection_name.setter
-        def collection_name(self, value):
-            do_check(value, 'collection_name', regex_tuple=uri_regex)
-            self._collection_name = value
+    @property
+    def collection_name(self):
+        return self._collection_name
 
-        @property
-        def subscription_id(self):
-            return self._subscription_id
+    @collection_name.setter
+    def collection_name(self, value):
+        do_check(value, 'collection_name', regex_tuple=uri_regex)
+        self._collection_name = value
 
-        @subscription_id.setter
-        def subscription_id(self, value):
-            do_check(value, 'subscription_id', regex_tuple=uri_regex)
-            self._subscription_id = value
+    @property
+    def subscription_id(self):
+        return self._subscription_id
 
-        @property
-        def exclusive_begin_timestamp_label(self):
-            return self._exclusive_begin_timestamp_label
+    @subscription_id.setter
+    def subscription_id(self, value):
+        do_check(value, 'subscription_id', regex_tuple=uri_regex)
+        self._subscription_id = value
 
-        @exclusive_begin_timestamp_label.setter
-        def exclusive_begin_timestamp_label(self, value):
-            check_timestamp_label(value, 'exclusive_begin_timestamp_label', can_be_none=True)
-            self._exclusive_begin_timestamp_label = value
+    @property
+    def exclusive_begin_timestamp_label(self):
+        return self._exclusive_begin_timestamp_label
 
-        @property
-        def inclusive_end_timestamp_label(self):
-            return self._inclusive_end_timestamp_label
+    @exclusive_begin_timestamp_label.setter
+    def exclusive_begin_timestamp_label(self, value):
+        check_timestamp_label(value, 'exclusive_begin_timestamp_label', can_be_none=True)
+        self._exclusive_begin_timestamp_label = value
 
-        @inclusive_end_timestamp_label.setter
-        def inclusive_end_timestamp_label(self, value):
-            check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
-            self._inclusive_end_timestamp_label = value
+    @property
+    def inclusive_end_timestamp_label(self):
+        return self._inclusive_end_timestamp_label
 
-        def to_etree(self):
-            xml = etree.Element('{%s}Source_Subscription' % ns_map['taxii_11'])
-            xml.attrib['collection_name'] = self.collection_name
-            si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
-            si.text = self.subscription_id
-            
-            if self.exclusive_begin_timestamp_label is not None:
-                ebtl = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'])
-                ebtl.text = self.exclusive_begin_timestamp_label.isoformat()
-            
-            if self.inclusive_end_timestamp_label is not None:
-                ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'])
-                ietl.text = self.inclusive_end_timestamp_label.isoformat()
+    @inclusive_end_timestamp_label.setter
+    def inclusive_end_timestamp_label(self, value):
+        check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
+        self._inclusive_end_timestamp_label = value
 
-            return xml
+    def to_etree(self):
+        xml = etree.Element('{%s}Source_Subscription' % ns_map['taxii_11'])
+        xml.attrib['collection_name'] = self.collection_name
+        si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
+        si.text = self.subscription_id
+        
+        if self.exclusive_begin_timestamp_label is not None:
+            ebtl = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'])
+            ebtl.text = self.exclusive_begin_timestamp_label.isoformat()
+        
+        if self.inclusive_end_timestamp_label is not None:
+            ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'])
+            ietl.text = self.inclusive_end_timestamp_label.isoformat()
 
-        def to_dict(self):
-            d = {}
-            d['collection_name'] = self.collection_name
-            d['subscription_id'] = self.subscription_id
-            if self.exclusive_begin_timestamp_label:
-                d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
-            if self.inclusive_end_timestamp_label:
-                d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
-            return d
+        return xml
 
-        @staticmethod
-        def from_etree(etree_xml):
-            collection_name = etree_xml.attrib['collection_name']
-            subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)[0].text
+    def to_dict(self):
+        d = {}
+        d['collection_name'] = self.collection_name
+        d['subscription_id'] = self.subscription_id
+        if self.exclusive_begin_timestamp_label:
+            d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
+        if self.inclusive_end_timestamp_label:
+            d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
+        return d
 
-            begin_ts = etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)
-            if begin_ts:
-                ebtl = _str2datetime(begin_ts[0].text)
-            else:
-                ebtl = None
+    @staticmethod
+    def from_etree(etree_xml):
+        collection_name = etree_xml.attrib['collection_name']
+        subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)[0].text
 
-            end_ts = etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)
-            if end_ts:
-                ietl = _str2datetime(end_ts[0].text)
-            else:
-                ietl = None
+        begin_ts = etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)
+        if begin_ts:
+            ebtl = _str2datetime(begin_ts[0].text)
+        else:
+            ebtl = None
 
-            return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
+        end_ts = etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)
+        if end_ts:
+            ietl = _str2datetime(end_ts[0].text)
+        else:
+            ietl = None
 
-        @staticmethod
-        def from_dict(d):
-            collection_name = d['collection_name']
-            subscription_id = d['subscription_id']
+        return SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 
-            ebtl = _str2datetime(d.get('exclusive_begin_timestamp_label'))
-            ietl = _str2datetime(d.get('inclusive_end_timestamp_label'))
+    @staticmethod
+    def from_dict(d):
+        collection_name = d['collection_name']
+        subscription_id = d['subscription_id']
 
-            return InboxMessage.SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
+        ebtl = _str2datetime(d.get('exclusive_begin_timestamp_label'))
+        ietl = _str2datetime(d.get('inclusive_end_timestamp_label'))
+
+        return SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 
 
 class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
@@ -3671,7 +3515,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
     @subscription_instances.setter
     def subscription_instances(self, value):
-        do_check(value, 'subscription_instances', type=ManageCollectionSubscriptionResponse.SubscriptionInstance)
+        do_check(value, 'subscription_instances', type=SubscriptionInstance)
         self._subscription_instances = value
 
     def to_etree(self):
@@ -3710,7 +3554,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
         kwargs['subscription_instances'] = []
         for si in subscription_instance_set:
-            kwargs['subscription_instances'].append(ManageCollectionSubscriptionResponse.SubscriptionInstance.from_etree(si))
+            kwargs['subscription_instances'].append(SubscriptionInstance.from_etree(si))
 
         msg = super(ManageCollectionSubscriptionResponse, cls).from_etree(etree_xml, **kwargs)
         return msg
@@ -3724,252 +3568,254 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
         kwargs['subscription_instances'] = []
         for instance in d['subscription_instances']:
-            kwargs['subscription_instances'].append(ManageCollectionSubscriptionResponse.SubscriptionInstance.from_dict(instance))
+            kwargs['subscription_instances'].append(SubscriptionInstance.from_dict(instance))
 
         msg = super(ManageCollectionSubscriptionResponse, cls).from_dict(d, **kwargs)
         return msg
 
-    class SubscriptionInstance(BaseNonMessage):
-        """
-        The Subscription Instance component of the Manage Collection Subscription
-        Response message.
 
-        Args:
-            subscription_id (str): the id of the subscription. **Required**
-            status (str): One of :py:data:`SS_ACTIVE`, :py:data:`SS_PAUSED`, or
-                 :py:data:`SS_UNSUBSCRIBED`. **Optional**, defaults to "ACTIVE"
-            subscription_parameters (SubscriptionParameters): the parameters
-                for this subscription. **Optional** If provided, should match
-                the request.
-            push_parameters (PushParameters): the push parameters for this
-                subscription. **Optional** If provided, should match the request.
-            poll_instances (list of PollInstance): The Poll Services that can be
-                 polled to fulfill this subscription. **Optional**
-        """
+class SubscriptionInstance(TAXIIBase):
+    """
+    The Subscription Instance component of the Manage Collection Subscription
+    Response message.
 
-        def __init__(self, subscription_id, status=SS_ACTIVE,
-                     subscription_parameters=None, push_parameters=None,
-                     poll_instances=None):
-            self.subscription_id = subscription_id
-            self.status = status
-            self.subscription_parameters = subscription_parameters
-            self.push_parameters = push_parameters
-            self.poll_instances = poll_instances or []
+    Args:
+        subscription_id (str): the id of the subscription. **Required**
+        status (str): One of :py:data:`SS_ACTIVE`, :py:data:`SS_PAUSED`, or
+                :py:data:`SS_UNSUBSCRIBED`. **Optional**, defaults to "ACTIVE"
+        subscription_parameters (SubscriptionParameters): the parameters
+            for this subscription. **Optional** If provided, should match
+            the request.
+        push_parameters (PushParameters): the push parameters for this
+            subscription. **Optional** If provided, should match the request.
+        poll_instances (list of PollInstance): The Poll Services that can be
+                polled to fulfill this subscription. **Optional**
+    """
 
-        @property
-        def sort_key(self):
-            return self.subscription_id
+    def __init__(self, subscription_id, status=SS_ACTIVE,
+                    subscription_parameters=None, push_parameters=None,
+                    poll_instances=None):
+        self.subscription_id = subscription_id
+        self.status = status
+        self.subscription_parameters = subscription_parameters
+        self.push_parameters = push_parameters
+        self.poll_instances = poll_instances or []
 
-        @property
-        def subscription_id(self):
-            return self._subscription_id
+    @property
+    def sort_key(self):
+        return self.subscription_id
 
-        @subscription_id.setter
-        def subscription_id(self, value):
-            do_check(value, 'subscription_id', regex_tuple=uri_regex)
-            self._subscription_id = value
+    @property
+    def subscription_id(self):
+        return self._subscription_id
 
-        @property
-        def status(self):
-            return self._status
+    @subscription_id.setter
+    def subscription_id(self, value):
+        do_check(value, 'subscription_id', regex_tuple=uri_regex)
+        self._subscription_id = value
 
-        @status.setter
-        def status(self, value):
-            do_check(value, 'status', value_tuple=SS_TYPES, can_be_none=True)
-            self._status = value
+    @property
+    def status(self):
+        return self._status
 
-        @property
-        def subscription_parameters(self):
-            return self._subscription_parameters
+    @status.setter
+    def status(self, value):
+        do_check(value, 'status', value_tuple=SS_TYPES, can_be_none=True)
+        self._status = value
 
-        @subscription_parameters.setter
-        def subscription_parameters(self, value):
-            do_check(value, 'subscription_parameters', type=SubscriptionParameters, can_be_none=True)
-            self._subscription_parameters = value
+    @property
+    def subscription_parameters(self):
+        return self._subscription_parameters
 
-        @property
-        def push_parameters(self):
-            return self._push_parameters
+    @subscription_parameters.setter
+    def subscription_parameters(self, value):
+        do_check(value, 'subscription_parameters', type=SubscriptionParameters, can_be_none=True)
+        self._subscription_parameters = value
 
-        @push_parameters.setter
-        def push_parameters(self, value):
-            do_check(value, 'push_parameters', type=PushParameters, can_be_none=True)
-            self._push_parameters = value
+    @property
+    def push_parameters(self):
+        return self._push_parameters
 
-        @property
-        def poll_instances(self):
-            return self._poll_instances
+    @push_parameters.setter
+    def push_parameters(self, value):
+        do_check(value, 'push_parameters', type=PushParameters, can_be_none=True)
+        self._push_parameters = value
 
-        @poll_instances.setter
-        def poll_instances(self, value):
-            do_check(value, 'poll_instances', type=ManageCollectionSubscriptionResponse.PollInstance)
-            self._poll_instances = value
+    @property
+    def poll_instances(self):
+        return self._poll_instances
 
-        def to_etree(self):
-            si = etree.Element('{%s}Subscription' % ns_map['taxii_11'], nsmap = ns_map)
-            if self.status is not None:
-                si.attrib['status'] = self.status
+    @poll_instances.setter
+    def poll_instances(self, value):
+        do_check(value, 'poll_instances', type=PollInstance)
+        self._poll_instances = value
 
-            subs_id = etree.SubElement(si, '{%s}Subscription_ID' % ns_map['taxii_11'])
-            subs_id.text = self.subscription_id
+    def to_etree(self):
+        si = etree.Element('{%s}Subscription' % ns_map['taxii_11'], nsmap = ns_map)
+        if self.status is not None:
+            si.attrib['status'] = self.status
 
-            if self.subscription_parameters is not None:
-                si.append(self.subscription_parameters.to_etree())
+        subs_id = etree.SubElement(si, '{%s}Subscription_ID' % ns_map['taxii_11'])
+        subs_id.text = self.subscription_id
 
-            if self.push_parameters is not None:
-                si.append(self.push_parameters.to_etree())
+        if self.subscription_parameters is not None:
+            si.append(self.subscription_parameters.to_etree())
 
-            for pi in self.poll_instances:
-                si.append(pi.to_etree())
+        if self.push_parameters is not None:
+            si.append(self.push_parameters.to_etree())
 
-            return si
+        for pi in self.poll_instances:
+            si.append(pi.to_etree())
 
-        def to_dict(self):
-            d = {}
-            d['status'] = self.status
-            d['subscription_id'] = self.subscription_id
-            d['subscription_parameters'] = None
-            if self.subscription_parameters is not None:
-                d['subscription_parameters'] = self.subscription_parameters.to_dict()
+        return si
 
-            d['push_parameters'] = None
-            if self.push_parameters is not None:
-                d['push_parameters'] = self.push_parameters.to_dict()
+    def to_dict(self):
+        d = {}
+        d['status'] = self.status
+        d['subscription_id'] = self.subscription_id
+        d['subscription_parameters'] = None
+        if self.subscription_parameters is not None:
+            d['subscription_parameters'] = self.subscription_parameters.to_dict()
 
-            d['poll_instances'] = []
-            for pi in self.poll_instances:
-                d['poll_instances'].append(pi.to_dict())
+        d['push_parameters'] = None
+        if self.push_parameters is not None:
+            d['push_parameters'] = self.push_parameters.to_dict()
 
-            return d
+        d['poll_instances'] = []
+        for pi in self.poll_instances:
+            d['poll_instances'].append(pi.to_dict())
 
-        @staticmethod
-        def from_etree(etree_xml):
+        return d
 
-            status = None
-            status_set = etree_xml.xpath('./@status')
-            if len(status_set) > 0:
-                status = status_set[0]
+    @staticmethod
+    def from_etree(etree_xml):
 
-            subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces = ns_map)[0].text
+        status = None
+        status_set = etree_xml.xpath('./@status')
+        if len(status_set) > 0:
+            status = status_set[0]
 
-            subscription_parameters = None
-            subscription_parameters_set = etree_xml.xpath('./taxii_11:Subscription_Parameters', namespaces = ns_map)
-            if len(subscription_parameters_set) > 0:
-                subscription_parameters = SubscriptionParameters.from_etree(subscription_parameters_set[0])
+        subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces = ns_map)[0].text
 
-            push_parameters = None
-            push_parameters_set = etree_xml.xpath('./taxii_11:Push_Parameters', namespaces = ns_map)
-            if len(push_parameters_set) > 0:
-                push_parameters = PushParameters.from_etree(push_parameters_set[0])
+        subscription_parameters = None
+        subscription_parameters_set = etree_xml.xpath('./taxii_11:Subscription_Parameters', namespaces = ns_map)
+        if len(subscription_parameters_set) > 0:
+            subscription_parameters = SubscriptionParameters.from_etree(subscription_parameters_set[0])
 
-            poll_instances = []
-            poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instance', namespaces = ns_map)
-            for pi in poll_instance_set:
-                poll_instances.append(ManageCollectionSubscriptionResponse.PollInstance.from_etree(pi))
+        push_parameters = None
+        push_parameters_set = etree_xml.xpath('./taxii_11:Push_Parameters', namespaces = ns_map)
+        if len(push_parameters_set) > 0:
+            push_parameters = PushParameters.from_etree(push_parameters_set[0])
 
-            return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
+        poll_instances = []
+        poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instance', namespaces = ns_map)
+        for pi in poll_instance_set:
+            poll_instances.append(PollInstance.from_etree(pi))
 
-        @staticmethod
-        def from_dict(d):
-            subscription_id = d['subscription_id']
-            status = d.get('status')
+        return SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
-            subscription_parameters = None
-            if d.get('subscription_parameters') is not None:
-                subscription_parameters = SubscriptionParameters.from_dict(d['subscription_parameters'])
+    @staticmethod
+    def from_dict(d):
+        subscription_id = d['subscription_id']
+        status = d.get('status')
 
-            push_parameters = None
-            if d.get('push_parameters') is not None:
-                push_parameters = PushParameters.from_dict(d['push_parameters'])
+        subscription_parameters = None
+        if d.get('subscription_parameters') is not None:
+            subscription_parameters = SubscriptionParameters.from_dict(d['subscription_parameters'])
 
-            poll_instances = []
-            if 'poll_instances' in d:
-                for pi in d['poll_instances']:
-                    poll_instances.append(ManageCollectionSubscriptionResponse.PollInstance.from_dict(pi))
+        push_parameters = None
+        if d.get('push_parameters') is not None:
+            push_parameters = PushParameters.from_dict(d['push_parameters'])
 
-            return ManageCollectionSubscriptionResponse.SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
+        poll_instances = []
+        if 'poll_instances' in d:
+            for pi in d['poll_instances']:
+                poll_instances.append(PollInstance.from_dict(pi))
 
-    class PollInstance(BaseNonMessage):
-        """
-        The Poll Instance component of the Manage Collection Subscription
-        Response message.
+        return SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
-        Args:
-            poll_protocol (str): The protocol binding supported by this
-                instance of a Polling Service. **Required**
-            poll_address (str): the address of the TAXII Daemon hosting
-                this Poll Service. **Required**
-            poll_message_bindings (list of str): one or more message bindings
-                that can be used when interacting with this Poll Service
-                instance. **Required**
-        """
 
-        def __init__(self, poll_protocol, poll_address, poll_message_bindings=None):
-            self.poll_protocol = poll_protocol
-            self.poll_address = poll_address
-            self.poll_message_bindings = poll_message_bindings or []
+class PollInstance(TAXIIBase):
+    """
+    The Poll Instance component of the Manage Collection Subscription
+    Response message.
 
-        @property
-        def sort_key(self):
-            return self.poll_address
+    Args:
+        poll_protocol (str): The protocol binding supported by this
+            instance of a Polling Service. **Required**
+        poll_address (str): the address of the TAXII Daemon hosting
+            this Poll Service. **Required**
+        poll_message_bindings (list of str): one or more message bindings
+            that can be used when interacting with this Poll Service
+            instance. **Required**
+    """
 
-        @property
-        def poll_protocol(self):
-            return self._poll_protocol
+    def __init__(self, poll_protocol, poll_address, poll_message_bindings=None):
+        self.poll_protocol = poll_protocol
+        self.poll_address = poll_address
+        self.poll_message_bindings = poll_message_bindings or []
 
-        @poll_protocol.setter
-        def poll_protocol(self, value):
-            do_check(value, 'poll_protocol', regex_tuple=uri_regex)
-            self._poll_protocol = value
+    @property
+    def sort_key(self):
+        return self.poll_address
 
-        @property
-        def poll_message_bindings(self):
-            return self._poll_message_bindings
+    @property
+    def poll_protocol(self):
+        return self._poll_protocol
 
-        @poll_message_bindings.setter
-        def poll_message_bindings(self, value):
-            do_check(value, 'poll_message_bindings', regex_tuple=uri_regex)
-            self._poll_message_bindings = value
+    @poll_protocol.setter
+    def poll_protocol(self, value):
+        do_check(value, 'poll_protocol', regex_tuple=uri_regex)
+        self._poll_protocol = value
 
-        def to_etree(self):
-            xml = etree.Element('{%s}Poll_Instance' % ns_map['taxii_11'])
+    @property
+    def poll_message_bindings(self):
+        return self._poll_message_bindings
 
-            pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
-            pb.text = self.poll_protocol
+    @poll_message_bindings.setter
+    def poll_message_bindings(self, value):
+        do_check(value, 'poll_message_bindings', regex_tuple=uri_regex)
+        self._poll_message_bindings = value
 
-            a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
-            a.text = self.poll_address
+    def to_etree(self):
+        xml = etree.Element('{%s}Poll_Instance' % ns_map['taxii_11'])
 
-            for binding in self.poll_message_bindings:
-                b = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
-                b.text = binding
+        pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
+        pb.text = self.poll_protocol
 
-            return xml
+        a = etree.SubElement(xml, '{%s}Address' % ns_map['taxii_11'])
+        a.text = self.poll_address
 
-        def to_dict(self):
-            d = {}
+        for binding in self.poll_message_bindings:
+            b = etree.SubElement(xml, '{%s}Message_Binding' % ns_map['taxii_11'])
+            b.text = binding
 
-            d['poll_protocol'] = self.poll_protocol
-            d['poll_address'] = self.poll_address
-            d['poll_message_bindings'] = []
-            for binding in self.poll_message_bindings:
-                d['poll_message_bindings'].append(binding)
+        return xml
 
-            return d
+    def to_dict(self):
+        d = {}
 
-        @staticmethod
-        def from_etree(etree_xml):
-            poll_protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
-            address = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
-            poll_message_bindings = []
-            for b in etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map):
-                poll_message_bindings.append(b.text)
+        d['poll_protocol'] = self.poll_protocol
+        d['poll_address'] = self.poll_address
+        d['poll_message_bindings'] = []
+        for binding in self.poll_message_bindings:
+            d['poll_message_bindings'].append(binding)
 
-            return ManageCollectionSubscriptionResponse.PollInstance(poll_protocol, address, poll_message_bindings)
+        return d
 
-        @staticmethod
-        def from_dict(d):
-            return ManageCollectionSubscriptionResponse.PollInstance(**d)
+    @staticmethod
+    def from_etree(etree_xml):
+        poll_protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
+        address = etree_xml.xpath('./taxii_11:Address', namespaces=ns_map)[0].text
+        poll_message_bindings = []
+        for b in etree_xml.xpath('./taxii_11:Message_Binding', namespaces=ns_map):
+            poll_message_bindings.append(b.text)
+
+        return PollInstance(poll_protocol, address, poll_message_bindings)
+
+    @staticmethod
+    def from_dict(d):
+        return PollInstance(**d)
 
 
 class PollFulfillmentRequest(TAXIIRequestMessage):
@@ -4054,3 +3900,16 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
         kwargs['result_part_number'] = int(d['result_part_number'])
 
         return super(PollFulfillmentRequest, cls).from_dict(d, **kwargs)
+
+
+# Add top-level classes as nested classes for backwards compatibility
+DiscoveryResponse.ServiceInstance = ServiceInstance
+CollectionInformationResponse.CollectionInformation = CollectionInformation
+CollectionInformation.PushMethod = PushMethod
+CollectionInformation.PollingServiceInstance = PollingServiceInstance
+CollectionInformation.SubscriptionMethod = SubscriptionMethod
+CollectionInformation.ReceivingInboxService = ReceivingInboxService
+ManageCollectionSubscriptionResponse.PollInstance = PollInstance
+ManageCollectionSubscriptionResponse.SubscriptionInstance = SubscriptionInstance
+PollRequest.PollParameters = PollParameters
+InboxMessage.SubscriptionInformation = SubscriptionInformation
