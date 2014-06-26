@@ -8,12 +8,12 @@ import argparse
 import dateutil.parser
 
 import libtaxii as t
+import libtaxii.scripts as scripts
 import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
 
-
 def main():
-    parser = t.scripts.get_base_parser("Poll Client", path="/services/poll/")
+    parser = scripts.get_base_parser("Poll Client", path="/services/poll/")
     parser.add_argument("--collection", dest="collection", default="default", help="Data Collection to poll. Defaults to 'default'.")
     parser.add_argument("--begin_timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
     parser.add_argument("--end_timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
@@ -46,7 +46,7 @@ def main():
 
     poll_req_xml = poll_req.to_xml(pretty_print=True)
     print "Poll Request: \r\n", poll_req_xml
-    client = t.scripts.create_client(args)
+    client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)

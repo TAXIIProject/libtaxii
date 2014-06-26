@@ -8,6 +8,7 @@ import argparse
 import libtaxii as t
 import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
+import libtaxii.scripts as scripts
 import StringIO
 
 #http://stix.mitre.org/language/version1.0/#samples
@@ -67,7 +68,7 @@ stix_watchlist = '''<!--
 </stix:STIX_Package>'''
 
 def main():
-    parser = t.scripts.get_base_parser("Inbox Client", path="/services/inbox/default/")
+    parser = scripts.get_base_parser("Inbox Client", path="/services/inbox/default/")
     parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_11, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_11 )
     parser.add_argument("--subtype", dest="subtype", default=None, help="The subtype of the Content Binding. Defaults to None")
     parser.add_argument("--content-file", dest="content_file", default=stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
@@ -88,7 +89,7 @@ def main():
     inbox_xml = inbox_message.to_xml(pretty_print=True)
 
     print "Inbox Message: \r\n", inbox_xml
-    client = t.scripts.create_client(args)
+    client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
