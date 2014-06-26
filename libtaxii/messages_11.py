@@ -19,12 +19,12 @@ except ImportError:
 import os
 import StringIO
 
-import dateutil.parser
 from lxml import etree
 
 import libtaxii.messages_10 as tm10
 
-from .common import get_xml_parser, set_xml_parser, TAXIIBase
+from .common import (get_xml_parser, parse_datetime_string, set_xml_parser,
+        TAXIIBase)
 from .validation import do_check, uri_regex, check_timestamp_label
 
 
@@ -199,19 +199,8 @@ ns_map = {
          }
 
 
-def _str2datetime(date_string):
-    """Parse a string into a :py:class:`datetime.datetime`.
-
-    This function should not be called by libtaxii users directly.
-    """
-    if not date_string:
-        return None
-    return dateutil.parser.parse(date_string)
-
-
 #Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
-
 
 
 def validate_xml(xml_string):
@@ -950,7 +939,7 @@ class ContentBlock(TAXIIBase):
         ts_set = etree_xml.xpath('./taxii_11:Timestamp_Label', namespaces=ns_map)
         if len(ts_set) > 0:
             ts_string = ts_set[0].text
-            kwargs['timestamp_label'] = _str2datetime(ts_string)
+            kwargs['timestamp_label'] = parse_datetime_string(ts_string)
 
         content = etree_xml.xpath('./taxii_11:Content', namespaces=ns_map)[0]
         if len(content) == 0:  # This has string content
@@ -966,7 +955,7 @@ class ContentBlock(TAXIIBase):
         kwargs['content_binding'] = ContentBinding.from_dict(d['content_binding'])
         kwargs['padding'] = d.get('padding')
         if 'timestamp_label' in d:
-            kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
+            kwargs['timestamp_label'] = parse_datetime_string(d['timestamp_label'])
 
         is_xml = d.get('content_is_xml', False)
         if is_xml:
@@ -2424,12 +2413,12 @@ class PollRequest(TAXIIRequestMessage):
         kwargs['exclusive_begin_timestamp_label'] = None
         begin_ts_set = etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)
         if len(begin_ts_set) > 0:
-            kwargs['exclusive_begin_timestamp_label'] = _str2datetime(begin_ts_set[0].text)
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(begin_ts_set[0].text)
 
         kwargs['inclusive_end_timestamp_label'] = None
         end_ts_set = etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)
         if len(end_ts_set) > 0:
-            kwargs['inclusive_end_timestamp_label'] = _str2datetime(end_ts_set[0].text)
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(end_ts_set[0].text)
 
         kwargs['poll_parameters'] = None
         poll_parameter_set = etree_xml.xpath('./taxii_11:Poll_Parameters', namespaces=ns_map)
@@ -2453,11 +2442,11 @@ class PollRequest(TAXIIRequestMessage):
 
         kwargs['exclusive_begin_timestamp_label'] = None
         if 'exclusive_begin_timestamp_label' in d:
-            kwargs['exclusive_begin_timestamp_label'] = _str2datetime(d['exclusive_begin_timestamp_label'])
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(d['exclusive_begin_timestamp_label'])
 
         kwargs['inclusive_end_timestamp_label'] = None
         if 'inclusive_end_timestamp_label' in d:
-            kwargs['inclusive_end_timestamp_label'] = _str2datetime(d['inclusive_end_timestamp_label'])
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(d['inclusive_end_timestamp_label'])
 
         kwargs['poll_parameters'] = None
         if 'poll_parameters' in d and d['poll_parameters'] is not None:
@@ -2773,12 +2762,12 @@ class PollResponse(TAXIIMessage):
         kwargs['exclusive_begin_timestamp_label'] = None
         ebts = etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)
         if len(ebts) > 0:
-            kwargs['exclusive_begin_timestamp_label'] = _str2datetime(ebts[0].text)
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(ebts[0].text)
 
         kwargs['inclusive_end_timestamp_label'] = None
         iets = etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)
         if len(iets) > 0:
-            kwargs['inclusive_end_timestamp_label'] = _str2datetime(iets[0].text)
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(iets[0].text)
 
         kwargs['content_blocks'] = []
         blocks = etree_xml.xpath('./taxii_11:Content_Block', namespaces=ns_map)
@@ -2808,7 +2797,7 @@ class PollResponse(TAXIIMessage):
 
         kwargs['exclusive_begin_timestamp_label'] = None
         if 'exclusive_begin_timestamp_label' in d:
-            kwargs['exclusive_begin_timestamp_label'] = _str2datetime(d['exclusive_begin_timestamp_label'])
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(d['exclusive_begin_timestamp_label'])
 
         kwargs['record_count'] = None
         if 'record_count' in d:
@@ -2816,7 +2805,7 @@ class PollResponse(TAXIIMessage):
 
         kwargs['inclusive_end_timestamp_label'] = None
         if 'inclusive_end_timestamp_label' in d:
-            kwargs['inclusive_end_timestamp_label'] = _str2datetime(d['inclusive_end_timestamp_label'])
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(d['inclusive_end_timestamp_label'])
 
         kwargs['content_blocks'] = []
         for block in d['content_blocks']:
@@ -3289,13 +3278,13 @@ class SubscriptionInformation(TAXIIBase):
 
         begin_ts = etree_xml.xpath('./taxii_11:Exclusive_Begin_Timestamp', namespaces=ns_map)
         if begin_ts:
-            ebtl = _str2datetime(begin_ts[0].text)
+            ebtl = parse_datetime_string(begin_ts[0].text)
         else:
             ebtl = None
 
         end_ts = etree_xml.xpath('./taxii_11:Inclusive_End_Timestamp', namespaces=ns_map)
         if end_ts:
-            ietl = _str2datetime(end_ts[0].text)
+            ietl = parse_datetime_string(end_ts[0].text)
         else:
             ietl = None
 
@@ -3306,8 +3295,8 @@ class SubscriptionInformation(TAXIIBase):
         collection_name = d['collection_name']
         subscription_id = d['subscription_id']
 
-        ebtl = _str2datetime(d.get('exclusive_begin_timestamp_label'))
-        ietl = _str2datetime(d.get('inclusive_end_timestamp_label'))
+        ebtl = parse_datetime_string(d.get('exclusive_begin_timestamp_label'))
+        ietl = parse_datetime_string(d.get('inclusive_end_timestamp_label'))
 
         return SubscriptionInformation(collection_name, subscription_id, ebtl, ietl)
 

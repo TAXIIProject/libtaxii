@@ -20,10 +20,9 @@ import os
 import random
 import StringIO
 
-import dateutil.parser
 from lxml import etree
 
-from .common import get_xml_parser, set_xml_parser
+from .common import get_xml_parser, parse_datetime_string, set_xml_parser
 from .validation import do_check, uri_regex, check_timestamp_label
 
 # TAXII 1.0 Message Types
@@ -283,13 +282,6 @@ def get_message_from_json(json_string):
         json_string (str): The JSON to parse into a TAXII message.
     """
     return get_message_from_dict(json.loads(json_string))
-
-
-def _str2datetime(date_string):
-    """ Users of libtaxii should not use this function.
-    Takes a date string and creates a datetime object
-    """
-    return dateutil.parser.parse(date_string)
 
 
 class BaseNonMessage(object):
@@ -853,7 +845,7 @@ class ContentBlock(BaseNonMessage):
         ts_set = etree_xml.xpath('./taxii:Timestamp_Label', namespaces=ns_map)
         if len(ts_set) > 0:
             ts_string = ts_set[0].text
-            kwargs['timestamp_label'] = _str2datetime(ts_string)
+            kwargs['timestamp_label'] = parse_datetime_string(ts_string)
 
         content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)[0]
         if len(content) == 0:  # This has string content
@@ -869,7 +861,7 @@ class ContentBlock(BaseNonMessage):
         kwargs['content_binding'] = d['content_binding']
         kwargs['padding'] = d.get('padding')
         if 'timestamp_label' in d:
-            kwargs['timestamp_label'] = _str2datetime(d['timestamp_label'])
+            kwargs['timestamp_label'] = parse_datetime_string(d['timestamp_label'])
 
         is_xml = d.get('content_is_xml', False)
         if is_xml:
@@ -1919,12 +1911,12 @@ class PollRequest(TAXIIMessage):
         kwargs['exclusive_begin_timestamp_label'] = None
         begin_ts_set = etree_xml.xpath('./taxii:Exclusive_Begin_Timestamp', namespaces=ns_map)
         if len(begin_ts_set) > 0:
-            kwargs['exclusive_begin_timestamp_label'] = _str2datetime(begin_ts_set[0].text)
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(begin_ts_set[0].text)
 
         kwargs['inclusive_end_timestamp_label'] = None
         end_ts_set = etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)
         if len(end_ts_set) > 0:
-            kwargs['inclusive_end_timestamp_label'] = _str2datetime(end_ts_set[0].text)
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(end_ts_set[0].text)
 
         kwargs['content_bindings'] = []
         content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
@@ -1943,11 +1935,11 @@ class PollRequest(TAXIIMessage):
 
         kwargs['exclusive_begin_timestamp_label'] = None
         if 'exclusive_begin_timestamp_label' in d:
-            kwargs['exclusive_begin_timestamp_label'] = _str2datetime(d['exclusive_begin_timestamp_label'])
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(d['exclusive_begin_timestamp_label'])
 
         kwargs['inclusive_end_timestamp_label'] = None
         if 'inclusive_end_timestamp_label' in d:
-            kwargs['inclusive_end_timestamp_label'] = _str2datetime(d['inclusive_end_timestamp_label'])
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(d['inclusive_end_timestamp_label'])
 
         kwargs['content_bindings'] = d.get('content_bindings', [])
 
@@ -2115,9 +2107,9 @@ class PollResponse(TAXIIMessage):
         kwargs['inclusive_begin_timestamp_label'] = None
         ibts = etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)
         if len(ibts) > 0:
-            kwargs['inclusive_begin_timestamp_label'] = _str2datetime(ibts[0].text)
+            kwargs['inclusive_begin_timestamp_label'] = parse_datetime_string(ibts[0].text)
 
-        kwargs['inclusive_end_timestamp_label'] = _str2datetime(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+        kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
 
         kwargs['content_blocks'] = []
         blocks = etree_xml.xpath('./taxii:Content_Block', namespaces=ns_map)
@@ -2140,9 +2132,9 @@ class PollResponse(TAXIIMessage):
 
         kwargs['inclusive_begin_timestamp_label'] = None
         if 'inclusive_begin_timestamp_label' in d:
-            kwargs['inclusive_begin_timestamp_label'] = _str2datetime(d['inclusive_begin_timestamp_label'])
+            kwargs['inclusive_begin_timestamp_label'] = parse_datetime_string(d['inclusive_begin_timestamp_label'])
 
-        kwargs['inclusive_end_timestamp_label'] = _str2datetime(d['inclusive_end_timestamp_label'])
+        kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(d['inclusive_end_timestamp_label'])
 
         kwargs['content_blocks'] = []
         for block in d['content_blocks']:
@@ -2484,8 +2476,8 @@ class InboxMessage(TAXIIMessage):
             feed_name = etree_xml.attrib['feed_name']
             subscription_id = etree_xml.attrib['subscription_id']
 
-            ibtl = _str2datetime(etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)[0].text)
-            ietl = _str2datetime(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+            ibtl = parse_datetime_string(etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)[0].text)
+            ietl = parse_datetime_string(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
 
             return InboxMessage.SubscriptionInformation(feed_name, subscription_id, ibtl, ietl)
 
@@ -2494,8 +2486,8 @@ class InboxMessage(TAXIIMessage):
             feed_name = d['feed_name']
             subscription_id = d['subscription_id']
 
-            ibtl = _str2datetime(d['inclusive_begin_timestamp_label'])
-            ietl = _str2datetime(d['inclusive_end_timestamp_label'])
+            ibtl = parse_datetime_string(d['inclusive_begin_timestamp_label'])
+            ietl = parse_datetime_string(d['inclusive_end_timestamp_label'])
 
             return InboxMessage.SubscriptionInformation(feed_name, subscription_id, ibtl, ietl)
 

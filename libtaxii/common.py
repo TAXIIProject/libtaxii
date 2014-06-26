@@ -6,6 +6,7 @@ Common utility classes and functions used throughout libtaxii.
 from operator import attrgetter
 from StringIO import StringIO
 
+import dateutil.parser
 from lxml import etree
 
 
@@ -32,6 +33,16 @@ def set_xml_parser(xml_parser=None):
     """
     global _XML_PARSER
     _XML_PARSER = xml_parser
+
+
+def parse_datetime_string(datetime_string):
+    """Parse a string into a :py:class:`datetime.datetime`.
+
+    libtaxii users should not need to use this function directly.
+    """
+    if not datetime_string:
+        return None
+    return dateutil.parser.parse(datetime_string)
 
 
 class TAXIIBase(object):
