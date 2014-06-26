@@ -58,7 +58,7 @@ Discovery Response
 ------------------
 
 .. autoclass:: DiscoveryResponse
-.. autoclass:: libtaxii.messages_10::DiscoveryResponse.ServiceInstance
+.. autoclass:: ServiceInstance
 
 **Example:**
 
@@ -68,7 +68,7 @@ Discovery Response
             message_id=tm10.generate_message_id(),
             in_response_to=discovery_request.message_id)
 
-    service_instance = tm10.DiscoveryResponse.ServiceInstance(
+    service_instance = tm10.ServiceInstance(
             service_type=tm10.SVC_INBOX,
             services_version=t.VID_TAXII_SERVICES_10,
             protocol_binding=t.VID_TAXII_HTTPS_10,
@@ -109,30 +109,30 @@ Feed Information Response
 -------------------------
 
 .. autoclass:: FeedInformationResponse
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation.PushMethod
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation.PollingServiceInstance
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation.SubscriptionMethod
+.. autoclass:: FeedInformation
+.. autoclass:: PushMethod
+.. autoclass:: PollingServiceInstance
+.. autoclass:: SubscriptionMethod
 
 **Example:**
 
 .. testcode::
 
-    push_method1 = tm10.FeedInformationResponse.FeedInformation.PushMethod(
+    push_method1 = tm10.PushMethod(
             push_protocol=t.VID_TAXII_HTTP_10,
             push_message_bindings=[t.VID_TAXII_XML_10])
 
-    polling_service1 = tm10.FeedInformationResponse.FeedInformation.PollingServiceInstance(
+    polling_service1 = tm10.PollingServiceInstance(
             poll_protocol=t.VID_TAXII_HTTP_10,
             poll_address='http://example.com/PollService/',
             poll_message_bindings=[t.VID_TAXII_XML_10])
 
-    subscription_service1 = tm10.FeedInformationResponse.FeedInformation.SubscriptionMethod(
+    subscription_service1 = tm10.SubscriptionMethod(
             subscription_protocol=t.VID_TAXII_HTTP_10,
             subscription_address='http://example.com/SubsService/',
             subscription_message_bindings=[t.VID_TAXII_XML_10])
 
-    feed1 = tm10.FeedInformationResponse.FeedInformation(
+    feed1 = tm10.FeedInformation(
             feed_name='Feed1',
             feed_description='Description of a feed',
             supported_contents=[t.CB_STIX_XML_10],
@@ -174,19 +174,19 @@ Manage Feed Subscription Response
 ---------------------------------
 
 .. autoclass:: ManageFeedSubscriptionResponse
-.. autoclass:: libtaxii.messages_10::ManageFeedSubscriptionResponse.SubscriptionInstance
-.. autoclass:: libtaxii.messages_10::ManageFeedSubscriptionResponse.PollInstance
+.. autoclass:: SubscriptionInstance
+.. autoclass:: PollInstance
 
 **Example:**
 
 .. testcode::
 
-    poll_instance1 = tm10.ManageFeedSubscriptionResponse.PollInstance(
+    poll_instance1 = tm10.PollInstance(
             poll_protocol=t.VID_TAXII_HTTP_10,
             poll_address='http://example.com/poll',
             poll_message_bindings=[t.VID_TAXII_XML_10])
 
-    subscription_instance1 = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
+    subscription_instance1 = tm10.SubscriptionInstance(
             subscription_id='SubsId234',
             delivery_parameters=[delivery_parameters1],
             poll_instances=[poll_instance1])
@@ -241,7 +241,7 @@ Inbox Message
 -------------
 
 .. autoclass:: InboxMessage
-.. autoclass:: libtaxii.messages_10::InboxMessage.SubscriptionInformation
+.. autoclass:: SubscriptionInformation
 
 **Example:**
 
@@ -249,7 +249,7 @@ Inbox Message
 
     cb1 = tm10.ContentBlock(t.CB_STIX_XML_11, "")
 
-    subscription_information1 = tm10.InboxMessage.SubscriptionInformation(
+    subscription_information1 = tm10.SubscriptionInformation(
             feed_name='SomeFeedName',
             subscription_id='SubsId021',
             inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),

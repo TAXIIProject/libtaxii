@@ -126,7 +126,7 @@ class DiscoveryRequestTests(unittest.TestCase):
 class DiscoveryResponseTests(unittest.TestCase):
 
     def test_discovery_response(self):
-        service_instance1 = tm10.DiscoveryResponse.ServiceInstance(
+        service_instance1 = tm10.ServiceInstance(
                 service_type=tm10.SVC_INBOX,  # Required
                 services_version=t.VID_TAXII_SERVICES_10,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -159,21 +159,21 @@ class FeedInformationRequestTests(unittest.TestCase):
 class FeedInformationResponseTests(unittest.TestCase):
 
     def test_feed_information_response1(self):
-        push_method1 = tm10.FeedInformationResponse.FeedInformation.PushMethod(
+        push_method1 = tm10.PushMethod(
                 push_protocol=t.VID_TAXII_HTTP_10,  # Required
                 push_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        polling_service1 = tm10.FeedInformationResponse.FeedInformation.PollingServiceInstance(
+        polling_service1 = tm10.PollingServiceInstance(
                 poll_protocol=t.VID_TAXII_HTTP_10,  # Required
                 poll_address='http://example.com/PollService/',  # Required
                 poll_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        subscription_service1 = tm10.FeedInformationResponse.FeedInformation.SubscriptionMethod(
+        subscription_service1 = tm10.SubscriptionMethod(
                 subscription_protocol=t.VID_TAXII_HTTP_10,  # Required
                 subscription_address='http://example.com/SubsService/',  # Required
                 subscription_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        feed1 = tm10.FeedInformationResponse.FeedInformation(
+        feed1 = tm10.FeedInformation(
                 feed_name='Feed1',  # Required
                 feed_description='Description of a feed',  # Required
                 supported_contents=[t.CB_STIX_XML_10],  # Required. List of supported content binding IDs
@@ -249,7 +249,7 @@ class StatusMessageTests(unittest.TestCase):
 class InboxMessageTests(unittest.TestCase):
 
     def setUp(self):
-        self.subscription_information1 = tm10.InboxMessage.SubscriptionInformation(
+        self.subscription_information1 = tm10.SubscriptionInformation(
                 feed_name='SomeFeedName',  # Required
                 subscription_id='SubsId021',  # Required
                 inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),  # Optional - Absence means 'no lower bound'
@@ -292,12 +292,12 @@ class ManageFeedSubscriptionRequestTests(unittest.TestCase):
 class ManageFeedSubscriptionResponseTests(unittest.TestCase):
 
     def test_manage_feed_subscription_response(self):
-        poll_instance1 = tm10.ManageFeedSubscriptionResponse.PollInstance(
+        poll_instance1 = tm10.PollInstance(
                 poll_protocol=t.VID_TAXII_HTTP_10,  # Required
                 poll_address='http://example.com/poll',  # Required
                 poll_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        subscription_instance1 = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
+        subscription_instance1 = tm10.SubscriptionInstance(
                 subscription_id='SubsId234',  # required
                 delivery_parameters=[delivery_parameters1],  # Required if message is responding to a status action. Optional otherwise
                 poll_instances=[poll_instance1])  # Required if action was polling subscription. Optional otherwise
