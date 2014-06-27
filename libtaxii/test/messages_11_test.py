@@ -355,13 +355,29 @@ class DiscoveryResponseTests(unittest.TestCase):
                 service_instances=[self.si1, self.si2, self.si4])  # Optional.
         round_trip_message(discovery_response04)
 
-
     def test_discovery_response_05(self):
         discovery_response05 = tm11.DiscoveryResponse(
                 message_id='DR05',  # Required
                 in_response_to='TheSecondIdentifier',  # Required. This should be the ID of the corresponding request
                 service_instances=[self.si1, self.si2, self.si3, self.si4, self.si5])  # Optional.
         round_trip_message(discovery_response05)
+
+    def test_discovery_response_deprecated(self):
+        # Test deprecated nested form:
+        #   DiscoveryResponse.ServiceInstance
+        service = tm11.DiscoveryResponse.ServiceInstance(
+                service_type=tm11.SVC_COLLECTION_MANAGEMENT,
+                services_version=t.VID_TAXII_SERVICES_11,
+                protocol_binding=t.VID_TAXII_HTTP_10,
+                service_address='http://example.com/collection_management/',
+                message_bindings=[t.VID_TAXII_XML_11])
+
+        response = tm11.DiscoveryResponse(
+                message_id='DR05',
+                in_response_to='TheSecondIdentifier',
+                service_instances=[service])
+
+        round_trip_message(response)
 
 
 class CollectionInformationRequestTests(unittest.TestCase):
@@ -482,6 +498,46 @@ class CollectionInformationResponseTests(unittest.TestCase):
                 collection_informations = [self.collection2, self.collection4])#Optional - absence means "no collections"
         round_trip_message(collection_response5)
 
+    def test_collection_information_response_deprecated(self):
+        # Test deprecated nested forms:
+        #   CollectionInformationResponse.CollectionInformation
+        #   CollectionInformationResponse.CollectionInformation.PushMethod
+        #   CollectionInformationResponse.CollectionInformation.PollingServiceInstance
+        #   CollectionInformationResponse.CollectionInformation.SubscriptionMethod
+        #   CollectionInformationResponse.CollectionInformation.ReceivingInboxService
+        push_method = tm11.CollectionInformationResponse.CollectionInformation.PushMethod(
+                push_protocol=t.VID_TAXII_HTTP_10,
+                push_message_bindings=[t.VID_TAXII_XML_11])
+
+        poll_service = tm11.CollectionInformationResponse.CollectionInformation.PollingServiceInstance(
+                poll_protocol=t.VID_TAXII_HTTPS_10,
+                poll_address='https://example.com/TheGreatestPollService',
+                poll_message_bindings=[t.VID_TAXII_XML_11])
+
+        subs_method = tm11.CollectionInformationResponse.CollectionInformation.SubscriptionMethod(
+                subscription_protocol=t.VID_TAXII_HTTPS_10,
+                subscription_address='https://example.com/TheSubscriptionService/',
+                subscription_message_bindings=[t.VID_TAXII_XML_11])
+
+        inbox_service = tm11.CollectionInformationResponse.CollectionInformation.ReceivingInboxService(
+                inbox_protocol=t.VID_TAXII_HTTPS_10,
+                inbox_address='https://example.com/inbox/',
+                inbox_message_bindings=[t.VID_TAXII_XML_11])
+
+        collection = tm11.CollectionInformationResponse.CollectionInformation(
+                collection_name='collection1',
+                collection_description='This is a collection',
+                push_methods=[push_method],
+                polling_service_instances=[poll_service],
+                subscription_methods=[subs_method],
+                receiving_inbox_services=[inbox_service])
+
+        response = tm11.CollectionInformationResponse(
+                message_id='CIR05',
+                in_response_to='0',
+                collection_informations=[collection])
+
+        round_trip_message(response)
 
 class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
 
@@ -648,6 +704,29 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
                 )
         round_trip_message(subs_resp4)
 
+    def test_subs_resp_deprecated(self):
+        # Test deprecated nested forms:
+        #   ManageCollectionSubscriptionResponse.PollInstance
+        #   ManageCollectionSubscriptionResponse.SubscriptionInstance
+        poll = tm11.ManageCollectionSubscriptionResponse.PollInstance(
+                poll_protocol=t.VID_TAXII_HTTPS_10,
+                poll_address='https://example.com/poll1/',
+                poll_message_bindings=[t.VID_TAXII_XML_11])
+
+        subscription = tm11.ManageCollectionSubscriptionResponse.SubscriptionInstance(
+                    subscription_id='Subs001',
+                    subscription_parameters=subscription_parameters1,
+                    push_parameters=push_parameters1,
+                    poll_instances=[poll])
+
+        subs_resp = tm11.ManageCollectionSubscriptionResponse(
+                message_id='SubsResp01',
+                in_response_to='xyz',
+                collection_name='abc123',
+                subscription_instances=[subscription])
+
+        round_trip_message(subs_resp)
+
 
 class PollRequestTests(unittest.TestCase):
 
@@ -707,6 +786,17 @@ class PollRequestTests(unittest.TestCase):
                 exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
                 poll_parameters = poll_params3)#Optional - one of this or subscription_id MUST be present
         round_trip_message(poll_req5)
+
+    def test_poll_req_deprecated(self):
+        # Test deprecated nested form:
+        #   PollRequest.PollParameters
+        params = tm11.PollRequest.PollParameters()
+        poll = tm11.PollRequest(
+                message_id='PollReq05',
+                collection_name='collection100',
+                exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+                poll_parameters=params)
+        round_trip_message(poll)
 
 
 class PollResponseTests(unittest.TestCase):
@@ -789,6 +879,19 @@ class InboxMessageTests(unittest.TestCase):
                 subscription_information = subs_info2,#Optional
                 content_blocks = [cb002])
         round_trip_message(inbox3)
+
+    def test_inbox_deprecated(self):
+        # Test deprecated nested form:
+        #   InboxMessage.SubscriptionInformation
+        subscription = tm11.InboxMessage.SubscriptionInformation(
+                collection_name='SomeCollectionName',
+                subscription_id='SubsId021')
+
+        inbox = tm11.InboxMessage(
+                message_id='InboxMsg0001',
+                subscription_information=subscription,
+                content_blocks=[cb002])
+        round_trip_message(inbox)
 
 
 class PollFulfillmentTests(unittest.TestCase):
