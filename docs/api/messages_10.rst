@@ -9,7 +9,17 @@
 
     .. code-block:: python
 
+        import datetime
+        from dateutil.tz import tzutc
+        import libtaxii as t
         import libtaxii.messages_10 as tm10
+
+.. testsetup::
+
+    import datetime
+    from dateutil.tz import tzutc
+    import libtaxii as t
+    import libtaxii.messages_10 as tm10
 
 
 Status Message
@@ -19,7 +29,7 @@ Status Message
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     status_message1 = tm10.StatusMessage(
             message_id=tm10.generate_message_id(),
@@ -36,7 +46,7 @@ Discovery Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     ext_headers = {'name1': 'val1', 'name2': 'val2'}
     discovery_request = tm10.DiscoveryRequest(
@@ -48,21 +58,21 @@ Discovery Response
 ------------------
 
 .. autoclass:: DiscoveryResponse
-.. autoclass:: libtaxii.messages_10::DiscoveryResponse.ServiceInstance
+.. autoclass:: ServiceInstance
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     discovery_response = tm10.DiscoveryResponse(
             message_id=tm10.generate_message_id(),
             in_response_to=discovery_request.message_id)
 
-    service_instance = tm10.DiscoveryResponse.ServiceInstance(
+    service_instance = tm10.ServiceInstance(
             service_type=tm10.SVC_INBOX,
             services_version=t.VID_TAXII_SERVICES_10,
             protocol_binding=t.VID_TAXII_HTTPS_10,
-            service_address='https://example.com/inbox/'
+            service_address='https://example.com/inbox/',
             message_bindings=[t.VID_TAXII_XML_10],
             inbox_service_accepted_content=[t.CB_STIX_XML_10],
             available=True,
@@ -70,10 +80,8 @@ Discovery Response
 
     discovery_response.service_instances.append(service_instance)
 
-Alternatively, you could define the service instance(s) first and use the
-following:
-
-.. code-block:: python
+    # Alternatively, you could define the service instance(s) first and use the
+    # following:
 
     service_instance_list = [service_instance]
     discovery_response = tm10.DiscoveryResponse(
@@ -89,7 +97,7 @@ Feed Information Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     ext_headers = {'name1': 'val1', 'name2': 'val2'}
     feed_information_request= tm10.FeedInformationRequest(
@@ -101,30 +109,30 @@ Feed Information Response
 -------------------------
 
 .. autoclass:: FeedInformationResponse
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation.PushMethod
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation.PollingServiceInstance
-.. autoclass:: libtaxii.messages_10::FeedInformationResponse.FeedInformation.SubscriptionMethod
+.. autoclass:: FeedInformation
+.. autoclass:: PushMethod
+.. autoclass:: PollingServiceInstance
+.. autoclass:: SubscriptionMethod
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
-    push_method1 = tm10.FeedInformationResponse.FeedInformation.PushMethod(
+    push_method1 = tm10.PushMethod(
             push_protocol=t.VID_TAXII_HTTP_10,
             push_message_bindings=[t.VID_TAXII_XML_10])
 
-    polling_service1 = tm10.FeedInformationResponse.FeedInformation.PollingServiceInstance(
+    polling_service1 = tm10.PollingServiceInstance(
             poll_protocol=t.VID_TAXII_HTTP_10,
             poll_address='http://example.com/PollService/',
             poll_message_bindings=[t.VID_TAXII_XML_10])
 
-    subscription_service1 = tm10.FeedInformationResponse.FeedInformation.SubscriptionMethod(
+    subscription_service1 = tm10.SubscriptionMethod(
             subscription_protocol=t.VID_TAXII_HTTP_10,
             subscription_address='http://example.com/SubsService/',
             subscription_message_bindings=[t.VID_TAXII_XML_10])
 
-    feed1 = tm10.FeedInformationResponse.FeedInformation(
+    feed1 = tm10.FeedInformation(
             feed_name='Feed1',
             feed_description='Description of a feed',
             supported_contents=[t.CB_STIX_XML_10],
@@ -146,7 +154,7 @@ Manage Feed Subscription Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     delivery_parameters1 = tm10.DeliveryParameters(
             inbox_protocol=t.VID_TAXII_HTTP_10,
@@ -166,19 +174,19 @@ Manage Feed Subscription Response
 ---------------------------------
 
 .. autoclass:: ManageFeedSubscriptionResponse
-.. autoclass:: libtaxii.messages_10::ManageFeedSubscriptionResponse.SubscriptionInstance
-.. autoclass:: libtaxii.messages_10::ManageFeedSubscriptionResponse.PollInstance
+.. autoclass:: SubscriptionInstance
+.. autoclass:: PollInstance
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
-    poll_instance1 = tm10.ManageFeedSubscriptionResponse.PollInstance(
+    poll_instance1 = tm10.PollInstance(
             poll_protocol=t.VID_TAXII_HTTP_10,
             poll_address='http://example.com/poll',
             poll_message_bindings=[t.VID_TAXII_XML_10])
 
-    subscription_instance1 = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
+    subscription_instance1 = tm10.SubscriptionInstance(
             subscription_id='SubsId234',
             delivery_parameters=[delivery_parameters1],
             poll_instances=[poll_instance1])
@@ -198,7 +206,7 @@ Poll Request
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     poll_request1 = tm10.PollRequest(
             message_id=tm10.generate_message_id(),
@@ -216,7 +224,7 @@ Poll Response
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     poll_response1 = tm10.PollResponse(
             message_id=tm10.generate_message_id(),
@@ -233,13 +241,15 @@ Inbox Message
 -------------
 
 .. autoclass:: InboxMessage
-.. autoclass:: libtaxii.messages_10::InboxMessage.SubscriptionInformation
+.. autoclass:: SubscriptionInformation
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
-    subscription_information1 = tm10.InboxMessage.SubscriptionInformation(
+    cb1 = tm10.ContentBlock(t.CB_STIX_XML_11, "")
+
+    subscription_information1 = tm10.SubscriptionInformation(
             feed_name='SomeFeedName',
             subscription_id='SubsId021',
             inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
@@ -249,7 +259,7 @@ Inbox Message
             message_id=tm10.generate_message_id(),
             message='This is a message.',
             subscription_information=subscription_information1,
-            content_blocks=[xml_content_block1])
+            content_blocks=[cb1])
 
 
 Other Classes
@@ -262,7 +272,7 @@ Other Classes
 
 **Example:**
 
-.. code-block:: python
+.. testcode::
 
     cb1 = tm10.ContentBlock(
             content_binding=t.CB_STIX_XML_10,
@@ -275,8 +285,6 @@ Functions
 ---------
 
 .. autofunction:: generate_message_id
-.. autofunction:: get_xml_parser
-.. autofunction:: set_xml_parser
 .. autofunction:: validate_xml
 .. autofunction:: get_message_from_xml
 .. autofunction:: get_message_from_dict

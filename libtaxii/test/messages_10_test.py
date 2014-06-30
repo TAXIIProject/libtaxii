@@ -126,7 +126,7 @@ class DiscoveryRequestTests(unittest.TestCase):
 class DiscoveryResponseTests(unittest.TestCase):
 
     def test_discovery_response(self):
-        service_instance1 = tm10.DiscoveryResponse.ServiceInstance(
+        service_instance1 = tm10.ServiceInstance(
                 service_type=tm10.SVC_INBOX,  # Required
                 services_version=t.VID_TAXII_SERVICES_10,  # Required
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
@@ -146,6 +146,24 @@ class DiscoveryResponseTests(unittest.TestCase):
 
         round_trip_message(discovery_response1)
 
+    def test_discovery_response_deprecated(self):
+        # Test nested-class form:
+        #   DiscoveryResponse.ServiceInstance
+
+        service_instance1 = tm10.DiscoveryResponse.ServiceInstance(
+                service_type=tm10.SVC_INBOX,
+                services_version=t.VID_TAXII_SERVICES_10,
+                protocol_binding=t.VID_TAXII_HTTP_10,
+                service_address='http://example.com/inboxservice/',
+                message_bindings=[t.VID_TAXII_XML_10])
+
+        discovery_response1 = tm10.DiscoveryResponse(
+                message_id=tm10.generate_message_id(),
+                in_response_to=tm10.generate_message_id(),
+                service_instances=[service_instance1])
+
+        round_trip_message(discovery_response1)
+
 
 class FeedInformationRequestTests(unittest.TestCase):
 
@@ -159,21 +177,21 @@ class FeedInformationRequestTests(unittest.TestCase):
 class FeedInformationResponseTests(unittest.TestCase):
 
     def test_feed_information_response1(self):
-        push_method1 = tm10.FeedInformationResponse.FeedInformation.PushMethod(
+        push_method1 = tm10.PushMethod(
                 push_protocol=t.VID_TAXII_HTTP_10,  # Required
                 push_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        polling_service1 = tm10.FeedInformationResponse.FeedInformation.PollingServiceInstance(
+        polling_service1 = tm10.PollingServiceInstance(
                 poll_protocol=t.VID_TAXII_HTTP_10,  # Required
                 poll_address='http://example.com/PollService/',  # Required
                 poll_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        subscription_service1 = tm10.FeedInformationResponse.FeedInformation.SubscriptionMethod(
+        subscription_service1 = tm10.SubscriptionMethod(
                 subscription_protocol=t.VID_TAXII_HTTP_10,  # Required
                 subscription_address='http://example.com/SubsService/',  # Required
                 subscription_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        feed1 = tm10.FeedInformationResponse.FeedInformation(
+        feed1 = tm10.FeedInformation(
                 feed_name='Feed1',  # Required
                 feed_description='Description of a feed',  # Required
                 supported_contents=[t.CB_STIX_XML_10],  # Required. List of supported content binding IDs
@@ -189,6 +207,41 @@ class FeedInformationResponseTests(unittest.TestCase):
 
         round_trip_message(feed_information_response1)
 
+    def test_feed_information_response_deprecated(self):
+        # Test nested-class forms:
+        #   FeedInformationResponse.FeedInformation
+        #   FeedInformationResponse.FeedInformation.PushMethod
+        #   FeedInformationResponse.FeedInformation.PollingServiceInstance
+        #   FeedInformationResponse.FeedInformation.SubscriptionMethod
+
+        push_method1 = tm10.FeedInformationResponse.FeedInformation.PushMethod(
+                push_protocol=t.VID_TAXII_HTTP_10,
+                push_message_bindings=[t.VID_TAXII_XML_10])
+
+        polling_service1 = tm10.FeedInformationResponse.FeedInformation.PollingServiceInstance(
+                poll_protocol=t.VID_TAXII_HTTP_10,
+                poll_address='http://example.com/PollService/',
+                poll_message_bindings=[t.VID_TAXII_XML_10])
+
+        subscription_service1 = tm10.FeedInformationResponse.FeedInformation.SubscriptionMethod(
+                subscription_protocol=t.VID_TAXII_HTTP_10,
+                subscription_address='http://example.com/SubsService/',
+                subscription_message_bindings=[t.VID_TAXII_XML_10])
+
+        feed1 = tm10.FeedInformationResponse.FeedInformation(
+                feed_name='Feed1',
+                feed_description='Description of a feed',
+                supported_contents=[t.CB_STIX_XML_10],
+                push_methods=[push_method1],
+                polling_service_instances=[polling_service1],
+                subscription_methods=[subscription_service1])
+
+        feed_information_response1 = tm10.FeedInformationResponse(
+                message_id=tm10.generate_message_id(),
+                in_response_to=tm10.generate_message_id(),
+                feed_informations=[feed1])
+
+        round_trip_message(feed_information_response1)
 
 class PollResponseTests(unittest.TestCase):
 
@@ -249,13 +302,11 @@ class StatusMessageTests(unittest.TestCase):
 class InboxMessageTests(unittest.TestCase):
 
     def setUp(self):
-        self.subscription_information1 = tm10.InboxMessage.SubscriptionInformation(
+        self.subscription_information1 = tm10.SubscriptionInformation(
                 feed_name='SomeFeedName',  # Required
                 subscription_id='SubsId021',  # Required
                 inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),  # Optional - Absence means 'no lower bound'
                 inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))  # Optional - Absence means 'no upper bound'
-
-
 
     def test_inbox_message1(self):
         inbox_message1 = tm10.InboxMessage(
@@ -275,6 +326,23 @@ class InboxMessageTests(unittest.TestCase):
 
         round_trip_message(inbox_message2)
 
+    def test_inbox_message_deprecated(self):
+        # Test nested-class form:
+        #   InboxMessage.SubscriptionInformation
+
+        sub_info = tm10.InboxMessage.SubscriptionInformation(
+                feed_name='SomeFeedName',
+                subscription_id='SubsId021',
+                inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+                inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))
+
+        inbox_msg = tm10.InboxMessage(
+                message_id=tm10.generate_message_id(),
+                subscription_information=sub_info,
+                content_blocks=[xml_content_block1])
+
+        round_trip_message(inbox_msg)
+
 
 class ManageFeedSubscriptionRequestTests(unittest.TestCase):
 
@@ -292,12 +360,12 @@ class ManageFeedSubscriptionRequestTests(unittest.TestCase):
 class ManageFeedSubscriptionResponseTests(unittest.TestCase):
 
     def test_manage_feed_subscription_response(self):
-        poll_instance1 = tm10.ManageFeedSubscriptionResponse.PollInstance(
+        poll_instance1 = tm10.PollInstance(
                 poll_protocol=t.VID_TAXII_HTTP_10,  # Required
                 poll_address='http://example.com/poll',  # Required
                 poll_message_bindings=[t.VID_TAXII_XML_10])  # Required
 
-        subscription_instance1 = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
+        subscription_instance1 = tm10.SubscriptionInstance(
                 subscription_id='SubsId234',  # required
                 delivery_parameters=[delivery_parameters1],  # Required if message is responding to a status action. Optional otherwise
                 poll_instances=[poll_instance1])  # Required if action was polling subscription. Optional otherwise
@@ -310,6 +378,29 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
                 subscription_instances=[subscription_instance1])  # Required
 
         round_trip_message(manage_feed_subscription_response1)
+
+    def test_manage_feed_subscription_response_deprecated(self):
+        # Test nested-class forms:
+        #   ManageFeedSubscriptionResponse.PollInstance
+        #   ManageFeedSubscriptionResponse.SubscriptionInstance
+
+        poll = tm10.ManageFeedSubscriptionResponse.PollInstance(
+                poll_protocol=t.VID_TAXII_HTTP_10,
+                poll_address='http://example.com/poll',
+                poll_message_bindings=[t.VID_TAXII_XML_10])
+
+        subscription = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
+                subscription_id='SubsId234',
+                delivery_parameters=[delivery_parameters1],
+                poll_instances=[poll])
+
+        response = tm10.ManageFeedSubscriptionResponse(
+                message_id=tm10.generate_message_id(),
+                in_response_to=tm10.generate_message_id(),
+                feed_name='Feed001',
+                subscription_instances=[subscription])
+
+        round_trip_message(response)
 
 
 class ContentBlockTests(unittest.TestCase):
