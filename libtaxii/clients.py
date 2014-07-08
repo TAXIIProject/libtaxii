@@ -26,6 +26,10 @@ class HttpClient:
     AUTH_CERT = 2  #: Offer certificate based authentication credentials to the server
     AUTH_CERT_BASIC = 3  #: Offer certificate based auth and HTTP Basic credentials
 
+    #Proxy values
+    SYSTEM_PROXY = None
+    NO_PROXY = 'noproxy'
+
     #Proxy Constants
     PROXY_HTTP = 'http'
     PROXY_HTTPS = 'https'
@@ -94,7 +98,7 @@ class HttpClient:
         """
         Set the proxy settings to use when making a connection.
 
-        :param string proxy_string: Proxy address formatted like http://proxy.example.com:80. Set to `None` to use the system proxy; set to `noproxy` to use no proxy.
+        :param string proxy_string: Proxy address formatted like http://proxy.example.com:80. Set to :attr:`SYSTEM_PROXY` to use the system proxy; set to :attr:`NO_PROXY` to use no proxy.
         :param string proxy_type: Either :attr:`PROXY_HTTP` or :attr:`PROXY_HTTPS`
         """
         self.proxy_string = proxy_string
