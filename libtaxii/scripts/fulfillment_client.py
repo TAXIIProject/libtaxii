@@ -9,10 +9,10 @@ import dateutil.parser
 import libtaxii as t
 import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
-
+import libtaxii.scripts as scripts
 
 def main():
-    parser = t.scripts.get_base_parser("Poll Fulfillment Client", path="/services/query_example/")
+    parser = scripts.get_base_parser("Poll Fulfillment Client", path="/services/query_example/")
     parser.add_argument("--collection", dest="collection", default="default_queryable", help="Data Collection that this Fulfillment request applies to. Defaults to 'default_queryable'.")
     parser.add_argument("--result_id", dest="result_id", required=True, help="The result_id being requested.")
     parser.add_argument("--result_part_number", dest="result_part_number", default=1, help="The part number being requested. Defaults to '1'.")
@@ -26,7 +26,7 @@ def main():
 
     poll_fulf_req_xml = poll_fulf_req.to_xml(pretty_print=True)
     print "Poll Fulfillment Request: \r\n", poll_fulf_req_xml
-    client = t.scripts.create_client(args)
+    client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_fulf_req_xml, args.port)
     response_message = t.get_message_from_http_response(resp, '0')
     print "Response Message: \r\n", response_message.to_xml(pretty_print=True)

@@ -62,7 +62,7 @@ In addition to the command line arguments listed above, the Inbox Client uses th
 Example: ``inbox_client --content-binding urn:stix.mitre.org:xml:1.1 --content-file stix_file.xml``
 
 Additional Poll Client Command Line Arguments
-----------------------------------------------
+---------------------------------------------
 In addition to the command line arguments listed above, the Poll Client uses these:
 
 * ``--collection`` - The Collection Name to Poll. Defaults to 'default'
@@ -72,7 +72,7 @@ In addition to the command line arguments listed above, the Poll Client uses the
 Example: ``poll_client --collection MyCollection``
 
 Additional Poll Client 1.0 Command Line Arguments
-----------------------------------------------
+-------------------------------------------------
 In addition to the command line arguments listed above, the Poll Client 1.0 uses these:
 
 * ``--feed`` - The Data Feed to Poll. Defaults to 'default'

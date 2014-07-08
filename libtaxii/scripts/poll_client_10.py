@@ -10,10 +10,11 @@ import dateutil.parser
 import libtaxii as t
 import libtaxii.messages_10 as tm10
 import libtaxii.clients as tc
+import libtaxii.scripts as scripts
 
 
 def main():
-    parser = t.scripts.get_base_parser("TAXII 1.0 Poll Client (Deprecated)", path="/services/poll/")
+    parser = scripts.get_base_parser("TAXII 1.0 Poll Client (Deprecated)", path="/services/poll/")
     parser.add_argument("--feed", dest="feed", default="default", help="Data Collection to poll. Defaults to 'default'.")
     parser.add_argument("--begin_timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
     parser.add_argument("--end_timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")

@@ -53,17 +53,3 @@ latex_documents = [
   ('index', 'libtaxii.tex', u'libtaxii Documentation',
    u'The MITRE Corporation', 'manual'),
 ]
-
-
-def skip_non_api_items(app, what, name, obj, skip, options):
-    if name in ['BaseNonMessage',
-                'get_message_from_httplib_http_response',
-                'get_message_from_urllib2_httperror',
-                'get_message_from_urllib_addinfourl',
-                'HTTPClientAuthHandler',
-                'HTTPSClientAuthHandler']:
-        return True
-    return False
-
-def setup(app):
-    app.connect('autodoc-skip-member', skip_non_api_items)

@@ -10,7 +10,10 @@ Creating, handling, and parsing TAXII Default Queries.
 
 import libtaxii.messages_11 as tm11
 import libtaxii as t
-from libtaxii.validation import (do_check, uri_regex)
+
+
+from .common import TAXIIBase
+from .validation import (do_check, uri_regex)
 
 from operator import attrgetter
 from lxml import etree
@@ -255,7 +258,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
 
         return DefaultQueryInfo(**kwargs)
 
-    class TargetingExpressionInfo(tm11.BaseNonMessage):
+    class TargetingExpressionInfo(TAXIIBase):
         """This class describes supported Targeting Expressions
 
         	:param string targeting_expression_id: The supported targeting expression ID
@@ -402,7 +405,7 @@ class DefaultQuery(tm11.Query):
         criteria = DefaultQuery.Criteria.from_dict(d['criteria'])
         return DefaultQuery(tei, criteria)
 
-    class Criteria(tm11.BaseNonMessage):
+    class Criteria(TAXIIBase):
         """Represents criteria for a :class:`DefaultQuery`. **Note**: At least one criterion OR criteria MUST be present
 
         :param str operator: The logical operator (should be one of `OP_AND` or `OP_OR`)
@@ -514,7 +517,7 @@ class DefaultQuery(tm11.Query):
 
             return DefaultQuery.Criteria(**kwargs)
 
-    class Criterion(tm11.BaseNonMessage):
+    class Criterion(TAXIIBase):
         """Represents criterion for a :class:`DefaultQuery.Criteria`
 
         	:param string target: A targeting expression identifying the target
@@ -601,7 +604,7 @@ class DefaultQuery(tm11.Query):
 
             return DefaultQuery.Criterion(target, test, negate)
 
-        class Test(tm11.BaseNonMessage):
+        class Test(TAXIIBase):
             """
             	:param string capability_id: The ID of the capability module that defines the relationship & parameters
             	:param string relationship: The relationship (e.g., equals)

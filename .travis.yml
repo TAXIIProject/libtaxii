@@ -5,9 +5,12 @@ python:
 
 install:
    - "pip install ."
+   - "pip install -r requirements.txt"
 
 script:
    - nosetests
+   - cd docs
+   - make doctest
 
 notifications:
     email:

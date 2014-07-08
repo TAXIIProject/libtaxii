@@ -29,30 +29,39 @@ The libtaxii library contains the following modules:
 TAXII Messages Module Structure
 -------------------------------
 
-In the TAXII message modules (**libtaxii.messages_10** and
-**libtaxii.messages_11**), there is a class corresponding to each type of TAXII
-message.  For example, there is a ``DiscoveryRequest`` class for the Discovery
-Request message.  Other types that are exclusive to a particular TAXII message
-type are defined as nested classes.  For example, a Service Instance can only
-exist as part of a Discovery Response message, so the class representing a
-Service Instance is ``DiscoveryResponse.ServiceInstance``.  If a type is used
-across multiple messages (e.g., a Content Block can exist in both Poll Response
-and Inbox Message), the corresponding class (``ContentBlock``) is defined at
-the module level.
-
-See below for example of how to instantiate the various types described above.
-Note that constructor arguments are omitted for clarity.  See the API
-documentation for proper constructor arguments.
+In the TAXII message modules (:py:mod:`libtaxii.messages_10` and
+:py:mod:`libtaxii.messages_11`), there is a class corresponding to each type of
+TAXII message.  For example, there is a ``DiscoveryRequest`` class for the
+Discovery Request message:
 
 .. code:: python
 
     import libtaxii.messages_11 as tm11
-    # Message classes are at the top level of the module
     discovery_request = tm11.DiscoveryRequest( ... )
-    # Message-specific classes are nested within the corresponding message class
-    service_instance = tm11.DiscoveryRequest.ServiceInstance( ... )
-    # Classes shared by multiple messages are also at the module level.
+
+For types that can been used across multiple messages (e.g., a Content Block
+can exist in both Poll Response and Inbox Message), the corresponding class
+(``ContentBlock``) is (and always has always been) defined at the module level.
+
+.. code:: python
+
     content_block = tm11.ContentBlock( ... )
+
+Other types that are used exclusively within a particular TAXII message type
+were previously defined as nested classes on the corresponding message class;
+however, they are now defined at the top level of the module.  For example, a
+Service Instance is only used in a Discovery Response message, so the class
+representing a Service Instance, now just ``ServiceInstance``, was previously
+``DiscoveryResponse.ServiceInstance``. The latter name still works for backward
+compatibilty reasons, but is deprecated and may be removed in the future.
+
+.. code:: python
+
+    service_instance = tm11.ServiceInstance( ... )
+    service_instance = tm11.DiscoveryRequest.ServiceInstance( ... )
+
+See the :ref:`API Documentation <apidoc>` for proper constructor arguments for
+each type above.
 
 
 TAXII Message Serialization and Deserialization
