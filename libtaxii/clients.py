@@ -77,7 +77,7 @@ class HttpClient:
 
     def setVerifyServer(self, verify_server=False, ca_file=None):
         """
-        Tell libtaxii whether to verify the server's ssl certificate 
+        Tell libtaxii whether to verify the server's ssl certificate
         using the provided ca_file.
 
         :param bool verify_server: Flag indicating whether or not libtaxii should verify the server.
@@ -85,8 +85,8 @@ class HttpClient:
         if verify_server and ca_file is None:
             raise ValueError('If verify_server is True, ca_file must not be None.')
 
-        self.verify_server=verify_server
-        self.ca_file=ca_file
+        self.verify_server = verify_server
+        self.ca_file = ca_file
 
     @property
     def basic_auth_header(self):
@@ -143,7 +143,7 @@ class HttpClient:
         self.auth_credentials = auth_credentials_dict
 
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
-        """ **DEPRECATED.** May be removed in the next version of `libtaxii`. 
+        """ **DEPRECATED.** May be removed in the next version of `libtaxii`.
             Use :func:`callTaxiiService2` instead.
 
             Call a TAXII service.
@@ -382,8 +382,8 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     """
 
     def __init__(self, host, port=None, key_file=None, cert_file=None,
-                     strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
-                     source_address=None, verify_server=False, ca_certs=None):
+                 strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+                 source_address=None, verify_server=False, ca_certs=None):
         httplib.HTTPSConnection.__init__(self, host, port, key_file,
                                          cert_file, strict, timeout,
                                          source_address)
@@ -398,14 +398,14 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
         # overrides the version in httplib so that we do
         # certificate verification
         sock = socket.create_connection((self.host, self.port),
-                                         self.timeout,
-                                         self.source_address)
+                                        self.timeout,
+                                        self.source_address)
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()
 
         self.sock = ssl.wrap_socket(sock,
-                        keyfile=self.key_file,
-                        certfile=self.cert_file,
-                        cert_reqs=self.cert_reqs,
-                        ca_certs=self.ca_certs)
+                                    keyfile=self.key_file,
+                                    certfile=self.cert_file,
+                                    cert_reqs=self.cert_reqs,
+                                    ca_certs=self.ca_certs)
