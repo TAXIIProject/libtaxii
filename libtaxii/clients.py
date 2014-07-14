@@ -18,6 +18,7 @@ import socket
 import ssl
 import libtaxii as t
 
+
 class HttpClient:
 
     # Constants for authentication types
@@ -211,7 +212,6 @@ class HttpClient:
             for k, v in headers.iteritems():
                 header_dict[k.lower()] = v
 
-
         header_dict['User-Agent'] = 'libtaxii.httpclient'
         header_dict[HttpClient.HEADER_X_TAXII_CONTENT_TYPE] = message_binding
 
@@ -340,6 +340,7 @@ class HttpClient:
         except urllib2.HTTPError, error:
             return error
 
+
 # http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
 class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
     def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
@@ -359,6 +360,7 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
                                        verify_server=self.verify_server,
                                        ca_certs=self.ca_certs)
 
+
 class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
     def __init__(self, key, cert):
         urllib2.HTTPSHandler.__init__(self)
@@ -370,6 +372,7 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
 
     def getConnection(self, host, timeout=0):
         return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
+
 
 class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     """

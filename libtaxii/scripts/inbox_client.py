@@ -67,6 +67,7 @@ stix_watchlist = '''<!--
     </stix:Indicators>
 </stix:STIX_Package>'''
 
+
 def main():
     parser = scripts.get_base_parser("Inbox Client", path="/services/inbox/default/")
     parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_11, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_11)

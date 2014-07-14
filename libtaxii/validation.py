@@ -24,6 +24,7 @@ _type_error = "%s must be of type %s. The incorrect value was of type %s"
 _regex_error = "%s must be a string conforming to %s. The incorrect value was: %s"
 _tuple_error = "%s must be one of %s. The incorrect value was %s"
 
+
 def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be_none=False):
     """
     Checks supplied var against all of the supplied checks using the following
@@ -66,6 +67,7 @@ def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be
         if var not in value_tuple:
             raise ValueError(_tuple_error % (varname, value_tuple, var))
     return
+
 
 def check_timestamp_label(timestamp_label, varname, can_be_none=False):
     """

@@ -986,6 +986,7 @@ class PushParameters(TAXIIBase):
     """
 
     name = 'Push_Parameters'
+
     def __init__(self, inbox_protocol, inbox_address, delivery_message_binding):
         self.inbox_protocol = inbox_protocol
         self.inbox_address = inbox_address
@@ -1879,7 +1880,6 @@ class CollectionInformation(TAXIIBase):
         subscription_method_set = etree_xml.xpath('./taxii_11:Subscription_Service', namespaces=ns_map)
         for subscription_elt in subscription_method_set:
             kwargs['subscription_methods'].append(SubscriptionMethod.from_etree(subscription_elt))
-
 
         kwargs['receiving_inbox_services'] = []
         receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Service', namespaces=ns_map)
@@ -3021,7 +3021,6 @@ class InboxMessage(TAXIIMessage):
         self.subscription_information = subscription_information
         self.record_count = record_count
         self.content_blocks = content_blocks or []
-
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):

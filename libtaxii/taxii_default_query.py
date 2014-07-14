@@ -57,6 +57,7 @@ ns_map = {'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'}
 # A Capability Module has valid relationships
 # Each relationship has 0-n valid parameters
 
+
 class CapabilityModule(object):
     def __init__(self, capability_module_id, relationships):
         self.capability_module_id = capability_module_id
@@ -84,6 +85,7 @@ class CapabilityModule(object):
 
     # def __hash__(self):
     #    return hash(self.capability_module_id)
+
 
 class Relationship(object):
     def __init__(self, name, parameters=None):
@@ -178,6 +180,7 @@ cm_regex = CapabilityModule(CM_REGEX, [rel_matches])
 cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte, rel_ts_lt, rel_ts_lte])
 
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
+
 
 class DefaultQueryInfo(tm11.SupportedQuery):
     """ Used to describe the TAXII Default Queries that are supported. 
@@ -345,7 +348,6 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         @staticmethod
         def from_dict(d):
             return DefaultQueryInfo.TargetingExpressionInfo(**d)
-
 
 
 class DefaultQuery(tm11.Query):
@@ -658,7 +660,6 @@ class DefaultQuery(tm11.Query):
                 relationship = capability_module.relationships.get(self.relationship)
                 if relationship is None:
                     raise Exception('relationship not in defined relationships. %s not in %s' % (self.relationship, capability_module.relationships.keys()))
-
 
                 for name, value in self.parameters.items():
                     param = relationship.parameters.get(name)

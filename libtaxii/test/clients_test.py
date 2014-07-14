@@ -15,6 +15,7 @@ import libtaxii as t
 import libtaxii.clients as tc
 import libtaxii.messages as tm
 
+
 # NOTE: This cannot currently be run as a unit test because it needs a server
 # to connect to.
 def client_example():

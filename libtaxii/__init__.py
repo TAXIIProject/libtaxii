@@ -56,6 +56,7 @@ CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
 #: Content Binding ID for SMIME
 CB_SMIME = 'application/x-pks7-mime'
 
+
 def get_message_from_http_response(http_response, in_response_to):
     """Create a TAXII message from an HTTPResponse object.
 

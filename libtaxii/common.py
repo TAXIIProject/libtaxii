@@ -9,8 +9,8 @@ from StringIO import StringIO
 import dateutil.parser
 from lxml import etree
 
-
 _XML_PARSER = None
+
 
 def get_xml_parser():
     """Return the XML parser currently in use.

@@ -8,6 +8,7 @@ import sys
 
 INIT_FILE = join(dirname(abspath(__file__)), 'libtaxii', '__init__.py')
 
+
 def get_version():
     with open(INIT_FILE) as f:
         for line in f.readlines():
@@ -15,6 +16,7 @@ def get_version():
                 version = line.split()[-1].strip('"')
                 return version
         raise AttributeError("Package does not have a __version__")
+
 if sys.version_info < (2, 6):
     raise Exception('libtaxii requires Python 2.6 or higher.')
 

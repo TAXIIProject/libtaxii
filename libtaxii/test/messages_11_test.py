@@ -539,6 +539,7 @@ class CollectionInformationResponseTests(unittest.TestCase):
 
         round_trip_message(response)
 
+
 class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
 
     def test_subs_req1(self):
@@ -647,8 +648,6 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
                     push_parameters=push_parameters1,  # Optional - should be an echo of the request
                     poll_instances=[poll_instance1, poll_instance2, poll_instance3],  # Optional
                     )
-
-
 
     def test_subs_resp1(self):
         subs2 = tm11.SubscriptionInstance(

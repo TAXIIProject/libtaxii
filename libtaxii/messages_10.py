@@ -529,7 +529,6 @@ class TAXIIMessage(BaseNonMessage):
         else:
             self.extended_headers = extended_headers
 
-
     @property
     def message_id(self):
         return self._message_id
@@ -556,7 +555,6 @@ class TAXIIMessage(BaseNonMessage):
     def extended_headers(self, value):
         do_check(value.keys(), 'extended_headers.keys()', regex_tuple=uri_regex)
         self._extended_headers = value
-
 
     def to_etree(self):
         """Creates the base etree for the TAXII Message.
@@ -2416,7 +2414,6 @@ class SubscriptionInformation(BaseNonMessage):
         self.subscription_id = subscription_id
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
-
 
     @property
     def feed_name(self):

@@ -8,6 +8,7 @@ import libtaxii.taxii_default_query as tdq
 import libtaxii.clients as tc
 import libtaxii.scripts as scripts
 
+
 def main():
     parser = scripts.get_base_parser("Discovery Client", path="/services/discovery/")
     args = parser.parse_args()

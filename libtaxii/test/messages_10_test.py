@@ -243,6 +243,7 @@ class FeedInformationResponseTests(unittest.TestCase):
 
         round_trip_message(feed_information_response1)
 
+
 class PollResponseTests(unittest.TestCase):
 
     def test_poll_request1(self):

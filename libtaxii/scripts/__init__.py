@@ -4,6 +4,7 @@
 import argparse
 import libtaxii.clients as tc
 
+
 class ProxyAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         """
@@ -14,6 +15,7 @@ class ProxyAction(argparse.Action):
             values = None
         
         setattr(namespace, self.dest, values)
+
 
 def create_client(args):
     client = tc.HttpClient()
@@ -32,6 +34,7 @@ def create_client(args):
         client.setAuthCredentials({'username': args.username, 'password': args.password})
     
     return client
+
 
 def get_base_parser(parser_description, path="/services/discovery/"):
     """
