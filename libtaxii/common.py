@@ -141,10 +141,10 @@ class TAXIIBase(object):
                 print 'class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__)
             return False
 
-        #Get all member properties that start with '_'
+        # Get all member properties that start with '_'
         members = [attr for attr in dir(self) if not callable(attr) and attr.startswith('_') and not attr.startswith('__')]
         for member in members:
-            #TODO: The attr for attr... statement includes functions for some strange reason...
+            # TODO: The attr for attr... statement includes functions for some strange reason...
             if member not in self.__dict__:
                 continue
 
@@ -200,7 +200,7 @@ class TAXIIBase(object):
                 # Do a direct comparison
                 eq = (self_value == other_value)
 
-            #TODO: is this duplicate?
+            # TODO: is this duplicate?
             if not eq:
                 if debug:
                     print '%s was not equal: %s != %s' % (member, self_value, other_value)

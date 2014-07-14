@@ -11,8 +11,8 @@ import libtaxii.clients as tc
 import libtaxii.scripts as scripts
 import StringIO
 
-#http://stix.mitre.org/language/version1.0/#samples
-#http://stix.mitre.org/language/version1.0/stix_v1.0_samples_20130408.zip
+# http://stix.mitre.org/language/version1.0/#samples
+# http://stix.mitre.org/language/version1.0/stix_v1.0_samples_20130408.zip
 stix_watchlist = '''<!--
 	STIX IP Watchlist Example
 	

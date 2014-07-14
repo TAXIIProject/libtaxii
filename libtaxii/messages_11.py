@@ -199,7 +199,7 @@ ns_map = {
          }
 
 
-#Import helper methods from libtaxii.messages_10 that are still applicable
+# Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
 
 
@@ -225,7 +225,7 @@ def validate_xml(xml_string):
     taxii_schema_doc = etree.parse(schema_file, get_xml_parser())
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
-    #TODO: Additionally, validate the Query stuff
+    # TODO: Additionally, validate the Query stuff
     if not valid:
         return xml_schema.error_log.last_error
     return valid
@@ -351,11 +351,11 @@ def _sanitize_content_binding(binding):
     This supports function calls where a string or ContentBinding can be 
     used to specify a content binding.
     """
-    if isinstance(binding, ContentBinding):#It's already good to go
+    if isinstance(binding, ContentBinding):  # It's already good to go
         return binding
-    elif isinstance(binding, basestring):#Convert it to a ContentBinding
+    elif isinstance(binding, basestring):  # Convert it to a ContentBinding
         return ContentBinding.from_string(binding)
-    else:#Don't know what to do with it.
+    else:  # Don't know what to do with it.
         raise ValueError('Type cannot be converted to ContentBinding: %s' % binding.__class__.__name__)
 
 
@@ -376,7 +376,7 @@ class UnsupportedQueryException(Exception):
          return repr(self.value)
 
 
-#Start with the 'default' deserializer
+# Start with the 'default' deserializer
 query_deserializers = {}
 
 
@@ -400,7 +400,7 @@ def get_deserializer(format_id, type):
 
     return query_deserializers[format_id][type]
 
-#TODO: Consider using this
+# TODO: Consider using this
 # def _create_element(name, namespace=ns_map['taxii_11'], value=None, attrs=None, parent=None):
     # """
     # Helper method for appending a new element to an existing element.
@@ -518,7 +518,7 @@ class Query(TAXIIBase):
         return cls(d, **kwargs)
 
 
-#A value can be one of:
+# A value can be one of:
 # - a dictionary, where each key is a content_binding_id and each value is a list of subtypes
 #   (This is the default representation)
 # - a "content_binding_id[>subtype]" structure
@@ -696,7 +696,7 @@ class _GenericParameters(TAXIIBase):
 
     @query.setter
     def query(self, value):
-        #TODO: Can i do more validation?
+        # TODO: Can i do more validation?
         do_check(value, 'query', type=Query, can_be_none=True)
         self._query = value
 
@@ -828,7 +828,7 @@ class ContentBlock(TAXIIBase):
 
     @content.setter
     def content(self, value):
-        do_check(value, 'content')#Just check for not None
+        do_check(value, 'content')  # Just check for not None
         self._content, self.content_is_xml = self._stringify_content(value)
 
     @property
@@ -853,28 +853,28 @@ class ContentBlock(TAXIIBase):
         """Always a string or raises an error.
         Returns the string representation and whether the data is XML.
         """
-        #If it's an etree, it's definitely XML
+        # If it's an etree, it's definitely XML
         if isinstance(content, etree._ElementTree):
             return content.getroot(), True
 
         if isinstance(content, etree._Element):
             return content, True
 
-        if hasattr(content, 'read'):#The content is file-like
-            try:#Try to parse as XML
+        if hasattr(content, 'read'):  # The content is file-like
+            try:  # Try to parse as XML
                 xml = etree.parse(content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 return content.read(), False
-        else: # The Content is not file-like
-            try:#Attempt to parse string as XML
+        else:  # The Content is not file-like
+            try:  # Attempt to parse string as XML
                 sio_content = StringIO.StringIO(content)
                 xml = etree.parse(sio_content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
-                if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
+                if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
                     return content, False
-                else:#It's some other datatype that needs casting to string
+                else:  # It's some other datatype that needs casting to string
                     return str(content), False
 
     @property
@@ -1187,21 +1187,21 @@ class TAXIIMessage(TAXIIBase):
         first, then parse their specific XML constructs.
         """
 
-        #Get the message type
+        # Get the message type
         message_type = src_etree.tag[55:]
         if message_type != cls.message_type:
             raise ValueError('%s != %s' % (message_type, cls.message_type))
 
-        #Get the message ID
+        # Get the message ID
         message_id = src_etree.xpath('/taxii_11:*/@message_id', namespaces=ns_map)[0]
 
-        #Get in response to, if present
+        # Get in response to, if present
         in_response_to = None
         in_response_tos = src_etree.xpath('/taxii_11:*/@in_response_to', namespaces=ns_map)
         if len(in_response_tos) > 0:
             in_response_to = in_response_tos[0]
 
-        #Get the Extended headers
+        # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii_11:*/taxii_11:Extended_Headers/taxii_11:Extended_Header', namespaces=ns_map)
         extended_headers = {}
         for header in extended_header_list:
@@ -2374,12 +2374,12 @@ class PollRequest(TAXIIRequestMessage):
 
         if self.exclusive_begin_timestamp_label is not None:
             ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'], nsmap=ns_map)
-            #TODO: Add TZ Info
+            # TODO: Add TZ Info
             ebt.text = self.exclusive_begin_timestamp_label.isoformat()
 
         if self.inclusive_end_timestamp_label is not None:
             iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'], nsmap=ns_map)
-            #TODO: Add TZ Info
+            # TODO: Add TZ Info
             iet.text = self.inclusive_end_timestamp_label.isoformat()
 
         if self.subscription_id is not None:
@@ -2945,24 +2945,24 @@ class StatusMessage(TAXIIMessage):
         kwargs['status_detail'] = {}
         detail_set = etree_xml.xpath('./taxii_11:Status_Detail/taxii_11:Detail', namespaces=ns_map)
         for detail in detail_set:
-            #TODO: This seems kind of hacky and should probably be improved
+            # TODO: This seems kind of hacky and should probably be improved
             name = detail.attrib['name']
 
-            if status_type in status_details and name in status_details[status_type]:#We have information for this status detail
+            if status_type in status_details and name in status_details[status_type]:  # We have information for this status detail
                 detail_info = status_details[status_type][name]
-            else:#We don't have information, so make something up
+            else:  # We don't have information, so make something up
                 detail_info = _StatusDetail('PlaceholderDetail', False, str, True)
 
             if detail_info.type == bool:
                 v = detail.text.lower() == 'true'
             else:
                 v = detail_info.type(detail.text)
-            if detail_info.multiple:#There can be multiple instances of this item
+            if detail_info.multiple:  # There can be multiple instances of this item
                 if name not in kwargs['status_detail']:
                     kwargs['status_detail'][name] = v
-                else: #It already exists
+                else:  # It already exists
                     if not isinstance(kwargs['status_detail'], list):
-                        kwargs['status_detail'][name] = [kwargs['status_detail'][name]]#Make it a list
+                        kwargs['status_detail'][name] = [kwargs['status_detail'][name]]  # Make it a list
                     kwargs['status_detail'][name].append(v)
             else:
                 kwargs['status_detail'][name] = v

@@ -23,7 +23,7 @@ import os
 #: Format ID for this version of TAXII Default Query
 FID_TAXII_DEFAULT_QUERY_10 = 'urn:taxii.mitre.org:query:default:1.0'
 
-#Capability Module IDs
+# Capability Module IDs
 #: Capability Module ID for Core
 CM_CORE = 'urn:taxii.mitre.org:query:capability:core-1'
 #: Capability Module ID for Regex
@@ -31,16 +31,16 @@ CM_REGEX = 'urn:taxii.mitre.org:query:capability:regex-1'
 #: Capability Module ID for Timestamp
 CM_TIMESTAMP = 'urn:taxii.mitre.org:query:capability:timestamp-1'
 
-#Tuple of all capability modules defined in TAXII Default Query 1.0
+# Tuple of all capability modules defined in TAXII Default Query 1.0
 CM_IDS = (CM_CORE, CM_REGEX, CM_TIMESTAMP)
 
-#Operators
+# Operators
 #:Operator OR
 OP_OR = 'OR'
 #:Operator AND
 OP_AND = 'AND'
 
-#Tuple of all operators
+# Tuple of all operators
 OP_TYPES = (OP_OR, OP_AND)
 
 
@@ -54,8 +54,8 @@ ST_UNSUPPORTED_TARGETING_EXPRESSION_ID = 'UNSUPPORTED_TARGETING_EXPRESSION_ID'
 #: TAXII namespace map for default queries
 ns_map = {'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'}
 
-#A Capability Module has valid relationships
-#Each relationship has 0-n valid parameters
+# A Capability Module has valid relationships
+# Each relationship has 0-n valid parameters
 
 class CapabilityModule(object):
     def __init__(self, capability_module_id, relationships):
@@ -82,7 +82,7 @@ class CapabilityModule(object):
         for item in value:
             self._relationships[item.name] = item
 
-    #def __hash__(self):
+    # def __hash__(self):
     #    return hash(self.capability_module_id)
 
 class Relationship(object):
@@ -110,7 +110,7 @@ class Relationship(object):
         for item in value:
             self._parameters[item.name] = item
 
-    #def __hash__(self):
+    # def __hash__(self):
     #    return hash(self.name)
 
 
@@ -130,17 +130,17 @@ class Parameter(object):
 
         return True, 'OK'
 
-    #def deserialize(self, value):#Deserializes a value
-        #if self.type
+    # def deserialize(self, value):#Deserializes a value
+        # if self.type
 
-#params - Define parameters for the Core/Regex/Timestamp capability modules
+# params - Define parameters for the Core/Regex/Timestamp capability modules
 param_str_value = Parameter('value', basestring)
 param_float_value = Parameter('value', float)
 param_ts_value = Parameter('value', datetime.datetime)
 param_match_type = Parameter('match_type', basestring, ('case_sensitive_string','case_insensitive_string','number'))
 param_case_sensitive = Parameter('case_sensitive', bool, (True, False))
 
-#CORE Relationships - Define relationships for the core capability module
+# CORE Relationships - Define relationships for the core capability module
 rel_equals = Relationship('equals', [param_str_value, param_match_type])
 rel_not_equals = Relationship('not_requals', [param_str_value, param_match_type])
 rel_greater_than = Relationship('greater_than', [param_float_value])
@@ -153,17 +153,17 @@ rel_begins_with = Relationship('begins_with', [param_case_sensitive, param_str_v
 rel_ends_with = Relationship('ends_with', [param_case_sensitive, param_str_value])
 rel_contains = Relationship('contains', [param_case_sensitive, param_str_value])
 
-#REGEX relationships
+# REGEX relationships
 rel_matches = Relationship('matches', [param_case_sensitive, param_str_value])
 
-#TIMESTAMP relationships
+# TIMESTAMP relationships
 rel_ts_eq = Relationship('equals', [param_ts_value])
 rel_ts_gt = Relationship('greater_than', [param_ts_value])
 rel_ts_gte = Relationship('greater_than_or_equals', [param_ts_value])
 rel_ts_lt = Relationship('less_than', [param_ts_value])
 rel_ts_lte = Relationship('less_than_or_equals', [param_ts_value])
 
-#CORE - Define the Core Capability Module
+# CORE - Define the Core Capability Module
 cm_core = CapabilityModule(CM_CORE, 
                            [rel_equals, rel_not_equals, rel_greater_than, 
                             rel_greater_than_or_equal, rel_less_than, 
@@ -171,10 +171,10 @@ cm_core = CapabilityModule(CM_CORE,
                             rel_begins_with, rel_contains, rel_ends_with]
                            )
 
-#REGEX - Define the RegEx Capability Module
+# REGEX - Define the RegEx Capability Module
 cm_regex = CapabilityModule(CM_REGEX, [rel_matches])
 
-#TIMESTAMP - Define the timestamp Capability Module
+# TIMESTAMP - Define the timestamp Capability Module
 cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte, rel_ts_lt, rel_ts_lte])
 
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
@@ -395,7 +395,7 @@ class DefaultQuery(tm11.Query):
 
     @staticmethod
     def from_etree(etree_xml):
-        tei = etree_xml.xpath('./tdq:Default_Query/@targeting_expression_id', namespaces=ns_map)[0]#attrib['targeting_expression_id']
+        tei = etree_xml.xpath('./tdq:Default_Query/@targeting_expression_id', namespaces=ns_map)[0]  # attrib['targeting_expression_id']
         criteria = DefaultQuery.Criteria.from_etree(etree_xml.xpath('./tdq:Default_Query/tdq:Criteria', namespaces=ns_map)[0])
         return DefaultQuery(tei, criteria)
 
@@ -634,8 +634,8 @@ class DefaultQuery(tm11.Query):
 
             @relationship.setter
             def relationship(self, value):
-                #TODO: For known capability IDs, check that the relationship is valid
-                #TODO: provide a way to register other capability IDs
+                # TODO: For known capability IDs, check that the relationship is valid
+                # TODO: provide a way to register other capability IDs
                 do_check(value, 'relationship', type=basestring)
                 self._relationship = value
 
@@ -648,10 +648,10 @@ class DefaultQuery(tm11.Query):
                 do_check(value.keys(), 'parameters.keys()', regex_tuple=uri_regex)
                 self._parameters = value
 
-            #TODO: Can this be done better?
+            # TODO: Can this be done better?
             def validate(self):
                 capability_module = capability_modules.get(self.capability_id)
-                if capability_module is None:#Nothing is defined for this, validation not possible
+                if capability_module is None:  # Nothing is defined for this, validation not possible
                     print 'Cannot validate'
                     return True
 
@@ -698,12 +698,12 @@ class DefaultQuery(tm11.Query):
                 for parameter in etree_xml.xpath('./tdq:Parameter', namespaces=ns_map):
                     k = parameter.attrib['name']
                     v = parameter.text
-                    if v in ('true', 'false'):#Assume bool
+                    if v in ('true', 'false'):  # Assume bool
                         parameters[k] = v == 'true'
                     else:
-                        try:#attempt to deserialize as a datetime
+                        try:  # attempt to deserialize as a datetime
                             parameters[k] = dateutil.parser.parse(v)
-                        except:#Just use it as a string
+                        except:  # Just use it as a string
                             parameters[k] = v
 
                 return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)

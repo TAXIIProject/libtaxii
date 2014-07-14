@@ -123,8 +123,8 @@ ns_map = {
 ### General purpose helper methods ###
 
 _RegexTuple = collections.namedtuple('_RegexTuple', ['regex','title'])
-#URI regex per http://tools.ietf.org/html/rfc3986
-#uri_regex = _RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
+# URI regex per http://tools.ietf.org/html/rfc3986
+# uri_regex = _RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
 _message_id_regex = _RegexTuple("[0-9]+", "Numbers only")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
@@ -339,7 +339,7 @@ class BaseNonMessage(object):
 
     def _checkPropertiesEq(self, other, arglist, debug=False):
         for arg in arglist:
-            #Check to see if the arg is in both objects
+            # Check to see if the arg is in both objects
             in_self = arg in self.__dict__
             in_other = arg in other.__dict__
             if in_self != in_other:
@@ -376,7 +376,7 @@ class DeliveryParameters(BaseNonMessage):
             receive for this TAXII Data Feed. **Optional**
     """
 
-    #TODO: Should the default arguments of these change? I'm not sure these are
+    # TODO: Should the default arguments of these change? I'm not sure these are
     # actually optional
     def __init__(self, inbox_protocol=None, inbox_address=None,
                  delivery_message_binding=None, content_bindings=None):
@@ -403,7 +403,7 @@ class DeliveryParameters(BaseNonMessage):
 
     @inbox_address.setter
     def inbox_address(self, value):
-        #TODO: Can inbox_address be validated?
+        # TODO: Can inbox_address be validated?
         self._inbox_address = value
 
     @property
@@ -625,21 +625,21 @@ class TAXIIMessage(BaseNonMessage):
         first, then parse their specific XML constructs.
         """
 
-        #Get the message type
+        # Get the message type
         message_type = src_etree.tag[53:]
         if message_type != cls.message_type:
             raise ValueError('%s != %s' % (message_type, cls.message_type))
 
-        #Get the message ID
+        # Get the message ID
         message_id = src_etree.xpath('/taxii:*/@message_id', namespaces=ns_map)[0]
 
-        #Get in response to, if present
+        # Get in response to, if present
         in_response_to = None
         in_response_tos = src_etree.xpath('/taxii:*/@in_response_to', namespaces=ns_map)
         if len(in_response_tos) > 0:
             in_response_to = in_response_tos[0]
 
-        #Get the Extended headers
+        # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii:*/taxii:Extended_Headers/taxii:Extended_Header', namespaces=ns_map)
         extended_headers = {}
         for header in extended_header_list:
@@ -733,7 +733,7 @@ class ContentBlock(BaseNonMessage):
 
     @content.setter
     def content(self, value):
-        do_check(value, 'content')#Just check for not None
+        do_check(value, 'content')  # Just check for not None
         self._content, self.content_is_xml = self._stringify_content(value)
 
     @property
@@ -758,28 +758,28 @@ class ContentBlock(BaseNonMessage):
         """Always a string or raises an error.
         Returns the string representation and whether the data is XML.
         """
-        #If it's an etree, it's definitely XML
+        # If it's an etree, it's definitely XML
         if isinstance(content, etree._ElementTree):
             return content.getroot(), True
 
         if isinstance(content, etree._Element):
             return content, True
 
-        if hasattr(content, 'read'):#The content is file-like
-            try:#Try to parse as XML
+        if hasattr(content, 'read'):  # The content is file-like
+            try:  # Try to parse as XML
                 xml = etree.parse(content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 return content.read(), False
-        else: # The Content is not file-like
-            try:#Attempt to parse string as XML
+        else:  # The Content is not file-like
+            try:  # Attempt to parse string as XML
                 sio_content = StringIO.StringIO(content)
                 xml = etree.parse(sio_content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
-                if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
+                if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
                     return content, False
-                else:#It's some other datatype that needs casting to string
+                else:  # It's some other datatype that needs casting to string
                     return str(content), False
 
     def to_etree(self):
@@ -828,8 +828,8 @@ class ContentBlock(BaseNonMessage):
         if not self._checkPropertiesEq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
             return False
 
-        #TODO: It's pretty hard to check and see if content is equal....
-        #if not self._checkPropertiesEq(other, ['content'], debug):
+        # TODO: It's pretty hard to check and see if content is equal....
+        # if not self._checkPropertiesEq(other, ['content'], debug):
         #    return False
 
         return True
@@ -959,7 +959,7 @@ class DiscoveryResponse(TAXIIMessage):
                 print 'service_instance lengths not equal: %s != %s' % (len(self.service_instances), len(other.service_instances))
             return False
 
-        #Who knows if this is a good way to compare the service instances or not...
+        # Who knows if this is a good way to compare the service instances or not...
         for item1, item2 in zip(sorted(self.service_instances), sorted(other.service_instances)):
             if item1 != item2:
                 if debug:
@@ -1266,7 +1266,7 @@ class FeedInformationResponse(TAXIIMessage):
         if not super(FeedInformationResponse, self).__eq__(other, debug):
             return False
 
-        #Who knows if this is a good way to compare the service instances or not...
+        # Who knows if this is a good way to compare the service instances or not...
         for item1, item2 in zip(sorted(self.feed_informations), sorted(other.feed_informations)):
             if item1 != item2:
                 if debug:
@@ -1455,7 +1455,7 @@ class FeedInformation(BaseNonMessage):
                 print 'supported_contents not equal: %s != %s' % (self.supported_contents, other.supported_contents)
             return False
 
-        #TODO: Test equality of: push_methods=[], polling_service_instances=[], subscription_methods=[]
+        # TODO: Test equality of: push_methods=[], polling_service_instances=[], subscription_methods=[]
 
         return True
 
@@ -1863,12 +1863,12 @@ class PollRequest(TAXIIMessage):
 
         if self.exclusive_begin_timestamp_label is not None:
             ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii'])
-            #TODO: Add TZ Info
+            # TODO: Add TZ Info
             ebt.text = self.exclusive_begin_timestamp_label.isoformat()
 
         if self.inclusive_end_timestamp_label is not None:
             iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
-            #TODO: Add TZ Info
+            # TODO: Add TZ Info
             iet.text = self.inclusive_end_timestamp_label.isoformat()
 
         for binding in self.content_bindings:
@@ -2090,7 +2090,7 @@ class PollResponse(TAXIIMessage):
         if not self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'message', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
                 return False
 
-        #TODO: Check content blocks
+        # TODO: Check content blocks
 
         return True
 
@@ -2191,7 +2191,7 @@ class StatusMessage(TAXIIMessage):
         do_check(value, 'status_type')
         self._status_type = value
 
-    #TODO: is it possible to check the status detail?
+    # TODO: is it possible to check the status detail?
 
     def to_etree(self):
         xml = super(StatusMessage, self).to_etree()
@@ -2347,7 +2347,7 @@ class InboxMessage(TAXIIMessage):
                 print 'content block lengths not equal: %s != %s' % (len(self.content_blocks), len(other.content_blocks))
             return False
 
-        #Who knows if this is a good way to compare the content blocks or not...
+        # Who knows if this is a good way to compare the content blocks or not...
         for item1, item2 in zip(sorted(self.content_blocks), sorted(other.content_blocks)):
             if item1 != item2:
                 if debug:
@@ -2707,7 +2707,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
                 print 'subscription instance lengths not equal'
             return False
 
-        #TODO: Compare the subscription instances
+        # TODO: Compare the subscription instances
 
         return True
 
@@ -2830,8 +2830,8 @@ class SubscriptionInstance(BaseNonMessage):
         if not self._checkPropertiesEq(other, ['subscription_id'], debug):
             return False
 
-        #TODO: Compare delivery parameters
-        #TODO: Compare poll instances
+        # TODO: Compare delivery parameters
+        # TODO: Compare poll instances
 
         return True
 

@@ -1,13 +1,13 @@
-#Copyright (C) 2013 - The MITRE Corporation
-#For license information, see the LICENSE.txt file
+# Copyright (C) 2013 - The MITRE Corporation
+# For license information, see the LICENSE.txt file
 
-#This file has two purposes:
+# This file has two purposes:
 # 1. To provide a rough unit test of libtaxii.messages
 # 2. To provide examples of how to use libtaxii.messages
 
 
 ### Contributors ###
-#Contributors: If you would like, add your name to the list, alphabetically by last name
+# Contributors: If you would like, add your name to the list, alphabetically by last name
 #
 # Mark Davidson - mdavidson@mitre.org
 #
@@ -118,7 +118,7 @@ class DiscoveryRequestTests(unittest.TestCase):
         discovery_request1 = tm10.DiscoveryRequest(
                 message_id=tm10.generate_message_id(),  # Required
                 extended_headers={'ext_header1': 'value1', 'ext_header2': 'value2'})  # Optional.
-                #Extended headers are optional for every message type, but only demonstrated here
+                # Extended headers are optional for every message type, but only demonstrated here
 
         round_trip_message(discovery_request1)
 
@@ -133,12 +133,12 @@ class DiscoveryResponseTests(unittest.TestCase):
                 service_address='http://example.com/inboxservice/',  # Required
                 message_bindings=[t.VID_TAXII_XML_10],  # Required, must have at least one value in the list
                 inbox_service_accepted_content=[t.CB_STIX_XML_10],  # Optional for service_type=SVC_INBOX, prohibited otherwise
-                                                    #If this is absent and service_type=SVC_INBOX,
-                                                    #It means the inbox service accepts all content
+                                                    # If this is absent and service_type=SVC_INBOX,
+                                                    # It means the inbox service accepts all content
                 available=True,  # Optional - defaults to None, which means 'Unknown'
                 message='This is a message.')  # Optional
 
-        #Create the discovery response
+        # Create the discovery response
         discovery_response1 = tm10.DiscoveryResponse(
                 message_id=tm10.generate_message_id(),  # Required
                 in_response_to=tm10.generate_message_id(),  # Required. This should be the ID of the corresponding request

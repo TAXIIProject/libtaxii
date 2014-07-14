@@ -97,7 +97,7 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
         return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=tm11.ST_FAILURE, message=m)
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
         return tm10.get_message_from_xml(response_message)
-    elif taxii_content_type == VID_TAXII_XML_11: #It's a TAXII XML 1.1 message
+    elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
         return tm11.get_message_from_xml(response_message)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
         return tm10.get_message_from_json(response_message)
@@ -117,7 +117,7 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
         message = []
         #header_tuples = http_response.getheaders()
         header_dict = http_response.info().dict.iteritems()
-        for k, v in header_dict:#header_tuples:
+        for k, v in header_dict:  # header_tuples:
             message.append(k + ': ' + v + '\r\n')
         message.append('\r\n')
         message.append(response_message)
@@ -128,7 +128,7 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
         return tm10.get_message_from_xml(response_message)
-    elif taxii_content_type == VID_TAXII_XML_11: #It's a TAXII XML 1.1 message
+    elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
         return tm11.get_message_from_xml(response_message)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
         return tm10.get_message_from_json(response_message)
@@ -158,7 +158,7 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
         return tm10.get_message_from_xml(response_message)
-    elif taxii_content_type == VID_TAXII_XML_11: # It's a TAXII XML 1.1 message
+    elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
         return tm11.get_message_from_xml(response_message)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
