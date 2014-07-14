@@ -30,38 +30,38 @@ from .validation import do_check, uri_regex, check_timestamp_label
 
 # TAXII 1.0 Message Types
 
-#:Constant identifying a Status Message
+#: Constant identifying a Status Message
 MSG_STATUS_MESSAGE = tm10.MSG_STATUS_MESSAGE
-#:Constant identifying a Discovery Request Message
+#: Constant identifying a Discovery Request Message
 MSG_DISCOVERY_REQUEST = tm10.MSG_DISCOVERY_REQUEST
-#:Constant identifying a Discovery Response Message
+#: Constant identifying a Discovery Response Message
 MSG_DISCOVERY_RESPONSE = tm10.MSG_DISCOVERY_RESPONSE
-#:Constant identifying a Feed Information Request Message
+#: Constant identifying a Feed Information Request Message
 MSG_FEED_INFORMATION_REQUEST = tm10.MSG_FEED_INFORMATION_REQUEST
-#:Constant identifying a Feed Information Response Message
+#: Constant identifying a Feed Information Response Message
 MSG_FEED_INFORMATION_RESPONSE = tm10.MSG_FEED_INFORMATION_RESPONSE
-#:Constant identifying a Subscription Management Request Message
+#: Constant identifying a Subscription Management Request Message
 MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
-#:Constant identifying a Subscription Management Response Message
+#: Constant identifying a Subscription Management Response Message
 MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
-#:Constant identifying a Poll Request Message
+#: Constant identifying a Poll Request Message
 MSG_POLL_REQUEST = tm10.MSG_POLL_REQUEST
-#:Constant identifying a Poll Response Message
+#: Constant identifying a Poll Response Message
 MSG_POLL_RESPONSE = tm10.MSG_POLL_RESPONSE
-#:Constant identifying a Inbox Message
+#: Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = tm10.MSG_INBOX_MESSAGE
 
 # New Message Types in TAXII 1.1
 
-#:Constant identifying a Status Message
+#: Constant identifying a Status Message
 MSG_POLL_FULFILLMENT_REQUEST = 'Poll_Fulfillment'
-#:Constant identifying a Collection Information Request
+#: Constant identifying a Collection Information Request
 MSG_COLLECTION_INFORMATION_REQUEST = 'Collection_Information_Request'
-#:Constant identifying a Collection Information Response
+#: Constant identifying a Collection Information Response
 MSG_COLLECTION_INFORMATION_RESPONSE = 'Collection_Information_Response'
-#:Constant identifying a Subscription Request
+#: Constant identifying a Subscription Request
 MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#:Constant identifying a Subscription Response
+#: Constant identifying a Subscription Response
 MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
 
 #: Tuple of all TAXII 1.1 Message Types
@@ -348,7 +348,7 @@ def _sanitize_content_binding(binding):
     2. string
     and returns a ContentBinding object.
 
-    This supports function calls where a string or ContentBinding can be 
+    This supports function calls where a string or ContentBinding can be
     used to specify a content binding.
     """
     if isinstance(binding, ContentBinding):  # It's already good to go
@@ -369,11 +369,11 @@ def _sanitize_content_bindings(binding_list):
 
 class UnsupportedQueryException(Exception):
 
-     def __init__(self, value):
-         self.value = value
+    def __init__(self, value):
+        self.value = value
 
-     def __str__(self):
-         return repr(self.value)
+    def __str__(self):
+        return repr(self.value)
 
 
 # Start with the 'default' deserializer
@@ -478,12 +478,12 @@ class SupportedQuery(TAXIIBase):
 
 
 class Query(TAXIIBase):
+    """This class contains an instance of a query.
+
+    It is expected that, generally, messages_11.Query subclasses will be used
+    in place of this class to represent a query.
     """
-    This class contains an instance of a query. It
-    is expected that, generally, messages_11.Query 
-    subclasses will be used in place of this class
-    to represent a query
-    """
+
     def __init__(self, format_id):
         """
         Arguments:
@@ -540,7 +540,7 @@ class ContentBinding(TAXIIBase):
     def __str__(self):
         s = self.binding_id
         if len(self.subtype_ids) > 0:
-            s = s+ '>' + ','.join(self.subtype_ids)
+            s += '>' + ','.join(self.subtype_ids)
 
         return s
 
@@ -1362,9 +1362,9 @@ class ServiceInstance(TAXIIBase):
     """
 
     def __init__(self, service_type, services_version, protocol_binding,
-                    service_address, message_bindings,
-                    inbox_service_accepted_content=None, available=None,
-                    message=None, supported_query=None):
+                 service_address, message_bindings,
+                 inbox_service_accepted_content=None, available=None,
+                 message=None, supported_query=None):
         self.service_type = service_type
         self.services_version = services_version
         self.protocol_binding = protocol_binding
@@ -1642,7 +1642,7 @@ class CollectionInformationResponse(TAXIIMessage):
 
 class CollectionInformation(TAXIIBase):
     """
-    The Collection Information component of a TAXII Collection Information 
+    The Collection Information component of a TAXII Collection Information
     Response Message.
 
     Arguments:
@@ -2088,7 +2088,7 @@ class SubscriptionMethod(TAXIIBase):
     NAME = 'Subscription_Service'
 
     def __init__(self, subscription_protocol, subscription_address,
-                    subscription_message_bindings):
+                 subscription_message_bindings):
         self.subscription_protocol = subscription_protocol
         self.subscription_address = subscription_address
         self.subscription_message_bindings = subscription_message_bindings
@@ -2169,7 +2169,7 @@ class ReceivingInboxService(TAXIIBase):
     """
 
     def __init__(self, inbox_protocol, inbox_address,
-                    inbox_message_bindings, supported_contents=None):
+                 inbox_message_bindings, supported_contents=None):
         self.inbox_protocol = inbox_protocol
         self.inbox_address = inbox_address
         self.inbox_message_bindings = inbox_message_bindings
@@ -2478,7 +2478,7 @@ class PollParameters(_GenericParameters):
     name = 'Poll_Parameters'
 
     def __init__(self, response_type=RT_FULL, content_bindings=None,
-                    query=None, allow_asynch=False, delivery_parameters=None):
+                 query=None, allow_asynch=False, delivery_parameters=None):
         super(PollParameters, self).__init__(response_type, content_bindings, query)
         self.allow_asynch = allow_asynch
         self.delivery_parameters = delivery_parameters
@@ -3581,8 +3581,8 @@ class SubscriptionInstance(TAXIIBase):
     """
 
     def __init__(self, subscription_id, status=SS_ACTIVE,
-                    subscription_parameters=None, push_parameters=None,
-                    poll_instances=None):
+                 subscription_parameters=None, push_parameters=None,
+                 poll_instances=None):
         self.subscription_id = subscription_id
         self.status = status
         self.subscription_parameters = subscription_parameters
