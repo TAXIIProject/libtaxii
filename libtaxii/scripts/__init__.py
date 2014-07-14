@@ -47,7 +47,7 @@ def get_base_parser(parser_description, path="/services/discovery/"):
     parser.add_argument("--key", dest="key", default=None, help="The file location of the private key to use. Defaults to None.")
     parser.add_argument("--username", dest="username", default=None, help="The username to authenticate with. Defaults to None.")
     parser.add_argument("--pass", dest="password", default=None, help="The password to authenticate with. Defaults to None.")
-    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default='noproxy', 
+    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default='noproxy',
                         help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
     
     return parser

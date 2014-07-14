@@ -647,8 +647,8 @@ class TAXIIMessage(BaseNonMessage):
             eh_value = header.text
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id, 
-                   in_response_to, 
+        return cls(message_id,
+                   in_response_to,
                    extended_headers=extended_headers,
                    **kwargs)
 
@@ -682,9 +682,9 @@ class TAXIIMessage(BaseNonMessage):
         extended_headers = d['extended_headers']
         in_response_to = d.get('in_response_to')
 
-        return cls(message_id, 
-                   in_response_to, 
-                   extended_headers=extended_headers, 
+        return cls(message_id,
+                   in_response_to,
+                   extended_headers=extended_headers,
                    **kwargs)
 
     @classmethod

@@ -156,7 +156,7 @@ class StatusMessageTests(unittest.TestCase):
             message_id='SM01',  # Required
             in_response_to=tm11.generate_message_id(),  # Required, should be the ID of the message that this is in response to
             status_type=tm11.ST_SUCCESS,  # Required
-            status_detail={'custom_status_detail_name': 'Custom status detail value', 
+            status_detail={'custom_status_detail_name': 'Custom status detail value',
                             'Custom_detail_2': ['this one has', 'multiple values']},  # Required depending on Status Type. See spec for details
             message='This is a test message'  # Optional
         )
@@ -304,8 +304,8 @@ class DiscoveryResponseTests(unittest.TestCase):
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
                 service_address='http://example.com/inbox/',  # Required
                 message_bindings=[t.VID_TAXII_XML_11],  # Required, must have at least one value in the list
-                inbox_service_accepted_content=[tm11.ContentBinding(t.CB_STIX_XML_11), 
-                                                tm11.ContentBinding(t.CB_STIX_XML_101), 
+                inbox_service_accepted_content=[tm11.ContentBinding(t.CB_STIX_XML_11),
+                                                tm11.ContentBinding(t.CB_STIX_XML_101),
                                                 tm11.ContentBinding(t.CB_STIX_XML_10)],  # Optional. Defaults to "accepts all content"
                 available=False,  # Optional - defaults to None, which means 'Unknown'
                 message='This is a message. Yipee!')  # optional

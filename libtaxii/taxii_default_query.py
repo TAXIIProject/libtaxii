@@ -164,10 +164,10 @@ rel_ts_lt = Relationship('less_than', [param_ts_value])
 rel_ts_lte = Relationship('less_than_or_equals', [param_ts_value])
 
 # CORE - Define the Core Capability Module
-cm_core = CapabilityModule(CM_CORE, 
-                           [rel_equals, rel_not_equals, rel_greater_than, 
-                            rel_greater_than_or_equal, rel_less_than, 
-                            rel_less_than_or_equal, rel_dne, rel_ex, 
+cm_core = CapabilityModule(CM_CORE,
+                           [rel_equals, rel_not_equals, rel_greater_than,
+                            rel_greater_than_or_equal, rel_less_than,
+                            rel_less_than_or_equal, rel_dne, rel_ex,
                             rel_begins_with, rel_contains, rel_ends_with]
                            )
 
@@ -716,7 +716,7 @@ package_dir, package_filename = os.path.split(__file__)
 schema_file = os.path.join(package_dir, "xsd", "TAXII_DefaultQuery_Schema.xsd")
 
 tm11.register_query_format(
-    format_id=FID_TAXII_DEFAULT_QUERY_10, 
+    format_id=FID_TAXII_DEFAULT_QUERY_10,
     query=DefaultQuery,
     query_info=DefaultQueryInfo,
     schema=schema_file)

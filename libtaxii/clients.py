@@ -235,17 +235,17 @@ class HttpClient:
         #    - Do nothing. Assume user knows what they are doing
         #
         # 3. Accept header not set and X-TAXII-Accept header set
-        #    - Do nothing. Bad practice, but not invalid. 
+        #    - Do nothing. Bad practice, but not invalid.
         #      Assume user knows what they are doing.
         #
         # 4. Accept header not set and X-TAXII-Accept header not set
-        #    - User hasn't specified anything. In this case, default behavior is: 
+        #    - User hasn't specified anything. In this case, default behavior is:
         #      Accept = Content-Type and
         #      X-TAXII-Accept = X-TAXII-Content-Type.
         #      This means that the client will only accept messages
         #      in the same format that was sent.
         #
-        # 5. Users of libtaxii that wish to accept everything should set the 
+        # 5. Users of libtaxii that wish to accept everything should set the
         #    Accept header to '*/*'.
 
         accept_set = header_dict.get(HttpClient.HEADER_ACCEPT) is not None
@@ -285,9 +285,9 @@ class HttpClient:
             verify_server = self.verify_server
             ca_file = self.ca_file
 
-            handler_list.append(LibtaxiiHTTPSHandler(key_file=key_file, 
-                                                     cert_file=cert_file, 
-                                                     verify_server=verify_server, 
+            handler_list.append(LibtaxiiHTTPSHandler(key_file=key_file,
+                                                     cert_file=cert_file,
+                                                     verify_server=verify_server,
                                                      ca_certs=ca_file))
 
         else:  # Not using https
@@ -353,10 +353,10 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host, timeout=0):
-        return VerifiableHTTPSConnection(host, 
-                                       key_file=self.key_file, 
-                                       cert_file=self.cert_file, 
-                                       verify_server=self.verify_server, 
+        return VerifiableHTTPSConnection(host,
+                                       key_file=self.key_file,
+                                       cert_file=self.cert_file,
+                                       verify_server=self.verify_server,
                                        ca_certs=self.ca_certs)
 
 class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
@@ -381,8 +381,8 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     def __init__(self, host, port=None, key_file=None, cert_file=None,
                      strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                      source_address=None, verify_server=False, ca_certs=None):
-        httplib.HTTPSConnection.__init__(self, host, port, key_file, 
-                                         cert_file, strict, timeout, 
+        httplib.HTTPSConnection.__init__(self, host, port, key_file,
+                                         cert_file, strict, timeout,
                                          source_address)
 
         if verify_server:
@@ -392,9 +392,9 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
         self.ca_certs = ca_certs
 
     def connect(self):
-        # overrides the version in httplib so that we do 
+        # overrides the version in httplib so that we do
         # certificate verification
-        sock = socket.create_connection((self.host, self.port), 
+        sock = socket.create_connection((self.host, self.port),
                                          self.timeout,
                                          self.source_address)
         if self._tunnel_host:

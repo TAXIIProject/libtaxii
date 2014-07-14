@@ -732,7 +732,7 @@ class _GenericParameters(TAXIIBase):
     @classmethod
     def from_etree(cls, etree_xml, **kwargs):
 
-        response_type = RT_FULL        
+        response_type = RT_FULL
         response_type_set = etree_xml.xpath('./taxii_11:Response_Type', namespaces=ns_map)
         if len(response_type_set) > 0:
             response_type = response_type_set[0].text
@@ -1209,8 +1209,8 @@ class TAXIIMessage(TAXIIBase):
             eh_value = header.text
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id, 
-                   in_response_to, 
+        return cls(message_id,
+                   in_response_to,
                    extended_headers=extended_headers,
                    **kwargs)
 
@@ -1229,9 +1229,9 @@ class TAXIIMessage(TAXIIBase):
         extended_headers = d['extended_headers']
         in_response_to = d.get('in_response_to')
 
-        return cls(message_id, 
-                   in_response_to, 
-                   extended_headers=extended_headers, 
+        return cls(message_id,
+                   in_response_to,
+                   extended_headers=extended_headers,
                    **kwargs)
 
     @classmethod
@@ -1892,7 +1892,7 @@ class CollectionInformation(TAXIIBase):
     def from_dict(d):
         kwargs = {}
         kwargs['collection_name'] = d['collection_name']
-        kwargs['collection_type'] = d.get('collection_type')            
+        kwargs['collection_type'] = d.get('collection_type')
         kwargs['available'] = d.get('available')
         kwargs['collection_description'] = d['collection_description']
         kwargs['collection_volume'] = d.get('collection_volume', None)
@@ -2829,23 +2829,23 @@ _UQ_SupportedQuery =         _StatusDetail('SUPPORTED_QUERY',        False, str,
 
 
 status_details = {
-    ST_ASYNCHRONOUS_POLL_ERROR: {}, 
-    ST_BAD_MESSAGE: {}, 
-    ST_DENIED: {}, 
-    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination}, 
-    ST_FAILURE: {}, 
-    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber}, 
-    ST_NETWORK_ERROR: {}, 
-    ST_NOT_FOUND: {'ITEM': _NF_Item}, 
-    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait, 
-                 'RESULT_ID': _P_ResultId, 
-                 'WILL_PUSH': _P_WillPush}, 
-    ST_POLLING_UNSUPPORTED: {}, 
-    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait}, 
+    ST_ASYNCHRONOUS_POLL_ERROR: {},
+    ST_BAD_MESSAGE: {},
+    ST_DENIED: {},
+    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination},
+    ST_FAILURE: {},
+    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber},
+    ST_NETWORK_ERROR: {},
+    ST_NOT_FOUND: {'ITEM': _NF_Item},
+    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait,
+                 'RESULT_ID': _P_ResultId,
+                 'WILL_PUSH': _P_WillPush},
+    ST_POLLING_UNSUPPORTED: {},
+    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait},
     ST_SUCCESS: {},
-    ST_UNAUTHORIZED: {}, 
-    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding}, 
-    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent}, 
+    ST_UNAUTHORIZED: {},
+    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding},
+    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent},
     ST_UNSUPPORTED_PROTOCOL: {'SUPPORTED_PROTOCOL': _UP_SupportedProtocol},
     ST_UNSUPPORTED_QUERY: {'SUPPORTED_QUERY': _UQ_SupportedQuery}
 }
@@ -3250,11 +3250,11 @@ class SubscriptionInformation(TAXIIBase):
         xml.attrib['collection_name'] = self.collection_name
         si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
         si.text = self.subscription_id
-        
+
         if self.exclusive_begin_timestamp_label is not None:
             ebtl = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'])
             ebtl.text = self.exclusive_begin_timestamp_label.isoformat()
-        
+
         if self.inclusive_end_timestamp_label is not None:
             ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'])
             ietl.text = self.inclusive_end_timestamp_label.isoformat()
