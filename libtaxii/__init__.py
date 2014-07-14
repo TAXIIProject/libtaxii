@@ -19,7 +19,8 @@ import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
 
-### TAXII Version IDs ###
+
+# TAXII Version IDs #
 
 #: Version ID for the TAXII Services Specification 1.0
 VID_TAXII_SERVICES_10 = 'urn:taxii.mitre.org:services:1.0'
@@ -39,7 +40,7 @@ VID_TAXII_HTTPS_10 = 'urn:taxii.mitre.org:protocol:https:1.0'
 VID_CERT_EU_JSON_10 = 'urn:cert.europa.eu:message:json:1.0'
 
 
-### TAXII Content Bindings ###
+# TAXII Content Bindings #
 
 #: Content Binding ID for STIX XML 1.0
 CB_STIX_XML_10 = 'urn:stix.mitre.org:xml:1.0'
@@ -116,9 +117,8 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
         message = []
-        #header_tuples = http_response.getheaders()
         header_dict = http_response.info().dict.iteritems()
-        for k, v in header_dict:  # header_tuples:
+        for k, v in header_dict:
             message.append(k + ': ' + v + '\r\n')
         message.append('\r\n')
         message.append(response_message)
