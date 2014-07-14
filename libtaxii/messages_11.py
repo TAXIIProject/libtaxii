@@ -2816,16 +2816,16 @@ class PollResponse(TAXIIMessage):
 
 _StatusDetail = collections.namedtuple('_StatusDetail', ['name', 'required', 'type', 'multiple'])
 _DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
-_IRP_MaxPartNumber =         _StatusDetail('MAX_PART_NUMBER',        True,  int,        False)
-_NF_Item =                   _StatusDetail('ITEM',                   False, str, False)
-_P_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         True,  int, False)
-_P_ResultId =                _StatusDetail('RESULT_ID',              True,  str, False)
-_P_WillPush =                _StatusDetail('WILL_PUSH',              True,  bool, False)
-_R_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         False, int, False)
-_UM_SupportedBinding =       _StatusDetail('SUPPORTED_BINDING',      False, str, True)
-_UC_SupportedContent =       _StatusDetail('SUPPORTED_CONTENT',      False, ContentBinding, True)
-_UP_SupportedProtocol =      _StatusDetail('SUPPORTED_PROTOCOL',     False, str, True)
-_UQ_SupportedQuery =         _StatusDetail('SUPPORTED_QUERY',        False, str, True)
+_IRP_MaxPartNumber = _StatusDetail('MAX_PART_NUMBER', True, int, False)
+_NF_Item = _StatusDetail('ITEM', False, str, False)
+_P_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', True, int, False)
+_P_ResultId = _StatusDetail('RESULT_ID', True, str, False)
+_P_WillPush = _StatusDetail('WILL_PUSH', True, bool, False)
+_R_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', False, int, False)
+_UM_SupportedBinding = _StatusDetail('SUPPORTED_BINDING', False, str, True)
+_UC_SupportedContent = _StatusDetail('SUPPORTED_CONTENT', False, ContentBinding, True)
+_UP_SupportedProtocol = _StatusDetail('SUPPORTED_PROTOCOL', False, str, True)
+_UQ_SupportedQuery = _StatusDetail('SUPPORTED_QUERY', False, str, True)
 
 
 status_details = {
