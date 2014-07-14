@@ -5,12 +5,8 @@
 # 1. To provide a rough unit test of libtaxii.messages
 # 2. To provide examples of how to use libtaxii.messages
 
-
-### Contributors ###
-# Contributors: If you would like, add your name to the list, alphabetically by last name
-#
-# Mark Davidson - mdavidson@mitre.org
-#
+# Contributors:
+# * Mark Davidson - mdavidson@mitre.org
 
 import datetime
 import StringIO
@@ -89,10 +85,10 @@ def round_trip_message(taxii_message, print_xml=False):
         except Exception as e:
             print xml_string
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
-    
+
     if print_xml:
         print etree.tostring(taxii_message.to_etree(), pretty_print=True)
-    
+
     msg_from_xml = tm11.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()
     msg_from_dict = tm11.get_message_from_dict(dictionary)
@@ -110,7 +106,7 @@ def round_trip_message(taxii_message, print_xml=False):
         print '\t Failure of test #4 - running equals w/ debug:'
         msg_from_xml.__eq__(msg_from_dict, True)
         raise Exception('Test #4 failed - msg_from_xml != msg_from_dict')
-    
+
     # print '***** All tests completed!'
 
 
@@ -157,7 +153,7 @@ class StatusMessageTests(unittest.TestCase):
             in_response_to=tm11.generate_message_id(),  # Required, should be the ID of the message that this is in response to
             status_type=tm11.ST_SUCCESS,  # Required
             status_detail={'custom_status_detail_name': 'Custom status detail value',
-                            'Custom_detail_2': ['this one has', 'multiple values']},  # Required depending on Status Type. See spec for details
+                           'Custom_detail_2': ['this one has', 'multiple values']},  # Required depending on Status Type. See spec for details
             message='This is a test message'  # Optional
         )
         round_trip_message(sm01)
@@ -385,7 +381,7 @@ class CollectionInformationRequestTests(unittest.TestCase):
     def test_collection_information_request_01(self):
         cir01 = tm11.CollectionInformationRequest(
                 message_id='CIReq01'  # Required
-                )
+        )
         round_trip_message(cir01)
 
 
@@ -647,30 +643,30 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
                     subscription_parameters=subscription_parameters1,  # Optional - should be an echo of the request
                     push_parameters=push_parameters1,  # Optional - should be an echo of the request
                     poll_instances=[poll_instance1, poll_instance2, poll_instance3],  # Optional
-                    )
+        )
 
     def test_subs_resp1(self):
         subs2 = tm11.SubscriptionInstance(
-                    status=tm11.SS_PAUSED,  # Optional, defaults to ACTIVE
-                    subscription_id='Subs001',  # Required
-                    subscription_parameters=subscription_parameters1,  # Optional - should be an echo of the request
-                    push_parameters=push_parameters1,  # Optional - should be an echo of the request
-                    # poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
-                    )
+                status=tm11.SS_PAUSED,  # Optional, defaults to ACTIVE
+                subscription_id='Subs001',  # Required
+                subscription_parameters=subscription_parameters1,  # Optional - should be an echo of the request
+                push_parameters=push_parameters1,  # Optional - should be an echo of the request
+                # poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
+        )
         subs3 = tm11.SubscriptionInstance(
-                    status=tm11.SS_PAUSED,  # Optional, defaults to ACTIVE
-                    subscription_id='Subs001',  # Required
-                    # subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
-                    # push_parameters = delivery_parameters1,#Optional - should be an echo of the request
-                    # poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
-                    )
+                status=tm11.SS_PAUSED,  # Optional, defaults to ACTIVE
+                subscription_id='Subs001',  # Required
+                # subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
+                # push_parameters = delivery_parameters1,#Optional - should be an echo of the request
+                # poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
+        )
         subs_resp1 = tm11.ManageCollectionSubscriptionResponse(
                 message_id='SubsResp01',  # Required
                 in_response_to='xyz',  # Required - should be the ID of the message that this is a response to
                 collection_name='abc123',  # Required
                 message='Hullo!',  # Optional
                 subscription_instances=[self.subs1, subs2, subs3],  # Optional
-                )
+        )
         round_trip_message(subs_resp1)
 
     def test_subs_resp2(self):
@@ -680,7 +676,7 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
                 collection_name='abc123',  # Required
                 # message = 'Hullo!', #Optional
                 # subscription_instances = [subs1, subs2, subs3],#Optional
-                )
+        )
         round_trip_message(subs_resp2)
 
     def test_subs_resp3(self):
@@ -690,7 +686,7 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
                 collection_name='abc123',  # Required
                 # message = 'Hullo!', #Optional
                 subscription_instances=[self.subs1],  # Optional
-                )
+        )
         round_trip_message(subs_resp3)
 
     def test_subs_resp4(self):
@@ -700,7 +696,7 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
                 collection_name='abc123',  # Required
                 message='Hullo!',  # Optional
                 # subscription_instances = [subs1, subs2, subs3],#Optional
-                )
+        )
         round_trip_message(subs_resp4)
 
     def test_subs_resp_deprecated(self):

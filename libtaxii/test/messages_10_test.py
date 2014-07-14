@@ -5,12 +5,8 @@
 # 1. To provide a rough unit test of libtaxii.messages
 # 2. To provide examples of how to use libtaxii.messages
 
-
-### Contributors ###
-# Contributors: If you would like, add your name to the list, alphabetically by last name
-#
-# Mark Davidson - mdavidson@mitre.org
-#
+# Contributors:
+# * Mark Davidson - mdavidson@mitre.org
 
 import datetime
 import StringIO
@@ -133,8 +129,8 @@ class DiscoveryResponseTests(unittest.TestCase):
                 service_address='http://example.com/inboxservice/',  # Required
                 message_bindings=[t.VID_TAXII_XML_10],  # Required, must have at least one value in the list
                 inbox_service_accepted_content=[t.CB_STIX_XML_10],  # Optional for service_type=SVC_INBOX, prohibited otherwise
-                                                    # If this is absent and service_type=SVC_INBOX,
-                                                    # It means the inbox service accepts all content
+                                                                    # If this is absent and service_type=SVC_INBOX,
+                                                                    # It means the inbox service accepts all content
                 available=True,  # Optional - defaults to None, which means 'Unknown'
                 message='This is a message.')  # Optional
 

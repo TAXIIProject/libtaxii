@@ -1,11 +1,8 @@
 # Copyright (C) 2013 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
-### Contributors ###
-# Contributors: If you would like, add your name to the list, alphabetically by last name
-#
-# Mark Davidson - mdavidson@mitre.org
-#
+# Contributors:
+# * Mark Davidson - mdavidson@mitre.org
 
 import datetime
 
@@ -28,7 +25,7 @@ def client_example():
 
     # Uncomment to use basic authentication
     # client.setAuthType(tc.HttpClient.AUTH_BASIC)
-    #client.setAuthCredentials({'username':'some_username', 'password':'some_password'})
+    # client.setAuthCredentials({'username':'some_username', 'password':'some_password'})
 
     # Uncomment to use certificate-based authentication
     client.setAuthType(tc.HttpClient.AUTH_CERT)
@@ -36,7 +33,7 @@ def client_example():
                             'cert_file': 'certfile'})
 
     # Uncomment to set a proxy
-    #client.setProxy(tc.HttpClient.PROXY_HTTP, 'http://proxy.company.com:80')
+    # client.setProxy(tc.HttpClient.PROXY_HTTP, 'http://proxy.company.com:80')
 
     # Create the poll request
     poll_request1 = tm.PollRequest(message_id=tm.generate_message_id(), feed_name='TheFeedToPoll')
