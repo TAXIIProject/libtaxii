@@ -20,29 +20,29 @@ def main():
     parser.add_argument("--allow_asynch", dest="allow_asynch", default=True, help="Indicate whether or not the client support Asynchronous Polling. Defaults to True")
     parser.add_argument("--ip", dest="ip", default=None, help="The IP address to query")
     parser.add_argument("--hash", dest="hash", default=None, help="The file hash to query")
-    
+
     args = parser.parse_args()
-    
+
     if args.ip is None and args.hash is None:
         print "At least one of --ip or --hash must be specified!"
         sys.exit()
-    
+
     criterion = []
-    
+
     if args.ip is not None:
         tmp = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_CORE,
                                               relationship='equals',
                                               parameters={'value': args.ip, 'match_type': 'case_insensitive_string'})
         criterion.append(tdq.DefaultQuery.Criterion(target='//Address_Value', test=tmp))
-    
+
     if args.hash is not None:
         tmp = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_CORE,
                                               relationship='equals',
                                               parameters={'value': args.hash, 'match_type': 'case_insensitive_string'})
         criterion.append(tdq.DefaultQuery.Criterion(target='//Hash/Simple_Hash_Value', test=tmp))
-    
+
     criteria = tdq.DefaultQuery.Criteria(operator=tdq.OP_AND, criterion=criterion)
-    
+
     q = tdq.DefaultQuery(t.CB_STIX_XML_11, criteria)
 
     poll_req = tm11.PollRequest(message_id=tm11.generate_message_id(),

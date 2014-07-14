@@ -13,23 +13,23 @@ import StringIO
 
 # http://stix.mitre.org/language/version1.0/#samples
 # http://stix.mitre.org/language/version1.0/stix_v1.0_samples_20130408.zip
-stix_watchlist = '''<!--
-	STIX IP Watchlist Example
-	
-	Copyright (c) 2014, The MITRE Corporation. All rights reserved. 
-    The contents of this file are subject to the terms of the STIX License located at http://stix.mitre.org/about/termsofuse.html.
-    
-	This example demonstrates a simple usage of STIX to represent a list of IP address indicators (watchlist of IP addresses). Cyber operations and malware analysis centers often share a list of suspected malicious IP addresses with information about what those IPs might indicate. This STIX package represents a list of three IP addresses with a short dummy description of what they represent.
-	
-	It demonstrates the use of:
-	
-	   * STIX Indicators
-	   * CybOX within STIX
-	   * The CybOX Address Object (IP)
-	   * CybOX Patterns (apply_condition="ANY")
-	   * Controlled vocabularies
-	
-	Created by Mark Davidson
+stix_watchlist = '''
+<!--STIX IP Watchlist Example
+
+    Copyright (c) 2014, The MITRE Corporation. All rights reserved.
+The contents of this file are subject to the terms of the STIX License located at http://stix.mitre.org/about/termsofuse.html.
+
+    This example demonstrates a simple usage of STIX to represent a list of IP address indicators (watchlist of IP addresses). Cyber operations and malware analysis centers often share a list of suspected malicious IP addresses with information about what those IPs might indicate. This STIX package represents a list of three IP addresses with a short dummy description of what they represent.
+
+    It demonstrates the use of:
+
+        * STIX Indicators
+        * CybOX within STIX
+        * The CybOX Address Object (IP)
+        * CybOX Patterns (apply_condition="ANY")
+        * Controlled vocabularies
+
+    Created by Mark Davidson
 -->
 <stix:STIX_Package
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -73,14 +73,14 @@ def main():
     parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_11, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_11)
     parser.add_argument("--subtype", dest="subtype", default=None, help="The subtype of the Content Binding. Defaults to None")
     parser.add_argument("--content-file", dest="content_file", default=stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
-    
+
     args = parser.parse_args()
 
     if args.content_file is stix_watchlist:
         c = StringIO.StringIO(stix_watchlist)
     else:
         c = open(args.content_file, 'r')
-    
+
     cb = tm11.ContentBlock(tm11.ContentBinding(args.content_binding), c.read())
     c.close()
     if args.subtype is not None:
@@ -97,14 +97,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
