@@ -27,25 +27,25 @@ from .validation import do_check, uri_regex, check_timestamp_label
 
 # TAXII 1.0 Message Types
 
-#:Constant identifying a Status Message
+#: Constant identifying a Status Message
 MSG_STATUS_MESSAGE = 'Status_Message'
-#:Constant identifying a Discovery Request Message
+#: Constant identifying a Discovery Request Message
 MSG_DISCOVERY_REQUEST = 'Discovery_Request'
-#:Constant identifying a Discovery Response Message
+#: Constant identifying a Discovery Response Message
 MSG_DISCOVERY_RESPONSE = 'Discovery_Response'
-#:Constant identifying a Feed Information Request Message
+#: Constant identifying a Feed Information Request Message
 MSG_FEED_INFORMATION_REQUEST = 'Feed_Information_Request'
-#:Constant identifying a Feed Information Response Message
+#: Constant identifying a Feed Information Response Message
 MSG_FEED_INFORMATION_RESPONSE = 'Feed_Information_Response'
-#:Constant identifying a Subscription Management Request Message
+#: Constant identifying a Subscription Management Request Message
 MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#:Constant identifying a Subscription Management Response Message
+#: Constant identifying a Subscription Management Response Message
 MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
-#:Constant identifying a Poll Request Message
+#: Constant identifying a Poll Request Message
 MSG_POLL_REQUEST = 'Poll_Request'
-#:Constant identifying a Poll Response Message
+#: Constant identifying a Poll Response Message
 MSG_POLL_RESPONSE = 'Poll_Response'
-#:Constant identifying a Inbox Message
+#: Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = 'Inbox_Message'
 
 #: Tuple of all TAXII 1.0 Message Types
@@ -117,14 +117,12 @@ SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_FEED_MANAGEMENT, SVC_DISCOVERY)
 
 
 ns_map = {
-            'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
-         }
+    'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
+}
 
-### General purpose helper methods ###
+# General purpose helper methods #
 
 _RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
-# URI regex per http://tools.ietf.org/html/rfc3986
-# uri_regex = _RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
 _message_id_regex = _RegexTuple("[0-9]+", "Numbers only")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
@@ -285,7 +283,7 @@ def get_message_from_json(json_string):
 
 
 class BaseNonMessage(object):
-    """This class should not be used directly by libtaxii users.  
+    """This class should not be used directly by libtaxii users.
 
     Base class for non-TAXII Message objects"""
 
@@ -875,7 +873,7 @@ class ContentBlock(BaseNonMessage):
         return cls.from_dict(json.loads(json_string))
 
 
-#### TAXII Message Classes ####
+# TAXII Message Classes #
 
 class DiscoveryRequest(TAXIIMessage):
     """
@@ -1016,9 +1014,9 @@ class ServiceInstance(BaseNonMessage):
     """
 
     def __init__(self, service_type, services_version, protocol_binding,
-                    service_address, message_bindings,
-                    inbox_service_accepted_content=None, available=None,
-                    message=None):
+                 service_address, message_bindings,
+                 inbox_service_accepted_content=None, available=None,
+                 message=None):
         self.service_type = service_type
         self.services_version = services_version
         self.protocol_binding = protocol_binding
@@ -1327,8 +1325,8 @@ class FeedInformation(BaseNonMessage):
     """
 
     def __init__(self, feed_name, feed_description, supported_contents,
-                    available=None, push_methods=None,
-                    polling_service_instances=None, subscription_methods=None):
+                 available=None, push_methods=None,
+                 polling_service_instances=None, subscription_methods=None):
 
         self.feed_name = feed_name
         self.available = available
@@ -1695,7 +1693,7 @@ class SubscriptionMethod(BaseNonMessage):
     NAME = 'Subscription_Service'
 
     def __init__(self, subscription_protocol, subscription_address,
-                    subscription_message_bindings):
+                 subscription_message_bindings):
         self.subscription_protocol = subscription_protocol
         self.subscription_address = subscription_address
         self.subscription_message_bindings = subscription_message_bindings
@@ -2407,9 +2405,10 @@ class SubscriptionInformation(BaseNonMessage):
             indicating the end of the time range this Inbox Message covers.
             **Optional**
     """
+
     def __init__(self, feed_name, subscription_id,
-                    inclusive_begin_timestamp_label,
-                    inclusive_end_timestamp_label):
+                 inclusive_begin_timestamp_label,
+                 inclusive_end_timestamp_label):
         self.feed_name = feed_name
         self.subscription_id = subscription_id
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
@@ -2758,7 +2757,7 @@ class SubscriptionInstance(BaseNonMessage):
     """
 
     def __init__(self, subscription_id, delivery_parameters=None,
-                    poll_instances=None):
+                 poll_instances=None):
         self.subscription_id = subscription_id
         if delivery_parameters is None:
             self.delivery_parameters = []
