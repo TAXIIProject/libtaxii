@@ -177,7 +177,7 @@ class StatusMessageTests(unittest.TestCase):
                 message_id='SM03',  # Required
                 in_response_to=tm11.generate_message_id(),  # Required, should be the ID of the message that this is in response to
                 status_type=tm11.ST_DESTINATION_COLLECTION_ERROR,  # Required
-                status_detail={'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']},  # Required/optional depending on Status Type. See spec for details
+                status_detail={'ACCEPTABLE_DESTINATION': ['Collection1', 'Collection2']},  # Required/optional depending on Status Type. See spec for details
                 message=None  # Optional
         )
         round_trip_message(sm03)
@@ -237,7 +237,7 @@ class StatusMessageTests(unittest.TestCase):
                 message_id='SM09',  # Required
                 in_response_to=tm11.generate_message_id(),  # Required, should be the ID of the message that this is in response to
                 status_type=tm11.ST_UNSUPPORTED_CONTENT_BINDING,  # Required
-                status_detail={'SUPPORTED_CONTENT': ['%s>%s,%s' % (tm11.ContentBinding, 'subtype1','subtype2'), t.CB_STIX_XML_101]},  # Required/optional depending on Status Type. See spec for details
+                status_detail={'SUPPORTED_CONTENT': ['%s>%s,%s' % (tm11.ContentBinding, 'subtype1', 'subtype2'), t.CB_STIX_XML_101]},  # Required/optional depending on Status Type. See spec for details
                 message=None  # Optional
         )
         round_trip_message(sm09)
@@ -430,7 +430,7 @@ class CollectionInformationResponseTests(unittest.TestCase):
                 inbox_protocol=t.VID_TAXII_HTTPS_10,  # required
                 inbox_address='https://example.com/inbox/',  # Required
                 inbox_message_bindings=[t.VID_TAXII_XML_11],  # Required
-                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['exmaple1','example2'])])  # Optional - None means "all are supported"
+                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['exmaple1', 'example2'])])  # Optional - None means "all are supported"
 
         # Instantiate collections
         self.collection1 = tm11.CollectionInformation(
@@ -461,7 +461,7 @@ class CollectionInformationResponseTests(unittest.TestCase):
         self.collection4 = tm11.CollectionInformation(
                 collection_name='collection4',  # Required
                 collection_description='So improve information. Much amaze.',  # Required
-                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101, subtype_ids=['ex1','ex2','ex3'])],  # Optional
+                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101, subtype_ids=['ex1', 'ex2', 'ex3'])],  # Optional
                 receiving_inbox_services=[inbox_service1, inbox_service2])  # Optional - absence indicates no receiving inbox services
 
     def test_collection_information_response_01(self):
@@ -856,7 +856,7 @@ class InboxMessageTests(unittest.TestCase):
         inbox1 = tm11.InboxMessage(
                 message_id='Inbox1',  # Required
                 result_id='123',  # Optional
-                destination_collection_names=['collection1','collection2'],  # Optional
+                destination_collection_names=['collection1', 'collection2'],  # Optional
                 message='Hello!',  # Optional
                 subscription_information=subs_info1,  # Optional
                 record_count=tm11.RecordCount(22, partial_count=True),  # Optional
@@ -875,7 +875,7 @@ class InboxMessageTests(unittest.TestCase):
         inbox3 = tm11.InboxMessage(
                 message_id='Inbox3',  # Required
                 result_id='123',  # Optional
-                destination_collection_names=['collection1','collection2'],  # Optional
+                destination_collection_names=['collection1', 'collection2'],  # Optional
                 subscription_information=subs_info2,  # Optional
                 content_blocks=[cb002])
         round_trip_message(inbox3)

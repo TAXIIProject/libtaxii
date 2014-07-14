@@ -137,7 +137,7 @@ class Parameter(object):
 param_str_value = Parameter('value', basestring)
 param_float_value = Parameter('value', float)
 param_ts_value = Parameter('value', datetime.datetime)
-param_match_type = Parameter('match_type', basestring, ('case_sensitive_string','case_insensitive_string','number'))
+param_match_type = Parameter('match_type', basestring, ('case_sensitive_string', 'case_insensitive_string', 'number'))
 param_case_sensitive = Parameter('case_sensitive', bool, (True, False))
 
 # CORE Relationships - Define relationships for the core capability module

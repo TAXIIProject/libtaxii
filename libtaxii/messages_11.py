@@ -393,7 +393,7 @@ def register_query_format(format_id, query, query_info, schema=None):
 
 
 def get_deserializer(format_id, type):
-    do_check(type, 'type', value_tuple=('query','query_info'))
+    do_check(type, 'type', value_tuple=('query', 'query_info'))
 
     if format_id not in query_deserializers:
         raise UnsupportedQueryException('A deserializer for the query format \'%s\' is not registered.' % format_id)
@@ -2814,7 +2814,7 @@ class PollResponse(TAXIIMessage):
         return msg
 
 
-_StatusDetail = collections.namedtuple('_StatusDetail', ['name','required','type','multiple'])
+_StatusDetail = collections.namedtuple('_StatusDetail', ['name', 'required', 'type', 'multiple'])
 _DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
 _IRP_MaxPartNumber =         _StatusDetail('MAX_PART_NUMBER',        True,  int,        False)
 _NF_Item =                   _StatusDetail('ITEM',                   False, str, False)

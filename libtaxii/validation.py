@@ -14,7 +14,7 @@ import datetime
 
 ### General purpose helper methods ###
 
-RegexTuple = collections.namedtuple('_RegexTuple', ['regex','title'])
+RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
 # URI regex per http://tools.ietf.org/html/rfc3986
 uri_regex = RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
 #_message_id_regex = _RegexTuple("[0-9]+", "Numbers only")

@@ -54,7 +54,7 @@ setup(name='libtaxii',
                  'libtaxii/scripts/inbox_client.py',
                  'libtaxii/scripts/poll_client.py',
                  'libtaxii/scripts/poll_client_10.py',
-                 'libtaxii/scripts/query_client.py',],
+                 'libtaxii/scripts/query_client.py', ],
       entry_points={
           'console_scripts': [
              'discovery_client = libtaxii.scripts.discovery_client:main',
