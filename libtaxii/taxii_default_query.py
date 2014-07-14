@@ -208,7 +208,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
 
     @capability_modules.setter
     def capability_modules(self, value):
-        do_check(value, 'capability_modules', regex_tuple = uri_regex)
+        do_check(value, 'capability_modules', regex_tuple=uri_regex)
         self._capability_modules = value
 
     def to_etree(self):
@@ -218,7 +218,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
             dqi.append(expression_info.to_etree())
 
         for cmod in self.capability_modules:
-            cm = etree.SubElement(dqi, '{%s}Capability_Module' % ns_map['tdq'], nsmap = ns_map)
+            cm = etree.SubElement(dqi, '{%s}Capability_Module' % ns_map['tdq'], nsmap=ns_map)
             cm.text = cmod
         return q
 
@@ -235,12 +235,12 @@ class DefaultQueryInfo(tm11.SupportedQuery):
 
     @staticmethod
     def from_etree(etree_xml):
-        texpr_infos = etree_xml.xpath('./tdq:Default_Query_Info/tdq:Targeting_Expression_Info', namespaces = ns_map)
+        texpr_infos = etree_xml.xpath('./tdq:Default_Query_Info/tdq:Targeting_Expression_Info', namespaces=ns_map)
         texpr_info_list = []
         for texpr_info in texpr_infos:
             texpr_info_list.append(DefaultQueryInfo.TargetingExpressionInfo.from_etree(texpr_info))
 
-        cms = etree_xml.xpath('./tdq:Default_Query_Info/tdq:Capability_Module', namespaces = ns_map)
+        cms = etree_xml.xpath('./tdq:Default_Query_Info/tdq:Capability_Module', namespaces=ns_map)
         cms_list = []
         for cm in cms:
             cms_list.append(cm.text)
@@ -268,7 +268,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         	:type allowed_scope: :class:`list` of :class:`string`
         """
 
-        def __init__(self, targeting_expression_id, preferred_scope = None, allowed_scope = None):
+        def __init__(self, targeting_expression_id, preferred_scope=None, allowed_scope=None):
             self.targeting_expression_id = targeting_expression_id
             self.preferred_scope = preferred_scope or []
             self.allowed_scope = allowed_scope or []
@@ -382,7 +382,7 @@ class DefaultQuery(tm11.Query):
 
     def to_etree(self):
         q = super(DefaultQuery, self).to_etree()
-        dq = etree.SubElement(q, '{%s}Default_Query' % ns_map['tdq'], nsmap = ns_map)
+        dq = etree.SubElement(q, '{%s}Default_Query' % ns_map['tdq'], nsmap=ns_map)
         dq.attrib['targeting_expression_id'] = self.targeting_expression_id
         dq.append(self.criteria.to_etree())
         return q
@@ -396,7 +396,7 @@ class DefaultQuery(tm11.Query):
     @staticmethod
     def from_etree(etree_xml):
         tei = etree_xml.xpath('./tdq:Default_Query/@targeting_expression_id', namespaces=ns_map)[0]#attrib['targeting_expression_id']
-        criteria = DefaultQuery.Criteria.from_etree(etree_xml.xpath('./tdq:Default_Query/tdq:Criteria', namespaces = ns_map)[0])
+        criteria = DefaultQuery.Criteria.from_etree(etree_xml.xpath('./tdq:Default_Query/tdq:Criteria', namespaces=ns_map)[0])
         return DefaultQuery(tei, criteria)
 
     @staticmethod
@@ -489,12 +489,12 @@ class DefaultQuery(tm11.Query):
             kwargs['operator'] = etree_xml.attrib['operator']
 
             kwargs['criteria'] = []
-            criteria_set = etree_xml.xpath('./tdq:Criteria', namespaces = ns_map)
+            criteria_set = etree_xml.xpath('./tdq:Criteria', namespaces=ns_map)
             for criteria in criteria_set:
                 kwargs['criteria'].append(DefaultQuery.Criteria.from_etree(criteria))
 
             kwargs['criterion'] = []
-            criterion_set = etree_xml.xpath('./tdq:Criterion', namespaces = ns_map)
+            criterion_set = etree_xml.xpath('./tdq:Criterion', namespaces=ns_map)
             for criterion in criterion_set:
                 kwargs['criterion'].append(DefaultQuery.Criterion.from_etree(criterion))
 
@@ -563,11 +563,11 @@ class DefaultQuery(tm11.Query):
             self._test = value
 
         def to_etree(self):
-            cr = etree.Element('{%s}Criterion' % ns_map['tdq'], nsmap = ns_map)
+            cr = etree.Element('{%s}Criterion' % ns_map['tdq'], nsmap=ns_map)
             if self.negate is not None:
                 cr.attrib['negate'] = str(self.negate).lower()
 
-            target = etree.SubElement(cr, '{%s}Target' % ns_map['tdq'], nsmap = ns_map)
+            target = etree.SubElement(cr, '{%s}Target' % ns_map['tdq'], nsmap=ns_map)
             target.text = self.target
 
             cr.append(self.test.to_etree())
@@ -591,8 +591,8 @@ class DefaultQuery(tm11.Query):
             if len(negate_set) > 0:
                 negate = negate_set[0] == 'true'
 
-            target = etree_xml.xpath('./tdq:Target', namespaces = ns_map)[0].text
-            test = DefaultQuery.Criterion.Test.from_etree(etree_xml.xpath('./tdq:Test', namespaces = ns_map)[0])
+            target = etree_xml.xpath('./tdq:Target', namespaces=ns_map)[0].text
+            test = DefaultQuery.Criterion.Test.from_etree(etree_xml.xpath('./tdq:Test', namespaces=ns_map)[0])
 
             return DefaultQuery.Criterion(target, test, negate)
 
@@ -667,7 +667,7 @@ class DefaultQuery(tm11.Query):
                     param.verify(value)
 
             def to_etree(self):
-                t = etree.Element('{%s}Test' % ns_map['tdq'], nsmap = ns_map)
+                t = etree.Element('{%s}Test' % ns_map['tdq'], nsmap=ns_map)
                 t.attrib['capability_id'] = self.capability_id
                 t.attrib['relationship'] = self.relationship
 
@@ -695,7 +695,7 @@ class DefaultQuery(tm11.Query):
                 capability_id = etree_xml.attrib['capability_id']
                 relationship = etree_xml.attrib['relationship']
                 parameters = {}
-                for parameter in etree_xml.xpath('./tdq:Parameter', namespaces = ns_map):
+                for parameter in etree_xml.xpath('./tdq:Parameter', namespaces=ns_map):
                     k = parameter.attrib['name']
                     v = parameter.text
                     if v in ('true', 'false'):#Assume bool
@@ -716,7 +716,7 @@ package_dir, package_filename = os.path.split(__file__)
 schema_file = os.path.join(package_dir, "xsd", "TAXII_DefaultQuery_Schema.xsd")
 
 tm11.register_query_format(
-    format_id = FID_TAXII_DEFAULT_QUERY_10, 
-    query = DefaultQuery,
-    query_info = DefaultQueryInfo,
-    schema = schema_file)
+    format_id=FID_TAXII_DEFAULT_QUERY_10, 
+    query=DefaultQuery,
+    query_info=DefaultQueryInfo,
+    schema=schema_file)

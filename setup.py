@@ -49,13 +49,13 @@ setup(name='libtaxii',
       packages=find_packages(),
       install_requires=install_requires,
       extras_require=extras_require,
-      scripts = ['libtaxii/scripts/discovery_client.py',
+      scripts=['libtaxii/scripts/discovery_client.py',
                  'libtaxii/scripts/fulfillment_client.py',
                  'libtaxii/scripts/inbox_client.py',
                  'libtaxii/scripts/poll_client.py',
                  'libtaxii/scripts/poll_client_10.py',
                  'libtaxii/scripts/query_client.py',],
-      entry_points = {
+      entry_points={
           'console_scripts': [
              'discovery_client = libtaxii.scripts.discovery_client:main',
              'fulfillment_client = libtaxii.scripts.fulfillment_client:main',

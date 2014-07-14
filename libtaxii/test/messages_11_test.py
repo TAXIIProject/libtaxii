@@ -53,25 +53,25 @@ query1 = tdq.DefaultQuery(t.CB_STIX_XML_11, criteria1)
 query2 = tdq.DefaultQuery(t.CB_STIX_XML_11, criteria3)
 
 subscription_parameters1 = tm11.SubscriptionParameters(
-    response_type = tm11.RT_COUNT_ONLY, #Optional, defaults to FULL
-    content_bindings = [tm11.ContentBinding(t.CB_STIX_XML_11)],#Optional. Absence means no restrictions on returned data
-    query = query1)#Optional. Absence means no query
+    response_type=tm11.RT_COUNT_ONLY, #Optional, defaults to FULL
+    content_bindings=[tm11.ContentBinding(t.CB_STIX_XML_11)],#Optional. Absence means no restrictions on returned data
+    query=query1)#Optional. Absence means no query
 
 push_parameters1 = tm11.PushParameters(
-    inbox_protocol = t.VID_TAXII_HTTPS_10, #Required
-    inbox_address = 'https://example.com/inboxAddress/',#Required
-    delivery_message_binding = t.VID_TAXII_XML_11)#Required
+    inbox_protocol=t.VID_TAXII_HTTPS_10, #Required
+    inbox_address='https://example.com/inboxAddress/',#Required
+    delivery_message_binding=t.VID_TAXII_XML_11)#Required
 
 cb001 = tm11.ContentBlock(
-    content_binding = tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['test1']),#Required
-    content = '<STIX_Package/>',#Required (This isn't real STIX)
-    timestamp_label = datetime.datetime.now(tzutc()),#Optional
-    message = 'Hullo!',#Optional
-    padding = 'The quick brown fox jumped over the lazy dogs.')#Optional
+    content_binding=tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['test1']),#Required
+    content='<STIX_Package/>',#Required (This isn't real STIX)
+    timestamp_label=datetime.datetime.now(tzutc()),#Optional
+    message='Hullo!',#Optional
+    padding='The quick brown fox jumped over the lazy dogs.')#Optional
 
 cb002 = tm11.ContentBlock(
-    content_binding = tm11.ContentBinding(t.CB_STIX_XML_11),#Required
-    content = '<STIX_Package/>')#Required
+    content_binding=tm11.ContentBinding(t.CB_STIX_XML_11),#Required
+    content='<STIX_Package/>')#Required
 
 
 def round_trip_message(taxii_message, print_xml=False):
@@ -153,92 +153,92 @@ class StatusMessageTests(unittest.TestCase):
 
     def test_status_message_01(self):
         sm01 = tm11.StatusMessage(
-            message_id = 'SM01', #Required
-            in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-            status_type = tm11.ST_SUCCESS, #Required
-            status_detail = {'custom_status_detail_name': 'Custom status detail value', 
+            message_id='SM01', #Required
+            in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+            status_type=tm11.ST_SUCCESS, #Required
+            status_detail={'custom_status_detail_name': 'Custom status detail value', 
                             'Custom_detail_2': ['this one has', 'multiple values']}, #Required depending on Status Type. See spec for details
-            message = 'This is a test message'#Optional
+            message='This is a test message'#Optional
         )
         round_trip_message(sm01)
 
     def test_status_message_02(self):
         sm02 = tm11.StatusMessage(
-                message_id = 'SM02', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_SUCCESS, #Required
-                status_detail = None, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM02', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_SUCCESS, #Required
+                status_detail=None, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm02)
 
     def test_status_message_03(self):
         sm03 = tm11.StatusMessage(
-                message_id = 'SM03', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_DESTINATION_COLLECTION_ERROR, #Required
-                status_detail = {'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM03', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_DESTINATION_COLLECTION_ERROR, #Required
+                status_detail={'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm03)
 
     def test_status_message_04(self):
         sm04 = tm11.StatusMessage(
-                message_id = 'SM04', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_INVALID_RESPONSE_PART, #Required
-                status_detail = {'MAX_PART_NUMBER': 4}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM04', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_INVALID_RESPONSE_PART, #Required
+                status_detail={'MAX_PART_NUMBER': 4}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm04)
 
     def test_status_message_05(self):
         sm05 = tm11.StatusMessage(
-                message_id = 'SM05', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_NOT_FOUND, #Required
-                status_detail = {'ITEM': 'Collection1'}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM05', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_NOT_FOUND, #Required
+                status_detail={'ITEM': 'Collection1'}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm05)
 
     def test_status_message_06(self):
         sm06 = tm11.StatusMessage(
-                message_id = 'SM06', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_PENDING, #Required
-                status_detail = {'ESTIMATED_WAIT': 900, 'RESULT_ID': 'Result1', 'WILL_PUSH': False}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM06', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_PENDING, #Required
+                status_detail={'ESTIMATED_WAIT': 900, 'RESULT_ID': 'Result1', 'WILL_PUSH': False}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm06)
 
     def test_status_message_07(self):
         sm07 = tm11.StatusMessage(
-                message_id = 'SM07', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_RETRY, #Required
-                status_detail = {'ESTIMATED_WAIT': 900}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM07', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_RETRY, #Required
+                status_detail={'ESTIMATED_WAIT': 900}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm07)
 
     def test_status_message_08(self):
         sm08 = tm11.StatusMessage(
-                message_id = 'SM08', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_UNSUPPORTED_MESSAGE_BINDING, #Required
-                status_detail = {'SUPPORTED_BINDING': [t.VID_TAXII_XML_10, t.VID_TAXII_XML_11]}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM08', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_UNSUPPORTED_MESSAGE_BINDING, #Required
+                status_detail={'SUPPORTED_BINDING': [t.VID_TAXII_XML_10, t.VID_TAXII_XML_11]}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm08)
 
     def test_status_message_09(self):
         sm09 = tm11.StatusMessage(
-                message_id = 'SM09', #Required
-                in_response_to = tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
-                status_type = tm11.ST_UNSUPPORTED_CONTENT_BINDING, #Required
-                status_detail = {'SUPPORTED_CONTENT': ['%s>%s,%s' % (tm11.ContentBinding, 'subtype1','subtype2'), t.CB_STIX_XML_101]}, #Required/optional depending on Status Type. See spec for details
-                message = None# Optional
+                message_id='SM09', #Required
+                in_response_to=tm11.generate_message_id(), #Required, should be the ID of the message that this is in response to
+                status_type=tm11.ST_UNSUPPORTED_CONTENT_BINDING, #Required
+                status_detail={'SUPPORTED_CONTENT': ['%s>%s,%s' % (tm11.ContentBinding, 'subtype1','subtype2'), t.CB_STIX_XML_101]}, #Required/optional depending on Status Type. See spec for details
+                message=None# Optional
         )
         round_trip_message(sm09)
 
@@ -260,22 +260,22 @@ class DiscoveryResponseTests(unittest.TestCase):
     def setUp(self):
         #Create query information to use in the ServiceInstances
         tei_01 = tdq.DefaultQueryInfo.TargetingExpressionInfo(
-                    targeting_expression_id = t.CB_STIX_XML_10, #Required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
+                    targeting_expression_id=t.CB_STIX_XML_10, #Required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
                     preferred_scope=[], #At least one of Preferred/Allowed must be present. Indicates Preferred and allowed search scope.
                     allowed_scope=['**'])#This example has no preferred scope, and allows any scope
 
         tei_02 = tdq.DefaultQueryInfo.TargetingExpressionInfo(
-                    targeting_expression_id = t.CB_STIX_XML_11,  #required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
+                    targeting_expression_id=t.CB_STIX_XML_11,  #required. Indicates a supported targeting vocabulary (in this case STIX 1.1)
                     preferred_scope=['STIX_Package/Indicators/Indicator/**'], #At least one of Preferred/Allowed must be present. Indicates Preferred and allowed search scope.
                     allowed_scope=[])#This example prefers the Indicator scope and allows no other scope
 
         tdq1 = tdq.DefaultQueryInfo(
-                    targeting_expression_infos = [tei_01, tei_02], #Required, 1-n. Indicates what targeting expressions are supported
-                    capability_modules = [tdq.CM_CORE])#Required, 1-n. Indicates which capability modules can be used.
+                    targeting_expression_infos=[tei_01, tei_02], #Required, 1-n. Indicates what targeting expressions are supported
+                    capability_modules=[tdq.CM_CORE])#Required, 1-n. Indicates which capability modules can be used.
 
         tdq2 = tdq.DefaultQueryInfo(
-                    targeting_expression_infos = [tei_02], #Required, 1-n. Indicates what targeting expressions are supported
-                    capability_modules = [tdq.CM_REGEX])#Required, 1-n. Indicates which capability modules can be used.
+                    targeting_expression_infos=[tei_02], #Required, 1-n. Indicates what targeting expressions are supported
+                    capability_modules=[tdq.CM_REGEX])#Required, 1-n. Indicates which capability modules can be used.
 
         #Create ServiceInstances to use in tests
         self.si1 = tm11.ServiceInstance(
@@ -304,7 +304,7 @@ class DiscoveryResponseTests(unittest.TestCase):
                 protocol_binding=t.VID_TAXII_HTTP_10,  # Required
                 service_address='http://example.com/inbox/',  # Required
                 message_bindings=[t.VID_TAXII_XML_11],  # Required, must have at least one value in the list
-                inbox_service_accepted_content = [tm11.ContentBinding(t.CB_STIX_XML_11), 
+                inbox_service_accepted_content=[tm11.ContentBinding(t.CB_STIX_XML_11), 
                                                 tm11.ContentBinding(t.CB_STIX_XML_101), 
                                                 tm11.ContentBinding(t.CB_STIX_XML_10)],#Optional. Defaults to "accepts all content"
                 available=False,  # Optional - defaults to None, which means 'Unknown'
@@ -384,7 +384,7 @@ class CollectionInformationRequestTests(unittest.TestCase):
 
     def test_collection_information_request_01(self):
         cir01 = tm11.CollectionInformationRequest(
-                message_id = 'CIReq01'#Required
+                message_id='CIReq01'#Required
                 )
         round_trip_message(cir01)
 
@@ -400,102 +400,102 @@ class CollectionInformationResponseTests(unittest.TestCase):
         #Instantiate Poll Services
         poll_service1 = tm11.PollingServiceInstance(
                 poll_protocol=t.VID_TAXII_HTTPS_10,#Required
-                poll_address = 'https://example.com/TheGreatestPollService',#Required
+                poll_address='https://example.com/TheGreatestPollService',#Required
                 poll_message_bindings=[t.VID_TAXII_XML_11])#Required, at least one item must be present in the list
 
         poll_service2 = tm11.PollingServiceInstance(
                 poll_protocol=t.VID_TAXII_HTTP_10,#Required
-                poll_address = 'http://example.com/TheOtherPollService',#Required
+                poll_address='http://example.com/TheOtherPollService',#Required
                 poll_message_bindings=[t.VID_TAXII_XML_11])#Required, at least one item must be present in the list
 
         #Instantiate Subscription Methods
         subs_method1 = tm11.SubscriptionMethod(
-                subscription_protocol = t.VID_TAXII_HTTPS_10, #Required
-                subscription_address = 'https://example.com/TheSubscriptionService/',#Required
-                subscription_message_bindings = [t.VID_TAXII_XML_11])#Required - at least one item must be present in the list
+                subscription_protocol=t.VID_TAXII_HTTPS_10, #Required
+                subscription_address='https://example.com/TheSubscriptionService/',#Required
+                subscription_message_bindings=[t.VID_TAXII_XML_11])#Required - at least one item must be present in the list
 
         subs_method2 = tm11.SubscriptionMethod(
-                subscription_protocol = t.VID_TAXII_HTTP_10, #Required
-                subscription_address = 'http://example.com/TheSubscriptionService/',#Required
-                subscription_message_bindings = [t.VID_TAXII_XML_11])#Required - at least one item must be present in the list
+                subscription_protocol=t.VID_TAXII_HTTP_10, #Required
+                subscription_address='http://example.com/TheSubscriptionService/',#Required
+                subscription_message_bindings=[t.VID_TAXII_XML_11])#Required - at least one item must be present in the list
 
         #Instantiate Inbox Services
         inbox_service1 = tm11.ReceivingInboxService(
-                inbox_protocol = t.VID_TAXII_HTTPS_10,#required
-                inbox_address = 'https://example.com/inbox/',#Required
-                inbox_message_bindings = [t.VID_TAXII_XML_11],#Required
-                supported_contents = None)#Optional - None means "all are supported"
+                inbox_protocol=t.VID_TAXII_HTTPS_10,#required
+                inbox_address='https://example.com/inbox/',#Required
+                inbox_message_bindings=[t.VID_TAXII_XML_11],#Required
+                supported_contents=None)#Optional - None means "all are supported"
 
         inbox_service2 = tm11.ReceivingInboxService(
-                inbox_protocol = t.VID_TAXII_HTTPS_10,#required
-                inbox_address = 'https://example.com/inbox/',#Required
-                inbox_message_bindings = [t.VID_TAXII_XML_11],#Required
-                supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['exmaple1','example2'])])#Optional - None means "all are supported"
+                inbox_protocol=t.VID_TAXII_HTTPS_10,#required
+                inbox_address='https://example.com/inbox/',#Required
+                inbox_message_bindings=[t.VID_TAXII_XML_11],#Required
+                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_11, subtype_ids=['exmaple1','example2'])])#Optional - None means "all are supported"
 
         #Instantiate collections
         self.collection1 = tm11.CollectionInformation(
-                collection_name = 'collection1',#Required
-                collection_type = tm11.CT_DATA_FEED,#Optional. Defaults to 'Data Feed'
-                available = False, #Optional. Defaults to None, which means "unknown"
-                collection_description = 'This is a collection', #Required
-                collection_volume = 4,#Optional - indicates typical number of messages per day
-                supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_101)],#Optional, absence indicates all content bindings
-                push_methods = [push_method1],#Optional - absence indicates no push methods
-                polling_service_instances = [poll_service1, poll_service2],#Optional - absence indicates no polling services
-                subscription_methods = [subs_method1, subs_method2],#optional - absence means no subscription services
-                receiving_inbox_services = [inbox_service1, inbox_service2])#Optional - absence indicates no receiving inbox services
+                collection_name='collection1',#Required
+                collection_type=tm11.CT_DATA_FEED,#Optional. Defaults to 'Data Feed'
+                available=False, #Optional. Defaults to None, which means "unknown"
+                collection_description='This is a collection', #Required
+                collection_volume=4,#Optional - indicates typical number of messages per day
+                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101)],#Optional, absence indicates all content bindings
+                push_methods=[push_method1],#Optional - absence indicates no push methods
+                polling_service_instances=[poll_service1, poll_service2],#Optional - absence indicates no polling services
+                subscription_methods=[subs_method1, subs_method2],#optional - absence means no subscription services
+                receiving_inbox_services=[inbox_service1, inbox_service2])#Optional - absence indicates no receiving inbox services
 
         self.collection2 = tm11.CollectionInformation(
-                collection_name = 'collection2', #Required
-                collection_type = tm11.CT_DATA_SET,#Optional. Defaults to 'Data Feed'
-                collection_description = 'Warrgghghglble.')#Required
+                collection_name='collection2', #Required
+                collection_type=tm11.CT_DATA_SET,#Optional. Defaults to 'Data Feed'
+                collection_description='Warrgghghglble.')#Required
 
         self.collection3 = tm11.CollectionInformation(
-                collection_name = 'collection3', #Required
-                collection_description = 'You must pay all the dollars to have this information.',#Required
-                supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_10), tm11.ContentBinding(t.CB_STIX_XML_11)],#Optional
-                polling_service_instances = [poll_service2],#Optional - absence indicates no polling services
-                subscription_methods = [subs_method2], #optional - absence means no subscription services
-                receiving_inbox_services = [inbox_service2])#Optional - absence indicates no receiving inbox services
+                collection_name='collection3', #Required
+                collection_description='You must pay all the dollars to have this information.',#Required
+                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_10), tm11.ContentBinding(t.CB_STIX_XML_11)],#Optional
+                polling_service_instances=[poll_service2],#Optional - absence indicates no polling services
+                subscription_methods=[subs_method2], #optional - absence means no subscription services
+                receiving_inbox_services=[inbox_service2])#Optional - absence indicates no receiving inbox services
 
         self.collection4 = tm11.CollectionInformation(
-                collection_name = 'collection4', #Required
-                collection_description = 'So improve information. Much amaze.',#Required
-                supported_contents = [tm11.ContentBinding(t.CB_STIX_XML_101, subtype_ids=['ex1','ex2','ex3'])],#Optional
-                receiving_inbox_services = [inbox_service1, inbox_service2])#Optional - absence indicates no receiving inbox services
+                collection_name='collection4', #Required
+                collection_description='So improve information. Much amaze.',#Required
+                supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101, subtype_ids=['ex1','ex2','ex3'])],#Optional
+                receiving_inbox_services=[inbox_service1, inbox_service2])#Optional - absence indicates no receiving inbox services
 
     def test_collection_information_response_01(self):
         collection_response1 = tm11.CollectionInformationResponse(
-                message_id = 'CIR01',#Required
-                in_response_to = '0',#Required - should be the ID of the message tha this message is a response to
-                collection_informations = [self.collection1])#Optional - absence means "no collections"
+                message_id='CIR01',#Required
+                in_response_to='0',#Required - should be the ID of the message tha this message is a response to
+                collection_informations=[self.collection1])#Optional - absence means "no collections"
         round_trip_message(collection_response1)
 
     def test_collection_information_response_02(self):
         collection_response2 = tm11.CollectionInformationResponse(
-                message_id = 'CIR02',#Required
-                in_response_to = '0',#Required - should be the ID of the message tha this message is a response to
-                collection_informations = [self.collection1, self.collection2, self.collection3, self.collection4])#Optional - absence means "no collections"
+                message_id='CIR02',#Required
+                in_response_to='0',#Required - should be the ID of the message tha this message is a response to
+                collection_informations=[self.collection1, self.collection2, self.collection3, self.collection4])#Optional - absence means "no collections"
         round_trip_message(collection_response2)
 
     def test_collection_information_response_03(self):
         collection_response3 = tm11.CollectionInformationResponse(
-                message_id = 'CIR03',#Required
-                in_response_to = '0')#Required - should be the ID of the message tha this message is a response to
+                message_id='CIR03',#Required
+                in_response_to='0')#Required - should be the ID of the message tha this message is a response to
         round_trip_message(collection_response3)
 
     def test_collection_information_response_04(self):
         collection_response4 = tm11.CollectionInformationResponse(
-                message_id = 'CIR04',#Required
-                in_response_to = '0',#Required - should be the ID of the message tha this message is a response to
-                collection_informations = [self.collection1, self.collection4])#Optional - absence means "no collections"
+                message_id='CIR04',#Required
+                in_response_to='0',#Required - should be the ID of the message tha this message is a response to
+                collection_informations=[self.collection1, self.collection4])#Optional - absence means "no collections"
         round_trip_message(collection_response4)
 
     def test_collection_information_response_05(self):
         collection_response5 = tm11.CollectionInformationResponse(
-                message_id = 'CIR05',#Required
-                in_response_to = '0',#Required - should be the ID of the message tha this message is a response to
-                collection_informations = [self.collection2, self.collection4])#Optional - absence means "no collections"
+                message_id='CIR05',#Required
+                in_response_to='0',#Required - should be the ID of the message tha this message is a response to
+                collection_informations=[self.collection2, self.collection4])#Optional - absence means "no collections"
         round_trip_message(collection_response5)
 
     def test_collection_information_response_deprecated(self):
@@ -543,44 +543,44 @@ class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
 
     def test_subs_req1(self):
         subs_req1 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq01', #Required
-                action = tm11.ACT_SUBSCRIBE, #Required
-                collection_name = 'collection1', #Required
+                message_id='SubsReq01', #Required
+                action=tm11.ACT_SUBSCRIBE, #Required
+                collection_name='collection1', #Required
                 #subscription_id = None, #Prohibited for action = SUBSCRIBE
-                subscription_parameters = subscription_parameters1,#optional - absence means there are not any subscription parameters
-                push_parameters = push_parameters1)#Optional - absence means push messaging not requested
+                subscription_parameters=subscription_parameters1,#optional - absence means there are not any subscription parameters
+                push_parameters=push_parameters1)#Optional - absence means push messaging not requested
         round_trip_message(subs_req1)
 
     def test_subs_req2(self):
         subscription_parameters2 = tm11.SubscriptionParameters(
-            response_type = tm11.RT_FULL, #Optional, defaults to FULL
+            response_type=tm11.RT_FULL, #Optional, defaults to FULL
             #content_bindings = [tm11.ContentBinding(t.CB_STIX_XML_11)],#Optional. Absence means no restrictions on returned data
-            query = query2)#Optional. Absence means no query
+            query=query2)#Optional. Absence means no query
         subs_req2 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq02',#Required
-                action = tm11.ACT_SUBSCRIBE, #Required
-                collection_name = 'collection2',#Required
+                message_id='SubsReq02',#Required
+                action=tm11.ACT_SUBSCRIBE, #Required
+                collection_name='collection2',#Required
                 #subscription_id = None, #Prohibited for action = SUBSCRIBE
-                subscription_parameters = subscription_parameters2)#optional - absence means there are not any subscription parameters
+                subscription_parameters=subscription_parameters2)#optional - absence means there are not any subscription parameters
                 #delivery_parameters = None)#Optional - absence means push messaging not requested
         round_trip_message(subs_req2)
 
     def test_subs_req3(self):
         subscription_parameters3 = tm11.SubscriptionParameters()#Use all the defaults
         subs_req3 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq03',#Required
-                action = tm11.ACT_SUBSCRIBE, #Required
-                collection_name = 'collection213',#Required
+                message_id='SubsReq03',#Required
+                action=tm11.ACT_SUBSCRIBE, #Required
+                collection_name='collection213',#Required
                 #subscription_id = None, #Prohibited for action = SUBSCRIBE
-                subscription_parameters = subscription_parameters3)#optional - absence means there are not any subscription parameters
+                subscription_parameters=subscription_parameters3)#optional - absence means there are not any subscription parameters
                 #delivery_parameters = None)#Optional - absence means push messaging not requested
         round_trip_message(subs_req3)
 
     def test_subs_req4(self):
         subs_req4 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq04',#Required
-                action = tm11.ACT_SUBSCRIBE, #Required
-                collection_name = 'collection2')#Required
+                message_id='SubsReq04',#Required
+                action=tm11.ACT_SUBSCRIBE, #Required
+                collection_name='collection2')#Required
                 #subscription_id = None, #Prohibited for action = SUBSCRIBE
                 #subscription_parameters = subscription_parameters2,#optional - absence means there are not any subscription parameters
                 #delivery_parameters = None)#Optional - absence means push messaging not requested
@@ -588,37 +588,37 @@ class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
 
     def test_subs_req5(self):
         subs_req5 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq05', #Required
-                action = tm11.ACT_STATUS, #Required
-                collection_name = 'collection2', #Required
-                subscription_id = 'id1') #Optional for ACT_STATUS
+                message_id='SubsReq05', #Required
+                action=tm11.ACT_STATUS, #Required
+                collection_name='collection2', #Required
+                subscription_id='id1') #Optional for ACT_STATUS
                 #subscription_parameters, delivery_parameters prohibited if action != SUBSCRIBE
         round_trip_message(subs_req5)
 
     def test_subs_req6(self):
         subs_req6 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq06', #Required
-                action = tm11.ACT_STATUS, #Required
-                collection_name = 'collection2') #Required
+                message_id='SubsReq06', #Required
+                action=tm11.ACT_STATUS, #Required
+                collection_name='collection2') #Required
                 #subscription_id = 'id1') #Optional for ACT_STATUS
                 #subscription_parameters, delivery_parameters prohibited if action != SUBSCRIBE
         round_trip_message(subs_req6)
 
     def test_subs_req7(self):
         subs_req7 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq07', #Required
-                action = tm11.ACT_PAUSE, #Required
-                collection_name = 'collection2', #Required
-                subscription_id = 'id1') #Optional for ACT_STATUS
+                message_id='SubsReq07', #Required
+                action=tm11.ACT_PAUSE, #Required
+                collection_name='collection2', #Required
+                subscription_id='id1') #Optional for ACT_STATUS
                 #subscription_parameters, delivery_parameters prohibited if action != SUBSCRIBE
         round_trip_message(subs_req7)
 
     def test_subs_req8(self):
         subs_req8 = tm11.ManageCollectionSubscriptionRequest(
-                message_id = 'SubsReq08', #Required
-                action = tm11.ACT_RESUME, #Required
-                collection_name = 'collection2', #Required
-                subscription_id = 'id1') #Optional for ACT_STATUS
+                message_id='SubsReq08', #Required
+                action=tm11.ACT_RESUME, #Required
+                collection_name='collection2', #Required
+                subscription_id='id1') #Optional for ACT_STATUS
                 #subscription_parameters, delivery_parameters prohibited if action != SUBSCRIBE
         round_trip_message(subs_req8)
 
@@ -627,58 +627,58 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
 
     def setUp(self):
         poll_instance1 = tm11.PollInstance(
-                            poll_protocol = t.VID_TAXII_HTTPS_10,
-                            poll_address = 'https://example.com/poll1/',
-                            poll_message_bindings = [t.VID_TAXII_XML_11])
+                            poll_protocol=t.VID_TAXII_HTTPS_10,
+                            poll_address='https://example.com/poll1/',
+                            poll_message_bindings=[t.VID_TAXII_XML_11])
 
         poll_instance2 = tm11.PollInstance(
-                            poll_protocol = t.VID_TAXII_HTTPS_10,
-                            poll_address = 'https://example.com/poll2/',
-                            poll_message_bindings = [t.VID_TAXII_XML_11])
+                            poll_protocol=t.VID_TAXII_HTTPS_10,
+                            poll_address='https://example.com/poll2/',
+                            poll_message_bindings=[t.VID_TAXII_XML_11])
         poll_instance3 = tm11.PollInstance(
-                            poll_protocol = t.VID_TAXII_HTTPS_10,
-                            poll_address = 'https://example.com/poll3/',
-                            poll_message_bindings = [t.VID_TAXII_XML_11])
+                            poll_protocol=t.VID_TAXII_HTTPS_10,
+                            poll_address='https://example.com/poll3/',
+                            poll_message_bindings=[t.VID_TAXII_XML_11])
 
         self.subs1 = tm11.SubscriptionInstance(
-                    status = tm11.SS_ACTIVE,#Optional, defaults to ACTIVE
-                    subscription_id = 'Subs001',#Required
-                    subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
-                    push_parameters = push_parameters1,#Optional - should be an echo of the request
-                    poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
+                    status=tm11.SS_ACTIVE,#Optional, defaults to ACTIVE
+                    subscription_id='Subs001',#Required
+                    subscription_parameters=subscription_parameters1,#Optional - should be an echo of the request
+                    push_parameters=push_parameters1,#Optional - should be an echo of the request
+                    poll_instances=[poll_instance1, poll_instance2, poll_instance3],#Optional
                     )
 
 
 
     def test_subs_resp1(self):
         subs2 = tm11.SubscriptionInstance(
-                    status = tm11.SS_PAUSED,#Optional, defaults to ACTIVE
-                    subscription_id = 'Subs001',#Required
-                    subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
-                    push_parameters = push_parameters1,#Optional - should be an echo of the request
+                    status=tm11.SS_PAUSED,#Optional, defaults to ACTIVE
+                    subscription_id='Subs001',#Required
+                    subscription_parameters=subscription_parameters1,#Optional - should be an echo of the request
+                    push_parameters=push_parameters1,#Optional - should be an echo of the request
                     #poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
                     )
         subs3 = tm11.SubscriptionInstance(
-                    status = tm11.SS_PAUSED,#Optional, defaults to ACTIVE
-                    subscription_id = 'Subs001',#Required
+                    status=tm11.SS_PAUSED,#Optional, defaults to ACTIVE
+                    subscription_id='Subs001',#Required
                     #subscription_parameters = subscription_parameters1,#Optional - should be an echo of the request
                     #push_parameters = delivery_parameters1,#Optional - should be an echo of the request
                     #poll_instances = [poll_instance1, poll_instance2, poll_instance3],#Optional
                     )
         subs_resp1 = tm11.ManageCollectionSubscriptionResponse(
-                message_id = 'SubsResp01',#Required
-                in_response_to = 'xyz', #Required - should be the ID of the message that this is a response to
-                collection_name = 'abc123',#Required
-                message = 'Hullo!', #Optional
-                subscription_instances = [self.subs1, subs2, subs3],#Optional
+                message_id='SubsResp01',#Required
+                in_response_to='xyz', #Required - should be the ID of the message that this is a response to
+                collection_name='abc123',#Required
+                message='Hullo!', #Optional
+                subscription_instances=[self.subs1, subs2, subs3],#Optional
                 )
         round_trip_message(subs_resp1)
 
     def test_subs_resp2(self):
         subs_resp2 = tm11.ManageCollectionSubscriptionResponse(
-                message_id = 'SubsResp02',#Required
-                in_response_to = 'xyz', #Required - should be the ID of the message that this is a response to
-                collection_name = 'abc123',#Required
+                message_id='SubsResp02',#Required
+                in_response_to='xyz', #Required - should be the ID of the message that this is a response to
+                collection_name='abc123',#Required
                 #message = 'Hullo!', #Optional
                 #subscription_instances = [subs1, subs2, subs3],#Optional
                 )
@@ -686,20 +686,20 @@ class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
 
     def test_subs_resp3(self):
         subs_resp3 = tm11.ManageCollectionSubscriptionResponse(
-                message_id = 'SubsResp03',#Required
-                in_response_to = 'xyz', #Required - should be the ID of the message that this is a response to
-                collection_name = 'abc123',#Required
+                message_id='SubsResp03',#Required
+                in_response_to='xyz', #Required - should be the ID of the message that this is a response to
+                collection_name='abc123',#Required
                 #message = 'Hullo!', #Optional
-                subscription_instances = [self.subs1],#Optional
+                subscription_instances=[self.subs1],#Optional
                 )
         round_trip_message(subs_resp3)
 
     def test_subs_resp4(self):
         subs_resp4 = tm11.ManageCollectionSubscriptionResponse(
-                message_id = 'SubsResp04',#Required
-                in_response_to = 'xyz', #Required - should be the ID of the message that this is a response to
-                collection_name = 'abc123',#Required
-                message = 'Hullo!', #Optional
+                message_id='SubsResp04',#Required
+                in_response_to='xyz', #Required - should be the ID of the message that this is a response to
+                collection_name='abc123',#Required
+                message='Hullo!', #Optional
                 #subscription_instances = [subs1, subs2, subs3],#Optional
                 )
         round_trip_message(subs_resp4)
@@ -732,59 +732,59 @@ class PollRequestTests(unittest.TestCase):
 
     def test_poll_req1(self):
         poll_req1 = tm11.PollRequest(
-                message_id = 'PollReq01',#Required
-                collection_name = 'collection100',#Required
-                exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-                inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-                subscription_id = '12345',#Optional - one of this or poll_parameters MUST be present.
-                poll_parameters = None)#Optional - one of this or subscription_id MUST be present
+                message_id='PollReq01',#Required
+                collection_name='collection100',#Required
+                exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+                inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+                subscription_id='12345',#Optional - one of this or poll_parameters MUST be present.
+                poll_parameters=None)#Optional - one of this or subscription_id MUST be present
         round_trip_message(poll_req1)
 
     def test_poll_req2(self):
         poll_req2 = tm11.PollRequest(
-                message_id = 'PollReq02',#Required
-                collection_name = 'collection100',#Required
-                subscription_id = 'Kenneth Coal Collection',#Optional - one of this or poll_parameters MUST be present.
-                poll_parameters = None)#Optional - one of this or subscription_id MUST be present
+                message_id='PollReq02',#Required
+                collection_name='collection100',#Required
+                subscription_id='Kenneth Coal Collection',#Optional - one of this or poll_parameters MUST be present.
+                poll_parameters=None)#Optional - one of this or subscription_id MUST be present
         round_trip_message(poll_req2)
 
     def test_poll_req3(self):
         delivery_parameters1 = tm11.DeliveryParameters(
-            inbox_protocol = t.VID_TAXII_HTTPS_10, #Required
-            inbox_address = 'https://example.com/inboxAddress/',#Required
-            delivery_message_binding = t.VID_TAXII_XML_11)#Required
+            inbox_protocol=t.VID_TAXII_HTTPS_10, #Required
+            inbox_address='https://example.com/inboxAddress/',#Required
+            delivery_message_binding=t.VID_TAXII_XML_11)#Required
 
         poll_params1 = tm11.PollParameters(
-                        allow_asynch = False,#Optional, defaults to False
-                        response_type = tm11.RT_COUNT_ONLY,#Optional, defaults to RT_FULL
-                        content_bindings = [tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],#Optional, defaults to None, which means "all bindings are accepted in response"
-                        query = query1,#Optional - defaults to None
-                        delivery_parameters = delivery_parameters1)#Optional - defaults to None
+                        allow_asynch=False,#Optional, defaults to False
+                        response_type=tm11.RT_COUNT_ONLY,#Optional, defaults to RT_FULL
+                        content_bindings=[tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],#Optional, defaults to None, which means "all bindings are accepted in response"
+                        query=query1,#Optional - defaults to None
+                        delivery_parameters=delivery_parameters1)#Optional - defaults to None
 
         poll_req3 = tm11.PollRequest(
-                message_id = 'PollReq03',#Required
-                collection_name = 'collection100',#Required
-                exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-                inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-                poll_parameters = poll_params1)#Optional - one of this or subscription_id MUST be present
+                message_id='PollReq03',#Required
+                collection_name='collection100',#Required
+                exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+                inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+                poll_parameters=poll_params1)#Optional - one of this or subscription_id MUST be present
         round_trip_message(poll_req3)
 
     def test_poll_req4(self):
         poll_params2 = tm11.PollParameters()
         poll_req4 = tm11.PollRequest(
-                message_id = 'PollReq04',#Required
-                collection_name = 'collection100',#Required
-                inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-                poll_parameters = poll_params2)#Optional - one of this or subscription_id MUST be present
+                message_id='PollReq04',#Required
+                collection_name='collection100',#Required
+                inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+                poll_parameters=poll_params2)#Optional - one of this or subscription_id MUST be present
         round_trip_message(poll_req4)
 
     def test_poll_req5(self):
-        poll_params3 = tm11.PollParameters(query = query1)#Optional - defaults to None)#Optional - defaults to None
+        poll_params3 = tm11.PollParameters(query=query1)#Optional - defaults to None)#Optional - defaults to None
         poll_req5 = tm11.PollRequest(
-                message_id = 'PollReq05',#Required
-                collection_name = 'collection100',#Required
-                exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
-                poll_parameters = poll_params3)#Optional - one of this or subscription_id MUST be present
+                message_id='PollReq05',#Required
+                collection_name='collection100',#Required
+                exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),#Optional for a Data Feed, prohibited for a Data Set
+                poll_parameters=poll_params3)#Optional - one of this or subscription_id MUST be present
         round_trip_message(poll_req5)
 
     def test_poll_req_deprecated(self):
@@ -803,45 +803,45 @@ class PollResponseTests(unittest.TestCase):
 
     def test_poll_resp1(self):
         poll_resp1 = tm11.PollResponse(
-                message_id = 'PollResp1',#Required
-                in_response_to = 'tmp',#Required. Must be the message that this is a response to
-                collection_name = 'blah',#Required
-                more = True, #Optional - defaults to false
-                result_id = '123',#Optional
-                result_part_number = 1,#optional
-                subscription_id = '24',#optional
-                exclusive_begin_timestamp_label = datetime.datetime.now(tzutc()),#Optional for data feeds, prohibited for data sets
-                inclusive_end_timestamp_label = datetime.datetime.now(tzutc()),#required for data feeds, prohibited for data sets
-                record_count = tm11.RecordCount(record_count=22, partial_count=False),
-                message = 'Woooooooo',#optional
-                content_blocks = [])#optional
+                message_id='PollResp1',#Required
+                in_response_to='tmp',#Required. Must be the message that this is a response to
+                collection_name='blah',#Required
+                more=True, #Optional - defaults to false
+                result_id='123',#Optional
+                result_part_number=1,#optional
+                subscription_id='24',#optional
+                exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),#Optional for data feeds, prohibited for data sets
+                inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),#required for data feeds, prohibited for data sets
+                record_count=tm11.RecordCount(record_count=22, partial_count=False),
+                message='Woooooooo',#optional
+                content_blocks=[])#optional
         round_trip_message(poll_resp1)
 
     def test_poll_resp2(self):
         poll_resp2 = tm11.PollResponse(
-                message_id = 'PollResp2',#Required
-                in_response_to = 'tmp',#Required. Must be the message that this is a response to
-                collection_name = 'blah')#Required
+                message_id='PollResp2',#Required
+                in_response_to='tmp',#Required. Must be the message that this is a response to
+                collection_name='blah')#Required
         round_trip_message(poll_resp2)
 
     def test_poll_resp3(self):
         poll_resp3 = tm11.PollResponse(
-                message_id = 'PollResp3',#Required
-                in_response_to = 'tmp',#Required. Must be the message that this is a response to
-                collection_name = 'blah',#Required
-                result_id = '123',#Optional
-                subscription_id = '24',#optional
-                record_count = tm11.RecordCount(record_count=22),
-                content_blocks = [])#optional
+                message_id='PollResp3',#Required
+                in_response_to='tmp',#Required. Must be the message that this is a response to
+                collection_name='blah',#Required
+                result_id='123',#Optional
+                subscription_id='24',#optional
+                record_count=tm11.RecordCount(record_count=22),
+                content_blocks=[])#optional
         round_trip_message(poll_resp3)
 
     def test_poll_resp4(self):
         poll_resp4 = tm11.PollResponse(
-                message_id = 'PollResp4',#Required
-                in_response_to = 'tmp',#Required. Must be the message that this is a response to
-                collection_name = 'blah',#Required
+                message_id='PollResp4',#Required
+                in_response_to='tmp',#Required. Must be the message that this is a response to
+                collection_name='blah',#Required
                 #content_blocks = [cb001, cb002])#optional
-                content_blocks = [])#optional
+                content_blocks=[])#optional
         round_trip_message(poll_resp4)
 
 
@@ -854,17 +854,17 @@ class InboxMessageTests(unittest.TestCase):
                 exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),  # Optional for data feeds, prohibited for data sets
                 inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))  # Optional for data feeds, prohibited for data sets
         inbox1 = tm11.InboxMessage(
-                message_id = 'Inbox1',#Required
-                result_id = '123',#Optional
+                message_id='Inbox1',#Required
+                result_id='123',#Optional
                 destination_collection_names=['collection1','collection2'],#Optional
-                message = 'Hello!', #Optional
-                subscription_information = subs_info1,#Optional
-                record_count = tm11.RecordCount(22, partial_count=True),#Optional
-                content_blocks = [cb001, cb002])
+                message='Hello!', #Optional
+                subscription_information=subs_info1,#Optional
+                record_count=tm11.RecordCount(22, partial_count=True),#Optional
+                content_blocks=[cb001, cb002])
         round_trip_message(inbox1)
 
     def test_inbox2(self):
-        inbox2 = tm11.InboxMessage(message_id = 'Inbox1')#Required
+        inbox2 = tm11.InboxMessage(message_id='Inbox1')#Required
         round_trip_message(inbox2)
 
     def test_inbox3(self):
@@ -873,11 +873,11 @@ class InboxMessageTests(unittest.TestCase):
                 subscription_id='SubsId021') # Required
 
         inbox3 = tm11.InboxMessage(
-                message_id = 'Inbox3',#Required
-                result_id = '123',#Optional
+                message_id='Inbox3',#Required
+                result_id='123',#Optional
                 destination_collection_names=['collection1','collection2'],#Optional
-                subscription_information = subs_info2,#Optional
-                content_blocks = [cb002])
+                subscription_information=subs_info2,#Optional
+                content_blocks=[cb002])
         round_trip_message(inbox3)
 
     def test_inbox_deprecated(self):
@@ -898,10 +898,10 @@ class PollFulfillmentTests(unittest.TestCase):
 
     def test_poll_fulfillment1(self):
         pf1 = tm11.PollFulfillmentRequest(
-                message_id = 'pf1',#required
-                collection_name = '1-800-collection',#required
-                result_id = '123',#required
-                result_part_number = 1)#required
+                message_id='pf1',#required
+                collection_name='1-800-collection',#required
+                result_id='123',#required
+                result_part_number=1)#required
 
         round_trip_message(pf1)
 

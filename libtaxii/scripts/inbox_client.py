@@ -85,7 +85,7 @@ def main():
     if args.subtype is not None:
         cb.subtypes.append(args.subtype)
 
-    inbox_message = tm11.InboxMessage(message_id = tm11.generate_message_id(), content_blocks=[cb])
+    inbox_message = tm11.InboxMessage(message_id=tm11.generate_message_id(), content_blocks=[cb])
     inbox_xml = inbox_message.to_xml(pretty_print=True)
 
     print "Inbox Message: \r\n", inbox_xml
