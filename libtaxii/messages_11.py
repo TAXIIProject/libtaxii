@@ -30,38 +30,38 @@ from .validation import do_check, uri_regex, check_timestamp_label
 
 # TAXII 1.0 Message Types
 
-#:Constant identifying a Status Message
+#: Constant identifying a Status Message
 MSG_STATUS_MESSAGE = tm10.MSG_STATUS_MESSAGE
-#:Constant identifying a Discovery Request Message
+#: Constant identifying a Discovery Request Message
 MSG_DISCOVERY_REQUEST = tm10.MSG_DISCOVERY_REQUEST
-#:Constant identifying a Discovery Response Message
+#: Constant identifying a Discovery Response Message
 MSG_DISCOVERY_RESPONSE = tm10.MSG_DISCOVERY_RESPONSE
-#:Constant identifying a Feed Information Request Message
+#: Constant identifying a Feed Information Request Message
 MSG_FEED_INFORMATION_REQUEST = tm10.MSG_FEED_INFORMATION_REQUEST
-#:Constant identifying a Feed Information Response Message
+#: Constant identifying a Feed Information Response Message
 MSG_FEED_INFORMATION_RESPONSE = tm10.MSG_FEED_INFORMATION_RESPONSE
-#:Constant identifying a Subscription Management Request Message
+#: Constant identifying a Subscription Management Request Message
 MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
-#:Constant identifying a Subscription Management Response Message
+#: Constant identifying a Subscription Management Response Message
 MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
-#:Constant identifying a Poll Request Message
+#: Constant identifying a Poll Request Message
 MSG_POLL_REQUEST = tm10.MSG_POLL_REQUEST
-#:Constant identifying a Poll Response Message
+#: Constant identifying a Poll Response Message
 MSG_POLL_RESPONSE = tm10.MSG_POLL_RESPONSE
-#:Constant identifying a Inbox Message
+#: Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = tm10.MSG_INBOX_MESSAGE
 
 # New Message Types in TAXII 1.1
 
-#:Constant identifying a Status Message
+#: Constant identifying a Status Message
 MSG_POLL_FULFILLMENT_REQUEST = 'Poll_Fulfillment'
-#:Constant identifying a Collection Information Request
+#: Constant identifying a Collection Information Request
 MSG_COLLECTION_INFORMATION_REQUEST = 'Collection_Information_Request'
-#:Constant identifying a Collection Information Response
+#: Constant identifying a Collection Information Response
 MSG_COLLECTION_INFORMATION_RESPONSE = 'Collection_Information_Response'
-#:Constant identifying a Subscription Request
+#: Constant identifying a Subscription Request
 MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#:Constant identifying a Subscription Response
+#: Constant identifying a Subscription Response
 MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
 
 #: Tuple of all TAXII 1.1 Message Types
@@ -199,7 +199,7 @@ ns_map = {
          }
 
 
-#Import helper methods from libtaxii.messages_10 that are still applicable
+# Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
 
 
@@ -225,7 +225,7 @@ def validate_xml(xml_string):
     taxii_schema_doc = etree.parse(schema_file, get_xml_parser())
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
-    #TODO: Additionally, validate the Query stuff
+    # TODO: Additionally, validate the Query stuff
     if not valid:
         return xml_schema.error_log.last_error
     return valid
@@ -348,14 +348,14 @@ def _sanitize_content_binding(binding):
     2. string
     and returns a ContentBinding object.
 
-    This supports function calls where a string or ContentBinding can be 
+    This supports function calls where a string or ContentBinding can be
     used to specify a content binding.
     """
-    if isinstance(binding, ContentBinding):#It's already good to go
+    if isinstance(binding, ContentBinding):  # It's already good to go
         return binding
-    elif isinstance(binding, basestring):#Convert it to a ContentBinding
+    elif isinstance(binding, basestring):  # Convert it to a ContentBinding
         return ContentBinding.from_string(binding)
-    else:#Don't know what to do with it.
+    else:  # Don't know what to do with it.
         raise ValueError('Type cannot be converted to ContentBinding: %s' % binding.__class__.__name__)
 
 
@@ -369,14 +369,14 @@ def _sanitize_content_bindings(binding_list):
 
 class UnsupportedQueryException(Exception):
 
-     def __init__(self, value):
-         self.value = value
+    def __init__(self, value):
+        self.value = value
 
-     def __str__(self):
-         return repr(self.value)
+    def __str__(self):
+        return repr(self.value)
 
 
-#Start with the 'default' deserializer
+# Start with the 'default' deserializer
 query_deserializers = {}
 
 
@@ -393,14 +393,14 @@ def register_query_format(format_id, query, query_info, schema=None):
 
 
 def get_deserializer(format_id, type):
-    do_check(type, 'type', value_tuple=('query','query_info'))
+    do_check(type, 'type', value_tuple=('query', 'query_info'))
 
     if format_id not in query_deserializers:
         raise UnsupportedQueryException('A deserializer for the query format \'%s\' is not registered.' % format_id)
 
     return query_deserializers[format_id][type]
 
-#TODO: Consider using this
+# TODO: Consider using this
 # def _create_element(name, namespace=ns_map['taxii_11'], value=None, attrs=None, parent=None):
     # """
     # Helper method for appending a new element to an existing element.
@@ -460,7 +460,7 @@ class SupportedQuery(TAXIIBase):
         self._format_id = value
 
     def to_etree(self):
-        q = etree.Element('{%s}Supported_Query' % ns_map['taxii_11'], nsmap = ns_map)
+        q = etree.Element('{%s}Supported_Query' % ns_map['taxii_11'], nsmap=ns_map)
         q.attrib['format_id'] = self.format_id
         return q
 
@@ -469,7 +469,7 @@ class SupportedQuery(TAXIIBase):
 
     @staticmethod
     def from_etree(etree_xml):
-        format_id = etree_xml.xpath('./@format_id', ns_map = nsmap)[0]
+        format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
         return SupportedQuery(format_id)
 
     @staticmethod
@@ -478,12 +478,12 @@ class SupportedQuery(TAXIIBase):
 
 
 class Query(TAXIIBase):
+    """This class contains an instance of a query.
+
+    It is expected that, generally, messages_11.Query subclasses will be used
+    in place of this class to represent a query.
     """
-    This class contains an instance of a query. It
-    is expected that, generally, messages_11.Query 
-    subclasses will be used in place of this class
-    to represent a query
-    """
+
     def __init__(self, format_id):
         """
         Arguments:
@@ -501,7 +501,7 @@ class Query(TAXIIBase):
         self._format_id = value
 
     def to_etree(self):
-        q = etree.Element('{%s}Query' % ns_map['taxii_11'], nsmap = ns_map)
+        q = etree.Element('{%s}Query' % ns_map['taxii_11'], nsmap=ns_map)
         q.attrib['format_id'] = self.format_id
         return q
 
@@ -510,7 +510,7 @@ class Query(TAXIIBase):
 
     @classmethod
     def from_etree(cls, etree_xml, kwargs):
-        format_id = etree_xml.xpath('./@format_id', ns_map = nsmap)[0]
+        format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
         return cls(format_id, **kwargs)
 
     @classmethod
@@ -518,7 +518,7 @@ class Query(TAXIIBase):
         return cls(d, **kwargs)
 
 
-#A value can be one of:
+# A value can be one of:
 # - a dictionary, where each key is a content_binding_id and each value is a list of subtypes
 #   (This is the default representation)
 # - a "content_binding_id[>subtype]" structure
@@ -540,7 +540,7 @@ class ContentBinding(TAXIIBase):
     def __str__(self):
         s = self.binding_id
         if len(self.subtype_ids) > 0:
-            s = s+ '>' + ','.join(self.subtype_ids)
+            s += '>' + ','.join(self.subtype_ids)
 
         return s
 
@@ -577,10 +577,10 @@ class ContentBinding(TAXIIBase):
         self._subtype_ids = value
 
     def to_etree(self):
-        cb = etree.Element('{%s}Content_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        cb = etree.Element('{%s}Content_Binding' % ns_map['taxii_11'], nsmap=ns_map)
         cb.attrib['binding_id'] = self.binding_id
         for subtype_id in self.subtype_ids:
-            s = etree.SubElement(cb, '{%s}Subtype' % ns_map['taxii_11'], nsmap = ns_map)
+            s = etree.SubElement(cb, '{%s}Subtype' % ns_map['taxii_11'], nsmap=ns_map)
             s.attrib['subtype_id'] = subtype_id
         return cb
 
@@ -635,7 +635,7 @@ class RecordCount(TAXIIBase):
         self._partial_count = value
 
     def to_etree(self):
-        xml = etree.Element('{%s}Record_Count' % ns_map['taxii_11'], nsmap = ns_map)
+        xml = etree.Element('{%s}Record_Count' % ns_map['taxii_11'], nsmap=ns_map)
         xml.text = str(self.record_count)
 
         if self.partial_count is not None:
@@ -666,7 +666,7 @@ class RecordCount(TAXIIBase):
 class _GenericParameters(TAXIIBase):
     name = 'Generic_Parameters'
 
-    def __init__(self, response_type = RT_FULL, content_bindings = None, query = None):
+    def __init__(self, response_type=RT_FULL, content_bindings=None, query=None):
         self.response_type = response_type
         self.content_bindings = content_bindings or []
         self.query = query
@@ -696,14 +696,14 @@ class _GenericParameters(TAXIIBase):
 
     @query.setter
     def query(self, value):
-        #TODO: Can i do more validation?
+        # TODO: Can i do more validation?
         do_check(value, 'query', type=Query, can_be_none=True)
         self._query = value
 
     def to_etree(self):
-        xml = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.name), nsmap = ns_map)
+        xml = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.name), nsmap=ns_map)
         if self.response_type is not None:
-            rt = etree.SubElement(xml, '{%s}Response_Type' % ns_map['taxii_11'], nsmap = ns_map)
+            rt = etree.SubElement(xml, '{%s}Response_Type' % ns_map['taxii_11'], nsmap=ns_map)
             rt.text = self.response_type
 
         for binding in self.content_bindings:
@@ -732,7 +732,7 @@ class _GenericParameters(TAXIIBase):
     @classmethod
     def from_etree(cls, etree_xml, **kwargs):
 
-        response_type = RT_FULL        
+        response_type = RT_FULL
         response_type_set = etree_xml.xpath('./taxii_11:Response_Type', namespaces=ns_map)
         if len(response_type_set) > 0:
             response_type = response_type_set[0].text
@@ -828,7 +828,7 @@ class ContentBlock(TAXIIBase):
 
     @content.setter
     def content(self, value):
-        do_check(value, 'content')#Just check for not None
+        do_check(value, 'content')  # Just check for not None
         self._content, self.content_is_xml = self._stringify_content(value)
 
     @property
@@ -853,28 +853,28 @@ class ContentBlock(TAXIIBase):
         """Always a string or raises an error.
         Returns the string representation and whether the data is XML.
         """
-        #If it's an etree, it's definitely XML
+        # If it's an etree, it's definitely XML
         if isinstance(content, etree._ElementTree):
             return content.getroot(), True
 
         if isinstance(content, etree._Element):
             return content, True
 
-        if hasattr(content, 'read'):#The content is file-like
-            try:#Try to parse as XML
+        if hasattr(content, 'read'):  # The content is file-like
+            try:  # Try to parse as XML
                 xml = etree.parse(content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 return content.read(), False
-        else: # The Content is not file-like
-            try:#Attempt to parse string as XML
+        else:  # The Content is not file-like
+            try:  # Attempt to parse string as XML
                 sio_content = StringIO.StringIO(content)
                 xml = etree.parse(sio_content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
-                if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
+                if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
                     return content, False
-                else:#It's some other datatype that needs casting to string
+                else:  # It's some other datatype that needs casting to string
                     return str(content), False
 
     @property
@@ -986,6 +986,7 @@ class PushParameters(TAXIIBase):
     """
 
     name = 'Push_Parameters'
+
     def __init__(self, inbox_protocol, inbox_address, delivery_message_binding):
         self.inbox_protocol = inbox_protocol
         self.inbox_address = inbox_address
@@ -1151,10 +1152,10 @@ class TAXIIMessage(TAXIIBase):
             root_elt.attrib['in_response_to'] = str(self.in_response_to)
 
         if len(self.extended_headers) > 0:
-            eh = etree.SubElement(root_elt, '{%s}Extended_Headers' % ns_map['taxii_11'], nsmap = ns_map)
+            eh = etree.SubElement(root_elt, '{%s}Extended_Headers' % ns_map['taxii_11'], nsmap=ns_map)
 
             for name, value in self.extended_headers.items():
-                h = etree.SubElement(eh, '{%s}Extended_Header' % ns_map['taxii_11'], nsmap = ns_map)
+                h = etree.SubElement(eh, '{%s}Extended_Header' % ns_map['taxii_11'], nsmap=ns_map)
                 h.attrib['name'] = name
                 h.text = value
         return root_elt
@@ -1187,21 +1188,21 @@ class TAXIIMessage(TAXIIBase):
         first, then parse their specific XML constructs.
         """
 
-        #Get the message type
+        # Get the message type
         message_type = src_etree.tag[55:]
         if message_type != cls.message_type:
             raise ValueError('%s != %s' % (message_type, cls.message_type))
 
-        #Get the message ID
+        # Get the message ID
         message_id = src_etree.xpath('/taxii_11:*/@message_id', namespaces=ns_map)[0]
 
-        #Get in response to, if present
+        # Get in response to, if present
         in_response_to = None
         in_response_tos = src_etree.xpath('/taxii_11:*/@in_response_to', namespaces=ns_map)
         if len(in_response_tos) > 0:
             in_response_to = in_response_tos[0]
 
-        #Get the Extended headers
+        # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii_11:*/taxii_11:Extended_Headers/taxii_11:Extended_Header', namespaces=ns_map)
         extended_headers = {}
         for header in extended_header_list:
@@ -1209,8 +1210,8 @@ class TAXIIMessage(TAXIIBase):
             eh_value = header.text
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id, 
-                   in_response_to, 
+        return cls(message_id,
+                   in_response_to,
                    extended_headers=extended_headers,
                    **kwargs)
 
@@ -1229,9 +1230,9 @@ class TAXIIMessage(TAXIIBase):
         extended_headers = d['extended_headers']
         in_response_to = d.get('in_response_to')
 
-        return cls(message_id, 
-                   in_response_to, 
-                   extended_headers=extended_headers, 
+        return cls(message_id,
+                   in_response_to,
+                   extended_headers=extended_headers,
                    **kwargs)
 
     @classmethod
@@ -1361,9 +1362,9 @@ class ServiceInstance(TAXIIBase):
     """
 
     def __init__(self, service_type, services_version, protocol_binding,
-                    service_address, message_bindings,
-                    inbox_service_accepted_content=None, available=None,
-                    message=None, supported_query=None):
+                 service_address, message_bindings,
+                 inbox_service_accepted_content=None, available=None,
+                 message=None, supported_query=None):
         self.service_type = service_type
         self.services_version = services_version
         self.protocol_binding = protocol_binding
@@ -1460,20 +1461,20 @@ class ServiceInstance(TAXIIBase):
         self._service_type = value
 
     def to_etree(self):
-        si = etree.Element('{%s}Service_Instance' % ns_map['taxii_11'], nsmap = ns_map)
+        si = etree.Element('{%s}Service_Instance' % ns_map['taxii_11'], nsmap=ns_map)
         si.attrib['service_type'] = self.service_type
         si.attrib['service_version'] = self.services_version
         if self.available is not None:
             si.attrib['available'] = str(self.available).lower()
 
-        protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap=ns_map)
         protocol_binding.text = self.protocol_binding
 
-        service_address = etree.SubElement(si, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
+        service_address = etree.SubElement(si, '{%s}Address' % ns_map['taxii_11'], nsmap=ns_map)
         service_address.text = self.service_address
 
         for mb in self.message_bindings:
-            message_binding = etree.SubElement(si, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            message_binding = etree.SubElement(si, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap=ns_map)
             message_binding.text = mb
 
         for sq in self.supported_query:
@@ -1484,7 +1485,7 @@ class ServiceInstance(TAXIIBase):
             si.append(content_binding)
 
         if self.message is not None:
-            message = etree.SubElement(si, '{%s}Message' % ns_map['taxii_11'], nsmap = ns_map)
+            message = etree.SubElement(si, '{%s}Message' % ns_map['taxii_11'], nsmap=ns_map)
             message.text = self.message
 
         return si
@@ -1641,7 +1642,7 @@ class CollectionInformationResponse(TAXIIMessage):
 
 class CollectionInformation(TAXIIBase):
     """
-    The Collection Information component of a TAXII Collection Information 
+    The Collection Information component of a TAXII Collection Information
     Response Message.
 
     Arguments:
@@ -1783,17 +1784,17 @@ class CollectionInformation(TAXIIBase):
         self._collection_type = value
 
     def to_etree(self):
-        c = etree.Element('{%s}Collection' % ns_map['taxii_11'], nsmap = ns_map)
+        c = etree.Element('{%s}Collection' % ns_map['taxii_11'], nsmap=ns_map)
         c.attrib['collection_name'] = self.collection_name
         if self.collection_type is not None:
             c.attrib['collection_type'] = self.collection_type
         if self.available is not None:
             c.attrib['available'] = str(self.available).lower()
-        collection_description = etree.SubElement(c, '{%s}Description' % ns_map['taxii_11'], nsmap = ns_map)
+        collection_description = etree.SubElement(c, '{%s}Description' % ns_map['taxii_11'], nsmap=ns_map)
         collection_description.text = self.collection_description
 
         if self.collection_volume is not None:
-            collection_volume = etree.SubElement(c, '{%s}Collection_Volume' % ns_map['taxii_11'], nsmap = ns_map)
+            collection_volume = etree.SubElement(c, '{%s}Collection_Volume' % ns_map['taxii_11'], nsmap=ns_map)
             collection_volume.text = str(self.collection_volume)
 
         for binding in self.supported_contents:
@@ -1880,7 +1881,6 @@ class CollectionInformation(TAXIIBase):
         for subscription_elt in subscription_method_set:
             kwargs['subscription_methods'].append(SubscriptionMethod.from_etree(subscription_elt))
 
-
         kwargs['receiving_inbox_services'] = []
         receiving_inbox_services_set = etree_xml.xpath('./taxii_11:Receiving_Inbox_Service', namespaces=ns_map)
         for receiving_inbox_service in receiving_inbox_services_set:
@@ -1892,7 +1892,7 @@ class CollectionInformation(TAXIIBase):
     def from_dict(d):
         kwargs = {}
         kwargs['collection_name'] = d['collection_name']
-        kwargs['collection_type'] = d.get('collection_type')            
+        kwargs['collection_type'] = d.get('collection_type')
         kwargs['available'] = d.get('available')
         kwargs['collection_description'] = d['collection_description']
         kwargs['collection_volume'] = d.get('collection_volume', None)
@@ -1962,11 +1962,11 @@ class PushMethod(TAXIIBase):
         self._push_message_bindings = value
 
     def to_etree(self):
-        x = etree.Element('{%s}Push_Method' % ns_map['taxii_11'], nsmap = ns_map)
-        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        x = etree.Element('{%s}Push_Method' % ns_map['taxii_11'], nsmap=ns_map)
+        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap=ns_map)
         proto_bind.text = self.push_protocol
         for binding in self.push_message_bindings:
-            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap=ns_map)
             b.text = binding
         return x
 
@@ -2036,13 +2036,13 @@ class PollingServiceInstance(TAXIIBase):
         self._poll_message_bindings = value
 
     def to_etree(self):
-        x = etree.Element('{%s}Polling_Service' % ns_map['taxii_11'], nsmap = ns_map)
-        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        x = etree.Element('{%s}Polling_Service' % ns_map['taxii_11'], nsmap=ns_map)
+        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap=ns_map)
         proto_bind.text = self.poll_protocol
-        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
+        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap=ns_map)
         address.text = self.poll_address
         for binding in self.poll_message_bindings:
-            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap=ns_map)
             b.text = binding
         return x
 
@@ -2088,7 +2088,7 @@ class SubscriptionMethod(TAXIIBase):
     NAME = 'Subscription_Service'
 
     def __init__(self, subscription_protocol, subscription_address,
-                    subscription_message_bindings):
+                 subscription_message_bindings):
         self.subscription_protocol = subscription_protocol
         self.subscription_address = subscription_address
         self.subscription_message_bindings = subscription_message_bindings
@@ -2117,12 +2117,12 @@ class SubscriptionMethod(TAXIIBase):
 
     def to_etree(self):
         x = etree.Element('{%s}%s' % (ns_map['taxii_11'], self.NAME))
-        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+        proto_bind = etree.SubElement(x, '{%s}Protocol_Binding' % ns_map['taxii_11'], nsmap=ns_map)
         proto_bind.text = self.subscription_protocol
-        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap = ns_map)
+        address = etree.SubElement(x, '{%s}Address' % ns_map['taxii_11'], nsmap=ns_map)
         address.text = self.subscription_address
         for binding in self.subscription_message_bindings:
-            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap = ns_map)
+            b = etree.SubElement(x, '{%s}Message_Binding' % ns_map['taxii_11'], nsmap=ns_map)
             b.text = binding
         return x
 
@@ -2169,7 +2169,7 @@ class ReceivingInboxService(TAXIIBase):
     """
 
     def __init__(self, inbox_protocol, inbox_address,
-                    inbox_message_bindings, supported_contents=None):
+                 inbox_message_bindings, supported_contents=None):
         self.inbox_protocol = inbox_protocol
         self.inbox_address = inbox_address
         self.inbox_message_bindings = inbox_message_bindings
@@ -2216,7 +2216,7 @@ class ReceivingInboxService(TAXIIBase):
         self._supported_contents = value
 
     def to_etree(self):
-        xml = etree.Element('{%s}Receiving_Inbox_Service' % ns_map['taxii_11'], nsmap = ns_map)
+        xml = etree.Element('{%s}Receiving_Inbox_Service' % ns_map['taxii_11'], nsmap=ns_map)
 
         pb = etree.SubElement(xml, '{%s}Protocol_Binding' % ns_map['taxii_11'])
         pb.text = self.inbox_protocol
@@ -2373,17 +2373,17 @@ class PollRequest(TAXIIRequestMessage):
         xml.attrib['collection_name'] = self.collection_name
 
         if self.exclusive_begin_timestamp_label is not None:
-            ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'], nsmap = ns_map)
-            #TODO: Add TZ Info
+            ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'], nsmap=ns_map)
+            # TODO: Add TZ Info
             ebt.text = self.exclusive_begin_timestamp_label.isoformat()
 
         if self.inclusive_end_timestamp_label is not None:
-            iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'], nsmap = ns_map)
-            #TODO: Add TZ Info
+            iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'], nsmap=ns_map)
+            # TODO: Add TZ Info
             iet.text = self.inclusive_end_timestamp_label.isoformat()
 
         if self.subscription_id is not None:
-            si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'], nsmap = ns_map)
+            si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'], nsmap=ns_map)
             si.text = self.subscription_id
 
         if self.poll_parameters is not None:
@@ -2478,7 +2478,7 @@ class PollParameters(_GenericParameters):
     name = 'Poll_Parameters'
 
     def __init__(self, response_type=RT_FULL, content_bindings=None,
-                    query=None, allow_asynch=False, delivery_parameters=None):
+                 query=None, allow_asynch=False, delivery_parameters=None):
         super(PollParameters, self).__init__(response_type, content_bindings, query)
         self.allow_asynch = allow_asynch
         self.delivery_parameters = delivery_parameters
@@ -2529,7 +2529,7 @@ class PollParameters(_GenericParameters):
         if len(allow_asynch_set) > 0:
             poll_parameters.allow_asynch = allow_asynch_set[0] == 'true'
 
-        delivery_parameters_set = etree_xml.xpath('./taxii_11:Delivery_Parameters', namespaces = ns_map)
+        delivery_parameters_set = etree_xml.xpath('./taxii_11:Delivery_Parameters', namespaces=ns_map)
         if len(delivery_parameters_set) > 0:
             poll_parameters.delivery_parameters = DeliveryParameters.from_etree(delivery_parameters_set[0])
 
@@ -2814,38 +2814,38 @@ class PollResponse(TAXIIMessage):
         return msg
 
 
-_StatusDetail = collections.namedtuple('_StatusDetail', ['name','required','type','multiple'])
+_StatusDetail = collections.namedtuple('_StatusDetail', ['name', 'required', 'type', 'multiple'])
 _DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
-_IRP_MaxPartNumber =         _StatusDetail('MAX_PART_NUMBER',        True,  int,        False)
-_NF_Item =                   _StatusDetail('ITEM',                   False, str, False)
-_P_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         True,  int, False)
-_P_ResultId =                _StatusDetail('RESULT_ID',              True,  str, False)
-_P_WillPush =                _StatusDetail('WILL_PUSH',              True,  bool, False)
-_R_EstimatedWait =           _StatusDetail('ESTIMATED_WAIT',         False, int, False)
-_UM_SupportedBinding =       _StatusDetail('SUPPORTED_BINDING',      False, str, True)
-_UC_SupportedContent =       _StatusDetail('SUPPORTED_CONTENT',      False, ContentBinding, True)
-_UP_SupportedProtocol =      _StatusDetail('SUPPORTED_PROTOCOL',     False, str, True)
-_UQ_SupportedQuery =         _StatusDetail('SUPPORTED_QUERY',        False, str, True)
+_IRP_MaxPartNumber = _StatusDetail('MAX_PART_NUMBER', True, int, False)
+_NF_Item = _StatusDetail('ITEM', False, str, False)
+_P_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', True, int, False)
+_P_ResultId = _StatusDetail('RESULT_ID', True, str, False)
+_P_WillPush = _StatusDetail('WILL_PUSH', True, bool, False)
+_R_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', False, int, False)
+_UM_SupportedBinding = _StatusDetail('SUPPORTED_BINDING', False, str, True)
+_UC_SupportedContent = _StatusDetail('SUPPORTED_CONTENT', False, ContentBinding, True)
+_UP_SupportedProtocol = _StatusDetail('SUPPORTED_PROTOCOL', False, str, True)
+_UQ_SupportedQuery = _StatusDetail('SUPPORTED_QUERY', False, str, True)
 
 
 status_details = {
-    ST_ASYNCHRONOUS_POLL_ERROR: {}, 
-    ST_BAD_MESSAGE: {}, 
-    ST_DENIED: {}, 
-    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination}, 
-    ST_FAILURE: {}, 
-    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber}, 
-    ST_NETWORK_ERROR: {}, 
-    ST_NOT_FOUND: {'ITEM': _NF_Item}, 
-    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait, 
-                 'RESULT_ID': _P_ResultId, 
-                 'WILL_PUSH': _P_WillPush}, 
-    ST_POLLING_UNSUPPORTED: {}, 
-    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait}, 
+    ST_ASYNCHRONOUS_POLL_ERROR: {},
+    ST_BAD_MESSAGE: {},
+    ST_DENIED: {},
+    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination},
+    ST_FAILURE: {},
+    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber},
+    ST_NETWORK_ERROR: {},
+    ST_NOT_FOUND: {'ITEM': _NF_Item},
+    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait,
+                 'RESULT_ID': _P_ResultId,
+                 'WILL_PUSH': _P_WillPush},
+    ST_POLLING_UNSUPPORTED: {},
+    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait},
     ST_SUCCESS: {},
-    ST_UNAUTHORIZED: {}, 
-    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding}, 
-    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent}, 
+    ST_UNAUTHORIZED: {},
+    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding},
+    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent},
     ST_UNSUPPORTED_PROTOCOL: {'SUPPORTED_PROTOCOL': _UP_SupportedProtocol},
     ST_UNSUPPORTED_QUERY: {'SUPPORTED_QUERY': _UQ_SupportedQuery}
 }
@@ -2945,24 +2945,24 @@ class StatusMessage(TAXIIMessage):
         kwargs['status_detail'] = {}
         detail_set = etree_xml.xpath('./taxii_11:Status_Detail/taxii_11:Detail', namespaces=ns_map)
         for detail in detail_set:
-            #TODO: This seems kind of hacky and should probably be improved
+            # TODO: This seems kind of hacky and should probably be improved
             name = detail.attrib['name']
 
-            if status_type in status_details and name in status_details[status_type]:#We have information for this status detail
+            if status_type in status_details and name in status_details[status_type]:  # We have information for this status detail
                 detail_info = status_details[status_type][name]
-            else:#We don't have information, so make something up
+            else:  # We don't have information, so make something up
                 detail_info = _StatusDetail('PlaceholderDetail', False, str, True)
 
             if detail_info.type == bool:
                 v = detail.text.lower() == 'true'
             else:
                 v = detail_info.type(detail.text)
-            if detail_info.multiple:#There can be multiple instances of this item
+            if detail_info.multiple:  # There can be multiple instances of this item
                 if name not in kwargs['status_detail']:
                     kwargs['status_detail'][name] = v
-                else: #It already exists
+                else:  # It already exists
                     if not isinstance(kwargs['status_detail'], list):
-                        kwargs['status_detail'][name] = [kwargs['status_detail'][name]]#Make it a list
+                        kwargs['status_detail'][name] = [kwargs['status_detail'][name]]  # Make it a list
                     kwargs['status_detail'][name].append(v)
             else:
                 kwargs['status_detail'][name] = v
@@ -3021,7 +3021,6 @@ class InboxMessage(TAXIIMessage):
         self.subscription_information = subscription_information
         self.record_count = record_count
         self.content_blocks = content_blocks or []
-
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -3250,11 +3249,11 @@ class SubscriptionInformation(TAXIIBase):
         xml.attrib['collection_name'] = self.collection_name
         si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
         si.text = self.subscription_id
-        
+
         if self.exclusive_begin_timestamp_label is not None:
             ebtl = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii_11'])
             ebtl.text = self.exclusive_begin_timestamp_label.isoformat()
-        
+
         if self.inclusive_end_timestamp_label is not None:
             ietl = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii_11'])
             ietl.text = self.inclusive_end_timestamp_label.isoformat()
@@ -3582,8 +3581,8 @@ class SubscriptionInstance(TAXIIBase):
     """
 
     def __init__(self, subscription_id, status=SS_ACTIVE,
-                    subscription_parameters=None, push_parameters=None,
-                    poll_instances=None):
+                 subscription_parameters=None, push_parameters=None,
+                 poll_instances=None):
         self.subscription_id = subscription_id
         self.status = status
         self.subscription_parameters = subscription_parameters
@@ -3640,7 +3639,7 @@ class SubscriptionInstance(TAXIIBase):
         self._poll_instances = value
 
     def to_etree(self):
-        si = etree.Element('{%s}Subscription' % ns_map['taxii_11'], nsmap = ns_map)
+        si = etree.Element('{%s}Subscription' % ns_map['taxii_11'], nsmap=ns_map)
         if self.status is not None:
             si.attrib['status'] = self.status
 
@@ -3684,20 +3683,20 @@ class SubscriptionInstance(TAXIIBase):
         if len(status_set) > 0:
             status = status_set[0]
 
-        subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces = ns_map)[0].text
+        subscription_id = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)[0].text
 
         subscription_parameters = None
-        subscription_parameters_set = etree_xml.xpath('./taxii_11:Subscription_Parameters', namespaces = ns_map)
+        subscription_parameters_set = etree_xml.xpath('./taxii_11:Subscription_Parameters', namespaces=ns_map)
         if len(subscription_parameters_set) > 0:
             subscription_parameters = SubscriptionParameters.from_etree(subscription_parameters_set[0])
 
         push_parameters = None
-        push_parameters_set = etree_xml.xpath('./taxii_11:Push_Parameters', namespaces = ns_map)
+        push_parameters_set = etree_xml.xpath('./taxii_11:Push_Parameters', namespaces=ns_map)
         if len(push_parameters_set) > 0:
             push_parameters = PushParameters.from_etree(push_parameters_set[0])
 
         poll_instances = []
-        poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instance', namespaces = ns_map)
+        poll_instance_set = etree_xml.xpath('./taxii_11:Poll_Instance', namespaces=ns_map)
         for pi in poll_instance_set:
             poll_instances.append(PollInstance.from_etree(pi))
 

@@ -4,6 +4,7 @@
 import argparse
 import libtaxii.clients as tc
 
+
 class ProxyAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         """
@@ -12,8 +13,9 @@ class ProxyAction(argparse.Action):
         """
         if option_string == "--proxy" and values == "None":
             values = None
-        
+
         setattr(namespace, self.dest, values)
+
 
 def create_client(args):
     client = tc.HttpClient()
@@ -30,12 +32,13 @@ def create_client(args):
     elif basic:
         client.setAuthType(tc.HttpClient.AUTH_BASIC)
         client.setAuthCredentials({'username': args.username, 'password': args.password})
-    
+
     return client
+
 
 def get_base_parser(parser_description, path="/services/discovery/"):
     """
-    Parser things common to all scripts. Parsers for specific TAXII Services should 
+    Parser things common to all scripts. Parsers for specific TAXII Services should
     add their own arguments.
     """
     parser = argparse.ArgumentParser(description=parser_description)
@@ -47,7 +50,7 @@ def get_base_parser(parser_description, path="/services/discovery/"):
     parser.add_argument("--key", dest="key", default=None, help="The file location of the private key to use. Defaults to None.")
     parser.add_argument("--username", dest="username", default=None, help="The username to authenticate with. Defaults to None.")
     parser.add_argument("--pass", dest="password", default=None, help="The password to authenticate with. Defaults to None.")
-    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default='noproxy', 
+    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default='noproxy',
                         help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
-    
+
     return parser

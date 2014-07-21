@@ -11,6 +11,7 @@ import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
 import libtaxii.scripts as scripts
 
+
 def main():
     parser = scripts.get_base_parser("Poll Fulfillment Client", path="/services/query_example/")
     parser.add_argument("--collection", dest="collection", default="default_queryable", help="Data Collection that this Fulfillment request applies to. Defaults to 'default_queryable'.")

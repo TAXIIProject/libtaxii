@@ -18,23 +18,24 @@ import socket
 import ssl
 import libtaxii as t
 
+
 class HttpClient:
 
-    #Constants for authentication types
+    # Constants for authentication types
     AUTH_NONE = 0  #: Do not offer any authentication credentials to the server
     AUTH_BASIC = 1  #: Offer HTTP Basic authentication credentials to the server
     AUTH_CERT = 2  #: Offer certificate based authentication credentials to the server
     AUTH_CERT_BASIC = 3  #: Offer certificate based auth and HTTP Basic credentials
 
-    #Proxy values
+    # Proxy values
     SYSTEM_PROXY = None
     NO_PROXY = 'noproxy'
 
-    #Proxy Constants
+    # Proxy Constants
     PROXY_HTTP = 'http'
     PROXY_HTTPS = 'https'
 
-    #Header Constants
+    # Header Constants
     HEADER_ACCEPT = 'accept'
     HEADER_CONTENT_TYPE = 'content-type'
     HEADER_X_TAXII_ACCEPT = 'x-taxii-accept'
@@ -48,7 +49,7 @@ class HttpClient:
         self.auth_credentials = {}
         if auth_credentials is not None:
             self.setAuthCredentials(auth_credentials)
-        #These cannot currently be set in the constructor
+        # These cannot currently be set in the constructor
         self.proxy_type = None
         self.proxy_string = None
         self.verify_server = False
@@ -59,7 +60,7 @@ class HttpClient:
 
         :param string auth_type: Must be one of :attr:`AUTH_NONE`, :attr:`AUTH_BASIC`, or :attr:`AUTH_CERT`
         """
-        #If this isn't a change, don't do anything
+        # If this isn't a change, don't do anything
         if self.auth_type == auth_type:
             return
 
@@ -76,7 +77,7 @@ class HttpClient:
 
     def setVerifyServer(self, verify_server=False, ca_file=None):
         """
-        Tell libtaxii whether to verify the server's ssl certificate 
+        Tell libtaxii whether to verify the server's ssl certificate
         using the provided ca_file.
 
         :param bool verify_server: Flag indicating whether or not libtaxii should verify the server.
@@ -84,8 +85,8 @@ class HttpClient:
         if verify_server and ca_file is None:
             raise ValueError('If verify_server is True, ca_file must not be None.')
 
-        self.verify_server=verify_server
-        self.ca_file=ca_file
+        self.verify_server = verify_server
+        self.ca_file = ca_file
 
     @property
     def basic_auth_header(self):
@@ -142,7 +143,7 @@ class HttpClient:
         self.auth_credentials = auth_credentials_dict
 
     def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
-        """ **DEPRECATED.** May be removed in the next version of `libtaxii`. 
+        """ **DEPRECATED.** May be removed in the next version of `libtaxii`.
             Use :func:`callTaxiiService2` instead.
 
             Call a TAXII service.
@@ -178,7 +179,7 @@ class HttpClient:
             header_dict['X-TAXII-Protocol'] = t.VID_TAXII_HTTP_10
             if self.auth_type == HttpClient.AUTH_NONE:
                 conn = httplib.HTTPConnection(host, port)
-            #TODO: Consider deleting because this is a terrible idea
+            # TODO: Consider deleting because this is a terrible idea
             elif self.auth_type == HttpClient.AUTH_BASIC:  # Sending credentials in cleartext.. tsk tsk
                 header_dict['Authorization'] = self.basic_auth_header
                 conn = httplib.HTTPConnection(host, port)
@@ -211,7 +212,6 @@ class HttpClient:
             for k, v in headers.iteritems():
                 header_dict[k.lower()] = v
 
-
         header_dict['User-Agent'] = 'libtaxii.httpclient'
         header_dict[HttpClient.HEADER_X_TAXII_CONTENT_TYPE] = message_binding
 
@@ -219,14 +219,14 @@ class HttpClient:
                             t.VID_TAXII_XML_11: 'application/xml',
                             t.VID_CERT_EU_JSON_10: 'application/json'}
 
-        if content_type is not None:#Set the content type to the user-provided value
+        if content_type is not None:  # Set the content type to the user-provided value
             header_dict[HttpClient.HEADER_CONTENT_TYPE] = content_type
-        else:#If the user did not provide a value, attempt to find a known value
+        else:  # If the user did not provide a value, attempt to find a known value
             if message_binding not in content_type_map:
                 raise ValueError("content_type not specified, and the message_binding is unrecognized")
             header_dict[HttpClient.HEADER_CONTENT_TYPE] = content_type_map[message_binding]
 
-        #States of Accept and X-TAXII-Accept headers:
+        # States of Accept and X-TAXII-Accept headers:
         #
         # 1. Accept and X-TAXII-Accept headers both set.
         #    - Do nothing. Assume user knows what they are doing
@@ -235,17 +235,17 @@ class HttpClient:
         #    - Do nothing. Assume user knows what they are doing
         #
         # 3. Accept header not set and X-TAXII-Accept header set
-        #    - Do nothing. Bad practice, but not invalid. 
+        #    - Do nothing. Bad practice, but not invalid.
         #      Assume user knows what they are doing.
         #
         # 4. Accept header not set and X-TAXII-Accept header not set
-        #    - User hasn't specified anything. In this case, default behavior is: 
+        #    - User hasn't specified anything. In this case, default behavior is:
         #      Accept = Content-Type and
         #      X-TAXII-Accept = X-TAXII-Content-Type.
         #      This means that the client will only accept messages
         #      in the same format that was sent.
         #
-        # 5. Users of libtaxii that wish to accept everything should set the 
+        # 5. Users of libtaxii that wish to accept everything should set the
         #    Accept header to '*/*'.
 
         accept_set = header_dict.get(HttpClient.HEADER_ACCEPT) is not None
@@ -255,12 +255,12 @@ class HttpClient:
             header_dict[HttpClient.HEADER_ACCEPT] = header_dict[HttpClient.HEADER_CONTENT_TYPE]
             header_dict[HttpClient.HEADER_X_TAXII_ACCEPT] = header_dict[HttpClient.HEADER_X_TAXII_CONTENT_TYPE]
 
-        #If the X-TAXII-Services header is not set by the user,
-        #Attempt to use the library's default mapping
+        # If the X-TAXII-Services header is not set by the user,
+        # Attempt to use the library's default mapping
         services_map = {t.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_10,
                         t.VID_TAXII_XML_11: t.VID_TAXII_SERVICES_11,
                         t.VID_CERT_EU_JSON_10: t.VID_TAXII_SERVICES_10}
-        if header_dict.get(HttpClient.HEADER_X_TAXII_SERVICES) is None:#The X-TAXII-Services header was not set by the user
+        if header_dict.get(HttpClient.HEADER_X_TAXII_SERVICES) is None:  # The X-TAXII-Services header was not set by the user
             if message_binding not in services_map:
                 raise ValueError('x-taxii-services header not specified, and the message_binding is unrecognized')
             header_dict[HttpClient.HEADER_X_TAXII_SERVICES] = services_map[message_binding]
@@ -285,9 +285,9 @@ class HttpClient:
             verify_server = self.verify_server
             ca_file = self.ca_file
 
-            handler_list.append(LibtaxiiHTTPSHandler(key_file=key_file, 
-                                                     cert_file=cert_file, 
-                                                     verify_server=verify_server, 
+            handler_list.append(LibtaxiiHTTPSHandler(key_file=key_file,
+                                                     cert_file=cert_file,
+                                                     verify_server=verify_server,
                                                      ca_certs=ca_file))
 
         else:  # Not using https
@@ -310,7 +310,7 @@ class HttpClient:
 
         if self.proxy_string is not None:
             if self.proxy_string == 'noproxy':
-                #Dont use any proxy, including the system-specified proxy
+                # Dont use any proxy, including the system-specified proxy
                 handler_list.append(urllib2.ProxyHandler({}))
             else:  # Use a specific proxy
                 handler_list.append(urllib2.ProxyHandler({self.proxy_type: self.proxy_string}))
@@ -340,7 +340,8 @@ class HttpClient:
         except urllib2.HTTPError, error:
             return error
 
-#http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
+
+# http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
 class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
     def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
         urllib2.HTTPSHandler.__init__(self)
@@ -353,11 +354,12 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
         return self.do_open(self.getConnection, req)
 
     def getConnection(self, host, timeout=0):
-        return VerifiableHTTPSConnection(host, 
-                                       key_file=self.key_file, 
-                                       cert_file=self.cert_file, 
-                                       verify_server=self.verify_server, 
+        return VerifiableHTTPSConnection(host,
+                                       key_file=self.key_file,
+                                       cert_file=self.cert_file,
+                                       verify_server=self.verify_server,
                                        ca_certs=self.ca_certs)
+
 
 class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
     def __init__(self, key, cert):
@@ -371,6 +373,7 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
     def getConnection(self, host, timeout=0):
         return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
 
+
 class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     """
     The default httplib HTTPSConnection does not verify certificates.
@@ -379,10 +382,10 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     """
 
     def __init__(self, host, port=None, key_file=None, cert_file=None,
-                     strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
-                     source_address=None, verify_server=False, ca_certs=None):
-        httplib.HTTPSConnection.__init__(self, host, port, key_file, 
-                                         cert_file, strict, timeout, 
+                 strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+                 source_address=None, verify_server=False, ca_certs=None):
+        httplib.HTTPSConnection.__init__(self, host, port, key_file,
+                                         cert_file, strict, timeout,
                                          source_address)
 
         if verify_server:
@@ -392,17 +395,17 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
         self.ca_certs = ca_certs
 
     def connect(self):
-        #overrides the version in httplib so that we do 
-        #certificate verification
-        sock = socket.create_connection((self.host, self.port), 
-                                         self.timeout,
-                                         self.source_address)
+        # overrides the version in httplib so that we do
+        # certificate verification
+        sock = socket.create_connection((self.host, self.port),
+                                        self.timeout,
+                                        self.source_address)
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()
 
         self.sock = ssl.wrap_socket(sock,
-                        keyfile=self.key_file,
-                        certfile=self.cert_file,
-                        cert_reqs=self.cert_reqs,
-                        ca_certs=self.ca_certs)
+                                    keyfile=self.key_file,
+                                    certfile=self.cert_file,
+                                    cert_reqs=self.cert_reqs,
+                                    ca_certs=self.ca_certs)

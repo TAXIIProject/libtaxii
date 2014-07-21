@@ -27,25 +27,25 @@ from .validation import do_check, uri_regex, check_timestamp_label
 
 # TAXII 1.0 Message Types
 
-#:Constant identifying a Status Message
+#: Constant identifying a Status Message
 MSG_STATUS_MESSAGE = 'Status_Message'
-#:Constant identifying a Discovery Request Message
+#: Constant identifying a Discovery Request Message
 MSG_DISCOVERY_REQUEST = 'Discovery_Request'
-#:Constant identifying a Discovery Response Message
+#: Constant identifying a Discovery Response Message
 MSG_DISCOVERY_RESPONSE = 'Discovery_Response'
-#:Constant identifying a Feed Information Request Message
+#: Constant identifying a Feed Information Request Message
 MSG_FEED_INFORMATION_REQUEST = 'Feed_Information_Request'
-#:Constant identifying a Feed Information Response Message
+#: Constant identifying a Feed Information Response Message
 MSG_FEED_INFORMATION_RESPONSE = 'Feed_Information_Response'
-#:Constant identifying a Subscription Management Request Message
+#: Constant identifying a Subscription Management Request Message
 MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#:Constant identifying a Subscription Management Response Message
+#: Constant identifying a Subscription Management Response Message
 MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
-#:Constant identifying a Poll Request Message
+#: Constant identifying a Poll Request Message
 MSG_POLL_REQUEST = 'Poll_Request'
-#:Constant identifying a Poll Response Message
+#: Constant identifying a Poll Response Message
 MSG_POLL_RESPONSE = 'Poll_Response'
-#:Constant identifying a Inbox Message
+#: Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = 'Inbox_Message'
 
 #: Tuple of all TAXII 1.0 Message Types
@@ -117,14 +117,12 @@ SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_FEED_MANAGEMENT, SVC_DISCOVERY)
 
 
 ns_map = {
-            'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
-         }
+    'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
+}
 
-### General purpose helper methods ###
+# General purpose helper methods #
 
-_RegexTuple = collections.namedtuple('_RegexTuple', ['regex','title'])
-#URI regex per http://tools.ietf.org/html/rfc3986
-#uri_regex = _RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
+_RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
 _message_id_regex = _RegexTuple("[0-9]+", "Numbers only")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
@@ -285,7 +283,7 @@ def get_message_from_json(json_string):
 
 
 class BaseNonMessage(object):
-    """This class should not be used directly by libtaxii users.  
+    """This class should not be used directly by libtaxii users.
 
     Base class for non-TAXII Message objects"""
 
@@ -339,7 +337,7 @@ class BaseNonMessage(object):
 
     def _checkPropertiesEq(self, other, arglist, debug=False):
         for arg in arglist:
-            #Check to see if the arg is in both objects
+            # Check to see if the arg is in both objects
             in_self = arg in self.__dict__
             in_other = arg in other.__dict__
             if in_self != in_other:
@@ -376,7 +374,7 @@ class DeliveryParameters(BaseNonMessage):
             receive for this TAXII Data Feed. **Optional**
     """
 
-    #TODO: Should the default arguments of these change? I'm not sure these are
+    # TODO: Should the default arguments of these change? I'm not sure these are
     # actually optional
     def __init__(self, inbox_protocol=None, inbox_address=None,
                  delivery_message_binding=None, content_bindings=None):
@@ -403,7 +401,7 @@ class DeliveryParameters(BaseNonMessage):
 
     @inbox_address.setter
     def inbox_address(self, value):
-        #TODO: Can inbox_address be validated?
+        # TODO: Can inbox_address be validated?
         self._inbox_address = value
 
     @property
@@ -529,7 +527,6 @@ class TAXIIMessage(BaseNonMessage):
         else:
             self.extended_headers = extended_headers
 
-
     @property
     def message_id(self):
         return self._message_id
@@ -556,7 +553,6 @@ class TAXIIMessage(BaseNonMessage):
     def extended_headers(self, value):
         do_check(value.keys(), 'extended_headers.keys()', regex_tuple=uri_regex)
         self._extended_headers = value
-
 
     def to_etree(self):
         """Creates the base etree for the TAXII Message.
@@ -625,21 +621,21 @@ class TAXIIMessage(BaseNonMessage):
         first, then parse their specific XML constructs.
         """
 
-        #Get the message type
+        # Get the message type
         message_type = src_etree.tag[53:]
         if message_type != cls.message_type:
             raise ValueError('%s != %s' % (message_type, cls.message_type))
 
-        #Get the message ID
+        # Get the message ID
         message_id = src_etree.xpath('/taxii:*/@message_id', namespaces=ns_map)[0]
 
-        #Get in response to, if present
+        # Get in response to, if present
         in_response_to = None
         in_response_tos = src_etree.xpath('/taxii:*/@in_response_to', namespaces=ns_map)
         if len(in_response_tos) > 0:
             in_response_to = in_response_tos[0]
 
-        #Get the Extended headers
+        # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii:*/taxii:Extended_Headers/taxii:Extended_Header', namespaces=ns_map)
         extended_headers = {}
         for header in extended_header_list:
@@ -647,8 +643,8 @@ class TAXIIMessage(BaseNonMessage):
             eh_value = header.text
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id, 
-                   in_response_to, 
+        return cls(message_id,
+                   in_response_to,
                    extended_headers=extended_headers,
                    **kwargs)
 
@@ -682,9 +678,9 @@ class TAXIIMessage(BaseNonMessage):
         extended_headers = d['extended_headers']
         in_response_to = d.get('in_response_to')
 
-        return cls(message_id, 
-                   in_response_to, 
-                   extended_headers=extended_headers, 
+        return cls(message_id,
+                   in_response_to,
+                   extended_headers=extended_headers,
                    **kwargs)
 
     @classmethod
@@ -733,7 +729,7 @@ class ContentBlock(BaseNonMessage):
 
     @content.setter
     def content(self, value):
-        do_check(value, 'content')#Just check for not None
+        do_check(value, 'content')  # Just check for not None
         self._content, self.content_is_xml = self._stringify_content(value)
 
     @property
@@ -758,28 +754,28 @@ class ContentBlock(BaseNonMessage):
         """Always a string or raises an error.
         Returns the string representation and whether the data is XML.
         """
-        #If it's an etree, it's definitely XML
+        # If it's an etree, it's definitely XML
         if isinstance(content, etree._ElementTree):
             return content.getroot(), True
 
         if isinstance(content, etree._Element):
             return content, True
 
-        if hasattr(content, 'read'):#The content is file-like
-            try:#Try to parse as XML
+        if hasattr(content, 'read'):  # The content is file-like
+            try:  # Try to parse as XML
                 xml = etree.parse(content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 return content.read(), False
-        else: # The Content is not file-like
-            try:#Attempt to parse string as XML
+        else:  # The Content is not file-like
+            try:  # Attempt to parse string as XML
                 sio_content = StringIO.StringIO(content)
                 xml = etree.parse(sio_content, get_xml_parser()).getroot()
                 return xml, True
-            except etree.XMLSyntaxError:#Content is not well-formed XML; just treat as a string
-                if isinstance(content, basestring):#It's a string of some kind, unicode or otherwise
+            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
+                if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
                     return content, False
-                else:#It's some other datatype that needs casting to string
+                else:  # It's some other datatype that needs casting to string
                     return str(content), False
 
     def to_etree(self):
@@ -828,8 +824,8 @@ class ContentBlock(BaseNonMessage):
         if not self._checkPropertiesEq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
             return False
 
-        #TODO: It's pretty hard to check and see if content is equal....
-        #if not self._checkPropertiesEq(other, ['content'], debug):
+        # TODO: It's pretty hard to check and see if content is equal....
+        # if not self._checkPropertiesEq(other, ['content'], debug):
         #    return False
 
         return True
@@ -877,7 +873,7 @@ class ContentBlock(BaseNonMessage):
         return cls.from_dict(json.loads(json_string))
 
 
-#### TAXII Message Classes ####
+# TAXII Message Classes #
 
 class DiscoveryRequest(TAXIIMessage):
     """
@@ -959,7 +955,7 @@ class DiscoveryResponse(TAXIIMessage):
                 print 'service_instance lengths not equal: %s != %s' % (len(self.service_instances), len(other.service_instances))
             return False
 
-        #Who knows if this is a good way to compare the service instances or not...
+        # Who knows if this is a good way to compare the service instances or not...
         for item1, item2 in zip(sorted(self.service_instances), sorted(other.service_instances)):
             if item1 != item2:
                 if debug:
@@ -1018,9 +1014,9 @@ class ServiceInstance(BaseNonMessage):
     """
 
     def __init__(self, service_type, services_version, protocol_binding,
-                    service_address, message_bindings,
-                    inbox_service_accepted_content=None, available=None,
-                    message=None):
+                 service_address, message_bindings,
+                 inbox_service_accepted_content=None, available=None,
+                 message=None):
         self.service_type = service_type
         self.services_version = services_version
         self.protocol_binding = protocol_binding
@@ -1266,7 +1262,7 @@ class FeedInformationResponse(TAXIIMessage):
         if not super(FeedInformationResponse, self).__eq__(other, debug):
             return False
 
-        #Who knows if this is a good way to compare the service instances or not...
+        # Who knows if this is a good way to compare the service instances or not...
         for item1, item2 in zip(sorted(self.feed_informations), sorted(other.feed_informations)):
             if item1 != item2:
                 if debug:
@@ -1329,8 +1325,8 @@ class FeedInformation(BaseNonMessage):
     """
 
     def __init__(self, feed_name, feed_description, supported_contents,
-                    available=None, push_methods=None,
-                    polling_service_instances=None, subscription_methods=None):
+                 available=None, push_methods=None,
+                 polling_service_instances=None, subscription_methods=None):
 
         self.feed_name = feed_name
         self.available = available
@@ -1455,7 +1451,7 @@ class FeedInformation(BaseNonMessage):
                 print 'supported_contents not equal: %s != %s' % (self.supported_contents, other.supported_contents)
             return False
 
-        #TODO: Test equality of: push_methods=[], polling_service_instances=[], subscription_methods=[]
+        # TODO: Test equality of: push_methods=[], polling_service_instances=[], subscription_methods=[]
 
         return True
 
@@ -1697,7 +1693,7 @@ class SubscriptionMethod(BaseNonMessage):
     NAME = 'Subscription_Service'
 
     def __init__(self, subscription_protocol, subscription_address,
-                    subscription_message_bindings):
+                 subscription_message_bindings):
         self.subscription_protocol = subscription_protocol
         self.subscription_address = subscription_address
         self.subscription_message_bindings = subscription_message_bindings
@@ -1863,12 +1859,12 @@ class PollRequest(TAXIIMessage):
 
         if self.exclusive_begin_timestamp_label is not None:
             ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii'])
-            #TODO: Add TZ Info
+            # TODO: Add TZ Info
             ebt.text = self.exclusive_begin_timestamp_label.isoformat()
 
         if self.inclusive_end_timestamp_label is not None:
             iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
-            #TODO: Add TZ Info
+            # TODO: Add TZ Info
             iet.text = self.inclusive_end_timestamp_label.isoformat()
 
         for binding in self.content_bindings:
@@ -2090,7 +2086,7 @@ class PollResponse(TAXIIMessage):
         if not self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'message', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
                 return False
 
-        #TODO: Check content blocks
+        # TODO: Check content blocks
 
         return True
 
@@ -2191,7 +2187,7 @@ class StatusMessage(TAXIIMessage):
         do_check(value, 'status_type')
         self._status_type = value
 
-    #TODO: is it possible to check the status detail?
+    # TODO: is it possible to check the status detail?
 
     def to_etree(self):
         xml = super(StatusMessage, self).to_etree()
@@ -2347,7 +2343,7 @@ class InboxMessage(TAXIIMessage):
                 print 'content block lengths not equal: %s != %s' % (len(self.content_blocks), len(other.content_blocks))
             return False
 
-        #Who knows if this is a good way to compare the content blocks or not...
+        # Who knows if this is a good way to compare the content blocks or not...
         for item1, item2 in zip(sorted(self.content_blocks), sorted(other.content_blocks)):
             if item1 != item2:
                 if debug:
@@ -2409,14 +2405,14 @@ class SubscriptionInformation(BaseNonMessage):
             indicating the end of the time range this Inbox Message covers.
             **Optional**
     """
+
     def __init__(self, feed_name, subscription_id,
-                    inclusive_begin_timestamp_label,
-                    inclusive_end_timestamp_label):
+                 inclusive_begin_timestamp_label,
+                 inclusive_end_timestamp_label):
         self.feed_name = feed_name
         self.subscription_id = subscription_id
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
-
 
     @property
     def feed_name(self):
@@ -2707,7 +2703,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
                 print 'subscription instance lengths not equal'
             return False
 
-        #TODO: Compare the subscription instances
+        # TODO: Compare the subscription instances
 
         return True
 
@@ -2761,7 +2757,7 @@ class SubscriptionInstance(BaseNonMessage):
     """
 
     def __init__(self, subscription_id, delivery_parameters=None,
-                    poll_instances=None):
+                 poll_instances=None):
         self.subscription_id = subscription_id
         if delivery_parameters is None:
             self.delivery_parameters = []
@@ -2830,8 +2826,8 @@ class SubscriptionInstance(BaseNonMessage):
         if not self._checkPropertiesEq(other, ['subscription_id'], debug):
             return False
 
-        #TODO: Compare delivery parameters
-        #TODO: Compare poll instances
+        # TODO: Compare delivery parameters
+        # TODO: Compare poll instances
 
         return True
 

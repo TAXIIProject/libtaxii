@@ -12,17 +12,17 @@ import collections
 import re
 import datetime
 
-### General purpose helper methods ###
+# General purpose helper methods #
 
-RegexTuple = collections.namedtuple('_RegexTuple', ['regex','title'])
-#URI regex per http://tools.ietf.org/html/rfc3986
+RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
+# URI regex per http://tools.ietf.org/html/rfc3986
 uri_regex = RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
-#_message_id_regex = _RegexTuple("[0-9]+", "Numbers only")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
 _type_error = "%s must be of type %s. The incorrect value was of type %s"
 _regex_error = "%s must be a string conforming to %s. The incorrect value was: %s"
 _tuple_error = "%s must be one of %s. The incorrect value was %s"
+
 
 def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be_none=False):
     """
@@ -44,7 +44,7 @@ def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be
         x = 0
         for item in var:
             do_check(item, "%s[%s]" % (varname, x), type, regex_tuple, value_tuple, can_be_none)
-            x = x+1
+            x = x + 1
         return
 
     if var is None and can_be_none:
@@ -66,6 +66,7 @@ def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be
         if var not in value_tuple:
             raise ValueError(_tuple_error % (varname, value_tuple, var))
     return
+
 
 def check_timestamp_label(timestamp_label, varname, can_be_none=False):
     """
