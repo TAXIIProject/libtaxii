@@ -36,21 +36,30 @@ def create_client(args):
     return client
 
 
-def get_base_parser(parser_description, path="/services/discovery/"):
+def get_base_parser(parser_description, 
+                    path="/services/discovery/", 
+                    host="taxiitest.mitre.org",
+                    port="80",
+                    https=False,
+                    cert=None,
+                    key=None,
+                    username=None,
+                    password=None,
+                    proxy='noproxy'):
     """
     Parser things common to all scripts. Parsers for specific TAXII Services should
     add their own arguments.
     """
     parser = argparse.ArgumentParser(description=parser_description)
-    parser.add_argument("--host", dest="host", default="taxiitest.mitre.org", help="Host where the Discovery Service is hosted. Defaults to taxiitest.mitre.org.")
-    parser.add_argument("--port", dest="port", default="80", type=int, help="Port where the Discovery Service is hosted. Defaults to 80.")
+    parser.add_argument("--host", dest="host", default=host, help="Host where the Discovery Service is hosted. Defaults to %s." % host)
+    parser.add_argument("--port", dest="port", default=port, type=int, help="Port where the Discovery Service is hosted. Defaults to %s." % port)
     parser.add_argument("--path", dest="path", default=path, help="Path where the Discovery Service is hosted. Defaults to %s" % path)
-    parser.add_argument("--https", dest="https", default=False, type=bool, help="Whether or not to use HTTPS. Defaults to False")
-    parser.add_argument("--cert", dest="cert", default=None, help="The file location of the certificate to use. Defaults to None.")
-    parser.add_argument("--key", dest="key", default=None, help="The file location of the private key to use. Defaults to None.")
-    parser.add_argument("--username", dest="username", default=None, help="The username to authenticate with. Defaults to None.")
-    parser.add_argument("--pass", dest="password", default=None, help="The password to authenticate with. Defaults to None.")
-    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default='noproxy',
+    parser.add_argument("--https", dest="https", default=https, type=bool, help="Whether or not to use HTTPS. Defaults to %s" % https)
+    parser.add_argument("--cert", dest="cert", default=cert, help="The file location of the certificate to use. Defaults to %s." % cert)
+    parser.add_argument("--key", dest="key", default=key, help="The file location of the private key to use. Defaults to %s." % key)
+    parser.add_argument("--username", dest="username", default=username, help="The username to authenticate with. Defaults to %s." % username)
+    parser.add_argument("--pass", dest="password", default=password, help="The password to authenticate with. Defaults to %s." % password)
+    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default=proxy,
                         help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
 
     return parser
