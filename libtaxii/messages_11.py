@@ -2598,6 +2598,7 @@ class PollResponse(TAXIIMessage):
         self.message = message
         self.content_blocks = content_blocks or []
         self.more = more
+        self.result_part_number = result_part_number
         self.result_id = result_id
         self.record_count = record_count
 
