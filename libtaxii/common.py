@@ -84,6 +84,17 @@ class TAXIIBase(object):
         """
         return etree.tostring(self.to_etree(), pretty_print=pretty_print)
 
+    def to_text(self, line_prepend=''):
+        """Create a nice looking (this is a subjective term!)
+        textual representation of this class. Subclasses should 
+        implement this method.
+        
+        Note that this is just a convenience method for making
+        TAXII Messages nice to read for humans and may change
+        drastically in future versions of libtaxii.
+        """
+        raise NotImplementedError()
+
     @classmethod
     def from_etree(cls, src_etree):
         """Create an instance of this class from an etree.
@@ -113,6 +124,9 @@ class TAXIIBase(object):
 
         etree_xml = etree.parse(xmlstr, get_xml_parser()).getroot()
         return cls.from_etree(etree_xml)
+
+    # Just noting that there is not a from_text() method. I also 
+    # don't think there will ever be one.
 
     def __eq__(self, other, debug=False):
         """

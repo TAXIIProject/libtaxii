@@ -230,8 +230,17 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         d['targeting_expression_infos'] = []
         for expression_info in self.targeting_expression_infos:
             d['targeting_expression_infos'].append(expression_info.to_dict())
+        #TODO: This looks like a serialization bug
         d['capability_modules'] = self.capability_modules
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(DefaultQueryInfo, self).to_text(line_prepend)
+        for expression_info in self.targeting_expression_infos:
+            s += expression_info.to_text(line_prepend + tm11._STD_INDENT)
+        for capability_module in self.capability_modules:
+            s += line_prepend + "  Capability Module: %s\r\n" % capability_module
+        return s
 
     def __hash__(self):
         return hash(str(self.to_dict()))
@@ -321,9 +330,20 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         def to_dict(self):
             d = {}
             d['targeting_expression_id'] = self.targeting_expression_id
+            #TODO: Preferred / Allowed scope look like serialization bugs
             d['preferred_scope'] = self.preferred_scope
             d['allowed_scope'] = self.allowed_scope
             return d
+
+        def to_text(self, line_prepend=''):
+            s = line_prepend + "=== Targeting Expression Info ===\r\n"
+            s += line_prepend + "  Targeting Expression ID: %s\r\n" % self.targeting_expression_id
+            for scope in self.preferred_scope:
+                s += line_prepend + "  Preferred Scope: %s\r\n" % scope
+            for scope in self.allowed_scope:
+                s += line_prepend + "  Allowed Scope: %s\r\n" % scope
+            
+            return s
 
         def __hash__(self):
             return hash(str(self.to_dict()))
@@ -393,6 +413,13 @@ class DefaultQuery(tm11.Query):
         d['targeting_expression_id'] = self.targeting_expression_id
         d['criteria'] = self.criteria.to_dict()
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(DefaultQuery, self).to_text(line_prepend)
+        s += line_prepend + "  Targeting Expression ID: %s\r\n" % self.targeting_expression_id
+        s += self.criteria.to_text(line_prepend)
+        
+        return s
 
     @staticmethod
     def from_etree(etree_xml):
@@ -483,6 +510,16 @@ class DefaultQuery(tm11.Query):
                 d['criterion'].append(criterion.to_dict())
 
             return d
+
+        def to_text(self, line_prepend=''):
+            s = line_prepend + "=== Criteria ===\r\n"
+            s += line_prepend + "  Operator: %s\r\n" % self.operator
+            for criteria in self.criteria:
+                s += criteria.to_text(line_prepend + tm11._STD_INDENT)
+            for criterion in self.criterion:
+                s += criterion.to_text(line_prepend + tm11._STD_INDENT)
+            
+            return s
 
         @staticmethod
         def from_etree(etree_xml):
@@ -584,6 +621,14 @@ class DefaultQuery(tm11.Query):
             d['test'] = self.test.to_dict()
 
             return d
+
+        def to_text(self, line_prepend=''):
+            s = line_prepend + "=== Criterion ===\r\n"
+            s += line_prepend + "  Negate: %s\r\n" % self.negate
+            s += line_prepend + "  Target: %s\r\n" % self.target
+            s += self.test.to_text(line_prepend + tm11._STD_INDENT)
+            
+            return s
 
         @staticmethod
         def from_etree(etree_xml):
@@ -689,6 +734,15 @@ class DefaultQuery(tm11.Query):
                 d['relationship'] = self.relationship
                 d['parameters'] = self.parameters
                 return d
+
+            def to_text(self, line_prepend=''):
+                s = line_prepend + "=== Test ==\r\n"
+                s += line_prepend + "  Capability ID: %s\r\n" % self.capability_id
+                s += line_prepend + "  Relationship: %s\r\n" % self.relationship
+                for k, v in self.parameters.iteritems():
+                    s += line_prepend + "  Parameter: %s = %s\r\n" % (k, v)
+                
+                return s
 
             @staticmethod
             def from_etree(etree_xml):
