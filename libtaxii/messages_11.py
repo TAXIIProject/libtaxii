@@ -2933,7 +2933,6 @@ class StatusMessage(TAXIIMessage):
             d['status_detail'] = self.status_detail
         if self.message is not None:
             d['message'] = self.message
-            d['message'] = self.message
         return d
 
     @classmethod
