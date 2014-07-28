@@ -20,7 +20,7 @@ def get_version():
 if sys.version_info < (2, 6):
     raise Exception('libtaxii requires Python 2.6 or higher.')
 
-install_requires = ['lxml>=2.3.2', 'python-dateutil>=1.5']
+install_requires = ['lxml>=2.2.3', 'python-dateutil>=1.4.1']
 try:
     import argparse
 except ImportError:
