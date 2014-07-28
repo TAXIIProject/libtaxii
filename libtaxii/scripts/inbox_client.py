@@ -92,8 +92,14 @@ def main():
     print "Inbox Message: \r\n", inbox_xml
     client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_xml, args.port)
-    response_message = t.get_message_from_http_response(resp, '0')
-    print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
+    r = t.get_message_from_http_response(resp, '0')
+    if args.xml_output is False:
+        print "Message ID: %s; In Response To: %s" % (r.message_id, r.in_response_to)
+        for k, v in r.extended_headers.iteritems():
+            print "Extended Header: %s = %s" % (k, v)
+        
+    else:
+        print "Response Message: \r\n", r.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()
