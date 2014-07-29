@@ -123,6 +123,7 @@ def round_trip_content_block(content_block):
     block_from_dict = tm11.ContentBlock.from_dict(dictionary)
     json_string = content_block.to_json()
     block_from_json = tm11.ContentBlock.from_json(json_string)
+    content_block.to_text()
 
     if content_block != block_from_xml:
         print '\t Failure of test #1 - running equals w/ debug:'

@@ -198,7 +198,7 @@ ns_map = {
             'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
          }
 
-_STD_INDENT = '  '
+_STD_INDENT = '  ' # A "Standard Indent" to use for to_text() methods
 
 # Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
@@ -1712,7 +1712,7 @@ class CollectionInformationResponse(TAXIIMessage):
         s = super(CollectionInformationResponse, self).to_text(line_prepend)
         s += line_prepend + "Contains %s Collection Informations\r\n" % len(self.collection_informations)
         for collection in self.collection_informations:
-            s += collection.to_text(line_prepend)
+            s += collection.to_text(line_prepend + _STD_INDENT)
         
         return s
 
@@ -1949,7 +1949,7 @@ class CollectionInformation(TAXIIBase):
         if self.collection_volume:
             s += line_prepend + "  Volume: %s\r\n" % self.collection_volume
         if len(self.supported_contents) == 0:#All contents supported:
-            s += line_prepend + "  Supported Content: %s\r\n" % "All Content"
+            s += line_prepend + "  Supported Content: %s\r\n" % "All"
         for contents in self.supported_contents:
             s += line_prepend + "  Supported Content: %s\r\n" % contents.to_text(line_prepend + _STD_INDENT)
         for psi in self.polling_service_instances:
