@@ -966,7 +966,7 @@ class ContentBlock(TAXIIBase):
         s += line_prepend + "  Content length: %s\r\n" % len(self.content)
         s += line_prepend + "  (Content not printed for brevity)\r\n"
         if self.timestamp_label:
-            s += "  Timestamp Label: %s" % self.timestamp_label
+            s += line_prepend + "  Timestamp Label: %s\r\n" % self.timestamp_label
         s += line_prepend + "  Padding: %s\r\n" % self.padding
         return s
         
@@ -2686,7 +2686,7 @@ class PollParameters(_GenericParameters):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Poll Parameters  ===\r\n"
+        s = super(PollParameters, self).to_text(line_prepend)
         if self.allow_asynch:
             s += line_prepend + "  Allow Asynch: %s\r\n" % self.allow_asynch
         if self.delivery_parameters:

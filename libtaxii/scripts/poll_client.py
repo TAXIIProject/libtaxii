@@ -47,35 +47,24 @@ def main():
                               inclusive_end_timestamp_label=end_ts,
                               poll_parameters=tm11.PollRequest.PollParameters())
 
-    poll_req_xml = poll_req.to_xml(pretty_print=True)
-    print "Poll Request: \r\n", poll_req_xml
+    print "Request:\r\n"
+    if args.xml_output is False:
+        print poll_req.to_text()
+    else:
+        print poll_req.to_xml(pretty_print=True)
+        
     client = scripts.create_client(args)
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req_xml, args.port)
+    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
     
+    print "Response:\r\n"
     if args.xml_output is False:
-        print "Message ID: %s; In Response To: %s" % (r.message_id, r.in_response_to)
-        for k, v in r.extended_headers.iteritems():
-            print "Extended Header: %s = %s" % (k, v)
-        print "Collection Name: %s" % r.collection_name
-        print "Exclusive Begin Timestamp Label: %s" % r.exclusive_begin_timestamp_label
-        print "Inclusive End Timestamp Label: %s" % r.inclusive_end_timestamp_label
-        if r.subscription_id:
-            print "Subscriptiption ID: %s" % r.subscription_id
-        print "Message: %s" % r.message
-        if r.result_id:
-            print "Result ID: %s" % r.result_id
-        if r.result_part_number:
-            print "Response Part: %s" % r.result_part_number
-        print "More Response Parts: %s" % r.more        
-        print "Response has %s Content Blocks" % len(r.content_blocks)
-        print ""
-        print "Note that Content Block filenames will be 'collection_name' + 'format' (if known) + <timestamp_label_or_system_time> . 'ext' (if known)"
-        print "This script currently knows about STIX 1.0, 1.0.1, 1.1, and 1.1.1."
-        print "The file will indicate whether timestamp label or system time was used by prepending a t (for timestamp label) or s (for systemtime) to the timestamp"
-        print ""
+        print r.to_text()
+    else:
+        print r.to_xml(pretty_print=True)
+    
+    if r.message_type == tm11.MSG_POLL_RESPONSE:
         for cb in r.content_blocks:
-            
             if cb.content_binding.binding_id == t.CB_STIX_XML_10:
                 format = '_STIX10_'
                 ext = '.xml'
@@ -103,9 +92,6 @@ def main():
             f.flush()
             f.close()
             print "Wrote Content Block to %s" % filename
-        
-    else:
-        print "Response Message: \r\n", r.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()

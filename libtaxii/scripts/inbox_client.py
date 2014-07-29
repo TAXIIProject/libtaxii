@@ -87,19 +87,23 @@ def main():
         cb.subtypes.append(args.subtype)
 
     inbox_message = tm11.InboxMessage(message_id=tm11.generate_message_id(), content_blocks=[cb])
-    inbox_xml = inbox_message.to_xml(pretty_print=True)
+    
+    print "Request:\r\n"
+    if args.xml_output is False:
+        print inbox_message.to_text()
+    else:
+        print inbox_message.to_xml(pretty_print=True)
 
     print "Inbox Message: \r\n", inbox_xml
     client = scripts.create_client(args)
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_xml, args.port)
+    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_message.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
+    
+    print "Response:\r\n"
     if args.xml_output is False:
-        print "Message ID: %s; In Response To: %s" % (r.message_id, r.in_response_to)
-        for k, v in r.extended_headers.iteritems():
-            print "Extended Header: %s = %s" % (k, v)
-        
+        print r.to_text()
     else:
-        print "Response Message: \r\n", r.to_xml(pretty_print=True)
+        print r.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()
