@@ -69,7 +69,7 @@ The contents of this file are subject to the terms of the STIX License located a
 
 
 def main():
-    parser = scripts.get_base_parser("Inbox Client", path="/services/inbox/default/")
+    parser = scripts.get_base_parser("Inbox Client", path="/services/inbox/")
     parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_11, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_11)
     parser.add_argument("--subtype", dest="subtype", default=None, help="The subtype of the Content Binding. Defaults to None")
     parser.add_argument("--content-file", dest="content_file", default=stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
