@@ -93,8 +93,7 @@ def main():
         print inbox_message.to_text()
     else:
         print inbox_message.to_xml(pretty_print=True)
-
-    print "Inbox Message: \n", inbox_xml
+    
     client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_message.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
