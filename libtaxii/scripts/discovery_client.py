@@ -15,7 +15,7 @@ def main():
 
     discovery_req = tm11.DiscoveryRequest(message_id=tm11.generate_message_id())
     
-    print "Request:\r\n"
+    print "Request:\n"
     if args.xml_output is False:
         print discovery_req.to_text()
     else:
@@ -25,7 +25,7 @@ def main():
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, discovery_req.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
     
-    print "Response:\r\n"
+    print "Response:\n"
     if args.xml_output is False:
         print r.to_text()
     else:

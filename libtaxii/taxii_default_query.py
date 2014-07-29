@@ -239,7 +239,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         for expression_info in self.targeting_expression_infos:
             s += expression_info.to_text(line_prepend + tm11._STD_INDENT)
         for capability_module in self.capability_modules:
-            s += line_prepend + "  Capability Module: %s\r\n" % capability_module
+            s += line_prepend + "  Capability Module: %s\n" % capability_module
         return s
 
     def __hash__(self):
@@ -336,12 +336,12 @@ class DefaultQueryInfo(tm11.SupportedQuery):
             return d
 
         def to_text(self, line_prepend=''):
-            s = line_prepend + "=== Targeting Expression Info ===\r\n"
-            s += line_prepend + "  Targeting Expression ID: %s\r\n" % self.targeting_expression_id
+            s = line_prepend + "=== Targeting Expression Info ===\n"
+            s += line_prepend + "  Targeting Expression ID: %s\n" % self.targeting_expression_id
             for scope in self.preferred_scope:
-                s += line_prepend + "  Preferred Scope: %s\r\n" % scope
+                s += line_prepend + "  Preferred Scope: %s\n" % scope
             for scope in self.allowed_scope:
-                s += line_prepend + "  Allowed Scope: %s\r\n" % scope
+                s += line_prepend + "  Allowed Scope: %s\n" % scope
             
             return s
 
@@ -416,7 +416,7 @@ class DefaultQuery(tm11.Query):
 
     def to_text(self, line_prepend=''):
         s = super(DefaultQuery, self).to_text(line_prepend)
-        s += line_prepend + "  Targeting Expression ID: %s\r\n" % self.targeting_expression_id
+        s += line_prepend + "  Targeting Expression ID: %s\n" % self.targeting_expression_id
         s += self.criteria.to_text(line_prepend)
         
         return s
@@ -512,8 +512,8 @@ class DefaultQuery(tm11.Query):
             return d
 
         def to_text(self, line_prepend=''):
-            s = line_prepend + "=== Criteria ===\r\n"
-            s += line_prepend + "  Operator: %s\r\n" % self.operator
+            s = line_prepend + "=== Criteria ===\n"
+            s += line_prepend + "  Operator: %s\n" % self.operator
             for criteria in self.criteria:
                 s += criteria.to_text(line_prepend + tm11._STD_INDENT)
             for criterion in self.criterion:
@@ -623,9 +623,9 @@ class DefaultQuery(tm11.Query):
             return d
 
         def to_text(self, line_prepend=''):
-            s = line_prepend + "=== Criterion ===\r\n"
-            s += line_prepend + "  Negate: %s\r\n" % self.negate
-            s += line_prepend + "  Target: %s\r\n" % self.target
+            s = line_prepend + "=== Criterion ===\n"
+            s += line_prepend + "  Negate: %s\n" % self.negate
+            s += line_prepend + "  Target: %s\n" % self.target
             s += self.test.to_text(line_prepend + tm11._STD_INDENT)
             
             return s
@@ -736,11 +736,11 @@ class DefaultQuery(tm11.Query):
                 return d
 
             def to_text(self, line_prepend=''):
-                s = line_prepend + "=== Test ==\r\n"
-                s += line_prepend + "  Capability ID: %s\r\n" % self.capability_id
-                s += line_prepend + "  Relationship: %s\r\n" % self.relationship
+                s = line_prepend + "=== Test ==\n"
+                s += line_prepend + "  Capability ID: %s\n" % self.capability_id
+                s += line_prepend + "  Relationship: %s\n" % self.relationship
                 for k, v in self.parameters.iteritems():
-                    s += line_prepend + "  Parameter: %s = %s\r\n" % (k, v)
+                    s += line_prepend + "  Parameter: %s = %s\n" % (k, v)
                 
                 return s
 

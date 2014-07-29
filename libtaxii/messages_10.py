@@ -466,14 +466,14 @@ class DeliveryParameters(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Push Parameters ===\r\n"
-        s += line_prepend + "  Inbox Protocol: %s\r\n" % self.inbox_protocol
-        s += line_prepend + "  Address: %s\r\n" % self.inbox_address
-        s += line_prepend + "  Message Binding: %s\r\n" % self.delivery_message_binding
+        s = line_prepend + "=== Push Parameters ===\n"
+        s += line_prepend + "  Inbox Protocol: %s\n" % self.inbox_protocol
+        s += line_prepend + "  Address: %s\n" % self.inbox_address
+        s += line_prepend + "  Message Binding: %s\n" % self.delivery_message_binding
         if len(self.content_bindings) > 0:
-            s += line_prepend + "  Content Bindings: Any Content\r\n"
+            s += line_prepend + "  Content Bindings: Any Content\n"
         for cb in self.content_bindings:
-            s += line_prepend + "  Content Binding: %s\r\n" % str(cb)
+            s += line_prepend + "  Content Binding: %s\n" % str(cb)
         
         return s
 
@@ -620,11 +620,11 @@ class TAXIIMessage(BaseNonMessage):
         return json.dumps(self.to_dict())
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "Message Type: %s\r\n" % self.message_type
+        s = line_prepend + "Message Type: %s\n" % self.message_type
         s += line_prepend + "Message ID: %s" % self.message_id
         if self.in_response_to:
             s += "; In Response To: %s" % self.in_response_to
-        s += "\r\n"
+        s += "\n"
         for k, v in self.extended_headers.iteritems():
             s += line_prepend + "Extended Header: %s = %s" % (k, v)
             
@@ -848,13 +848,13 @@ class ContentBlock(BaseNonMessage):
         return json.dumps(self.to_dict())
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Content Block ===\r\n"
-        s += line_prepend + "  Content Binding: %s\r\n" % self.content_binding
-        s += line_prepend + "  Content Length: %s\r\n" % len(self.content)
-        s += line_prepend + "  (Only content length is shown for brevity)\r\n"
+        s = line_prepend + "=== Content Block ===\n"
+        s += line_prepend + "  Content Binding: %s\n" % self.content_binding
+        s += line_prepend + "  Content Length: %s\n" % len(self.content)
+        s += line_prepend + "  (Only content length is shown for brevity)\n"
         if self.timestamp_label:
-            s += line_prepend + "  Timestamp Label: %s\r\n" % self.timestamp_label.isoformat()
-        s += line_prepend + "  Padding: %s\r\n" % self.padding
+            s += line_prepend + "  Timestamp Label: %s\n" % self.timestamp_label.isoformat()
+        s += line_prepend + "  Padding: %s\n" % self.padding
         
         return s
 
@@ -1185,19 +1185,19 @@ class ServiceInstance(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Service Instance===\r\n"
-        s += line_prepend + "  Service Type: %s\r\n" % self.service_type
-        s += line_prepend + "  Services Version: %s\r\n" % self.services_version
-        s += line_prepend + "  Protocol Binding: %s\r\n" % self.protocol_binding
-        s += line_prepend + "  Address: %s\r\n" % self.service_address
+        s = line_prepend + "=== Service Instance===\n"
+        s += line_prepend + "  Service Type: %s\n" % self.service_type
+        s += line_prepend + "  Services Version: %s\n" % self.services_version
+        s += line_prepend + "  Protocol Binding: %s\n" % self.protocol_binding
+        s += line_prepend + "  Address: %s\n" % self.service_address
         for mb in self.message_bindings:
-            s += line_prepend + "  Message Binding: %s\r\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         if len(self.inbox_service_accepted_content) == 0:
-            s += line_prepend + "  Inbox Service Accepts: %s\r\n" % None
+            s += line_prepend + "  Inbox Service Accepts: %s\n" % None
         for isac in self.inbox_service_accepted_content:
-            s += line_prepend + "  Inbox Service Accepts: %s\r\n" % isac
-        s += line_prepend + "  Available: %s\r\n" % self.available
-        s += line_prepend + "  Message: %s\r\n" % self.message
+            s += line_prepend + "  Inbox Service Accepts: %s\n" % isac
+        s += line_prepend + "  Available: %s\n" % self.available
+        s += line_prepend + "  Message: %s\n" % self.message
         
         return s
 
@@ -1512,13 +1512,13 @@ class FeedInformation(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Data Feed ===\r\n"
-        s += line_prepend + "  Feed Name: %s\r\n" % self.feed_name
+        s = line_prepend + "=== Data Feed ===\n"
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
         if self.available:
-            s += line_prepend + "  Available: %s\r\n" % self.available
-        s += line_prepend + "  Feed Description: %s\r\n" % self.feed_description
+            s += line_prepend + "  Available: %s\n" % self.available
+        s += line_prepend + "  Feed Description: %s\n" % self.feed_description
         for sc in self.supported_contents:
-            s += line_prepend + "  Supported Content: %s\r\n" % sc
+            s += line_prepend + "  Supported Content: %s\n" % sc
         for pm in self.push_methods:
             s += pm.to_text(line_prepend + _STD_INDENT)
         for ps in self.polling_service_instances:
@@ -1652,10 +1652,10 @@ class PushMethod(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Push Method ===\r\n"
-        s += line_prepend + "  Protocol Binding: %s\r\n" % self.push_protocol
+        s = line_prepend + "=== Push Method ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.push_protocol
         for mb in self.push_message_bindings:
-            s += line_prepend + "  Message Binding: %s\r\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         
         return s
 
@@ -1744,11 +1744,11 @@ class PollingServiceInstance(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Poll Service Instance ===\r\n"
-        s += line_prepend + "  Protocol Binding: %s\r\n" % self.poll_protocol
-        s += line_prepend + "  Address: %s\r\n" % self.poll_address
+        s = line_prepend + "=== Poll Service Instance ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.poll_protocol
+        s += line_prepend + "  Address: %s\n" % self.poll_address
         for mb in self.poll_message_bindings:
-            s += line_prepend + "  Message Binding: %s\r\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         
         return s
 
@@ -1840,11 +1840,11 @@ class SubscriptionMethod(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Subscription Method ===\r\n"
-        s += line_prepend + "  Protocol Binding: %s\r\n" % self.subscription_protocol
-        s += line_prepend + "  Address: %s\r\n" % self.subscription_address
+        s = line_prepend + "=== Subscription Method ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.subscription_protocol
+        s += line_prepend + "  Address: %s\n" % self.subscription_address
         for mb in self.subscription_message_bindings:
-            s += line_prepend + "  Message Binding: %s\r\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         
         return s
 
@@ -2001,25 +2001,25 @@ class PollRequest(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(PollRequest, self).to_text(line_prepend)
-        s += line_prepend + "  Feed Name: %s\r\n" % self.feed_name
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
         if self.subscription_id:
-            s += line_prepend + "  Subscription ID: %s\r\n" % self.subscription_id
+            s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         
         if self.exclusive_begin_timestamp_label:
-            s += line_prepend + "  Excl. Begin Timestamp Label: %s\r\n" % self.exclusive_begin_timestamp_label.isoformat()
+            s += line_prepend + "  Excl. Begin Timestamp Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
         else:
-            s += line_prepend + "  Excl. Begin Timestamp Label: %s\r\n" % None
+            s += line_prepend + "  Excl. Begin Timestamp Label: %s\n" % None
         
         if self.inclusive_end_timestamp_label:
-            s += line_prepend + "  Incl. End Timestamp Label: %s\r\n" % self.inclusive_end_timestamp_label.isoformat()
+            s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         else:
-            s += line_prepend + "  Incl. End Timestamp Label: %s\r\n" % self.inclusive_end_timestamp_label.isoformat()
+            s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         
         if len(self.content_bindings) == 0:
-            s += line_prepend + "  Content Binding: Any Content\r\n" % cb
+            s += line_prepend + "  Content Binding: Any Content\n" % cb
         
         for cb in self.content_bindings:
-            s += line_prepend + "  Content Binding: %s\r\n" % cb
+            s += line_prepend + "  Content Binding: %s\n" % cb
         
         return s
 
@@ -2217,17 +2217,17 @@ class PollResponse(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(PollResponse, self).to_text(line_prepend)
-        s += line_prepend + "  Feed Name: %s\r\n" % self.feed_name
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
         if self.subscription_id:
-            s += line_prepend + "  Subscription ID: %s\r\n" % self.subscription_id
-        s += line_prepend + "  Message: %s\r\n" % self.message
+            s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        s += line_prepend + "  Message: %s\n" % self.message
         
         if self.inclusive_begin_timestamp_label:
-            s += line_prepend + "  Incl. Begin Timestamp Label: %s\r\n" % self.inclusive_begin_timestamp_label.isoformat()
+            s += line_prepend + "  Incl. Begin Timestamp Label: %s\n" % self.inclusive_begin_timestamp_label.isoformat()
         else:
-            s += line_prepend + "  Incl. Begin Timestamp Label: %s\r\n" % None
+            s += line_prepend + "  Incl. Begin Timestamp Label: %s\n" % None
         
-        s += line_prepend + "  Incl. End Timestamp Label: %s\r\n" % self.inclusive_end_timestamp_label.isoformat()
+        s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         
         for cb in self.content_blocks:
             s += cb.to_text(line_prepend + _STD_INDENT)
@@ -2370,10 +2370,10 @@ class StatusMessage(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(StatusMessage, self).to_text(line_prepend)
-        s += line_prepend + "  Status Type: %s\r\n" % self.status_type
+        s += line_prepend + "  Status Type: %s\n" % self.status_type
         if self.status_detail:
-            s += line_prepend + "  Status Detail: %s\r\n" % self.status_detail
-        s += line_prepend + "  Status Message: %s\r\n" % self.message
+            s += line_prepend + "  Status Detail: %s\n" % self.status_detail
+        s += line_prepend + "  Status Message: %s\n" % self.message
         return s
 
     def __eq__(self, other, debug=None):
@@ -2496,10 +2496,10 @@ class InboxMessage(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(InboxMessage, self).to_text(line_prepend)
-        s += line_prepend + "  Message: %s\r\n" % self.message
+        s += line_prepend + "  Message: %s\n" % self.message
         if self.subscription_information:
             s += self.subscription_information.to_text(line_prepend + _STD_INDENT)
-        s += line_prepend + "  Message has %s Content Blocks\r\n" % len(self.content_blocks)
+        s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
         for cb in self.content_blocks:
             s += cb.to_text(line_prepend + _STD_INDENT)
         
@@ -2646,11 +2646,11 @@ class SubscriptionInformation(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Subscription Information ===\r\n"
-        s += line_prepend + "  Feed Name: %s\r\n" % self.feed_name
-        s += line_prepend + "  Subscription ID: %s\r\n" % self.subscription_id
-        s += line_prepend + "  Incl. Begin TS Label: %s\r\n" % self.inclusive_begin_timestamp_label.isoformat()
-        s += line_prepend + "  Incl. End TS Label: %s\r\n" % self.inclusive_end_timestamp_label.isoformat()
+        s = line_prepend + "=== Subscription Information ===\n"
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        s += line_prepend + "  Incl. Begin TS Label: %s\n" % self.inclusive_begin_timestamp_label.isoformat()
+        s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         return s
 
     def __eq__(self, other, debug=False):
@@ -2771,9 +2771,9 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(ManageFeedSubscriptionRequest, self).to_text(line_prepend)
-        s += line_prepend + "  Feed Name: %s\r\n" % self.feed_name
-        s += line_prepend + "  Action: %s\r\n" % self.action
-        s += line_prepend + "  Subscription ID: %s\r\n" % self.subscription_id
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        s += line_prepend + "  Action: %s\n" % self.action
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         if self.delivery_parameters:
             s += self.delivery_parameters.to_text(line_prepend + _STD_INDENT)
         return s
@@ -2884,8 +2884,8 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(ManageFeedSubscriptionResponse, self).to_text(line_prepend)
-        s += line_prepend + "  Feed Name: %s\r\n" % self.feed_name
-        s += line_prepend + "  Message: %s\r\n" % self.message
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        s += line_prepend + "  Message: %s\n" % self.message
         for si in self.subscription_instances:
             s += si.to_text(line_prepend + _STD_INDENT)
         return s
@@ -3022,8 +3022,8 @@ class SubscriptionInstance(BaseNonMessage):
         return d
 
     def to_text(self, line_indent=''):
-        s = line_indent + "=== Subscription Instance ===\r\n"
-        s += line_indent + "  Subscription ID: %s\r\n" % self.subscription_id
+        s = line_indent + "=== Subscription Instance ===\n"
+        s += line_indent + "  Subscription ID: %s\n" % self.subscription_id
         for dp in self.delivery_parameters:
             s += dp.to_text(line_indent + _STD_INDENT)
         for pi in self.poll_instances:
@@ -3138,11 +3138,11 @@ class PollInstance(BaseNonMessage):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + "=== Poll Instance ===\r\n"
-        s += line_prepend + "  Protocol Binding: %s\r\n" % self.poll_protocol
-        s += line_prepend + "  Address: %s\r\n" % self.poll_address
+        s = line_prepend + "=== Poll Instance ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.poll_protocol
+        s += line_prepend + "  Address: %s\n" % self.poll_address
         for mb in self.poll_message_bindings:
-            s += line_prepend + "  Message Binding: %s\r\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         return s
 
     def __eq__(self, other, debug=True):

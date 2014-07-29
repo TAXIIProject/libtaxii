@@ -14,7 +14,7 @@ def main():
 
     discovery_req = tm10.DiscoveryRequest(message_id=tm10.generate_message_id())
     
-    print "Request:\r\n"
+    print "Request:\n"
     if args.xml_output is False:
         print discovery_req.to_text()
     else:
@@ -25,7 +25,7 @@ def main():
     r = t.get_message_from_http_response(resp, '0')
     
     
-    print "Response:\r\n"
+    print "Response:\n"
     if args.xml_output is False:
         print r.to_text()
     else:

@@ -88,18 +88,18 @@ def main():
 
     inbox_message = tm11.InboxMessage(message_id=tm11.generate_message_id(), content_blocks=[cb])
     
-    print "Request:\r\n"
+    print "Request:\n"
     if args.xml_output is False:
         print inbox_message.to_text()
     else:
         print inbox_message.to_xml(pretty_print=True)
 
-    print "Inbox Message: \r\n", inbox_xml
+    print "Inbox Message: \n", inbox_xml
     client = scripts.create_client(args)
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_message.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
     
-    print "Response:\r\n"
+    print "Response:\n"
     if args.xml_output is False:
         print r.to_text()
     else:

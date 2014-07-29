@@ -25,7 +25,7 @@ def main():
                               result_id=args.result_id,
                               result_part_number=args.result_part_number)
     
-    print "Request:\r\n"
+    print "Request:\n"
     if args.xml_output is False:
         print poll_fulf_req.to_text()
     else:
@@ -35,7 +35,7 @@ def main():
     resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_fulf_req.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
     
-    print "Response:\r\n"
+    print "Response:\n"
     if args.xml_output is False:
         print r.to_text()
     else:
