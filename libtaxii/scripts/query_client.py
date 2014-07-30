@@ -43,7 +43,7 @@ def main():
 
     criteria = tdq.DefaultQuery.Criteria(operator=tdq.OP_AND, criterion=criterion)
 
-    q = tdq.DefaultQuery(t.CB_STIX_XML_11, criteria)
+    q = tdq.DefaultQuery(t.CB_STIX_XML_111, criteria)
 
     poll_req = tm11.PollRequest(message_id=tm11.generate_message_id(),
                               collection_name=args.collection,
