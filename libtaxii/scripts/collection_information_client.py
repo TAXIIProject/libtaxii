@@ -10,7 +10,7 @@ import libtaxii.scripts as scripts
 
 
 def main():
-    parser = scripts.get_base_parser("Collection Information Client", path="/services/discovery/")
+    parser = scripts.get_base_parser("Collection Information Client", path="/services/collection-management/")
     args = parser.parse_args()
 
     collection_information_req = tm11.CollectionInformationRequest(message_id=tm11.generate_message_id())
