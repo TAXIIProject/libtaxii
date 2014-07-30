@@ -3130,11 +3130,11 @@ class StatusMessage(TAXIIMessage):
 
     def to_text(self, line_prepend=''):
         s = super(StatusMessage, self).to_text(line_prepend)
-        s += line_prepend + "  Status Type: %s\n" % self.status_type
+        s += line_prepend + "Status Type: %s\n" % self.status_type
         for k, v in self.status_detail.iteritems():
-            s += line_prepend + "  Status Detail: %s = %s\n" % (k, v)
+            s += line_prepend + "Status Detail: %s = %s\n" % (k, v)
         if self.message:
-            s += line_prepend + "  Message: %s\n" % self.message
+            s += line_prepend + "Message: %s\n" % self.message
         return s
 
     @classmethod
