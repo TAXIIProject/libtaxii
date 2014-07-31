@@ -2928,9 +2928,9 @@ class PollResponse(TAXIIMessage):
         if self.message:
             s += line_prepend + "  Message: %s\n" % self.message
         if self.exclusive_begin_timestamp_label:
-            s += line_prepend + "  Incl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
+            s += line_prepend + "  Excl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
         if self.inclusive_end_timestamp_label:
-            s += line_prepend + "  Excl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+            s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         for cb in self.content_blocks:
             s += cb.to_text(line_prepend + _STD_INDENT)
         return s
