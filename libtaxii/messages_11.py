@@ -3036,39 +3036,39 @@ class PollResponse(TAXIIMessage):
 
 
 _StatusDetail = collections.namedtuple('_StatusDetail', ['name', 'required', 'type', 'multiple'])
-_DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
-_IRP_MaxPartNumber = _StatusDetail('MAX_PART_NUMBER', True, int, False)
-_NF_Item = _StatusDetail('ITEM', False, str, False)
-_P_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', True, int, False)
-_P_ResultId = _StatusDetail('RESULT_ID', True, str, False)
-_P_WillPush = _StatusDetail('WILL_PUSH', True, bool, False)
-_R_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', False, int, False)
-_UM_SupportedBinding = _StatusDetail('SUPPORTED_BINDING', False, str, True)
-_UC_SupportedContent = _StatusDetail('SUPPORTED_CONTENT', False, ContentBinding, True)
-_UP_SupportedProtocol = _StatusDetail('SUPPORTED_PROTOCOL', False, str, True)
-_UQ_SupportedQuery = _StatusDetail('SUPPORTED_QUERY', False, str, True)
+_DCE_AcceptableDestination = _StatusDetail(SD_ACCEPTABLE_DESTINATION, False, str, True)
+_IRP_MaxPartNumber = _StatusDetail(SD_MAX_PART_NUMBER, True, int, False)
+_NF_Item = _StatusDetail(SD_ITEM, False, str, False)
+_P_EstimatedWait = _StatusDetail(SD_ESTIMATED_WAIT, True, int, False)
+_P_ResultId = _StatusDetail(SD_RESULT_ID, True, str, False)
+_P_WillPush = _StatusDetail(SD_WILL_PUSH, True, bool, False)
+_R_EstimatedWait = _StatusDetail(SD_ESTIMATED_WAIT, False, int, False)
+_UM_SupportedBinding = _StatusDetail(SD_SUPPORTED_BINDING, False, str, True)
+_UC_SupportedContent = _StatusDetail(SD_SUPPORTED_CONTENT, False, ContentBinding, True)
+_UP_SupportedProtocol = _StatusDetail(SD_SUPPORTED_PROTOCOL, False, str, True)
+_UQ_SupportedQuery = _StatusDetail(SD_SUPPORTED_QUERY, False, str, True)
 
 
 status_details = {
     ST_ASYNCHRONOUS_POLL_ERROR: {},
     ST_BAD_MESSAGE: {},
     ST_DENIED: {},
-    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination},
+    ST_DESTINATION_COLLECTION_ERROR: {SD_ACCEPTABLE_DESTINATION: _DCE_AcceptableDestination},
     ST_FAILURE: {},
-    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber},
+    ST_INVALID_RESPONSE_PART: {SD_MAX_PART_NUMBER: _IRP_MaxPartNumber},
     ST_NETWORK_ERROR: {},
-    ST_NOT_FOUND: {'ITEM': _NF_Item},
-    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait,
-                 'RESULT_ID': _P_ResultId,
-                 'WILL_PUSH': _P_WillPush},
+    ST_NOT_FOUND: {SD_ITEM: _NF_Item},
+    ST_PENDING: {SD_ESTIMATED_WAIT: _P_EstimatedWait,
+                 SD_RESULT_ID: _P_ResultId,
+                 SD_WILL_PUSH: _P_WillPush},
     ST_POLLING_UNSUPPORTED: {},
-    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait},
+    ST_RETRY: {SD_ESTIMATED_WAIT: _R_EstimatedWait},
     ST_SUCCESS: {},
     ST_UNAUTHORIZED: {},
-    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding},
-    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent},
-    ST_UNSUPPORTED_PROTOCOL: {'SUPPORTED_PROTOCOL': _UP_SupportedProtocol},
-    ST_UNSUPPORTED_QUERY: {'SUPPORTED_QUERY': _UQ_SupportedQuery}
+    ST_UNSUPPORTED_MESSAGE_BINDING: {SD_SUPPORTED_BINDING: _UM_SupportedBinding},
+    ST_UNSUPPORTED_CONTENT_BINDING: {SD_SUPPORTED_CONTENT: _UC_SupportedContent},
+    ST_UNSUPPORTED_PROTOCOL: {SD_SUPPORTED_PROTOCOL: _UP_SupportedProtocol},
+    ST_UNSUPPORTED_QUERY: {SD_SUPPORTED_QUERY: _UQ_SupportedQuery}
 }
 
 
