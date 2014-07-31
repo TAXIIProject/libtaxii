@@ -193,6 +193,34 @@ SVC_COLLECTION_MANAGEMENT = 'COLLECTION_MANAGEMENT'
 #: Tuple of all TAXII 1.1 Service Types
 SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_COLLECTION_MANAGEMENT, SVC_DISCOVERY)
 
+# TAXII 1.1 Status Detail Keys
+
+#: Constant Identifying the Acceptable Destination Status Detail
+SD_ACCEPTABLE_DESTINATION = 'ACCEPTABLE_DESTINATION'
+#: Constant Identifying the Max Part Number Status Detail
+SD_MAX_PART_NUMBER = 'MAX_PART_NUMBER'
+#: Constant Identifying the Item Status Detail
+SD_ITEM = 'ITEM'
+#: Constant Identifying the Estimated Wait Status Detail
+SD_ESTIMATED_WAIT = 'ESTIMATED_WAIT'
+#: Constant Identifying the Result ID Status Detail
+SD_RESULT_ID = 'RESULT_ID'
+#: Constant Identifying the Will Push Status Detail
+SD_WILL_PUSH = 'WILL_PUSH'
+#: Constant Identifying the Supported Binding Status Detail
+SD_SUPPORTED_BINDING = 'SUPPORTED_BINDING'
+#: Constant Identifying the Supported Content Status Detail
+SD_SUPPORTED_CONTENT = 'SUPPORTED_CONTENT'
+#: Constant Identifying the Supported Protocol Status Detail
+SD_SUPPORTED_PROTOCOL = 'SUPPORTED_PROTOCOL'
+#: Constant Identifying the Supported Query Status Detail
+SD_SUPPORTED_QUERY = 'SUPPORTED_QUERY'
+
+#: Tuple of all TAXII 1.1 Status Detail Keys
+SD_TYPES = ( SD_ACCEPTABLE_DESTINATION, SD_MAX_PART_NUMBER, SD_ITEM,
+             SD_ESTIMATED_WAIT, SD_RESULT_ID, SD_WILL_PUSH,
+             SD_SUPPORTED_BINDING, SD_SUPPORTED_CONTENT, SD_SUPPORTED_PROTOCOL,
+             SD_SUPPORTED_QUERY)
 
 ns_map = {
             'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
