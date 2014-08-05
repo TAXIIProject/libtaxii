@@ -17,8 +17,9 @@ from lxml import etree
 import libtaxii.messages_11 as tm11
 
 from .common import TAXIIBase
-from .validation import (do_check, uri_regex)
+from .validation import (do_check, uri_regex, RegexTuple)
 
+targeting_expression_regex = RegexTuple("(@?\w+|\*{1,2})(/(@?\w+|\*{1,2}))*", "Targeting Expression Syntax")
 
 #: Format ID for this version of TAXII Default Query
 FID_TAXII_DEFAULT_QUERY_10 = 'urn:taxii.mitre.org:query:default:1.0'
@@ -292,7 +293,7 @@ class TargetingExpressionInfo(TAXIIBase):
 
     @preferred_scope.setter
     def preferred_scope(self, value):
-        do_check(value, 'preferred_scope', type=basestring)
+        do_check(value, 'preferred_scope', type=basestring, regex_tuple=targeting_expression_regex)
         self._preferred_scope = value
 
     @property
@@ -301,7 +302,7 @@ class TargetingExpressionInfo(TAXIIBase):
 
     @allowed_scope.setter
     def allowed_scope(self, value):
-        do_check(value, 'allowed_scope', type=basestring)
+        do_check(value, 'allowed_scope', type=basestring, regex_tuple=targeting_expression_regex)
         self._allowed_scope = value
 
     def to_etree(self):
