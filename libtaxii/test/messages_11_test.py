@@ -243,7 +243,7 @@ class StatusMessageTests(unittest.TestCase):
 
 class DiscoveryRequestTests(unittest.TestCase):
 
-    def test_status_message_09(self):
+    def test_discovery_request(self):
         discovery_request1 = tm11.DiscoveryRequest(
                 message_id=tm11.generate_message_id(),  # Required
                 extended_headers={'ext_header1': 'value1', 'ext_header2': 'value2'})  # Optional.
