@@ -293,14 +293,14 @@ class BaseNonMessage(object):
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     def to_dict(self):
         """Create a dictionary representation of this class.
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     def to_xml(self, pretty_print=False):
         """Create an XML representation of this class."""
@@ -315,7 +315,7 @@ class BaseNonMessage(object):
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     @classmethod
     def from_dict(cls, d):
@@ -323,7 +323,7 @@ class BaseNonMessage(object):
 
         To be implemented by child classes.
         """
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     @classmethod
     def from_xml(cls, xml):
@@ -340,7 +340,7 @@ class BaseNonMessage(object):
         return self.to_xml(pretty_print=True)
 
     def __eq__(self, other, debug=False):
-        raise Exception('Method not implemented by child class!')
+        raise NotImplementedError()
 
     def _checkPropertiesEq(self, other, arglist, debug=False):
         for arg in arglist:
