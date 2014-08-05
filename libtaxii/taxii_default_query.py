@@ -83,10 +83,6 @@ class CapabilityModule(object):
         for item in value:
             self._relationships[item.name] = item
 
-    # def __hash__(self):
-    #    return hash(self.capability_module_id)
-
-
 class Relationship(object):
     def __init__(self, name, parameters=None):
         self.name = name
@@ -112,10 +108,6 @@ class Relationship(object):
         for item in value:
             self._parameters[item.name] = item
 
-    # def __hash__(self):
-    #    return hash(self.name)
-
-
 class Parameter(object):
     def __init__(self, name, type, value_tuple=None):
         self.name = name
@@ -131,9 +123,6 @@ class Parameter(object):
                 return False, 'value not in value tuple'
 
         return True, 'OK'
-
-    # def deserialize(self, value):#Deserializes a value
-        # if self.type
 
 # params - Define parameters for the Core/Regex/Timestamp capability modules
 param_str_value = Parameter('value', basestring)
@@ -180,7 +169,6 @@ cm_regex = CapabilityModule(CM_REGEX, [rel_matches])
 cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte, rel_ts_lt, rel_ts_lte])
 
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
-
 
 class DefaultQueryInfo(tm11.SupportedQuery):
     """ Used to describe the TAXII Default Queries that are supported.
