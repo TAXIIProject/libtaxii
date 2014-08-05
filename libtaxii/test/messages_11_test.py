@@ -92,6 +92,7 @@ def round_trip_message(taxii_message, print_xml=False):
     msg_from_xml = tm11.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()
     msg_from_dict = tm11.get_message_from_dict(dictionary)
+    taxii_message.to_text()#to_text() returns a string, this just makes sure the call succeeds but doesn't validate the response
     if taxii_message != msg_from_xml:
         print '\t Failure of test #2 - running equals w/ debug:'
         taxii_message.__eq__(msg_from_xml, True)
@@ -122,6 +123,7 @@ def round_trip_content_block(content_block):
     block_from_dict = tm11.ContentBlock.from_dict(dictionary)
     json_string = content_block.to_json()
     block_from_json = tm11.ContentBlock.from_json(json_string)
+    content_block.to_text()
 
     if content_block != block_from_xml:
         print '\t Failure of test #1 - running equals w/ debug:'

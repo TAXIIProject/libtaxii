@@ -193,11 +193,40 @@ SVC_COLLECTION_MANAGEMENT = 'COLLECTION_MANAGEMENT'
 #: Tuple of all TAXII 1.1 Service Types
 SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_COLLECTION_MANAGEMENT, SVC_DISCOVERY)
 
+# TAXII 1.1 Status Detail Keys
+
+#: Constant Identifying the Acceptable Destination Status Detail
+SD_ACCEPTABLE_DESTINATION = 'ACCEPTABLE_DESTINATION'
+#: Constant Identifying the Max Part Number Status Detail
+SD_MAX_PART_NUMBER = 'MAX_PART_NUMBER'
+#: Constant Identifying the Item Status Detail
+SD_ITEM = 'ITEM'
+#: Constant Identifying the Estimated Wait Status Detail
+SD_ESTIMATED_WAIT = 'ESTIMATED_WAIT'
+#: Constant Identifying the Result ID Status Detail
+SD_RESULT_ID = 'RESULT_ID'
+#: Constant Identifying the Will Push Status Detail
+SD_WILL_PUSH = 'WILL_PUSH'
+#: Constant Identifying the Supported Binding Status Detail
+SD_SUPPORTED_BINDING = 'SUPPORTED_BINDING'
+#: Constant Identifying the Supported Content Status Detail
+SD_SUPPORTED_CONTENT = 'SUPPORTED_CONTENT'
+#: Constant Identifying the Supported Protocol Status Detail
+SD_SUPPORTED_PROTOCOL = 'SUPPORTED_PROTOCOL'
+#: Constant Identifying the Supported Query Status Detail
+SD_SUPPORTED_QUERY = 'SUPPORTED_QUERY'
+
+#: Tuple of all TAXII 1.1 Status Detail Keys
+SD_TYPES = ( SD_ACCEPTABLE_DESTINATION, SD_MAX_PART_NUMBER, SD_ITEM,
+             SD_ESTIMATED_WAIT, SD_RESULT_ID, SD_WILL_PUSH,
+             SD_SUPPORTED_BINDING, SD_SUPPORTED_CONTENT, SD_SUPPORTED_PROTOCOL,
+             SD_SUPPORTED_QUERY)
 
 ns_map = {
             'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
          }
 
+_STD_INDENT = '  ' # A "Standard Indent" to use for to_text() methods
 
 # Import helper methods from libtaxii.messages_10 that are still applicable
 from libtaxii.messages_10 import (generate_message_id)
@@ -467,6 +496,12 @@ class SupportedQuery(TAXIIBase):
     def to_dict(self):
         return {'format_id': self.format_id}
 
+    
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Supported Query Information ===\n"
+        s += line_prepend + "  Query Format: %s\n" % self.format_id
+        return s
+
     @staticmethod
     def from_etree(etree_xml):
         format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
@@ -507,6 +542,12 @@ class Query(TAXIIBase):
 
     def to_dict(self):
         return {'format_id': self.format_id}
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Query ===\n"
+        s += line_prepend + "  Query Format: %s\n" % self.format_id
+        
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml, kwargs):
@@ -587,6 +628,9 @@ class ContentBinding(TAXIIBase):
     def to_dict(self):
         return {'binding_id': self.binding_id, 'subtype_ids': self.subtype_ids}
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + str(self)
+
     def __hash__(self):
         return hash(str(self.to_dict()))
 
@@ -650,6 +694,14 @@ class RecordCount(TAXIIBase):
             d['partial_count'] = self.partial_count
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Record Count ===\n"
+        s += line_prepend + "  Record Count: %s\n" % self.record_count
+        if self.partial_count:
+            s += line_prepend + "  Partial Count: %s\n" % self.partial_count
+        
+        return s
 
     @staticmethod
     def from_etree(etree_xml):
@@ -728,6 +780,15 @@ class _GenericParameters(TAXIIBase):
             d['query'] = self.query.to_dict()
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== %s ===\n" % self.name
+        for binding in self.content_bindings:
+            s += "  Content Binding: %s\n" % str(binding)
+        if self.query:
+            s += self.query.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml, **kwargs):
@@ -927,6 +988,17 @@ class ContentBlock(TAXIIBase):
     def to_json(self):
         return json.dumps(self.to_dict())
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Content Block ===\n"
+        s += line_prepend + "  Content Binding: %s\n" % str(self.content_binding)
+        s += line_prepend + "  Content length: %s\n" % len(self.content)
+        s += line_prepend + "  (Content not printed for brevity)\n"
+        if self.timestamp_label:
+            s += line_prepend + "  Timestamp Label: %s\n" % self.timestamp_label
+        s += line_prepend + "  Padding: %s\n" % self.padding
+        return s
+        
+
     @staticmethod
     def from_etree(etree_xml):
         kwargs = {}
@@ -1045,6 +1117,13 @@ class PushParameters(TAXIIBase):
             d['delivery_message_binding'] = self.delivery_message_binding
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Push Parameters ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.inbox_protocol
+        s += line_prepend + "  Inbox Address: %s\n" % self.inbox_address
+        s += line_prepend + "  Message Binding: %s\n" % self.delivery_message_binding
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -1175,6 +1254,17 @@ class TAXIIMessage(TAXIIBase):
         d['extended_headers'] = self.extended_headers
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "Message Type: %s\n" % self.message_type
+        s += line_prepend + "Message ID: %s" % self.message_id
+        if self.in_response_to:
+            s += "; In Response To: %s" % self.in_response_to
+        s += "\n"
+        for k, v in self.extended_headers.iteritems():
+            s += line_prepend + "Extended Header: %s = %s\n" % (k, v)
+            
+        return s
 
     def to_json(self):
         return json.dumps(self.to_dict())
@@ -1307,6 +1397,13 @@ class DiscoveryResponse(TAXIIMessage):
         for service_instance in self.service_instances:
             d['service_instances'].append(service_instance.to_dict())
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(DiscoveryResponse, self).to_text()
+        for si in self.service_instances:
+            s += si.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -1505,6 +1602,23 @@ class ServiceInstance(TAXIIBase):
         d['message'] = self.message
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend +  "=== Service Instance ===\n"
+        s += line_prepend +  "  Service Type: %s\n" % self.service_type
+        s += line_prepend +  "  Service Version: %s\n" % self.services_version
+        s += line_prepend +  "  Protocol Binding: %s\n" % self.protocol_binding
+        s += line_prepend +  "  Service Address: %s\n" % self.service_address
+        for mb in self.message_bindings:
+            s += line_prepend +  "  Message Binding: %s\n" % mb
+        if self.service_type == SVC_INBOX:
+            s += line_prepend + "  Inbox Service AC: %s\n" % [ac.to_text() for ac in self.inbox_service_accepted_content]
+        s += line_prepend +  "  Available: %s\n" % self.available
+        s += line_prepend +  "  Message: %s\n" % self.message
+        for q in self.supported_query:
+            s += q.to_text(line_prepend)
+        
+        return s
+
     @staticmethod
     def from_etree(etree_xml):  # Expects a taxii_11:Service_Instance element
         service_type = etree_xml.attrib['service_type']
@@ -1621,6 +1735,14 @@ class CollectionInformationResponse(TAXIIMessage):
         for collection in self.collection_informations:
             d['collection_informations'].append(collection.to_dict())
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(CollectionInformationResponse, self).to_text(line_prepend)
+        s += line_prepend + "Contains %s Collection Informations\n" % len(self.collection_informations)
+        for collection in self.collection_informations:
+            s += collection.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -1824,6 +1946,8 @@ class CollectionInformation(TAXIIBase):
         d['collection_description'] = self.collection_description
         if self.collection_volume is not None:
             d['collection_volume'] = self.collection_volume
+        #TODO: I think this isn't a good serialization, I think a for loop is necessary
+        # This is probably a bug
         d['supported_contents'] = self.supported_contents
 
         d['push_methods'] = []
@@ -1843,6 +1967,27 @@ class CollectionInformation(TAXIIBase):
             d['receiving_inbox_services'].append(receiving_inbox_service.to_dict())
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Data Collection Information ===\n"
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        s += line_prepend + "  Collection Type: %s\n" % self.collection_type
+        s += line_prepend + "  Available: %s\n" % self.available
+        s += line_prepend + "  Collection Description: %s\n" % self.collection_description
+        if self.collection_volume:
+            s += line_prepend + "  Volume: %s\n" % self.collection_volume
+        if len(self.supported_contents) == 0:#All contents supported:
+            s += line_prepend + "  Supported Content: %s\n" % "All"
+        for contents in self.supported_contents:
+            s += line_prepend + "  Supported Content: %s\n" % contents.to_text(line_prepend + _STD_INDENT)
+        for psi in self.polling_service_instances:
+            s += psi.to_text(line_prepend + _STD_INDENT)
+        for sm in self.subscription_methods:
+            s += sm.to_text(line_prepend + _STD_INDENT)
+        for ris in self.receiving_inbox_services:
+            s += ris.to_text(line_prepend + _STD_INDENT)
+        s += line_prepend + "==================================\n\n"
+        return s
 
     @staticmethod
     def from_etree(etree_xml):
@@ -1978,6 +2123,13 @@ class PushMethod(TAXIIBase):
             d['push_message_bindings'].append(binding)
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Push Method ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.push_protocol
+        for mb in self.push_message_bindings:
+            s += line_prepend +  "  Message Binding: %s\n" % mb
+        return s
+
     @staticmethod
     def from_etree(etree_xml):
         kwargs = {}
@@ -2054,6 +2206,14 @@ class PollingServiceInstance(TAXIIBase):
         for binding in self.poll_message_bindings:
             d['poll_message_bindings'].append(binding)
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Polling Service Instance ===\n"
+        s += line_prepend + "  Poll Protocol: %s\n" % self.poll_protocol
+        s += line_prepend + "  Poll Address: %s\n" % self.poll_address
+        for binding in self.poll_message_bindings:
+            s += line_prepend + "  Message Binding: %s\n" % binding
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -2134,6 +2294,14 @@ class SubscriptionMethod(TAXIIBase):
         for binding in self.subscription_message_bindings:
             d['subscription_message_bindings'].append(binding)
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Subscription Service ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.subscription_protocol
+        s += line_prepend + "  Address: %s\n" % self.subscription_address
+        for mb in self.subscription_message_bindings:
+            s += line_prepend +  "  Message Binding: %s\n" % mb
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -2244,6 +2412,19 @@ class ReceivingInboxService(TAXIIBase):
             d['supported_contents'].append(supported_content.to_dict())
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Receiving Inbox Service ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.inbox_protocol
+        s += line_prepend + "  Address: %s\n" % self.inbox_address
+        for mb in self.inbox_message_bindings:
+            s += line_prepend +  "  Message Binding: %s\n" % mb
+        if len(self.supported_contents) == 0:
+            s += line_prepend + "  Supported Contents: All\n"
+        for sc in self.supported_contents:
+            s += line_prepend + "  Supported Content: %s\n" % str(sc)
+        
+        return s
 
     @staticmethod
     def from_etree(etree_xml):
@@ -2405,6 +2586,18 @@ class PollRequest(TAXIIRequestMessage):
             d['poll_parameters'] = self.poll_parameters.to_dict()
         return d
 
+    def to_text(self, line_prepend=''):
+        s = super(PollRequest, self).to_text(line_prepend)
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        if self.subscription_id:
+            s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        s += line_prepend + "  Excl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label
+        s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label
+        if self.poll_parameters:
+            s += self.poll_parameters.to_text(line_prepend + _STD_INDENT)
+        
+        return s
+
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -2519,6 +2712,14 @@ class PollParameters(_GenericParameters):
         if self.delivery_parameters is not None:
             d['delivery_parameters'] = self.delivery_parameters.to_dict()
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(PollParameters, self).to_text(line_prepend)
+        if self.allow_asynch:
+            s += line_prepend + "  Allow Asynch: %s\n" % self.allow_asynch
+        if self.delivery_parameters:
+            s += self.delivery_parameters.to_text(line_prepend + _STD_INDENT)
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -2743,6 +2944,25 @@ class PollResponse(TAXIIMessage):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = super(PollResponse, self).to_text(line_prepend)
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        s += line_prepend + "  More: %s\n" % self.more
+        s += line_prepend + "  Result ID: %s\n" % self.result_id
+        if self.record_count:
+            s += self.record_count.to_text(line_prepend + _STD_INDENT)
+        if self.subscription_id:
+            s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        if self.message:
+            s += line_prepend + "  Message: %s\n" % self.message
+        if self.exclusive_begin_timestamp_label:
+            s += line_prepend + "  Excl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
+        if self.inclusive_end_timestamp_label:
+            s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+        for cb in self.content_blocks:
+            s += cb.to_text(line_prepend + _STD_INDENT)
+        return s
+
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -2816,39 +3036,39 @@ class PollResponse(TAXIIMessage):
 
 
 _StatusDetail = collections.namedtuple('_StatusDetail', ['name', 'required', 'type', 'multiple'])
-_DCE_AcceptableDestination = _StatusDetail('ACCEPTABLE_DESTINATION', False, str, True)
-_IRP_MaxPartNumber = _StatusDetail('MAX_PART_NUMBER', True, int, False)
-_NF_Item = _StatusDetail('ITEM', False, str, False)
-_P_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', True, int, False)
-_P_ResultId = _StatusDetail('RESULT_ID', True, str, False)
-_P_WillPush = _StatusDetail('WILL_PUSH', True, bool, False)
-_R_EstimatedWait = _StatusDetail('ESTIMATED_WAIT', False, int, False)
-_UM_SupportedBinding = _StatusDetail('SUPPORTED_BINDING', False, str, True)
-_UC_SupportedContent = _StatusDetail('SUPPORTED_CONTENT', False, ContentBinding, True)
-_UP_SupportedProtocol = _StatusDetail('SUPPORTED_PROTOCOL', False, str, True)
-_UQ_SupportedQuery = _StatusDetail('SUPPORTED_QUERY', False, str, True)
+_DCE_AcceptableDestination = _StatusDetail(SD_ACCEPTABLE_DESTINATION, False, str, True)
+_IRP_MaxPartNumber = _StatusDetail(SD_MAX_PART_NUMBER, True, int, False)
+_NF_Item = _StatusDetail(SD_ITEM, False, str, False)
+_P_EstimatedWait = _StatusDetail(SD_ESTIMATED_WAIT, True, int, False)
+_P_ResultId = _StatusDetail(SD_RESULT_ID, True, str, False)
+_P_WillPush = _StatusDetail(SD_WILL_PUSH, True, bool, False)
+_R_EstimatedWait = _StatusDetail(SD_ESTIMATED_WAIT, False, int, False)
+_UM_SupportedBinding = _StatusDetail(SD_SUPPORTED_BINDING, False, str, True)
+_UC_SupportedContent = _StatusDetail(SD_SUPPORTED_CONTENT, False, ContentBinding, True)
+_UP_SupportedProtocol = _StatusDetail(SD_SUPPORTED_PROTOCOL, False, str, True)
+_UQ_SupportedQuery = _StatusDetail(SD_SUPPORTED_QUERY, False, str, True)
 
 
 status_details = {
     ST_ASYNCHRONOUS_POLL_ERROR: {},
     ST_BAD_MESSAGE: {},
     ST_DENIED: {},
-    ST_DESTINATION_COLLECTION_ERROR: {'ACCEPTABLE_DESTINATION': _DCE_AcceptableDestination},
+    ST_DESTINATION_COLLECTION_ERROR: {SD_ACCEPTABLE_DESTINATION: _DCE_AcceptableDestination},
     ST_FAILURE: {},
-    ST_INVALID_RESPONSE_PART: {'MAX_PART_NUMBER': _IRP_MaxPartNumber},
+    ST_INVALID_RESPONSE_PART: {SD_MAX_PART_NUMBER: _IRP_MaxPartNumber},
     ST_NETWORK_ERROR: {},
-    ST_NOT_FOUND: {'ITEM': _NF_Item},
-    ST_PENDING: {'ESTIMATED_WAIT': _P_EstimatedWait,
-                 'RESULT_ID': _P_ResultId,
-                 'WILL_PUSH': _P_WillPush},
+    ST_NOT_FOUND: {SD_ITEM: _NF_Item},
+    ST_PENDING: {SD_ESTIMATED_WAIT: _P_EstimatedWait,
+                 SD_RESULT_ID: _P_ResultId,
+                 SD_WILL_PUSH: _P_WillPush},
     ST_POLLING_UNSUPPORTED: {},
-    ST_RETRY: {'ESTIMATED_WAIT': _R_EstimatedWait},
+    ST_RETRY: {SD_ESTIMATED_WAIT: _R_EstimatedWait},
     ST_SUCCESS: {},
     ST_UNAUTHORIZED: {},
-    ST_UNSUPPORTED_MESSAGE_BINDING: {'SUPPORTED_BINDING': _UM_SupportedBinding},
-    ST_UNSUPPORTED_CONTENT_BINDING: {'SUPPORTED_CONTENT': _UC_SupportedContent},
-    ST_UNSUPPORTED_PROTOCOL: {'SUPPORTED_PROTOCOL': _UP_SupportedProtocol},
-    ST_UNSUPPORTED_QUERY: {'SUPPORTED_QUERY': _UQ_SupportedQuery}
+    ST_UNSUPPORTED_MESSAGE_BINDING: {SD_SUPPORTED_BINDING: _UM_SupportedBinding},
+    ST_UNSUPPORTED_CONTENT_BINDING: {SD_SUPPORTED_CONTENT: _UC_SupportedContent},
+    ST_UNSUPPORTED_PROTOCOL: {SD_SUPPORTED_PROTOCOL: _UP_SupportedProtocol},
+    ST_UNSUPPORTED_QUERY: {SD_SUPPORTED_QUERY: _UQ_SupportedQuery}
 }
 
 
@@ -2934,6 +3154,15 @@ class StatusMessage(TAXIIMessage):
         if self.message is not None:
             d['message'] = self.message
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(StatusMessage, self).to_text(line_prepend)
+        s += line_prepend + "Status Type: %s\n" % self.status_type
+        for k, v in self.status_detail.iteritems():
+            s += line_prepend + "Status Detail: %s = %s\n" % (k, v)
+        if self.message:
+            s += line_prepend + "Message: %s\n" % self.message
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -3123,6 +3352,23 @@ class InboxMessage(TAXIIMessage):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = super(InboxMessage, self).to_text(line_prepend)
+        if self.result_id:
+            s += line_prepend + "  Result ID: %s\n" % self.result_id
+        for dcn in self.destination_collection_names:
+            s += line_prepend + "  Destination Collection Name: %s\n" % dcn
+        s += line_prepend + "  Message: %s\n" % self.message
+        if self.subscription_information:
+            s += self.subscription_information.to_text(line_prepend + _STD_INDENT)
+        if self.record_count:
+            s += self.record_count.to_text(line_prepend + _STD_INDENT)
+        s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
+        for cb in self.content_blocks:
+            s += cb.to_text(line_prepend + _STD_INDENT)
+        
+        return s
+
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -3270,6 +3516,22 @@ class SubscriptionInformation(TAXIIBase):
             d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Source Subscription ===\n"
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        
+        if self.exclusive_begin_timestamp_label:
+            s += line_prepend + "  Excl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
+        else:
+            s += line_prepend + "  Excl. Begin TS Label: %s\n" % None
+        
+        if self.inclusive_end_timestamp_label:
+            s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+        else:
+            s += line_prepend + "  Incl. End TS Label: %s\n" % None
+        return s
+
     @staticmethod
     def from_etree(etree_xml):
         collection_name = etree_xml.attrib['collection_name']
@@ -3415,6 +3677,20 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = super(ManageCollectionSubscriptionRequest, self).to_text(line_prepend)
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        s += line_prepend + "  Action: %s\n" % self.action
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        
+        if self.action == ACT_SUBSCRIBE:
+            s += self.subscription_parameters.to_text(line_prepend + _STD_INDENT)
+        
+        if self.action == ACT_SUBSCRIBE and self.push_parameters:
+            s += self.push_parameters.to_text(line_prepend + _STD_INDENT)
+        
+        return s
+
     @classmethod
     def from_etree(cls, etree_xml):
 
@@ -3528,6 +3804,15 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
             d['subscription_instances'].append(subscription_instance.to_dict())
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(ManageCollectionSubscriptionResponse, self).to_text(line_prepend)
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        s += line_prepend + "  Message: %s\n" % self.message
+        for si in self.subscription_instances:
+            s += si.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -3675,6 +3960,19 @@ class SubscriptionInstance(TAXIIBase):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Subscription Instance ===\n"
+        s += line_prepend + "  Status: %s\n" % self.status
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        if self.subscription_parameters:
+            s += self.subscription_parameters.to_text(line_prepend + _STD_INDENT)
+        if self.push_parameters:
+            s += self.push_parameters.to_text(line_prepend + _STD_INDENT)
+        for pi in self.poll_instances:
+            s += pi.to_text(line_prepend + _STD_INDENT)
+        
+        return s
+
     @staticmethod
     def from_etree(etree_xml):
 
@@ -3791,6 +4089,14 @@ class PollInstance(TAXIIBase):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Poll Instance ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.poll_protocol
+        s += line_prepend + "  Address: %s\n" % self.poll_address
+        for mb in self.poll_message_bindings:
+            s += line_prepend +  "  Message Binding: %s\n" % mb
+        return s
+
     @staticmethod
     def from_etree(etree_xml):
         poll_protocol = etree_xml.xpath('./taxii_11:Protocol_Binding', namespaces=ns_map)[0].text
@@ -3868,6 +4174,13 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
         d['result_id'] = self.result_id
         d['result_part_number'] = self.result_part_number
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(PollFulfillmentRequest, self).to_text(line_prepend)
+        s += line_prepend + "  Collection Name: %s\n" % self.collection_name
+        s += line_prepend + "  Result ID: %s\n" % self.result_id
+        s += line_prepend + "  Result Part Number: %s\n" % self.result_part_number
+        return s
 
     @classmethod
     def from_etree(cls, etree_xml):

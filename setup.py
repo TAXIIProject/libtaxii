@@ -53,6 +53,7 @@ setup(
     install_requires=install_requires,
     extras_require=extras_require,
     scripts=[
+        'libtaxii/scripts/collection_information_client.py',
         'libtaxii/scripts/discovery_client.py',
         'libtaxii/scripts/fulfillment_client.py',
         'libtaxii/scripts/inbox_client.py',
@@ -62,6 +63,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
+            'collection_information_client = libtaxii.scripts.collection_information_client:main',
             'discovery_client = libtaxii.scripts.discovery_client:main',
             'fulfillment_client = libtaxii.scripts.fulfillment_client:main',
             'inbox_client = libtaxii.scripts.inbox_client:main',

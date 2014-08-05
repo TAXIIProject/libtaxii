@@ -24,13 +24,22 @@ def main():
                               collection_name=args.collection,
                               result_id=args.result_id,
                               result_part_number=args.result_part_number)
-
-    poll_fulf_req_xml = poll_fulf_req.to_xml(pretty_print=True)
-    print "Poll Fulfillment Request: \r\n", poll_fulf_req_xml
+    
+    print "Request:\n"
+    if args.xml_output is False:
+        print poll_fulf_req.to_text()
+    else:
+        print poll_fulf_req.to_xml(pretty_print=True)
+    
     client = scripts.create_client(args)
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_fulf_req_xml, args.port)
-    response_message = t.get_message_from_http_response(resp, '0')
-    print "Response Message: \r\n", response_message.to_xml(pretty_print=True)
+    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_fulf_req.to_xml(pretty_print=True), args.port)
+    r = t.get_message_from_http_response(resp, '0')
+    
+    print "Response:\n"
+    if args.xml_output is False:
+        print r.to_text()
+    else:
+        print r.to_xml(pretty_print=True)
 
 if __name__ == "__main__":
     main()

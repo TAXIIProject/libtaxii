@@ -3,7 +3,8 @@
 
 import argparse
 import libtaxii.clients as tc
-
+import libtaxii.messages_10 as tm10
+import libtaxii.messages_11 as tm11
 
 class ProxyAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -15,7 +16,6 @@ class ProxyAction(argparse.Action):
             values = None
 
         setattr(namespace, self.dest, values)
-
 
 def create_client(args):
     client = tc.HttpClient()
@@ -35,7 +35,6 @@ def create_client(args):
 
     return client
 
-
 def get_base_parser(parser_description, 
                     path="/services/discovery/", 
                     host="taxiitest.mitre.org",
@@ -45,7 +44,8 @@ def get_base_parser(parser_description,
                     key=None,
                     username=None,
                     password=None,
-                    proxy='noproxy'):
+                    proxy='noproxy',
+                    xml_output=False):
     """
     Parser things common to all scripts. Parsers for specific TAXII Services should
     add their own arguments.
@@ -61,5 +61,7 @@ def get_base_parser(parser_description,
     parser.add_argument("--pass", dest="password", default=password, help="The password to authenticate with. Defaults to %s." % password)
     parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default=proxy,
                         help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
+    parser.add_argument("--xml-output", dest="xml_output", action='store_true', default=xml_output,
+                        help="If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.")
 
     return parser

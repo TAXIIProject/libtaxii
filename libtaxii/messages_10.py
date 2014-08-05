@@ -130,6 +130,7 @@ _type_error = "%s must be of type %s. The incorrect value was of type %s"
 _regex_error = "%s must be a string conforming to %s. The incorrect value was: %s"
 _tuple_error = "%s must be one of %s. The incorrect value was %s"
 
+_STD_INDENT = '  ' # A "Standard Indent" to use for to_text() methods
 
 def generate_message_id(maxlen=5):
     """Generate a TAXII Message ID.
@@ -305,6 +306,9 @@ class BaseNonMessage(object):
         """Create an XML representation of this class."""
         return etree.tostring(self.to_etree(), pretty_print=pretty_print)
 
+    def to_text(self, line_prepend=''):
+        raise NotImplementedError()
+
     @classmethod
     def from_etree(cls, src_etree):
         """Create an instance of this class from an etree.
@@ -461,6 +465,18 @@ class DeliveryParameters(BaseNonMessage):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Push Parameters ===\n"
+        s += line_prepend + "  Inbox Protocol: %s\n" % self.inbox_protocol
+        s += line_prepend + "  Address: %s\n" % self.inbox_address
+        s += line_prepend + "  Message Binding: %s\n" % self.delivery_message_binding
+        if len(self.content_bindings) > 0:
+            s += line_prepend + "  Content Bindings: Any Content\n"
+        for cb in self.content_bindings:
+            s += line_prepend + "  Content Binding: %s\n" % str(cb)
+        
+        return s
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
             return False
@@ -602,6 +618,17 @@ class TAXIIMessage(BaseNonMessage):
 
     def to_json(self):
         return json.dumps(self.to_dict())
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "Message Type: %s\n" % self.message_type
+        s += line_prepend + "Message ID: %s" % self.message_id
+        if self.in_response_to:
+            s += "; In Response To: %s" % self.in_response_to
+        s += "\n"
+        for k, v in self.extended_headers.iteritems():
+            s += line_prepend + "Extended Header: %s = %s" % (k, v)
+            
+        return s
 
     def __eq__(self, other, debug=False):
         if not isinstance(other, TAXIIMessage):
@@ -820,6 +847,17 @@ class ContentBlock(BaseNonMessage):
     def to_json(self):
         return json.dumps(self.to_dict())
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Content Block ===\n"
+        s += line_prepend + "  Content Binding: %s\n" % self.content_binding
+        s += line_prepend + "  Content Length: %s\n" % len(self.content)
+        s += line_prepend + "  (Only content length is shown for brevity)\n"
+        if self.timestamp_label:
+            s += line_prepend + "  Timestamp Label: %s\n" % self.timestamp_label.isoformat()
+        s += line_prepend + "  Padding: %s\n" % self.padding
+        
+        return s
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
             return False
@@ -945,6 +983,13 @@ class DiscoveryResponse(TAXIIMessage):
 
     def to_json(self):
         return json.dumps(self.to_dict())
+
+    def to_text(self, line_prepend=''):
+        s = super(DiscoveryResponse, self).to_text(line_prepend)
+        for si in self.service_instances:
+            s += si.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     def __eq__(self, other, debug=False):
         if not super(DiscoveryResponse, self).__eq__(other, debug):
@@ -1139,6 +1184,23 @@ class ServiceInstance(BaseNonMessage):
         d['message'] = self.message
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Service Instance===\n"
+        s += line_prepend + "  Service Type: %s\n" % self.service_type
+        s += line_prepend + "  Services Version: %s\n" % self.services_version
+        s += line_prepend + "  Protocol Binding: %s\n" % self.protocol_binding
+        s += line_prepend + "  Address: %s\n" % self.service_address
+        for mb in self.message_bindings:
+            s += line_prepend + "  Message Binding: %s\n" % mb
+        if len(self.inbox_service_accepted_content) == 0:
+            s += line_prepend + "  Inbox Service Accepts: %s\n" % None
+        for isac in self.inbox_service_accepted_content:
+            s += line_prepend + "  Inbox Service Accepts: %s\n" % isac
+        s += line_prepend + "  Available: %s\n" % self.available
+        s += line_prepend + "  Message: %s\n" % self.message
+        
+        return s
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['service_type', 'services_version', 'protocol_binding', 'service_address', 'available', 'message'], debug):
             return False
@@ -1257,6 +1319,13 @@ class FeedInformationResponse(TAXIIMessage):
         for feed in self.feed_informations:
             d['feed_informations'].append(feed.to_dict())
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(FeedInformationResponse, self).to_text(line_prepend)
+        for feed in self.feed_informations:
+            s += feed.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     def __eq__(self, other, debug=False):
         if not super(FeedInformationResponse, self).__eq__(other, debug):
@@ -1442,6 +1511,23 @@ class FeedInformation(BaseNonMessage):
             d['subscription_methods'].append(subscription_method.to_dict())
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Data Feed ===\n"
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        if self.available:
+            s += line_prepend + "  Available: %s\n" % self.available
+        s += line_prepend + "  Feed Description: %s\n" % self.feed_description
+        for sc in self.supported_contents:
+            s += line_prepend + "  Supported Content: %s\n" % sc
+        for pm in self.push_methods:
+            s += pm.to_text(line_prepend + _STD_INDENT)
+        for ps in self.polling_service_instances:
+            s += ps.to_text(line_prepend + _STD_INDENT)
+        for sm in self.subscription_methods:
+            s += sm.to_text(line_prepend + _STD_INDENT)
+        
+        return s
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['feed_name', 'feed_description', 'available'], debug):
             return False
@@ -1565,6 +1651,14 @@ class PushMethod(BaseNonMessage):
             d['push_message_bindings'].append(binding)
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Push Method ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.push_protocol
+        for mb in self.push_message_bindings:
+            s += line_prepend + "  Message Binding: %s\n" % mb
+        
+        return s
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['push_protocol'], debug):
             return False
@@ -1648,6 +1742,15 @@ class PollingServiceInstance(BaseNonMessage):
         for binding in self.poll_message_bindings:
             d['poll_message_bindings'].append(binding)
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Poll Service Instance ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.poll_protocol
+        s += line_prepend + "  Address: %s\n" % self.poll_address
+        for mb in self.poll_message_bindings:
+            s += line_prepend + "  Message Binding: %s\n" % mb
+        
+        return s
 
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['poll_protocol', 'poll_address'], debug):
@@ -1735,6 +1838,15 @@ class SubscriptionMethod(BaseNonMessage):
         for binding in self.subscription_message_bindings:
             d['subscription_message_bindings'].append(binding)
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Subscription Method ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.subscription_protocol
+        s += line_prepend + "  Address: %s\n" % self.subscription_address
+        for mb in self.subscription_message_bindings:
+            s += line_prepend + "  Message Binding: %s\n" % mb
+        
+        return s
 
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['subscription_protocol', 'subscription_address'], debug):
@@ -1886,6 +1998,30 @@ class PollRequest(TAXIIMessage):
         for bind in self.content_bindings:
             d['content_bindings'].append(bind)
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(PollRequest, self).to_text(line_prepend)
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        if self.subscription_id:
+            s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        
+        if self.exclusive_begin_timestamp_label:
+            s += line_prepend + "  Excl. Begin Timestamp Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
+        else:
+            s += line_prepend + "  Excl. Begin Timestamp Label: %s\n" % None
+        
+        if self.inclusive_end_timestamp_label:
+            s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+        else:
+            s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+        
+        if len(self.content_bindings) == 0:
+            s += line_prepend + "  Content Binding: Any Content\n" % cb
+        
+        for cb in self.content_bindings:
+            s += line_prepend + "  Content Binding: %s\n" % cb
+        
+        return s
 
     def __eq__(self, other, debug=False):
         if not super(PollRequest, self).__eq__(other, debug):
@@ -2079,6 +2215,25 @@ class PollResponse(TAXIIMessage):
 
         return d
 
+    def to_text(self, line_prepend=''):
+        s = super(PollResponse, self).to_text(line_prepend)
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        if self.subscription_id:
+            s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        s += line_prepend + "  Message: %s\n" % self.message
+        
+        if self.inclusive_begin_timestamp_label:
+            s += line_prepend + "  Incl. Begin Timestamp Label: %s\n" % self.inclusive_begin_timestamp_label.isoformat()
+        else:
+            s += line_prepend + "  Incl. Begin Timestamp Label: %s\n" % None
+        
+        s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+        
+        for cb in self.content_blocks:
+            s += cb.to_text(line_prepend + _STD_INDENT)
+        
+        return s
+
     def __eq__(self, other, debug=False):
         if not super(PollResponse, self).__eq__(other, debug):
             return False
@@ -2210,8 +2365,16 @@ class StatusMessage(TAXIIMessage):
             d['status_detail'] = self.status_detail
         if self.message is not None:
             d['message'] = self.message
-            d['message'] = self.message
+        
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(StatusMessage, self).to_text(line_prepend)
+        s += line_prepend + "  Status Type: %s\n" % self.status_type
+        if self.status_detail:
+            s += line_prepend + "  Status Detail: %s\n" % self.status_detail
+        s += line_prepend + "  Status Message: %s\n" % self.message
+        return s
 
     def __eq__(self, other, debug=None):
         if not super(StatusMessage, self).__eq__(other, debug):
@@ -2330,6 +2493,17 @@ class InboxMessage(TAXIIMessage):
             d['content_blocks'].append(block.to_dict())
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(InboxMessage, self).to_text(line_prepend)
+        s += line_prepend + "  Message: %s\n" % self.message
+        if self.subscription_information:
+            s += self.subscription_information.to_text(line_prepend + _STD_INDENT)
+        s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
+        for cb in self.content_blocks:
+            s += cb.to_text(line_prepend + _STD_INDENT)
+        
+        return s
 
     def __eq__(self, other, debug=False):
         if not super(InboxMessage, self).__eq__(other, debug):
@@ -2471,6 +2645,14 @@ class SubscriptionInformation(BaseNonMessage):
         d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         return d
 
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Subscription Information ===\n"
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        s += line_prepend + "  Incl. Begin TS Label: %s\n" % self.inclusive_begin_timestamp_label.isoformat()
+        s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+        return s
+
     def __eq__(self, other, debug=False):
         return self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug)
 
@@ -2587,6 +2769,15 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
             d['delivery_parameters'] = self.delivery_parameters.to_dict()
         return d
 
+    def to_text(self, line_prepend=''):
+        s = super(ManageFeedSubscriptionRequest, self).to_text(line_prepend)
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        s += line_prepend + "  Action: %s\n" % self.action
+        s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
+        if self.delivery_parameters:
+            s += self.delivery_parameters.to_text(line_prepend + _STD_INDENT)
+        return s
+
     def __eq__(self, other, debug=False):
         if not super(ManageFeedSubscriptionRequest, self).__eq__(other, debug):
             return False
@@ -2690,6 +2881,14 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             d['subscription_instances'].append(subscription_instance.to_dict())
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = super(ManageFeedSubscriptionResponse, self).to_text(line_prepend)
+        s += line_prepend + "  Feed Name: %s\n" % self.feed_name
+        s += line_prepend + "  Message: %s\n" % self.message
+        for si in self.subscription_instances:
+            s += si.to_text(line_prepend + _STD_INDENT)
+        return s
 
     def __eq__(self, other, debug=False):
         if not super(ManageFeedSubscriptionResponse, self).__eq__(other, debug):
@@ -2822,6 +3021,15 @@ class SubscriptionInstance(BaseNonMessage):
 
         return d
 
+    def to_text(self, line_indent=''):
+        s = line_indent + "=== Subscription Instance ===\n"
+        s += line_indent + "  Subscription ID: %s\n" % self.subscription_id
+        for dp in self.delivery_parameters:
+            s += dp.to_text(line_indent + _STD_INDENT)
+        for pi in self.poll_instances:
+            s += pi.to_text(line_indent + _STD_INDENT)
+        return s
+
     def __eq__(self, other, debug=False):
         if not self._checkPropertiesEq(other, ['subscription_id'], debug):
             return False
@@ -2928,6 +3136,14 @@ class PollInstance(BaseNonMessage):
             d['poll_message_bindings'].append(binding)
 
         return d
+
+    def to_text(self, line_prepend=''):
+        s = line_prepend + "=== Poll Instance ===\n"
+        s += line_prepend + "  Protocol Binding: %s\n" % self.poll_protocol
+        s += line_prepend + "  Address: %s\n" % self.poll_address
+        for mb in self.poll_message_bindings:
+            s += line_prepend + "  Message Binding: %s\n" % mb
+        return s
 
     def __eq__(self, other, debug=True):
         if not self._checkPropertiesEq(other, ['poll_protocol', 'poll_address'], debug):
