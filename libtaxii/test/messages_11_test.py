@@ -22,28 +22,53 @@ import libtaxii.taxii_default_query as tdq
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
-test1 = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_CORE,  # Required
+
+#Note that the "*_old" tests are just to make sure that backward-compatible aliases exist
+test1 = tdq.Test(capability_id=tdq.CM_CORE,  # Required
+                 relationship='equals',  # Required
+                 parameters={'value': 'Test value',
+                             'match_type': 'case_sensitive_string'}  # Each relationship defines which params are and are not required
+                 )
+
+test1_old = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_CORE,  # Required
                                         relationship='equals',  # Required
                                         parameters={'value': 'Test value',
                                                     'match_type': 'case_sensitive_string'}  # Each relationship defines which params are and are not required
                                         )
 
-test2 = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_REGEX,  # Required
+test2 = tdq.Test(capability_id=tdq.CM_REGEX,  # Required
+                 relationship='matches',  # Required
+                 parameters={'value': '[A-Z]*',
+                             'case_sensitive': True})  # Each relationship defines which params are and are not required
+
+test2_old = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_REGEX,  # Required
                                         relationship='matches',  # Required
                                         parameters={'value': '[A-Z]*',
                                                     'case_sensitive': True})  # Each relationship defines which params are and are not required
 
-test3 = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_TIMESTAMP,  # Required
+test3 = tdq.Test(capability_id=tdq.CM_TIMESTAMP,  # Required
+                 relationship='greater_than',  # Required
+                 parameters={'value': datetime.datetime.now()})  # Each relationship defines which params are and are not required
+
+test3_old = tdq.DefaultQuery.Criterion.Test(capability_id=tdq.CM_TIMESTAMP,  # Required
                                         relationship='greater_than',  # Required
                                         parameters={'value': datetime.datetime.now()})  # Each relationship defines which params are and are not required
 
-criterion1 = tdq.DefaultQuery.Criterion(target='**', test=test1)
-criterion2 = tdq.DefaultQuery.Criterion(target='STIX_Package/Indicators/Indicator/@id', test=test2)
-criterion3 = tdq.DefaultQuery.Criterion(target='**/Description', test=test3)
+criterion1 = tdq.Criterion(target='**', test=test1)
+criterion2 = tdq.Criterion(target='STIX_Package/Indicators/Indicator/@id', test=test2)
+criterion3 = tdq.Criterion(target='**/Description', test=test3)
 
-criteria1 = tdq.DefaultQuery.Criteria(operator=tdq.OP_AND, criterion=[criterion1])
-criteria2 = tdq.DefaultQuery.Criteria(operator=tdq.OP_OR, criterion=[criterion1, criterion2, criterion3])
-criteria3 = tdq.DefaultQuery.Criteria(operator=tdq.OP_AND, criterion=[criterion1, criterion3], criteria=[criteria2])
+criterion1_old = tdq.DefaultQuery.Criterion(target='**', test=test1)
+criterion2_old = tdq.DefaultQuery.Criterion(target='STIX_Package/Indicators/Indicator/@id', test=test2)
+criterion3_old = tdq.DefaultQuery.Criterion(target='**/Description', test=test3)
+
+criteria1 = tdq.Criteria(operator=tdq.OP_AND, criterion=[criterion1])
+criteria2 = tdq.Criteria(operator=tdq.OP_OR, criterion=[criterion1, criterion2, criterion3])
+criteria3 = tdq.Criteria(operator=tdq.OP_AND, criterion=[criterion1, criterion3], criteria=[criteria2])
+
+criteria1_old = tdq.DefaultQuery.Criteria(operator=tdq.OP_AND, criterion=[criterion1])
+criteria2_old = tdq.DefaultQuery.Criteria(operator=tdq.OP_OR, criterion=[criterion1, criterion2, criterion3])
+criteria3_old = tdq.DefaultQuery.Criteria(operator=tdq.OP_AND, criterion=[criterion1, criterion3], criteria=[criteria2])
 
 query1 = tdq.DefaultQuery(t.CB_STIX_XML_11, criteria1)
 query2 = tdq.DefaultQuery(t.CB_STIX_XML_11, criteria3)
