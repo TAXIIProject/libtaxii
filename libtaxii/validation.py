@@ -59,6 +59,8 @@ def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be
             raise ValueError(_type_error % (varname, type, bad_type))
 
     if regex_tuple is not None:
+        #if not isinstance(var, basestring):
+            #raise ValueError('%s was about to undergo a regex check, but is not of type basestring! Regex check was not performed' % (varname))
         if re.match(regex_tuple.regex, var) is None:
             raise ValueError(_regex_error % (varname, regex_tuple.title, var))
 
