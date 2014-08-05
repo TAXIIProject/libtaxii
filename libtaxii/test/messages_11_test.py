@@ -233,7 +233,7 @@ class StatusMessageTests(unittest.TestCase):
                 message_id='SM09',  # Required
                 in_response_to=tm11.generate_message_id(),  # Required, should be the ID of the message that this is in response to
                 status_type=tm11.ST_UNSUPPORTED_CONTENT_BINDING,  # Required
-                status_detail={'SUPPORTED_CONTENT': ['%s>%s,%s' % (tm11.ContentBinding, 'subtype1', 'subtype2'), t.CB_STIX_XML_101]},  # Required/optional depending on Status Type. See spec for details
+                status_detail={'SUPPORTED_CONTENT': ['%s>%s,%s' % ('maintype', 'subtype1', 'subtype2'), t.CB_STIX_XML_101]},  # Required/optional depending on Status Type. See spec for details
                 message=None  # Optional
         )
         round_trip_message(sm09)
