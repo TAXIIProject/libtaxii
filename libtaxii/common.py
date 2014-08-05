@@ -128,6 +128,9 @@ class TAXIIBase(object):
     # Just noting that there is not a from_text() method. I also 
     # don't think there will ever be one.
 
+    def __str__(self):
+        return self.to_xml(pretty_print=True)
+
     def __eq__(self, other, debug=False):
         """
         Generic method used to check equality of objects of any TAXII type.

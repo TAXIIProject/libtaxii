@@ -336,6 +336,9 @@ class BaseNonMessage(object):
         etree_xml = etree.parse(f, get_xml_parser()).getroot()
         return cls.from_etree(etree_xml)
 
+    def __str__(self):
+        return self.to_xml(pretty_print=True)
+
     def __eq__(self, other, debug=False):
         raise Exception('Method not implemented by child class!')
 
