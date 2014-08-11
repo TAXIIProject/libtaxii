@@ -19,7 +19,7 @@ import libtaxii.messages_11 as tm11
 from .common import TAXIIBase
 from .validation import (do_check, uri_regex, RegexTuple)
 
-targeting_expression_regex = RegexTuple("(@?\w+|\*{1,2})(/(@?\w+|\*{1,2}))*", "Targeting Expression Syntax")
+targeting_expression_regex = RegexTuple("^(@?\w+|\*{1,2})(/(@?\w+|\*{1,2}))*$", "Targeting Expression Syntax")
 
 #: Format ID for this version of TAXII Default Query
 FID_TAXII_DEFAULT_QUERY_10 = 'urn:taxii.mitre.org:query:default:1.0'
