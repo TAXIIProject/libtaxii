@@ -15,8 +15,8 @@ import libtaxii.scripts as scripts
 def main():
     parser = scripts.get_base_parser("Poll Fulfillment Client", path="/services/query_example/")
     parser.add_argument("--collection", dest="collection", default="default_queryable", help="Data Collection that this Fulfillment request applies to. Defaults to 'default_queryable'.")
-    parser.add_argument("--result_id", dest="result_id", required=True, help="The result_id being requested.")
-    parser.add_argument("--result_part_number", dest="result_part_number", default=1, help="The part number being requested. Defaults to '1'.")
+    parser.add_argument("--result-id", dest="result_id", required=True, help="The result_id being requested.")
+    parser.add_argument("--result-part-number", dest="result_part_number", default=1, help="The part number being requested. Defaults to '1'.")
 
     args = parser.parse_args()
 

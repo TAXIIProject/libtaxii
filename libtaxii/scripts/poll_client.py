@@ -17,9 +17,9 @@ import datetime
 def main():
     parser = scripts.get_base_parser("Poll Client", path="/services/poll/")
     parser.add_argument("--collection", dest="collection", default="default", help="Data Collection to poll. Defaults to 'default'.")
-    parser.add_argument("--begin_timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
-    parser.add_argument("--end_timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
-    parser.add_argument("--dest_dir", dest="dest_dir", default="", help="The directory to save Content Blocks to. Defaults to the current directory.")
+    parser.add_argument("--begin-timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
+    parser.add_argument("--end-timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
+    parser.add_argument("--dest-dir", dest="dest_dir", default="", help="The directory to save Content Blocks to. Defaults to the current directory.")
 
     args = parser.parse_args()
 

@@ -17,7 +17,7 @@ import libtaxii.scripts as scripts
 def main():
     parser = scripts.get_base_parser("Poll Query Client", path="/services/query_example/")
     parser.add_argument("--collection", dest="collection", default="default_queryable", help="Data Collection to poll. Defaults to 'default_queryable'.")
-    parser.add_argument("--allow_asynch", dest="allow_asynch", default=True, help="Indicate whether or not the client support Asynchronous Polling. Defaults to True")
+    parser.add_argument("--allow-asynch", dest="allow_asynch", default=True, help="Indicate whether or not the client support Asynchronous Polling. Defaults to True")
     parser.add_argument("--ip", dest="ip", default=None, help="The IP address to query")
     parser.add_argument("--hash", dest="hash", default=None, help="The file hash to query")
 
