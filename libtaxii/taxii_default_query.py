@@ -158,13 +158,7 @@ class Parameter(object):
         self.value_tuple = value_tuple
 
     def verify(self, value):
-        if not isinstance(value, self.type):
-            return False, 'value not of correct type!'
-
-        if self.value_tuple is not None:
-            if value not in self.value_tuple:
-                return False, 'value not in value tuple'
-
+        do_check(value, 'value', type=self.type, value_tuple=self.value_tuple)
         return True, 'OK'
 
 # params - Define parameters for the Core/Regex/Timestamp capability modules
