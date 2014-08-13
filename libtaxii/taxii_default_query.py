@@ -785,6 +785,8 @@ class Test(TAXIIBase):
                     parameters[k] = dateutil.parser.parse(v)
                 except TypeError:  # Just use it as a string
                     parameters[k] = v
+                except ValueError: # Just use it as a string
+                    parameters[k] = v
 
         return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)
 
