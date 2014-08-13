@@ -930,32 +930,32 @@ class PollFulfillmentTests(unittest.TestCase):
 
 class ContentBlockTests(unittest.TestCase):
 
-    def test_content_block1(self):
+    def test_content_block01(self):
         cb1 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
                             content='<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')
         round_trip_content_block(cb1)
 
-    def test_content_block1(self):
+    def test_content_block02(self):
         cb2 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
                             content=StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
-    def test_content_block1(self):
+    def test_content_block03(self):
         cb3 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
                             content=etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
         round_trip_content_block(cb3)
 
-    def test_content_block1(self):
+    def test_content_block04(self):
         cb4 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
                             content='<Something thats not XML')
         round_trip_content_block(cb4)
 
-    def test_content_block1(self):
+    def test_content_block05(self):
         cb5 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
                             content='Something thats not XML <xml/>')
         round_trip_content_block(cb5)
 
-    def test_content_block1(self):
+    def test_content_block06(self):
         cb6 = tm11.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
         round_trip_content_block(cb6)
 
