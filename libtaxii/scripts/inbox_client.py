@@ -2,18 +2,18 @@
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
-
-import argparse
-
-import libtaxii as t
+from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_11 as tm11
-import libtaxii.clients as tc
-import libtaxii.scripts as scripts
+import libtaxii as t
 import StringIO
 
-# http://stix.mitre.org/language/version1.0/#samples
-# http://stix.mitre.org/language/version1.0/stix_v1.0_samples_20130408.zip
-stix_watchlist = '''
+class InboxClient11Script(TaxiiScript):
+    parser_description = 'TAXII 1.1 Inbox Client'
+    path = '/services/inbox/'
+    
+    # http://stix.mitre.org/language/version1.1.1/#samples
+    # http://stix.mitre.org/language/version1.1.1/stix_v1.0_samples_20130408.zip
+    stix_watchlist = '''
 <!--
 	STIX Domain Watchlist Example
 	
@@ -66,46 +66,36 @@ stix_watchlist = '''
         </stix:Indicator>
     </stix:Indicators>
 </stix:STIX_Package>'''
+    
+    
+    def get_arg_parser(self, *args, **kwargs):
+        parser = super(InboxClient11Script, self).get_arg_parser(*args, **kwargs)
+        parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_111, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_111)
+        parser.add_argument("--subtype", dest="subtype", default=None, help="The subtype of the Content Binding. Defaults to None")
+        parser.add_argument("--content-file", dest="content_file", default=self.stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
+        parser.add_argument("--dcn", dest="dcn", default=None, help="The Destination Collection Name for this Inbox Message. Defaults to None. This script only supports one Destination Collection Name")
+        return parser
+        
+    def create_request_message(self, args):
+        if args.content_file is self.stix_watchlist:
+            c = StringIO.StringIO(self.stix_watchlist)
+        else:
+            c = open(args.content_file, 'r')
 
+        cb = tm11.ContentBlock(tm11.ContentBinding(args.content_binding), c.read())
+        c.close()
+        if args.subtype is not None:
+            cb.subtypes.append(args.subtype)
+
+        inbox_message = tm11.InboxMessage(message_id=tm11.generate_message_id(), content_blocks=[cb])
+        if args.dcn:
+            inbox_message.destination_collection_names.append(args.dcn)
+        
+        return inbox_message
 
 def main():
-    parser = scripts.get_base_parser("Inbox Client", path="/services/inbox/")
-    parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_111, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_111)
-    parser.add_argument("--subtype", dest="subtype", default=None, help="The subtype of the Content Binding. Defaults to None")
-    parser.add_argument("--content-file", dest="content_file", default=stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
-    parser.add_argument("--dcn", dest="dcn", default=None, help="The Destination Collection Name for this Inbox Message. Defaults to None. This script only supports one Destination Collection Name")
-
-    args = parser.parse_args()
-
-    if args.content_file is stix_watchlist:
-        c = StringIO.StringIO(stix_watchlist)
-    else:
-        c = open(args.content_file, 'r')
-
-    cb = tm11.ContentBlock(tm11.ContentBinding(args.content_binding), c.read())
-    c.close()
-    if args.subtype is not None:
-        cb.subtypes.append(args.subtype)
-
-    inbox_message = tm11.InboxMessage(message_id=tm11.generate_message_id(), content_blocks=[cb])
-    if args.dcn:
-        inbox_message.destination_collection_names.append(args.dcn)
-    
-    print "Request:\n"
-    if args.xml_output is False:
-        print inbox_message.to_text()
-    else:
-        print inbox_message.to_xml(pretty_print=True)
-    
-    client = scripts.create_client(args)
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, inbox_message.to_xml(pretty_print=True), args.port)
-    r = t.get_message_from_http_response(resp, '0')
-    
-    print "Response:\n"
-    if args.xml_output is False:
-        print r.to_text()
-    else:
-        print r.to_xml(pretty_print=True)
+    script = InboxClient11Script()
+    script()
 
 if __name__ == "__main__":
     main()

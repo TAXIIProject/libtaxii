@@ -4,32 +4,18 @@
 
 import libtaxii as t
 import libtaxii.messages_11 as tm11
-#import libtaxii.taxii_default_query as tdq
-import libtaxii.clients as tc
-import libtaxii.scripts as scripts
+import libtaxii.taxii_default_query as tdq
+from libtaxii.scripts import TaxiiScript
 
+class CollectionInformationClient11Script(TaxiiScript):
+    parser_description = 'TAXII 1.1 Collection Information Client'
+    path = '/services/collection-management/'
+    def create_request_message(self, args):
+        return tm11.CollectionInformationRequest(message_id = tm11.generate_message_id())
 
 def main():
-    parser = scripts.get_base_parser("Collection Information Client", path="/services/collection-management/")
-    args = parser.parse_args()
-
-    collection_information_req = tm11.CollectionInformationRequest(message_id=tm11.generate_message_id())
-    
-    print "Request:\n"
-    if args.xml_output is False:
-        print collection_information_req.to_text()
-    else:
-        print collection_information_req.to_xml(pretty_print=True)
-    
-    client = scripts.create_client(args)
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, collection_information_req.to_xml(pretty_print=True), args.port)
-    r = t.get_message_from_http_response(resp, '0')
-    
-    print "Response:\n"
-    if args.xml_output is False:
-        print r.to_text()
-    else:
-        print r.to_xml(pretty_print=True)
+    script = CollectionInformationClient11Script()
+    script()
 
 if __name__ == "__main__":
     main()

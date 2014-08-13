@@ -2,9 +2,11 @@
 # For license information, see the LICENSE.txt file
 
 import argparse
+import libtaxii as t
 import libtaxii.clients as tc
 import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
+import libtaxii.taxii_default_query as tdq
 
 class ProxyAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -17,25 +19,17 @@ class ProxyAction(argparse.Action):
 
         setattr(namespace, self.dest, values)
 
-def create_client(args):
-    client = tc.HttpClient()
-    client.setUseHttps(args.https)
-    client.setProxy(args.proxy)
-    tls = (args.cert is not None and args.key is not None)
-    basic = (args.username is not None and args.password is not None)
-    if tls and basic:
-        client.setAuthType(tc.HttpClient.AUTH_CERT_BASIC)
-        client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert, 'username': args.username, 'password': args.password})
-    elif tls:
-        client.setAuthType(tc.HttpClient.AUTH_CERT)
-        client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})
-    elif basic:
-        client.setAuthType(tc.HttpClient.AUTH_BASIC)
-        client.setAuthCredentials({'username': args.username, 'password': args.password})
-
-    return client
-
-def get_base_parser(parser_description, 
+class TaxiiScript(object):
+    
+    #: taxii version to put in the request headers. Defaults to TAXII 1.1
+    taxii_version = t.VID_TAXII_XML_11
+    #: parser description
+    parser_description = ''
+    #: default path
+    path = '/'
+    
+    def get_arg_parser(self,
+                    parser_description, 
                     path="/services/discovery/", 
                     host="taxiitest.mitre.org",
                     port="80",
@@ -46,22 +40,98 @@ def get_base_parser(parser_description,
                     password=None,
                     proxy='noproxy',
                     xml_output=False):
-    """
-    Parser things common to all scripts. Parsers for specific TAXII Services should
-    add their own arguments.
-    """
-    parser = argparse.ArgumentParser(description=parser_description)
-    parser.add_argument("--host", dest="host", default=host, help="Host where the Discovery Service is hosted. Defaults to %s." % host)
-    parser.add_argument("--port", dest="port", default=port, type=int, help="Port where the Discovery Service is hosted. Defaults to %s." % port)
-    parser.add_argument("--path", dest="path", default=path, help="Path where the Discovery Service is hosted. Defaults to %s" % path)
-    parser.add_argument("--https", dest="https", default=https, type=bool, help="Whether or not to use HTTPS. Defaults to %s" % https)
-    parser.add_argument("--cert", dest="cert", default=cert, help="The file location of the certificate to use. Defaults to %s." % cert)
-    parser.add_argument("--key", dest="key", default=key, help="The file location of the private key to use. Defaults to %s." % key)
-    parser.add_argument("--username", dest="username", default=username, help="The username to authenticate with. Defaults to %s." % username)
-    parser.add_argument("--pass", dest="password", default=password, help="The password to authenticate with. Defaults to %s." % password)
-    parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default=proxy,
-                        help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
-    parser.add_argument("--xml-output", dest="xml_output", action='store_true', default=xml_output,
-                        help="If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.")
+        """
+        Parser things common to all scripts. Parsers for specific TAXII Services should
+        add their own arguments.
+        """
+        parser = argparse.ArgumentParser(description=parser_description)
+        parser.add_argument("--host", dest="host", default=host, help="Host where the TAXII Service is hosted. Defaults to %s." % host)
+        parser.add_argument("--port", dest="port", default=port, type=int, help="Port where the TAXII Service is hosted. Defaults to %s." % port)
+        parser.add_argument("--path", dest="path", default=path, help="Path where the TAXII Service is hosted. Defaults to %s" % path)
+        parser.add_argument("--https", dest="https", default=https, type=bool, help="Whether or not to use HTTPS. Defaults to %s" % https)
+        parser.add_argument("--cert", dest="cert", default=cert, help="The file location of the certificate to use. Defaults to %s." % cert)
+        parser.add_argument("--key", dest="key", default=key, help="The file location of the private key to use. Defaults to %s." % key)
+        parser.add_argument("--username", dest="username", default=username, help="The username to authenticate with. Defaults to %s." % username)
+        parser.add_argument("--pass", dest="password", default=password, help="The password to authenticate with. Defaults to %s." % password)
+        parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default=proxy,
+                            help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
+        parser.add_argument("--xml-output", dest="xml_output", action='store_true', default=xml_output,
+                            help="If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.")
 
-    return parser
+        return parser
+    
+    def handle_response(self, response, args):
+        """
+        Default response handler. Just prints the response
+        """
+        print "Response:\n"
+        if args.xml_output is False:
+            print response.to_text()
+        else:
+            print response.to_xml(pretty_print=True)
+    
+    def create_client(self, args):
+        client = tc.HttpClient()
+        client.setUseHttps(args.https)
+        client.setProxy(args.proxy)
+        tls = (args.cert is not None and args.key is not None)
+        basic = (args.username is not None and args.password is not None)
+        if tls and basic:
+            client.setAuthType(tc.HttpClient.AUTH_CERT_BASIC)
+            client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert, 'username': args.username, 'password': args.password})
+        elif tls:
+            client.setAuthType(tc.HttpClient.AUTH_CERT)
+            client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})
+        elif basic:
+            client.setAuthType(tc.HttpClient.AUTH_BASIC)
+            client.setAuthCredentials({'username': args.username, 'password': args.password})
+
+        return client
+    
+    def create_request_message(self, args):
+        """
+        This function should create a request message.
+        Should be implemented by child classes.
+        """
+        raise NotImplementedError
+    
+    def __call__(self):
+        """
+        Invoke a TAXII Service based on the arguments
+        """
+        parser = self.get_arg_parser(parser_description=self.parser_description, path=self.path)
+        args = parser.parse_args()
+        request_message = self.create_request_message(args)
+        client = self.create_client(args)
+        
+        print "Request:\n"
+        if args.xml_output is False:
+            print request_message.to_text()
+        else:
+            print request_message.to_xml(pretty_print=True)
+        
+        resp = client.callTaxiiService2(args.host, args.path, self.taxii_version, request_message.to_xml(pretty_print=True), args.port)
+        r = t.get_message_from_http_response(resp, '0')
+        
+        self.handle_response(r, args)
+
+#TODO: These are stubs that will eventually need to be moved out into their own files / scripts
+
+class SubscriptionClient11Script(TaxiiScript):
+    parser_description = 'TAXII 1.1 Subscription Management Client'
+    path = '/services/collection-management/'
+    pass
+
+class InboxClient10Script(TaxiiScript):
+    taxii_version = t.VID_TAXII_XML_10
+    parser_description = 'TAXII 1.0 Inbox Client'
+    path = '/services/inbox/'
+
+class SubscriptionClient10Script(TaxiiScript):
+    taxii_version = t.VID_TAXII_XML_10
+    parser_description = 'TAXII 1.0 Subscription Management Client'
+    path = '/services/feed-management/'
+
+
+
+#No poll fulfillment in TAXII 1.0
