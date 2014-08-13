@@ -168,34 +168,34 @@ class Parameter(object):
         return True, 'OK'
 
 # params - Define parameters for the Core/Regex/Timestamp capability modules
-param_str_value = Parameter('value', basestring)
-param_float_value = Parameter('value', float)
-param_ts_value = Parameter('value', datetime.datetime)
-param_match_type = Parameter('match_type', basestring, ('case_sensitive_string', 'case_insensitive_string', 'number'))
-param_case_sensitive = Parameter('case_sensitive', bool, (True, False))
+param_str_value = Parameter(P_VALUE, basestring)
+param_float_value = Parameter(P_VALUE, float)
+param_ts_value = Parameter(P_VALUE, datetime.datetime)
+param_match_type = Parameter(P_MATCH_TYPE, basestring, ('case_sensitive_string', 'case_insensitive_string', 'number'))
+param_case_sensitive = Parameter(P_CASE_SENSITIVE, bool, (True, False))
 
 # CORE Relationships - Define relationships for the core capability module
-rel_equals = Relationship('equals', [param_str_value, param_match_type])
-rel_not_equals = Relationship('not_requals', [param_str_value, param_match_type])
-rel_greater_than = Relationship('greater_than', [param_float_value])
-rel_greater_than_or_equal = Relationship('greater_than', [param_float_value])
-rel_less_than = Relationship('greater_than', [param_float_value])
-rel_less_than_or_equal = Relationship('greater_than', [param_float_value])
-rel_dne = Relationship('does_not_exist')
-rel_ex = Relationship('exists')
-rel_begins_with = Relationship('begins_with', [param_case_sensitive, param_str_value])
-rel_ends_with = Relationship('ends_with', [param_case_sensitive, param_str_value])
-rel_contains = Relationship('contains', [param_case_sensitive, param_str_value])
+rel_equals = Relationship(R_EQUALS, [param_str_value, param_match_type])
+rel_not_equals = Relationship(R_NOT_EQUALS, [param_str_value, param_match_type])
+rel_greater_than = Relationship(R_GREATER_THAN, [param_float_value])
+rel_greater_than_or_equal = Relationship(R_GREATER_THAN_OR_EQUAL, [param_float_value])
+rel_less_than = Relationship(R_LESS_THAN, [param_float_value])
+rel_less_than_or_equal = Relationship(R_LESS_THAN_OR_EQUAL, [param_float_value])
+rel_dne = Relationship(R_DOES_NOT_EXIST)
+rel_ex = Relationship(R_EXISTS)
+rel_begins_with = Relationship(R_BEGINS_WITH, [param_case_sensitive, param_str_value])
+rel_ends_with = Relationship(R_ENDS_WITH, [param_case_sensitive, param_str_value])
+rel_contains = Relationship(R_CONTAINS, [param_case_sensitive, param_str_value])
 
 # REGEX relationships
-rel_matches = Relationship('matches', [param_case_sensitive, param_str_value])
+rel_matches = Relationship(R_MATCHES, [param_case_sensitive, param_str_value])
 
 # TIMESTAMP relationships
-rel_ts_eq = Relationship('equals', [param_ts_value])
-rel_ts_gt = Relationship('greater_than', [param_ts_value])
-rel_ts_gte = Relationship('greater_than_or_equals', [param_ts_value])
-rel_ts_lt = Relationship('less_than', [param_ts_value])
-rel_ts_lte = Relationship('less_than_or_equals', [param_ts_value])
+rel_ts_eq = Relationship(R_EQUALS, [param_ts_value])
+rel_ts_gt = Relationship(R_GREATER_THAN, [param_ts_value])
+rel_ts_gte = Relationship(R_GREATER_THAN_OR_EQUAL, [param_ts_value])
+rel_ts_lt = Relationship(R_LESS_THAN, [param_ts_value])
+rel_ts_lte = Relationship(R_LESS_THAN_OR_EQUAL, [param_ts_value])
 
 # CORE - Define the Core Capability Module
 cm_core = CapabilityModule(CM_CORE,
