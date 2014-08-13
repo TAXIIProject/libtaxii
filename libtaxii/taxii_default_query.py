@@ -11,6 +11,7 @@ Creating, handling, and parsing TAXII Default Queries.
 import datetime
 from operator import attrgetter
 import os
+import dateutil.parser
 
 from lxml import etree
 
@@ -782,7 +783,7 @@ class Test(TAXIIBase):
             else:
                 try:  # attempt to deserialize as a datetime
                     parameters[k] = dateutil.parser.parse(v)
-                except:  # Just use it as a string
+                except TypeError:  # Just use it as a string
                     parameters[k] = v
 
         return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)
