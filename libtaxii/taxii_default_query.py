@@ -52,6 +52,48 @@ ST_UNSUPPORTED_TARGETING_EXPRESSION = 'UNSUPPORTED_TARGETING_EXPRESSION'
 #: Status Type indicating an unsupported targeting expression id
 ST_UNSUPPORTED_TARGETING_EXPRESSION_ID = 'UNSUPPORTED_TARGETING_EXPRESSION_ID'
 
+#: Parameter name: value
+P_VALUE = 'value'
+#: Parameter name: match_type
+P_MATCH_TYPE = 'match_type'
+#: Parameter name: case_sensitive
+P_CASE_SENSITIVE = 'case_sensitive'
+
+# Tuple of all parameter names
+P_NAMES = (P_VALUE, P_MATCH_TYPE, P_CASE_SENSITIVE)
+
+#: Relationship name: equals
+R_EQUALS = 'equals'
+#: Relationship name: not_requals
+R_NOT_EQUALS = 'not_requals'
+#: Relationship name: greater_than
+R_GREATER_THAN = 'greater_than'
+#: Relationship name: greater_than_or_equal
+R_GREATER_THAN_OR_EQUAL = 'greater_than_or_equal'
+#: Relationship name: less_than
+R_LESS_THAN = 'less_than'
+#: Relationship name: less_than_or_equal
+R_LESS_THAN_OR_EQUAL = 'less_than_or_equal'
+#: Relationship name: does_not_exist
+R_DOES_NOT_EXIST = 'does_not_exist'
+#: Relationship name: exists
+R_EXISTS = 'exists'
+#: Relationship name: begins_with
+R_BEGINS_WITH = 'begins_with'
+#: Relationship name: ends_with
+R_ENDS_WITH = 'ends_with'
+#: Relationship name: contains
+R_CONTAINS = 'contains'
+#: Relationship name: matches
+R_MATCHES = 'matches'
+
+# Tuple of all relationship names
+R_NAMES = (R_EQUALS, R_NOT_EQUALS, R_GREATER_THAN, 
+           R_GREATER_THAN_OR_EQUAL, R_LESS_THAN, 
+           R_LESS_THAN_OR_EQUAL, R_DOES_NOT_EXIST, 
+           R_EXISTS, R_BEGINS_WITH, R_ENDS_WITH, 
+           R_CONTAINS, R_MATCHES)
+
 #: TAXII namespace map for default queries
 ns_map = {'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'}
 
