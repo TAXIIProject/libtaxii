@@ -2016,10 +2016,10 @@ class PollRequest(TAXIIMessage):
         if self.inclusive_end_timestamp_label:
             s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         else:
-            s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
+            s += line_prepend + "  Incl. End Timestamp Label: %s\n" % None
         
         if len(self.content_bindings) == 0:
-            s += line_prepend + "  Content Binding: Any Content\n" % cb
+            s += line_prepend + "  Content Binding: Any Content\n"
         
         for cb in self.content_bindings:
             s += line_prepend + "  Content Binding: %s\n" % cb
