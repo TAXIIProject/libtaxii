@@ -169,7 +169,7 @@
             <xs:documentation>Type for fields that may contain any string and may contain additional XML.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
         </xs:sequence>
     </xs:complexType>
 

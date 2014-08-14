@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://taxii.mitre.org/messages/taxii_xml_binding-1" xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" targetNamespace="http://taxii.mitre.org/messages/taxii_xml_binding-1" elementFormDefault="qualified" version="1.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://taxii.mitre.org/messages/taxii_xml_binding-1"
+    xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    targetNamespace="http://taxii.mitre.org/messages/taxii_xml_binding-1"
+    elementFormDefault="qualified" version="1.0">
     <xs:annotation>
         <xs:appinfo>
             <schema>TAXII XML Message Binding Schema</schema>
@@ -11,7 +16,8 @@
         <xs:documentation>XML schema associated with the TAXII XML Message Binding Specification. Note that in case of conflict, the specification is considered normative.</xs:documentation>
     </xs:annotation>
 
-    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd">
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
+        schemaLocation="xmldsig-core-schema.xsd">
         <xs:annotation>
             <xs:documentation>XML Digital Signature schema imported to support signatures of messages and contents.</xs:documentation>
         </xs:annotation>
@@ -24,7 +30,8 @@
             <xs:documentation>The root of all TAXII messages. This is used to define header fields. This will never be instantiated directly but the TAXII Message Body types all extend this type.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="Extended_Headers" minOccurs="0" maxOccurs="1" type="ExtendedHeadersType">
+            <xs:element name="Extended_Headers" minOccurs="0" maxOccurs="1"
+                type="ExtendedHeadersType">
                 <xs:annotation>
                     <xs:documentation>Represents any number of extended headers for this message.</xs:documentation>
                 </xs:annotation>
@@ -42,7 +49,8 @@
             <xs:documentation>Holds one or more extended headers for the message.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="Extended_Header" type="ExtendedHeaderType" minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="Extended_Header" type="ExtendedHeaderType" minOccurs="1"
+                maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>Each instance of Extended_Header represents one extended header for the message.</xs:documentation>
                 </xs:annotation>
@@ -121,7 +129,9 @@
 
     <xs:simpleType name="TimestampLabelType">
         <xs:restriction base="xs:dateTime">
-            <xs:pattern value="-?[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?(((\+|-)[0-9]{2}:[0-9]{2})|Z)"/>
+            <xs:pattern
+                value="-?[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?(((\+|-)[0-9]{2}:[0-9]{2})|Z)"
+            />
         </xs:restriction>
     </xs:simpleType>
 
@@ -130,7 +140,7 @@
             <xs:documentation>Type for fields that may contain any string and may contain additional XML.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -211,7 +221,7 @@
         <xs:annotation>
             <xs:documentation>This identifies the type of status conveyed in this Status Message. Can either be one of the defined Status Types or a user-defined value.</xs:documentation>
         </xs:annotation>
-        <xs:union memberTypes="taxii:StatusTypeEnum taxii:CustomStatusType"/> 
+        <xs:union memberTypes="taxii:StatusTypeEnum taxii:CustomStatusType"/>
     </xs:simpleType>
 
     <xs:simpleType name="CustomStatusType">
@@ -312,7 +322,8 @@
         <xs:complexContent>
             <xs:extension base="ResponseMessageType">
                 <xs:sequence>
-                    <xs:element name="Service_Instance" minOccurs="0" maxOccurs="unbounded" type="taxii:ServiceInstanceType">
+                    <xs:element name="Service_Instance" minOccurs="0" maxOccurs="unbounded"
+                        type="taxii:ServiceInstanceType">
                         <xs:annotation>
                             <xs:documentation>Each instance holds one service record.</xs:documentation>
                         </xs:annotation>
@@ -421,7 +432,8 @@
         <xs:complexContent>
             <xs:extension base="ResponseMessageType">
                 <xs:sequence>
-                    <xs:element name="Feed" minOccurs="0" maxOccurs="unbounded" type="taxii:FeedRecordType">
+                    <xs:element name="Feed" minOccurs="0" maxOccurs="unbounded"
+                        type="taxii:FeedRecordType">
                         <xs:annotation>
                             <xs:documentation>One element provided for each feed in the response.</xs:documentation>
                         </xs:annotation>
@@ -456,24 +468,28 @@
                     <xs:documentation>Ensure that at least one of Push_Method and Polling_Service are present.</xs:documentation>
                 </xs:annotation>
                 <xs:sequence>
-                    <xs:element name="Push_Method" minOccurs="1" maxOccurs="unbounded" type="PushMethodType">
+                    <xs:element name="Push_Method" minOccurs="1" maxOccurs="unbounded"
+                        type="PushMethodType">
                         <xs:annotation>
                             <xs:documentation>Identify one or more ways that content from this Data Feed can be pushed.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Polling_Service" minOccurs="0" maxOccurs="unbounded" type="ServiceContactInfoType">
+                    <xs:element name="Polling_Service" minOccurs="0" maxOccurs="unbounded"
+                        type="ServiceContactInfoType">
                         <xs:annotation>
                             <xs:documentation>Identify zero or more ways to contact a Poll service to collect information for this Data Feed.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
                 </xs:sequence>
-                <xs:element name="Polling_Service" minOccurs="1" maxOccurs="unbounded" type="ServiceContactInfoType">
+                <xs:element name="Polling_Service" minOccurs="1" maxOccurs="unbounded"
+                    type="ServiceContactInfoType">
                     <xs:annotation>
                         <xs:documentation>Identify one or more ways to contact a Poll service to collect information for this Data Feed.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:choice>
-            <xs:element name="Subscription_Service" minOccurs="0" maxOccurs="unbounded" type="ServiceContactInfoType">
+            <xs:element name="Subscription_Service" minOccurs="0" maxOccurs="unbounded"
+                type="ServiceContactInfoType">
                 <xs:annotation>
                     <xs:documentation>Identify zero or more Feed Management Services to use when establishing a subscription to this Data Feed.</xs:documentation>
                 </xs:annotation>
@@ -518,7 +534,8 @@
         <xs:complexContent>
             <xs:extension base="RequestMessageType">
                 <xs:sequence>
-                    <xs:element name="Push_Parameters" type="PushParameterType" minOccurs="0" maxOccurs="1">
+                    <xs:element name="Push_Parameters" type="PushParameterType" minOccurs="0"
+                        maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>This field is only relevant if the action type is SUBSCRIBE and is ignored otherwise. If action type is SUBSCRIBE, and this field is present, its sub-fields indicate how the subscriber wishes to have Data Feed content pushed to their Inbox Service. If action type is SUBSCRIBE and this field is not present, this indicates that the subscriber does not wish to have content pushed and instead will poll for content.</xs:documentation>
                         </xs:annotation>
@@ -613,7 +630,8 @@
                             <xs:documentation>An additional message intended for human consumption.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Subscription" type="SubscriptionRecordType" minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="Subscription" type="SubscriptionRecordType" minOccurs="0"
+                        maxOccurs="unbounded">
                         <xs:annotation>
                             <xs:documentation>If this message is in response to a message with an action type of SUBSCRIBE or UNSUBSCRIBE, this element MUST be present exactly once. If this message is in response to a message with an action type of STATUS, this element may appear 0 or more times, with each instance describing a different subscription the requester has to the named Data Feed. </xs:documentation>
                         </xs:annotation>
@@ -643,7 +661,8 @@
                     <xs:documentation>This field SHOULD NOT be included by a sender and MUST be ignored by a recipient if this response message is sent in response to a request with an action value other than STATUS. This field and its subfields exactly duplicate the Push_Parameters structure in the request message that established this subscription. Note that if there was no Push_Parameters structure in the request establishing this subscription (i.e., the subscriber did not want content pushed and instead would be polling for content) then that would mean this element was also absent, mirroring the request structure.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="Poll_Instance" type="ServiceContactInfoType" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Poll_Instance" type="ServiceContactInfoType" minOccurs="0"
+                maxOccurs="unbounded">
                 <xs:annotation>
                     <xs:documentation>For actions other than UNSUBSCRIBE, this field MUST be present if the request that established this subscription did not contain a Push_Parameters field. This field SHOULD NOT be present if in response to an UNSUBSCRIBE action. This field MAY be present in all other circumstances.</xs:documentation>
                 </xs:annotation>
@@ -665,17 +684,20 @@
         <xs:complexContent>
             <xs:extension base="RequestMessageType">
                 <xs:sequence>
-                    <xs:element name="Exclusive_Begin_Timestamp" type="TimestampLabelType" minOccurs="0" maxOccurs="1">
+                    <xs:element name="Exclusive_Begin_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>The earliest timestamp of content to retrieve. If absent, indicates no lower bound.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType" minOccurs="0" maxOccurs="1">
+                    <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>The latest timestamp of content to retrieve. If absent, indicates no upper bound.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Content_Binding" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="Content_Binding" type="xs:anyURI" minOccurs="0"
+                        maxOccurs="unbounded">
                         <xs:annotation>
                             <xs:documentation>Lists the content bindings that can be returned in the Poll Response using Content Binding Identifier values. If there are no instances of this field, this indicates that any content bindings are acceptable.</xs:documentation>
                         </xs:annotation>
@@ -714,17 +736,20 @@
                             <xs:documentation>An additional message intended for human consumption.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Inclusive_Begin_Timestamp" type="TimestampLabelType" minOccurs="0" maxOccurs="1">
+                    <xs:element name="Inclusive_Begin_Timestamp" type="TimestampLabelType"
+                        minOccurs="0" maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>The earliest timestamp of content considered. If absent, indicates the earliest content in the Data Feed was considered.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType" minOccurs="1" maxOccurs="1">
+                    <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType"
+                        minOccurs="1" maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>The latest timestamp of content considered.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Content_Block" type="ContentBlockType" minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="Content_Block" type="ContentBlockType" minOccurs="0"
+                        maxOccurs="unbounded">
                         <xs:annotation>
                             <xs:documentation>Returned content.</xs:documentation>
                         </xs:annotation>
@@ -763,12 +788,14 @@
                             <xs:documentation>An additional message intended for human consumption.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Source_Subscription" type="SourceSubscriptionType" minOccurs="0" maxOccurs="1">
+                    <xs:element name="Source_Subscription" type="SourceSubscriptionType"
+                        minOccurs="0" maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation>If this message is being sent in service of an existing subscription, this field SHOULD be present and provide information about the subscription being serviced.</xs:documentation>
                         </xs:annotation>
                     </xs:element>
-                    <xs:element name="Content_Block" type="ContentBlockType" minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="Content_Block" type="ContentBlockType" minOccurs="0"
+                        maxOccurs="unbounded">
                         <xs:annotation>
                             <xs:documentation>Returned content.</xs:documentation>
                         </xs:annotation>
@@ -788,12 +815,14 @@
             <xs:documentation>Describes a subscription to a feed, and the portion of that feed that is being serviced by a message.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="Inclusive_Begin_Timestamp" type="TimestampLabelType" minOccurs="0" maxOccurs="1">
+            <xs:element name="Inclusive_Begin_Timestamp" type="TimestampLabelType" minOccurs="0"
+                maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>The earliest timestamp of content considered. If absent, indicates the earliest content in the Data Feed was considered.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType" minOccurs="1" maxOccurs="1">
+            <xs:element name="Inclusive_End_Timestamp" type="TimestampLabelType" minOccurs="1"
+                maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>The latest timestamp of content considered.</xs:documentation>
                 </xs:annotation>
@@ -817,14 +846,22 @@
             <xs:documentation>Abstract super-type of all message elements.</xs:documentation>
         </xs:annotation>
     </xs:element>
-    <xs:element name="Status_Message" type="TAXIIStatusMessageType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Discovery_Request" type="TAXIIDiscoveryRequestType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Discovery_Response" type="TAXIIDiscoveryResponseType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Feed_Information_Request" type="TAXIIFeedInformationRequestType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Feed_Information_Response" type="TAXIIFeedInformationResponseType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Subscription_Management_Request" type="TAXIISubscriptionManagementRequestType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Subscription_Management_Response" type="TAXIISubscriptionManagementResponseType" substitutionGroup="TAXII_Message"/>
+    <xs:element name="Status_Message" type="TAXIIStatusMessageType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Discovery_Request" type="TAXIIDiscoveryRequestType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Discovery_Response" type="TAXIIDiscoveryResponseType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Feed_Information_Request" type="TAXIIFeedInformationRequestType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Feed_Information_Response" type="TAXIIFeedInformationResponseType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Subscription_Management_Request" type="TAXIISubscriptionManagementRequestType"
+        substitutionGroup="TAXII_Message"/>
+    <xs:element name="Subscription_Management_Response"
+        type="TAXIISubscriptionManagementResponseType" substitutionGroup="TAXII_Message"/>
     <xs:element name="Poll_Request" type="TAXIIPollRequestType" substitutionGroup="TAXII_Message"/>
     <xs:element name="Poll_Response" type="TAXIIPollResponseType" substitutionGroup="TAXII_Message"/>
-    <xs:element name="Inbox_Message" type="TAXIIInboxMessageType" substitutionGroup="TAXII_Message"/>
+    <xs:element name="Inbox_Message" type="TAXIIInboxMessageType" substitutionGroup="TAXII_Message"
+    />
 </xs:schema>
