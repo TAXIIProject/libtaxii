@@ -3079,7 +3079,7 @@ class StatusMessage(TAXIIMessage):
     Args:
         message_id (str): A value identifying this message. **Required**
         in_response_to (str): Contains the Message ID of the message to
-            which this is a response. **Optional**
+            which this is a response. **Required**
         extended_headers (dict): A dictionary of name/value pairs for
             use as Extended Headers. **Optional**
         status_type (str): One of the defined Status Types or a third-party-
