@@ -3214,6 +3214,78 @@ class StatusMessage(TAXIIMessage):
         msg = super(StatusMessage, cls).from_dict(d, **kwargs)
         return msg
 
+# message_id - set by function
+# in_response_to - set by user
+# extended_headers - set by user or None
+# status_type - set by function
+# status_detail - required/allowed by function, set by user
+# message - set by user
+
+def _create_status_message(in_response_to, status_type, status_detail = None, message = None, extended_headers=None, required_sd_keys = None):
+    if required_sd_keys:
+        if status_detail is None:
+            raise ValueError('status_detail was none, but the following status_detail entries are required: %s' % str(required_sd_keys))
+        for key in required_sd_keys:
+            if key not in status_detail:
+                raise ValueError('A required entry in status_detail was not provided: %s' % key)
+    
+    return StatusMessage(message_id = generate_message_id(),
+                         in_response_to = in_response_to,
+                         extended_headers = extended_headers,
+                         status_type = status_type,
+                         status_detail = status_detail,
+                         message = message)
+
+def status_success(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_SUCCESS, status_detail, message, extended_headers, None)
+
+def status_async_poll_error(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_ASYNCHRONOUS_POLL_ERROR, status_detail, message, extended_headers, None)
+
+def status_bad_message(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_BAD_MESSAGE, status_detail, message, extended_headers, None)
+
+def status_denied(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_DENIED, status_detail, message, extended_headers, None)
+
+def status_destination_collection_error(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_BAD_MESSAGE, status_detail, message, extended_headers, [SD_ACCEPTABLE_DESTINATION])
+
+def status_failure(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_FAILURE, status_detail, message, extended_headers, None)
+
+def status_invalid_response_part(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_INVALID_RESPONSE_PART, status_detail, message, extended_headers, [SD_MAX_PART_NUMBER])
+
+def status_network_error(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_NETWORK_ERROR, status_detail, message, extended_headers, None)
+
+def status_not_found(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_NOT_FOUND, status_detail, message, extended_headers, [SD_ITEM])
+
+def status_pending(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_PENDING, status_detail, message, extended_headers, [SD_ESTIMATED_WAIT, SD_RESULT_ID, SD_WILL_PUSH])
+
+def status_polling_not_supported(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_POLLING_UNSUPPORTED, status_detail, message, extended_headers, None)
+
+def status_retry(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_RETRY, status_detail, message, extended_headers, [SD_ESTIMATED_WAIT])
+
+def status_unauthorized(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_UNAUTHORIZED, status_detail, message, extended_headers, None)
+
+def status_unsupported_message_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_MESSAGE_BINDING, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
+
+def status_unsupported_content_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_CONTENT_BINDING, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
+
+def status_unsupported_protocol_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_PROTOCOL, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
+
+def status_unsupported_query_format(in_response_to, status_detail=None, message=None, extended_headers=None):
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_QUERY, status_detail, message, extended_headers, [SD_SUPPORTED_QUERY])
 
 class InboxMessage(TAXIIMessage):
     """
