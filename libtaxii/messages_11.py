@@ -3121,6 +3121,13 @@ class StatusMessage(TAXIIMessage):
     @status_detail.setter
     def status_detail(self, value):
         do_check(value.keys(), 'status_detail.keys()', regex_tuple=uri_regex)
+        detail_rules = status_details[self.status_type]
+        # Check defined status types for conformance
+        for sd_name, rules in detail_rules.iteritems():
+            do_check(value.get(sd_name, None), 
+                     'status_detail[\'%s\']' % sd_name, 
+                     type=rules.type, 
+                     can_be_none=(not rules.required))
         self._status_detail = value
 
     def to_etree(self):
