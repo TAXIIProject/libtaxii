@@ -3214,13 +3214,6 @@ class StatusMessage(TAXIIMessage):
         msg = super(StatusMessage, cls).from_dict(d, **kwargs)
         return msg
 
-# message_id - set by function
-# in_response_to - set by user
-# extended_headers - set by user or None
-# status_type - set by function
-# status_detail - required/allowed by function, set by user
-# message - set by user
-
 def _create_status_message(in_response_to, status_type, status_detail = None, message = None, extended_headers=None, required_sd_keys = None):
     if required_sd_keys:
         if status_detail is None:
@@ -3237,54 +3230,309 @@ def _create_status_message(in_response_to, status_type, status_detail = None, me
                          message = message)
 
 def status_success(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_SUCCESS
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_success(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_SUCCESS, status_detail, message, extended_headers, None)
 
 def status_async_poll_error(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_ASYNCHRONOUS_POLL_ERROR
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_ASYNCHRONOUS_POLL_ERROR, status_detail, message, extended_headers, None)
 
 def status_bad_message(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_BAD_MESSAGE
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_bad_message(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_BAD_MESSAGE, status_detail, message, extended_headers, None)
 
 def status_denied(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_DENIED
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_denied(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_DENIED, status_detail, message, extended_headers, None)
 
 def status_destination_collection_error(in_response_to, status_detail=None, message=None, extended_headers=None):
-    return _create_status_message(in_response_to, ST_BAD_MESSAGE, status_detail, message, extended_headers, [SD_ACCEPTABLE_DESTINATION])
+    """Creates a Status Message with a status_type of ST_DESTINATION_COLLECTION_ERROR
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details. **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_destination_collection_error(request_message.message_id, status_detail={SD_ACCEPTABLE_DESTINATION: 'SomeDestination'})
+    """
+    return _create_status_message(in_response_to, ST_DESTINATION_COLLECTION_ERROR, status_detail, message, extended_headers, [SD_ACCEPTABLE_DESTINATION])
 
 def status_failure(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_FAILURE
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_failure(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_FAILURE, status_detail, message, extended_headers, None)
 
 def status_invalid_response_part(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_INVALID_RESPONSE_PART
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_invalid_response_part(request_message.message_id, status_detail={SD_MAX_PART_NUMBER: 3})
+    """
     return _create_status_message(in_response_to, ST_INVALID_RESPONSE_PART, status_detail, message, extended_headers, [SD_MAX_PART_NUMBER])
 
 def status_network_error(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_NETWORK_ERROR
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_network_error(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_NETWORK_ERROR, status_detail, message, extended_headers, None)
 
 def status_not_found(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_NOT_FOUND
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_not_found(request_message.message_id, status_detail={SD_ITEM: 'TheItemName'})
+    """
     return _create_status_message(in_response_to, ST_NOT_FOUND, status_detail, message, extended_headers, [SD_ITEM])
 
 def status_pending(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_PENDING
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_pending(request_message.message_id, status_detail={SD_ESTIMATED_WAIT: 60, SD_RESULT_ID: '123', SD_WILL_PUSH: False})
+    """
     return _create_status_message(in_response_to, ST_PENDING, status_detail, message, extended_headers, [SD_ESTIMATED_WAIT, SD_RESULT_ID, SD_WILL_PUSH])
 
 def status_polling_not_supported(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_POLLING_UNSUPPORTED
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_polling_not_supported(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_POLLING_UNSUPPORTED, status_detail, message, extended_headers, None)
 
 def status_retry(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_RETRY
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_retry(request_message.message_id, status_detail{SD_ESTIMATED_WAIT: 60})
+    """
     return _create_status_message(in_response_to, ST_RETRY, status_detail, message, extended_headers, [SD_ESTIMATED_WAIT])
 
 def status_unauthorized(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_UNAUTHORIZED
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Optional**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_unauthorized(request_message.message_id)
+    """
     return _create_status_message(in_response_to, ST_UNAUTHORIZED, status_detail, message, extended_headers, None)
 
 def status_unsupported_message_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_UNSUPPORTED_MESSAGE_BINDING
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_unsupported_message_binding(request_message.message_id, status_detail={SD_SUPPORTED_BINDING: 'some_supported_binding'})
+    """
     return _create_status_message(in_response_to, ST_UNSUPPORTED_MESSAGE_BINDING, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
 
 def status_unsupported_content_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_UNSUPPORTED_CONTENT_BINDING
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_unsupported_content_binding(request_message.message_id, status_detail={SD_SUPPORTED_BINDING: 'some_supported_binding'})
+    """
     return _create_status_message(in_response_to, ST_UNSUPPORTED_CONTENT_BINDING, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
 
 def status_unsupported_protocol_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_UNSUPPORTED_PROTOCOL
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_unsupported_protocol_binding(request_message.message_id, status_detail={SD_SUPPORTED_BINDING: 'some_supported_binding'})
+    """
     return _create_status_message(in_response_to, ST_UNSUPPORTED_PROTOCOL, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
 
 def status_unsupported_query_format(in_response_to, status_detail=None, message=None, extended_headers=None):
+    """Creates a Status Message with a status_type of ST_UNSUPPORTED_QUERY
+    and auto-generates the message_id using the generate_message_id()
+    function.
+
+    Args:
+        in_response_to (str): The message_id of the message that this is a response to **Required**
+        status_detail (dict): A dict containing status details **Required**
+        message (str): A message for the Status Message **Optional**
+        extended_headers (dict): A dict containing extended headers **Optional**
+
+    Example:
+        .. code-block:: python
+
+            sm = status_unsupported_query_format(request_message.message_id, status_detail={SD_SUPPORTED_QUERY: 'some_supported_query'})
+    """
     return _create_status_message(in_response_to, ST_UNSUPPORTED_QUERY, status_detail, message, extended_headers, [SD_SUPPORTED_QUERY])
 
 class InboxMessage(TAXIIMessage):
