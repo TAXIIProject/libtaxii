@@ -15,6 +15,7 @@ class PollClient11Script(TaxiiScript):
         parser.add_argument("--collection", dest="collection", default="default", help="Data Collection to poll. Defaults to 'default'.")
         parser.add_argument("--begin-timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
         parser.add_argument("--end-timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
+        parser.add_argument("--subscription-id", dest="subscription_id", default=None, help="The Subscription ID for the poll request. Defaults to None.")
         parser.add_argument("--dest-dir", dest="dest_dir", default="", help="The directory to save Content Blocks to. Defaults to the current directory.")
         return parser
     
@@ -36,12 +37,17 @@ class PollClient11Script(TaxiiScript):
         except ValueError:
             print "Unable to parse timestamp value. Timestamp should include both date and time information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll."
             sys.exit()
-
-        poll_req = tm11.PollRequest(message_id=tm11.generate_message_id(),
-                                  collection_name=args.collection,
-                                  exclusive_begin_timestamp_label=begin_ts,
-                                  inclusive_end_timestamp_label=end_ts,
-                                  poll_parameters=tm11.PollRequest.PollParameters())
+        
+        create_kwargs = {'message_id': tm11.generate_message_id(),
+                         'collection_name': args.collection,
+                         'exclusive_begin_timestamp_label': begin_ts,
+                         'inclusive_end_timestamp_label': end_ts}
+        
+        if args.subscription_id:
+            create_kwargs['subscription_id'] = args.subscription_id
+        else:
+            create_kwargs['poll_parameters'] = tm11.PollRequest.PollParameters()
+        poll_req = tm11.PollRequest(**create_kwargs)
         return poll_req
     
     def handle_response(self, response, args):
