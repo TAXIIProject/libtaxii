@@ -246,7 +246,22 @@ def validate_xml(xml_string):
     Example:
         .. code-block:: python
 
-            is_valid, error_log = tm11.validate_xml(message.to_xml())
+            from libtaxii import messages_11
+            from lxml.etree import XMLSyntaxError
+            
+            try:
+               valid, error_log = messages_11.validate_xml(some_xml_string)
+            except XMLSyntaxError:
+                # Handle this exception, which occurs when
+                # some_xml_string is not valid XML (e.g., 'foo')
+
+            if not valid:
+                for error in error_log:
+                    print error
+                sys.exit(-1)
+            
+            # At this point, the XML is schema valid
+            do_something(some_xml_string)
     """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
