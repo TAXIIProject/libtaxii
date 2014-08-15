@@ -235,13 +235,18 @@ from libtaxii.messages_10 import (generate_message_id)
 def validate_xml(xml_string):
     """Validate XML with the TAXII XML Schema 1.1.
 
+    Returns a tuple of (True/False, error_log) where
+    True/False indicates whether validation succeeded and
+    the error_log is a log of all errors encountered during
+    validation.
+    
     Args:
         xml_string (str): The XML to validate.
 
     Example:
         .. code-block:: python
 
-            is_valid = tm11.validate_xml(message.to_xml())
+            is_valid, error_log = tm11.validate_xml(message.to_xml())
     """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -255,9 +260,7 @@ def validate_xml(xml_string):
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
     # TODO: Additionally, validate the Query stuff
-    if not valid:
-        return xml_schema.error_log.last_error
-    return valid
+    return valid, xml_schema.error_log
 
 
 def get_message_from_xml(xml_string):
