@@ -171,7 +171,7 @@ def validate_xml(xml_string):
             if not valid:
                 for error in error_log:
                     print error
-                sys.exit(-1)
+                sys.exit(1)
             
             # At this point, the XML is schema valid
             do_something(some_xml_string)
