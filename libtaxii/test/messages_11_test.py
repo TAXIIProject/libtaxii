@@ -102,14 +102,14 @@ def round_trip_message(taxii_message, print_xml=False):
     # print '***** Message type = %s; id = %s' % (taxii_message.message_type, taxii_message.message_id)
 
     xml_string = taxii_message.to_xml()
-    valid = tm11.validate_xml(xml_string)
-    if valid is not True:
+    valid, error_log = tm11.validate_xml(xml_string)
+    if not valid:
         print 'Bad XML was:'
         try:
             print etree.tostring(taxii_message.to_etree(), pretty_print=True)
         except Exception as e:
             print xml_string
-        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
+        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % error_log.last_error)
 
     if print_xml:
         print etree.tostring(taxii_message.to_etree(), pretty_print=True)
