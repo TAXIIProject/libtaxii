@@ -3214,13 +3214,7 @@ class StatusMessage(TAXIIMessage):
         msg = super(StatusMessage, cls).from_dict(d, **kwargs)
         return msg
 
-def _create_status_message(in_response_to, status_type, status_detail = None, message = None, extended_headers=None, required_sd_keys = None):
-    if required_sd_keys:
-        if status_detail is None:
-            raise ValueError('status_detail was none, but the following status_detail entries are required: %s' % str(required_sd_keys))
-        for key in required_sd_keys:
-            if key not in status_detail:
-                raise ValueError('A required entry in status_detail was not provided: %s' % key)
+def _create_status_message(in_response_to, status_type, status_detail = None, message = None, extended_headers=None):
     
     return StatusMessage(message_id = generate_message_id(),
                          in_response_to = in_response_to,
@@ -3245,7 +3239,7 @@ def status_success(in_response_to, status_detail=None, message=None, extended_he
 
             sm = status_success(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_SUCCESS, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_SUCCESS, status_detail, message, extended_headers)
 
 def status_async_poll_error(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_ASYNCHRONOUS_POLL_ERROR
@@ -3263,7 +3257,7 @@ def status_async_poll_error(in_response_to, status_detail=None, message=None, ex
 
             sm = status_(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_ASYNCHRONOUS_POLL_ERROR, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_ASYNCHRONOUS_POLL_ERROR, status_detail, message, extended_headers)
 
 def status_bad_message(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_BAD_MESSAGE
@@ -3281,7 +3275,7 @@ def status_bad_message(in_response_to, status_detail=None, message=None, extende
 
             sm = status_bad_message(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_BAD_MESSAGE, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_BAD_MESSAGE, status_detail, message, extended_headers)
 
 def status_denied(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_DENIED
@@ -3299,7 +3293,7 @@ def status_denied(in_response_to, status_detail=None, message=None, extended_hea
 
             sm = status_denied(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_DENIED, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_DENIED, status_detail, message, extended_headers)
 
 def status_destination_collection_error(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_DESTINATION_COLLECTION_ERROR
@@ -3317,7 +3311,7 @@ def status_destination_collection_error(in_response_to, status_detail=None, mess
 
             sm = status_destination_collection_error(request_message.message_id, status_detail={SD_ACCEPTABLE_DESTINATION: 'SomeDestination'})
     """
-    return _create_status_message(in_response_to, ST_DESTINATION_COLLECTION_ERROR, status_detail, message, extended_headers, [SD_ACCEPTABLE_DESTINATION])
+    return _create_status_message(in_response_to, ST_DESTINATION_COLLECTION_ERROR, status_detail, message, extended_headers)
 
 def status_failure(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_FAILURE
@@ -3335,7 +3329,7 @@ def status_failure(in_response_to, status_detail=None, message=None, extended_he
 
             sm = status_failure(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_FAILURE, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_FAILURE, status_detail, message, extended_headers)
 
 def status_invalid_response_part(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_INVALID_RESPONSE_PART
@@ -3353,7 +3347,7 @@ def status_invalid_response_part(in_response_to, status_detail=None, message=Non
 
             sm = status_invalid_response_part(request_message.message_id, status_detail={SD_MAX_PART_NUMBER: 3})
     """
-    return _create_status_message(in_response_to, ST_INVALID_RESPONSE_PART, status_detail, message, extended_headers, [SD_MAX_PART_NUMBER])
+    return _create_status_message(in_response_to, ST_INVALID_RESPONSE_PART, status_detail, message, extended_headers)
 
 def status_network_error(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_NETWORK_ERROR
@@ -3371,7 +3365,7 @@ def status_network_error(in_response_to, status_detail=None, message=None, exten
 
             sm = status_network_error(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_NETWORK_ERROR, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_NETWORK_ERROR, status_detail, message, extended_headers)
 
 def status_not_found(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_NOT_FOUND
@@ -3389,7 +3383,7 @@ def status_not_found(in_response_to, status_detail=None, message=None, extended_
 
             sm = status_not_found(request_message.message_id, status_detail={SD_ITEM: 'TheItemName'})
     """
-    return _create_status_message(in_response_to, ST_NOT_FOUND, status_detail, message, extended_headers, [SD_ITEM])
+    return _create_status_message(in_response_to, ST_NOT_FOUND, status_detail, message, extended_headers)
 
 def status_pending(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_PENDING
@@ -3407,7 +3401,7 @@ def status_pending(in_response_to, status_detail=None, message=None, extended_he
 
             sm = status_pending(request_message.message_id, status_detail={SD_ESTIMATED_WAIT: 60, SD_RESULT_ID: '123', SD_WILL_PUSH: False})
     """
-    return _create_status_message(in_response_to, ST_PENDING, status_detail, message, extended_headers, [SD_ESTIMATED_WAIT, SD_RESULT_ID, SD_WILL_PUSH])
+    return _create_status_message(in_response_to, ST_PENDING, status_detail, message, extended_headers)
 
 def status_polling_not_supported(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_POLLING_UNSUPPORTED
@@ -3425,7 +3419,7 @@ def status_polling_not_supported(in_response_to, status_detail=None, message=Non
 
             sm = status_polling_not_supported(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_POLLING_UNSUPPORTED, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_POLLING_UNSUPPORTED, status_detail, message, extended_headers)
 
 def status_retry(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_RETRY
@@ -3443,7 +3437,7 @@ def status_retry(in_response_to, status_detail=None, message=None, extended_head
 
             sm = status_retry(request_message.message_id, status_detail{SD_ESTIMATED_WAIT: 60})
     """
-    return _create_status_message(in_response_to, ST_RETRY, status_detail, message, extended_headers, [SD_ESTIMATED_WAIT])
+    return _create_status_message(in_response_to, ST_RETRY, status_detail, message, extended_headers)
 
 def status_unauthorized(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_UNAUTHORIZED
@@ -3461,7 +3455,7 @@ def status_unauthorized(in_response_to, status_detail=None, message=None, extend
 
             sm = status_unauthorized(request_message.message_id)
     """
-    return _create_status_message(in_response_to, ST_UNAUTHORIZED, status_detail, message, extended_headers, None)
+    return _create_status_message(in_response_to, ST_UNAUTHORIZED, status_detail, message, extended_headers)
 
 def status_unsupported_message_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_UNSUPPORTED_MESSAGE_BINDING
@@ -3479,7 +3473,7 @@ def status_unsupported_message_binding(in_response_to, status_detail=None, messa
 
             sm = status_unsupported_message_binding(request_message.message_id, status_detail={SD_SUPPORTED_BINDING: 'some_supported_binding'})
     """
-    return _create_status_message(in_response_to, ST_UNSUPPORTED_MESSAGE_BINDING, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_MESSAGE_BINDING, status_detail, message, extended_headers)
 
 def status_unsupported_content_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_UNSUPPORTED_CONTENT_BINDING
@@ -3497,7 +3491,7 @@ def status_unsupported_content_binding(in_response_to, status_detail=None, messa
 
             sm = status_unsupported_content_binding(request_message.message_id, status_detail={SD_SUPPORTED_BINDING: 'some_supported_binding'})
     """
-    return _create_status_message(in_response_to, ST_UNSUPPORTED_CONTENT_BINDING, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_CONTENT_BINDING, status_detail, message, extended_headers)
 
 def status_unsupported_protocol_binding(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_UNSUPPORTED_PROTOCOL
@@ -3515,7 +3509,7 @@ def status_unsupported_protocol_binding(in_response_to, status_detail=None, mess
 
             sm = status_unsupported_protocol_binding(request_message.message_id, status_detail={SD_SUPPORTED_BINDING: 'some_supported_binding'})
     """
-    return _create_status_message(in_response_to, ST_UNSUPPORTED_PROTOCOL, status_detail, message, extended_headers, [SD_SUPPORTED_BINDING])
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_PROTOCOL, status_detail, message, extended_headers)
 
 def status_unsupported_query_format(in_response_to, status_detail=None, message=None, extended_headers=None):
     """Creates a Status Message with a status_type of ST_UNSUPPORTED_QUERY
@@ -3533,7 +3527,7 @@ def status_unsupported_query_format(in_response_to, status_detail=None, message=
 
             sm = status_unsupported_query_format(request_message.message_id, status_detail={SD_SUPPORTED_QUERY: 'some_supported_query'})
     """
-    return _create_status_message(in_response_to, ST_UNSUPPORTED_QUERY, status_detail, message, extended_headers, [SD_SUPPORTED_QUERY])
+    return _create_status_message(in_response_to, ST_UNSUPPORTED_QUERY, status_detail, message, extended_headers)
 
 class InboxMessage(TAXIIMessage):
     """
