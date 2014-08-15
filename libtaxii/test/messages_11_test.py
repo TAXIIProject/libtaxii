@@ -109,7 +109,8 @@ def round_trip_message(taxii_message, print_xml=False):
             print etree.tostring(taxii_message.to_etree(), pretty_print=True)
         except Exception as e:
             print xml_string
-        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % error_log.last_error)
+        validation_errors = "\n".join([str(x) for x in error_log])
+        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % validation_errors)
 
     if print_xml:
         print etree.tostring(taxii_message.to_etree(), pretty_print=True)
