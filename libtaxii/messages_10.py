@@ -159,7 +159,22 @@ def validate_xml(xml_string):
     Example:
         .. code-block:: python
 
-            is_valid = tm10.validate_xml(message.to_xml())
+            from libtaxii import messages_10
+            from lxml.etree import XMLSyntaxError
+            
+            try:
+               valid, error_log = messages_10.validate_xml(some_xml_string)
+            except XMLSyntaxError:
+                # Handle this exception, which occurs when
+                # some_xml_string is not valid XML (e.g., 'foo')
+
+            if not valid:
+                for error in error_log:
+                    print error
+                sys.exit(-1)
+            
+            # At this point, the XML is schema valid
+            do_something(some_xml_string)
     """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -172,9 +187,7 @@ def validate_xml(xml_string):
     taxii_schema_doc = etree.parse(schema_file, get_xml_parser())
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
-    if not valid:
-        return xml_schema.error_log.last_error
-    return valid
+    return valid, xml_schema.error_log
 
 
 def get_message_from_xml(xml_string):
