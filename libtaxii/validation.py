@@ -103,6 +103,12 @@ class SchemaValidationResult:
         self.error_log = error_log
 
 class SchemaValidator(object):
+    """
+    A helper class for TAXII Schema Validation.
+    
+    Example:
+        See validate_etree(...) for an example how to use this class
+    """
     package_dir, package_filename = os.path.split(__file__)
     TAXII_11_SCHEMA = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema_11.xsd")
     TAXII_10_SCHEMA = schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
@@ -152,6 +158,7 @@ class SchemaValidator(object):
 
                 try:
                    result = sv.validate_etree(some_etree)
+                   # Note that validate_string() and validate_file() can also be used
                 except XMLSyntaxError:
                     # Handle this exception, which occurs when
                     # some_xml_string is not valid XML (e.g., 'foo')
