@@ -19,6 +19,7 @@ from lxml import etree
 import libtaxii as t
 import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
+from libtaxii.validation import SchemaValidator
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
@@ -102,6 +103,8 @@ def round_trip_message(taxii_message, print_xml=False):
     # print '***** Message type = %s; id = %s' % (taxii_message.message_type, taxii_message.message_id)
 
     xml_string = taxii_message.to_xml()
+    
+    #The old way of validating
     valid = tm11.validate_xml(xml_string)
     if valid is not True:
         print 'Bad XML was:'
@@ -110,6 +113,17 @@ def round_trip_message(taxii_message, print_xml=False):
         except Exception as e:
             print xml_string
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
+
+    # The new way of validating
+    sv = SchemaValidator(SchemaValidator.TAXII_11_SCHEMA)
+    try:
+       result = sv.validate_string(xml_string)
+    except XMLSyntaxError:
+        raise
+
+    if not result.valid:
+        errors = [item for item in result.error_log]
+        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % errors)
 
     if print_xml:
         print etree.tostring(taxii_message.to_etree(), pretty_print=True)

@@ -151,7 +151,11 @@ def generate_message_id(maxlen=5):
 
 
 def validate_xml(xml_string):
-    """Validate XML with the TAXII XML Schema 1.0.
+    """
+    Note that this function has been deprecated. Please see 
+    libtaxii.validators.SchemaValidator.
+
+    Validate XML with the TAXII XML Schema 1.0.
 
     Args:
         xml_string (str): The XML to validate.
