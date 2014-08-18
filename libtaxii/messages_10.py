@@ -156,6 +156,15 @@ def validate_xml(xml_string):
     Args:
         xml_string (str): The XML to validate.
 
+    Returns:
+        a tuple of (True/False, error_log) where
+        True/False indicates whether validation succeeded and
+        the error_log is a log of all errors encountered during
+        validation.
+    
+    Raises:
+        lxml.etree.XMLSyntaxError: When the XML to be validated is not well formed
+    
     Example:
         .. code-block:: python
 
