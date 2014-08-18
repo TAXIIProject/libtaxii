@@ -21,6 +21,8 @@ from .common import (get_xml_parser, set_xml_parser)
 RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
 # URI regex per http://tools.ietf.org/html/rfc3986
 uri_regex = RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
+message_id_regex_10 = RegexTuple("[0-9]+", "Numbers only")
+targeting_expression_regex = RegexTuple("^(@?\w+|\*{1,2})(/(@?\w+|\*{1,2}))*$", "Targeting Expression Syntax")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
 _type_error = "%s must be of type %s. The incorrect value was of type %s"

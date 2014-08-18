@@ -21,216 +21,10 @@ import StringIO
 
 from lxml import etree
 
-import libtaxii.messages_10 as tm10
-
 from .common import (get_xml_parser, parse_datetime_string, set_xml_parser,
         TAXIIBase)
 from .validation import do_check, uri_regex, check_timestamp_label
-
-
-# TAXII 1.0 Message Types
-
-#: Constant identifying a Status Message
-MSG_STATUS_MESSAGE = tm10.MSG_STATUS_MESSAGE
-#: Constant identifying a Discovery Request Message
-MSG_DISCOVERY_REQUEST = tm10.MSG_DISCOVERY_REQUEST
-#: Constant identifying a Discovery Response Message
-MSG_DISCOVERY_RESPONSE = tm10.MSG_DISCOVERY_RESPONSE
-#: Constant identifying a Feed Information Request Message
-MSG_FEED_INFORMATION_REQUEST = tm10.MSG_FEED_INFORMATION_REQUEST
-#: Constant identifying a Feed Information Response Message
-MSG_FEED_INFORMATION_RESPONSE = tm10.MSG_FEED_INFORMATION_RESPONSE
-#: Constant identifying a Subscription Management Request Message
-MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
-#: Constant identifying a Subscription Management Response Message
-MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = tm10.MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE
-#: Constant identifying a Poll Request Message
-MSG_POLL_REQUEST = tm10.MSG_POLL_REQUEST
-#: Constant identifying a Poll Response Message
-MSG_POLL_RESPONSE = tm10.MSG_POLL_RESPONSE
-#: Constant identifying a Inbox Message
-MSG_INBOX_MESSAGE = tm10.MSG_INBOX_MESSAGE
-
-# New Message Types in TAXII 1.1
-
-#: Constant identifying a Status Message
-MSG_POLL_FULFILLMENT_REQUEST = 'Poll_Fulfillment'
-#: Constant identifying a Collection Information Request
-MSG_COLLECTION_INFORMATION_REQUEST = 'Collection_Information_Request'
-#: Constant identifying a Collection Information Response
-MSG_COLLECTION_INFORMATION_RESPONSE = 'Collection_Information_Response'
-#: Constant identifying a Subscription Request
-MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#: Constant identifying a Subscription Response
-MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
-
-#: Tuple of all TAXII 1.1 Message Types
-MSG_TYPES = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE,
-        MSG_COLLECTION_INFORMATION_REQUEST, MSG_COLLECTION_INFORMATION_RESPONSE,
-        MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST,
-        MSG_MANAGE_COLLECTION_SUBSCRIPTION_RESPONSE, MSG_POLL_REQUEST,
-        MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE, MSG_POLL_FULFILLMENT_REQUEST)
-
-
-# TAXII 1.0 Status Types
-
-#: Constant identifying a Status Type of Bad Message
-ST_BAD_MESSAGE = tm10.ST_BAD_MESSAGE
-#: Constant identifying a Status Type of Denied
-ST_DENIED = tm10.ST_DENIED
-#: Constant identifying a Status Type of Failure
-ST_FAILURE = tm10.ST_FAILURE
-#: Constant identifying a Status Type of Not Found
-ST_NOT_FOUND = tm10.ST_NOT_FOUND
-#: Constant identifying a Status Type of Polling Unsupported
-ST_POLLING_UNSUPPORTED = tm10.ST_POLLING_UNSUPPORTED
-#: Constant identifying a Status Type of Retry
-ST_RETRY = tm10.ST_RETRY
-#: Constant identifying a Status Type of Success
-ST_SUCCESS = tm10.ST_SUCCESS
-#: Constant identifying a Status Type of Unauthorized
-ST_UNAUTHORIZED = tm10.ST_UNAUTHORIZED
-#: Constant identifying a Status Type of Unsupported Message Binding
-ST_UNSUPPORTED_MESSAGE_BINDING = tm10.ST_UNSUPPORTED_MESSAGE_BINDING
-#: Constant identifying a Status Type of Unsupported Content Binding
-ST_UNSUPPORTED_CONTENT_BINDING = tm10.ST_UNSUPPORTED_CONTENT_BINDING
-#: Constant identifying a Status Type of Unsupported Protocol Binding
-ST_UNSUPPORTED_PROTOCOL = tm10.ST_UNSUPPORTED_PROTOCOL
-
-# New Status Types in TAXII 1.1
-
-#: Constant identifying a Status Type of Asynchronous Poll Error
-ST_ASYNCHRONOUS_POLL_ERROR = 'ASYNCHRONOUS_POLL_ERROR'
-#: Constant identifying a Status Type of Destination Collection Error
-ST_DESTINATION_COLLECTION_ERROR = 'DESTINATION_COLLECTION_ERROR'
-#: Constant identifying a Status Type of Invalid Response Part
-ST_INVALID_RESPONSE_PART = 'INVALID_RESPONSE_PART'
-#: Constant identifying a Status Type of Network Error
-ST_NETWORK_ERROR = 'NETWORK_ERROR'
-#: Constant identifying a Status Type of Pending
-ST_PENDING = 'PENDING'
-#: Constant identifying a Status Type of Unsupported Query Format
-ST_UNSUPPORTED_QUERY = 'UNSUPPORTED_QUERY'
-
-#: Tuple of all TAXII 1.1 Status types
-ST_TYPES = (ST_ASYNCHRONOUS_POLL_ERROR, ST_BAD_MESSAGE, ST_DENIED,
-        ST_DESTINATION_COLLECTION_ERROR, ST_FAILURE, ST_INVALID_RESPONSE_PART,
-        ST_NETWORK_ERROR, ST_NOT_FOUND, ST_PENDING, ST_POLLING_UNSUPPORTED,
-        ST_RETRY, ST_SUCCESS, ST_UNAUTHORIZED, ST_UNSUPPORTED_MESSAGE_BINDING,
-        ST_UNSUPPORTED_CONTENT_BINDING, ST_UNSUPPORTED_PROTOCOL,
-        ST_UNSUPPORTED_QUERY)
-
-
-# TAXII 1.0 Action Types
-
-#: Constant identifying an Action of Subscribe
-ACT_SUBSCRIBE = tm10.ACT_SUBSCRIBE
-#: Constant identifying an Action of Unsubscribe
-ACT_UNSUBSCRIBE = tm10.ACT_UNSUBSCRIBE
-#: Constant identifying an Action of Status
-ACT_STATUS = tm10.ACT_STATUS
-
-# New Action Types in TAXII 1.1
-
-#: Constant identifying an Action of Pause
-ACT_PAUSE = 'PAUSE'
-#: Constant identifying an Action of Resume
-ACT_RESUME = 'RESUME'
-
-#: Tuple of all TAXII 1.1 Action types
-ACT_TYPES = (ACT_SUBSCRIBE, ACT_PAUSE, ACT_RESUME, ACT_UNSUBSCRIBE, ACT_STATUS)
-
-
-# TAXII 1.1 Subscription Statuses
-
-#: Subscription Status of Active
-SS_ACTIVE = 'ACTIVE'
-#: Subscription Status of Paused
-SS_PAUSED = 'PAUSED'
-#: Subscription Status of Unsubscribed
-SS_UNSUBSCRIBED = 'UNSUBSCRIBED'
-
-#: Tuple of all TAXII 1.1 Subscription Statues
-SS_TYPES = (SS_ACTIVE, SS_PAUSED, SS_UNSUBSCRIBED)
-
-
-# TAXII 1.1 Response Types
-
-#: Constant identifying a response type of Full
-RT_FULL = 'FULL'
-#: Constant identifying a response type of Count only
-RT_COUNT_ONLY = 'COUNT_ONLY'
-
-#: Tuple of all TAXII 1.1 Response Types
-RT_TYPES = (RT_FULL, RT_COUNT_ONLY)
-
-
-# TAXII 1.1 Response Types
-
-#: Constant identifying a collection type of Data Feed
-CT_DATA_FEED = 'DATA_FEED'
-#: Constant identifying a collection type of Data Set
-CT_DATA_SET = 'DATA_SET'
-
-#: Tuple of all TAXII 1.1 Collection Types
-CT_TYPES = (CT_DATA_FEED, CT_DATA_SET)
-
-
-# TAXII 1.0 Service Types
-
-#: Constant identifying a Service Type of Inbox
-SVC_INBOX = tm10.SVC_INBOX
-#: Constant identifying a Service Type of Poll
-SVC_POLL = tm10.SVC_POLL
-#: Constant identifying a Service Type of Discovery
-SVC_DISCOVERY = tm10.SVC_DISCOVERY
-
-# Renamed Status Types in TAXII 1.1
-#: Constant identifying a Service Type of Collection Management.
-#: "Feed Management" was renamed to "Collection Management" in TAXII 1.1.
-SVC_COLLECTION_MANAGEMENT = 'COLLECTION_MANAGEMENT'
-
-#: Tuple of all TAXII 1.1 Service Types
-SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_COLLECTION_MANAGEMENT, SVC_DISCOVERY)
-
-# TAXII 1.1 Status Detail Keys
-
-#: Constant Identifying the Acceptable Destination Status Detail
-SD_ACCEPTABLE_DESTINATION = 'ACCEPTABLE_DESTINATION'
-#: Constant Identifying the Max Part Number Status Detail
-SD_MAX_PART_NUMBER = 'MAX_PART_NUMBER'
-#: Constant Identifying the Item Status Detail
-SD_ITEM = 'ITEM'
-#: Constant Identifying the Estimated Wait Status Detail
-SD_ESTIMATED_WAIT = 'ESTIMATED_WAIT'
-#: Constant Identifying the Result ID Status Detail
-SD_RESULT_ID = 'RESULT_ID'
-#: Constant Identifying the Will Push Status Detail
-SD_WILL_PUSH = 'WILL_PUSH'
-#: Constant Identifying the Supported Binding Status Detail
-SD_SUPPORTED_BINDING = 'SUPPORTED_BINDING'
-#: Constant Identifying the Supported Content Status Detail
-SD_SUPPORTED_CONTENT = 'SUPPORTED_CONTENT'
-#: Constant Identifying the Supported Protocol Status Detail
-SD_SUPPORTED_PROTOCOL = 'SUPPORTED_PROTOCOL'
-#: Constant Identifying the Supported Query Status Detail
-SD_SUPPORTED_QUERY = 'SUPPORTED_QUERY'
-
-#: Tuple of all TAXII 1.1 Status Detail Keys
-SD_TYPES = ( SD_ACCEPTABLE_DESTINATION, SD_MAX_PART_NUMBER, SD_ITEM,
-             SD_ESTIMATED_WAIT, SD_RESULT_ID, SD_WILL_PUSH,
-             SD_SUPPORTED_BINDING, SD_SUPPORTED_CONTENT, SD_SUPPORTED_PROTOCOL,
-             SD_SUPPORTED_QUERY)
-
-ns_map = {
-            'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
-         }
-
-_STD_INDENT = '  ' # A "Standard Indent" to use for to_text() methods
-
-# Import helper methods from libtaxii.messages_10 that are still applicable
-from libtaxii.messages_10 import (generate_message_id)
-
+from .constants import *
 
 def validate_xml(xml_string):
     """
@@ -555,7 +349,7 @@ class Query(TAXIIBase):
 
     @classmethod
     def from_etree(cls, etree_xml, kwargs):
-        format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
+        format_id = etree_xml.xpath('./@format_id', ns_mapnsmap)[0]
         return cls(format_id, **kwargs)
 
     @classmethod
@@ -790,7 +584,7 @@ class _GenericParameters(TAXIIBase):
         for binding in self.content_bindings:
             s += "  Content Binding: %s\n" % str(binding)
         if self.query:
-            s += self.query.to_text(line_prepend + _STD_INDENT)
+            s += self.query.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -1405,7 +1199,7 @@ class DiscoveryResponse(TAXIIMessage):
     def to_text(self, line_prepend=''):
         s = super(DiscoveryResponse, self).to_text()
         for si in self.service_instances:
-            s += si.to_text(line_prepend + _STD_INDENT)
+            s += si.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -1744,7 +1538,7 @@ class CollectionInformationResponse(TAXIIMessage):
         s = super(CollectionInformationResponse, self).to_text(line_prepend)
         s += line_prepend + "Contains %s Collection Informations\n" % len(self.collection_informations)
         for collection in self.collection_informations:
-            s += collection.to_text(line_prepend + _STD_INDENT)
+            s += collection.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -1983,13 +1777,13 @@ class CollectionInformation(TAXIIBase):
         if len(self.supported_contents) == 0:#All contents supported:
             s += line_prepend + "  Supported Content: %s\n" % "All"
         for contents in self.supported_contents:
-            s += line_prepend + "  Supported Content: %s\n" % contents.to_text(line_prepend + _STD_INDENT)
+            s += line_prepend + "  Supported Content: %s\n" % contents.to_text(line_prepend + STD_INDENT)
         for psi in self.polling_service_instances:
-            s += psi.to_text(line_prepend + _STD_INDENT)
+            s += psi.to_text(line_prepend + STD_INDENT)
         for sm in self.subscription_methods:
-            s += sm.to_text(line_prepend + _STD_INDENT)
+            s += sm.to_text(line_prepend + STD_INDENT)
         for ris in self.receiving_inbox_services:
-            s += ris.to_text(line_prepend + _STD_INDENT)
+            s += ris.to_text(line_prepend + STD_INDENT)
         s += line_prepend + "==================================\n\n"
         return s
 
@@ -2598,7 +2392,7 @@ class PollRequest(TAXIIRequestMessage):
         s += line_prepend + "  Excl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label
         s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label
         if self.poll_parameters:
-            s += self.poll_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.poll_parameters.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -2722,7 +2516,7 @@ class PollParameters(_GenericParameters):
         if self.allow_asynch:
             s += line_prepend + "  Allow Asynch: %s\n" % self.allow_asynch
         if self.delivery_parameters:
-            s += self.delivery_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.delivery_parameters.to_text(line_prepend + STD_INDENT)
         return s
 
     @classmethod
@@ -2954,7 +2748,7 @@ class PollResponse(TAXIIMessage):
         s += line_prepend + "  More: %s\n" % self.more
         s += line_prepend + "  Result ID: %s\n" % self.result_id
         if self.record_count:
-            s += self.record_count.to_text(line_prepend + _STD_INDENT)
+            s += self.record_count.to_text(line_prepend + STD_INDENT)
         if self.subscription_id:
             s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         if self.message:
@@ -2964,7 +2758,7 @@ class PollResponse(TAXIIMessage):
         if self.inclusive_end_timestamp_label:
             s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         for cb in self.content_blocks:
-            s += cb.to_text(line_prepend + _STD_INDENT)
+            s += cb.to_text(line_prepend + STD_INDENT)
         return s
 
     @classmethod
@@ -3371,12 +3165,12 @@ class InboxMessage(TAXIIMessage):
             s += line_prepend + "  Destination Collection Name: %s\n" % dcn
         s += line_prepend + "  Message: %s\n" % self.message
         if self.subscription_information:
-            s += self.subscription_information.to_text(line_prepend + _STD_INDENT)
+            s += self.subscription_information.to_text(line_prepend + STD_INDENT)
         if self.record_count:
-            s += self.record_count.to_text(line_prepend + _STD_INDENT)
+            s += self.record_count.to_text(line_prepend + STD_INDENT)
         s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
         for cb in self.content_blocks:
-            s += cb.to_text(line_prepend + _STD_INDENT)
+            s += cb.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -3695,10 +3489,10 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
         s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         
         if self.action == ACT_SUBSCRIBE:
-            s += self.subscription_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.subscription_parameters.to_text(line_prepend + STD_INDENT)
         
         if self.action == ACT_SUBSCRIBE and self.push_parameters:
-            s += self.push_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.push_parameters.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -3821,7 +3615,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
         s += line_prepend + "  Collection Name: %s\n" % self.collection_name
         s += line_prepend + "  Message: %s\n" % self.message
         for si in self.subscription_instances:
-            s += si.to_text(line_prepend + _STD_INDENT)
+            s += si.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -3976,11 +3770,11 @@ class SubscriptionInstance(TAXIIBase):
         s += line_prepend + "  Status: %s\n" % self.status
         s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         if self.subscription_parameters:
-            s += self.subscription_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.subscription_parameters.to_text(line_prepend + STD_INDENT)
         if self.push_parameters:
-            s += self.push_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.push_parameters.to_text(line_prepend + STD_INDENT)
         for pi in self.poll_instances:
-            s += pi.to_text(line_prepend + _STD_INDENT)
+            s += pi.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -4214,6 +4008,10 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
         return super(PollFulfillmentRequest, cls).from_dict(d, **kwargs)
 
 
+##########################################################
+## EVERYTHING BELOW HERE IS FOR BACKWARDS COMPATIBILITY ##
+##########################################################
+
 # Add top-level classes as nested classes for backwards compatibility
 DiscoveryResponse.ServiceInstance = ServiceInstance
 CollectionInformationResponse.CollectionInformation = CollectionInformation
@@ -4225,3 +4023,16 @@ ManageCollectionSubscriptionResponse.PollInstance = PollInstance
 ManageCollectionSubscriptionResponse.SubscriptionInstance = SubscriptionInstance
 PollRequest.PollParameters = PollParameters
 InboxMessage.SubscriptionInformation = SubscriptionInformation
+
+# Constants not imported in `from constants import *`
+
+MSG_TYPES = MSG_TYPES_11
+ST_TYPES = ST_TYPES_11
+ACT_TYPES = ACT_TYPES_11
+SS_TYPES = SS_TYPES_11
+RT_TYPES = RT_TYPES_11
+CT_TYPES = CT_TYPES_11
+SVC_TYPES = SVC_TYPES_11
+SD_TYPES = SD_TYPES_11
+
+from common import (generate_message_id)

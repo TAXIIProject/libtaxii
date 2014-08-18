@@ -17,138 +17,13 @@ try:
 except ImportError:
     import json
 import os
-import random
 import StringIO
 
 from lxml import etree
 
 from .common import get_xml_parser, parse_datetime_string, set_xml_parser
-from .validation import do_check, uri_regex, check_timestamp_label
-
-# TAXII 1.0 Message Types
-
-#: Constant identifying a Status Message
-MSG_STATUS_MESSAGE = 'Status_Message'
-#: Constant identifying a Discovery Request Message
-MSG_DISCOVERY_REQUEST = 'Discovery_Request'
-#: Constant identifying a Discovery Response Message
-MSG_DISCOVERY_RESPONSE = 'Discovery_Response'
-#: Constant identifying a Feed Information Request Message
-MSG_FEED_INFORMATION_REQUEST = 'Feed_Information_Request'
-#: Constant identifying a Feed Information Response Message
-MSG_FEED_INFORMATION_RESPONSE = 'Feed_Information_Response'
-#: Constant identifying a Subscription Management Request Message
-MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST = 'Subscription_Management_Request'
-#: Constant identifying a Subscription Management Response Message
-MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE = 'Subscription_Management_Response'
-#: Constant identifying a Poll Request Message
-MSG_POLL_REQUEST = 'Poll_Request'
-#: Constant identifying a Poll Response Message
-MSG_POLL_RESPONSE = 'Poll_Response'
-#: Constant identifying a Inbox Message
-MSG_INBOX_MESSAGE = 'Inbox_Message'
-
-#: Tuple of all TAXII 1.0 Message Types
-MSG_TYPES = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE,
-        MSG_FEED_INFORMATION_REQUEST, MSG_FEED_INFORMATION_RESPONSE,
-        MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST,
-        MSG_MANAGE_FEED_SUBSCRIPTION_RESPONSE, MSG_POLL_REQUEST,
-        MSG_POLL_RESPONSE, MSG_INBOX_MESSAGE)
-
-
-# TAXII 1.0 Status Types
-
-#: Constant identifying a Status Type of Bad Message
-ST_BAD_MESSAGE = 'BAD_MESSAGE'
-#: Constant identifying a Status Type of Denied
-ST_DENIED = 'DENIED'
-#: Constant identifying a Status Type of Failure
-ST_FAILURE = 'FAILURE'
-#: Constant identifying a Status Type of Not Found
-ST_NOT_FOUND = 'NOT_FOUND'
-#: Constant identifying a Status Type of Polling Unsupported
-ST_POLLING_UNSUPPORTED = 'POLLING_UNSUPPORTED'
-#: Constant identifying a Status Type of Retry
-ST_RETRY = 'RETRY'
-#: Constant identifying a Status Type of Success
-ST_SUCCESS = 'SUCCESS'
-#: Constant identifying a Status Type of Unauthorized
-ST_UNAUTHORIZED = 'UNAUTHORIZED'
-#: Constant identifying a Status Type of Unsupported Message Binding
-ST_UNSUPPORTED_MESSAGE_BINDING = 'UNSUPPORTED_MESSAGE'
-#: Constant identifying a Status Type of Unsupported Content Binding
-ST_UNSUPPORTED_CONTENT_BINDING = 'UNSUPPORTED_CONTENT'
-#: Constant identifying a Status Type of Unsupported Protocol Binding
-ST_UNSUPPORTED_PROTOCOL = 'UNSUPPORTED_PROTOCOL'
-
-#: Tuple of all TAXII 1.0 Status Types
-ST_TYPES = (ST_BAD_MESSAGE, ST_DENIED, ST_FAILURE, ST_NOT_FOUND,
-        ST_POLLING_UNSUPPORTED, ST_RETRY, ST_SUCCESS, ST_UNAUTHORIZED,
-        ST_UNSUPPORTED_MESSAGE_BINDING, ST_UNSUPPORTED_CONTENT_BINDING,
-        ST_UNSUPPORTED_PROTOCOL)
-
-
-# TAXII 1.0 Action Types
-
-#: Constant identifying an Action of Subscribe
-ACT_SUBSCRIBE = 'SUBSCRIBE'
-#: Constant identifying an Action of Unsubscribe
-ACT_UNSUBSCRIBE = 'UNSUBSCRIBE'
-#: Constant identifying an Action of Status
-ACT_STATUS = 'STATUS'
-
-#: Tuple of all TAXII 1.0 Action Types
-ACT_TYPES = (ACT_SUBSCRIBE, ACT_UNSUBSCRIBE, ACT_STATUS)
-
-
-# TAXII 1.0 Service Types
-
-#: Constant identifying a Service Type of Inbox
-SVC_INBOX = 'INBOX'
-#: Constant identifying a Service Type of Poll
-SVC_POLL = 'POLL'
-#: Constant identifying a Service Type of Feed Management
-SVC_FEED_MANAGEMENT = 'FEED_MANAGEMENT'
-#: Constant identifying a Service Type of Discovery
-SVC_DISCOVERY = 'DISCOVERY'
-
-#: Tuple of all TAXII 1.0 Service Types
-SVC_TYPES = (SVC_INBOX, SVC_POLL, SVC_FEED_MANAGEMENT, SVC_DISCOVERY)
-
-
-ns_map = {
-    'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
-}
-
-# General purpose helper methods #
-
-_RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
-_message_id_regex = _RegexTuple("[0-9]+", "Numbers only")
-
-_none_error = "%s is not allowed to be None and the provided value was None"
-_type_error = "%s must be of type %s. The incorrect value was of type %s"
-_regex_error = "%s must be a string conforming to %s. The incorrect value was: %s"
-_tuple_error = "%s must be one of %s. The incorrect value was %s"
-
-_STD_INDENT = '  ' # A "Standard Indent" to use for to_text() methods
-
-def generate_message_id(maxlen=5):
-    """Generate a TAXII Message ID.
-
-    Args:
-        maxlen (int): maximum length of the ID, in characters
-
-    Example:
-        .. code-block:: python
-
-            msg_id = tm11.generate_message_id()
-            message = tm11.DiscoveryRequest(msg_id)
-            # Or...
-            message = tm11.DiscoveryRequest(tm11.generate_message_id())
-    """
-    message_id = random.randint(1, 10 ** maxlen)
-    return str(message_id)
-
+from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
+from constants import *
 
 def validate_xml(xml_string):
     """
@@ -556,7 +431,7 @@ class TAXIIMessage(BaseNonMessage):
 
     @message_id.setter
     def message_id(self, value):
-        do_check(value, 'message_id', regex_tuple=_message_id_regex)
+        do_check(value, 'message_id', regex_tuple=message_id_regex_10)
         self._message_id = value
 
     @property
@@ -565,7 +440,7 @@ class TAXIIMessage(BaseNonMessage):
 
     @in_response_to.setter
     def in_response_to(self, value):
-        do_check(value, 'in_response_to', regex_tuple=_message_id_regex, can_be_none=True)
+        do_check(value, 'in_response_to', regex_tuple=message_id_regex_10, can_be_none=True)
         self._in_response_to = value
 
     @property
@@ -994,7 +869,7 @@ class DiscoveryResponse(TAXIIMessage):
     def to_text(self, line_prepend=''):
         s = super(DiscoveryResponse, self).to_text(line_prepend)
         for si in self.service_instances:
-            s += si.to_text(line_prepend + _STD_INDENT)
+            s += si.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -1302,7 +1177,7 @@ class FeedInformationResponse(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        do_check(value, 'in_response_to', regex_tuple=_message_id_regex)
+        do_check(value, 'in_response_to', regex_tuple=message_id_regex_10)
         self._in_response_to = value
 
     @property
@@ -1330,7 +1205,7 @@ class FeedInformationResponse(TAXIIMessage):
     def to_text(self, line_prepend=''):
         s = super(FeedInformationResponse, self).to_text(line_prepend)
         for feed in self.feed_informations:
-            s += feed.to_text(line_prepend + _STD_INDENT)
+            s += feed.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -1527,11 +1402,11 @@ class FeedInformation(BaseNonMessage):
         for sc in self.supported_contents:
             s += line_prepend + "  Supported Content: %s\n" % sc
         for pm in self.push_methods:
-            s += pm.to_text(line_prepend + _STD_INDENT)
+            s += pm.to_text(line_prepend + STD_INDENT)
         for ps in self.polling_service_instances:
-            s += ps.to_text(line_prepend + _STD_INDENT)
+            s += ps.to_text(line_prepend + STD_INDENT)
         for sm in self.subscription_methods:
-            s += sm.to_text(line_prepend + _STD_INDENT)
+            s += sm.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -2237,7 +2112,7 @@ class PollResponse(TAXIIMessage):
         s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         
         for cb in self.content_blocks:
-            s += cb.to_text(line_prepend + _STD_INDENT)
+            s += cb.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -2505,10 +2380,10 @@ class InboxMessage(TAXIIMessage):
         s = super(InboxMessage, self).to_text(line_prepend)
         s += line_prepend + "  Message: %s\n" % self.message
         if self.subscription_information:
-            s += self.subscription_information.to_text(line_prepend + _STD_INDENT)
+            s += self.subscription_information.to_text(line_prepend + STD_INDENT)
         s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
         for cb in self.content_blocks:
-            s += cb.to_text(line_prepend + _STD_INDENT)
+            s += cb.to_text(line_prepend + STD_INDENT)
         
         return s
 
@@ -2782,7 +2657,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         s += line_prepend + "  Action: %s\n" % self.action
         s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         if self.delivery_parameters:
-            s += self.delivery_parameters.to_text(line_prepend + _STD_INDENT)
+            s += self.delivery_parameters.to_text(line_prepend + STD_INDENT)
         return s
 
     def __eq__(self, other, debug=False):
@@ -2894,7 +2769,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         s += line_prepend + "  Feed Name: %s\n" % self.feed_name
         s += line_prepend + "  Message: %s\n" % self.message
         for si in self.subscription_instances:
-            s += si.to_text(line_prepend + _STD_INDENT)
+            s += si.to_text(line_prepend + STD_INDENT)
         return s
 
     def __eq__(self, other, debug=False):
@@ -3032,9 +2907,9 @@ class SubscriptionInstance(BaseNonMessage):
         s = line_indent + "=== Subscription Instance ===\n"
         s += line_indent + "  Subscription ID: %s\n" % self.subscription_id
         for dp in self.delivery_parameters:
-            s += dp.to_text(line_indent + _STD_INDENT)
+            s += dp.to_text(line_indent + STD_INDENT)
         for pi in self.poll_instances:
-            s += pi.to_text(line_indent + _STD_INDENT)
+            s += pi.to_text(line_indent + STD_INDENT)
         return s
 
     def __eq__(self, other, debug=False):
@@ -3177,6 +3052,9 @@ class PollInstance(BaseNonMessage):
     def from_dict(d):
         return PollInstance(**d)
 
+##########################################################
+## EVERYTHING BELOW HERE IS FOR BACKWARDS COMPATIBILITY ##
+##########################################################
 
 # Add top-level classes as nested classes for backwards compatibility
 DiscoveryResponse.ServiceInstance = ServiceInstance
@@ -3187,3 +3065,11 @@ FeedInformation.SubscriptionMethod = SubscriptionMethod
 ManageFeedSubscriptionResponse.PollInstance = PollInstance
 ManageFeedSubscriptionResponse.SubscriptionInstance = SubscriptionInstance
 InboxMessage.SubscriptionInformation = SubscriptionInformation
+
+# Constants not imported in `from constants import *`
+MSG_TYPES = MSG_TYPES_10
+ST_TYPES = ST_TYPES_10
+ACT_TYPES = ACT_TYPES_10
+SVC_TYPES = SVC_TYPES_10
+
+from common import (generate_message_id)
