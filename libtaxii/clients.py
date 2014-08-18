@@ -17,7 +17,7 @@ import uuid
 import socket
 import ssl
 import libtaxii as t
-
+import warnings
 
 class HttpClient:
 
@@ -148,6 +148,9 @@ class HttpClient:
 
             Call a TAXII service.
         """
+
+        warnings.warn('Call to deprecated function: libtaxii.clients.HttpClient.callTaxiiService()',
+                      category=DeprecationWarning)
 
         if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:

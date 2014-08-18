@@ -18,6 +18,7 @@ except ImportError:
     import json
 import os
 import StringIO
+import warnings
 
 from lxml import etree
 
@@ -40,6 +41,10 @@ def validate_xml(xml_string):
 
             is_valid = tm10.validate_xml(message.to_xml())
     """
+
+    warnings.warn('Call to deprecated function: libtaxii.messages_10.validate_xml()',
+                      category=DeprecationWarning)
+
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
     else:
