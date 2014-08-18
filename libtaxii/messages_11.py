@@ -349,7 +349,7 @@ class Query(TAXIIBase):
 
     @classmethod
     def from_etree(cls, etree_xml, kwargs):
-        format_id = etree_xml.xpath('./@format_id', ns_mapnsmap)[0]
+        format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
         return cls(format_id, **kwargs)
 
     @classmethod
