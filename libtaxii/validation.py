@@ -114,6 +114,15 @@ class SchemaValidator(object):
     TAXII_10_SCHEMA = schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
 
     def __init__(self, schema_file):
+        """
+        Args:
+            schema_file (str) - The file location of the schema to 
+                                validate against. Use the TAXII_11_SCHEMA 
+                                and TAXII_10_SCHEMA constants to validate 
+                                against TAXII 1.1 / 1.0. This schema file 
+                                will be used when validate_file/string/etree 
+                                is used.
+        """
         schema_doc = etree.parse(schema_file, get_xml_parser())
         self.xml_schema = etree.XMLSchema(schema_doc)
 
