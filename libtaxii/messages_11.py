@@ -238,34 +238,10 @@ def validate_xml(xml_string):
     Args:
         xml_string (str): The XML to validate.
 
-    Returns:
-        a tuple of (True/False, error_log) where
-        True/False indicates whether validation succeeded and
-        the error_log is a log of all errors encountered during
-        validation.
-    
-    Raises:
-        lxml.etree.XMLSyntaxError: When the XML to be validated is not well formed
-
     Example:
         .. code-block:: python
 
-            from libtaxii import messages_11
-            from lxml.etree import XMLSyntaxError
-            
-            try:
-               valid, error_log = messages_11.validate_xml(some_xml_string)
-            except XMLSyntaxError:
-                # Handle this exception, which occurs when
-                # some_xml_string is not valid XML (e.g., 'foo')
-
-            if not valid:
-                for error in error_log:
-                    print error
-                sys.exit(1)
-            
-            # At this point, the XML is schema valid
-            do_something(some_xml_string)
+            is_valid = tm11.validate_xml(message.to_xml())
     """
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -279,7 +255,9 @@ def validate_xml(xml_string):
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
     # TODO: Additionally, validate the Query stuff
-    return valid, xml_schema.error_log
+    if not valid:
+        return xml_schema.error_log.last_error
+    return valid
 
 
 def get_message_from_xml(xml_string):

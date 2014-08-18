@@ -49,11 +49,9 @@ def round_trip_message(taxii_message):
     print '***** Message type = %s; id = %s' % (taxii_message.message_type, taxii_message.message_id)
 
     xml_string = taxii_message.to_xml()
-    valid, error_log = tm10.validate_xml(xml_string)
-    if not valid:
-        validation_errors = "\n".join([str(x) for x in error_log])
-        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % validation_errors)
-    
+    valid = tm10.validate_xml(xml_string)
+    if valid is not True:
+        raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
     msg_from_xml = tm10.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()
     msg_from_dict = tm10.get_message_from_dict(dictionary)
