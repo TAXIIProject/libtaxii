@@ -1,6 +1,7 @@
 # Copyright (C) 2014 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
+#: Namespace map of namespaces libtaxii knows about
 ns_map = {
     'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
     'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
