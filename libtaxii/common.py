@@ -7,6 +7,8 @@ from operator import attrgetter
 from StringIO import StringIO
 
 import dateutil.parser
+import random
+
 from lxml import etree
 
 _XML_PARSER = None
@@ -44,6 +46,22 @@ def parse_datetime_string(datetime_string):
         return None
     return dateutil.parser.parse(datetime_string)
 
+def generate_message_id(maxlen=5):
+    """Generate a TAXII Message ID.
+
+    Args:
+        maxlen (int): maximum length of the ID, in characters
+
+    Example:
+        .. code-block:: python
+
+            msg_id = tm11.generate_message_id()
+            message = tm11.DiscoveryRequest(msg_id)
+            # Or...
+            message = tm11.DiscoveryRequest(tm11.generate_message_id())
+    """
+    message_id = random.randint(1, 10 ** maxlen)
+    return str(message_id)
 
 class TAXIIBase(object):
     """
