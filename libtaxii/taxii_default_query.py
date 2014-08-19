@@ -21,11 +21,11 @@ from .common import TAXIIBase
 from .validation import (do_check, uri_regex, targeting_expression_regex, RegexTuple)
 from .constants import *
 
-# A Capability Module has valid relationships
-# Each relationship has 0-n valid parameters
-
-
 class CapabilityModule(object):
+    """
+    A Capability Module has valid relationships
+    Each relationship has 0-n valid parameters
+    """
     def __init__(self, capability_module_id, relationships):
         self.capability_module_id = capability_module_id
         self.relationships = relationships
