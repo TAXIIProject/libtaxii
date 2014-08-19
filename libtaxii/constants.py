@@ -2,11 +2,13 @@
 # For license information, see the LICENSE.txt file
 
 #: Namespace map of namespaces libtaxii knows about
-ns_map = {
-    'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
-    'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
-    'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1'
-}
+NS_MAP = {'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
+          'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
+          'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1',
+          }
+
+#: alias for NS_MAP for backward compatibility
+ns_map = NS_MAP
 
 #: Constant identifying a Status Message
 MSG_STATUS_MESSAGE = 'Status_Message'
@@ -29,6 +31,7 @@ MSG_POLL_RESPONSE = 'Poll_Response'
 #: Constant identifying a Inbox Message
 MSG_INBOX_MESSAGE = 'Inbox_Message'
 
+#: TAXII 1.0 Message Types
 MSG_TYPES_10 = (MSG_STATUS_MESSAGE, MSG_DISCOVERY_REQUEST, MSG_DISCOVERY_RESPONSE,
                 MSG_FEED_INFORMATION_REQUEST, MSG_FEED_INFORMATION_RESPONSE,
                 MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST,
