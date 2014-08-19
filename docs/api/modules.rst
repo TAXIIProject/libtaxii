@@ -7,6 +7,7 @@ API Documentation
 
     libtaxii
     common
+    constants
     clients
     messages_10
     messages_11
