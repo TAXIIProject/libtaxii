@@ -190,7 +190,7 @@ These constants are used to indicate query format.
 ..autodata:: FID_TAXII_DEFAULT_QUERY_10
 
 Query Capability Modules
-******************
+************************
 
 These constants are used to indicate TAXII Default Query Capability Modules
 
