@@ -1418,7 +1418,7 @@ class ServiceInstance(TAXIIBase):
         s += line_prepend +  "  Available: %s\n" % self.available
         s += line_prepend +  "  Message: %s\n" % self.message
         for q in self.supported_query:
-            s += q.to_text(line_prepend)
+            s += q.to_text(line_prepend + STD_INDENT)
         
         return s
 
