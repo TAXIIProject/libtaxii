@@ -5,7 +5,7 @@
 from libtaxii.scripts import TaxiiScript
 import libtaxii as t
 import libtaxii.messages_10 as tm10
-from common import generate_message_id
+from libtaxii.common import generate_message_id
 
 class DiscoveryClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
