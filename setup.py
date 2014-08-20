@@ -73,8 +73,8 @@ setup(
             'poll_client = libtaxii.scripts.poll_client:main',
             #'query_client = libtaxii.scripts.query_client:main', - NOTE: Query client is still under active development
             
-            'discovery_client_10 = libtaxii.scripts.feed_information_client_10:main',
-            'feed_information_client_10 = libtaxii.scripts.discovery_client_10:main',
+            'discovery_client_10 = libtaxii.scripts.discovery_client_10:main',
+            'feed_information_client_10 = libtaxii.scripts.feed_information_client_10:main',
             'poll_client_10 = libtaxii.scripts.poll_client_10:main',
         ],
     },
