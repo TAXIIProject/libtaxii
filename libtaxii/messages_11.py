@@ -2700,6 +2700,9 @@ class PollResponse(TAXIIMessage):
 
         if self.more is not None:
             xml.attrib['more'] = str(self.more).lower()
+        
+        if self.result_part_number is not None:
+            xml.attrib['result_part_number'] = str(self.result_part_number)
 
         if self.subscription_id is not None:
             si = etree.SubElement(xml, '{%s}Subscription_ID' % ns_map['taxii_11'])
@@ -2731,6 +2734,7 @@ class PollResponse(TAXIIMessage):
         d['collection_name'] = self.collection_name
         d['more'] = self.more
         d['result_id'] = self.result_id
+        d['result_part_number'] = self.result_part_number
         if self.record_count is not None:
             d['record_count'] = self.record_count.to_dict()
         if self.subscription_id is not None:
@@ -2752,6 +2756,8 @@ class PollResponse(TAXIIMessage):
         s += line_prepend + "  Collection Name: %s\n" % self.collection_name
         s += line_prepend + "  More: %s\n" % self.more
         s += line_prepend + "  Result ID: %s\n" % self.result_id
+        if self.result_part_number:
+            s += line_prepend + "  Result Part Num: %s\n" % self.result_part_number
         if self.record_count:
             s += self.record_count.to_text(line_prepend + STD_INDENT)
         if self.subscription_id:
@@ -2774,6 +2780,10 @@ class PollResponse(TAXIIMessage):
         kwargs['more'] = etree_xml.attrib.get('more', 'false') == 'true'
         kwargs['subscription_id'] = None
         kwargs['result_id'] = etree_xml.attrib.get('result_id')
+        rpn = etree_xml.attrib.get('result_part_number', None)
+        if rpn:
+            kwargs['result_part_number'] = int(rpn)
+        
         subs_ids = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)
         if len(subs_ids) > 0:
             kwargs['subscription_id'] = subs_ids[0].text
@@ -2811,7 +2821,7 @@ class PollResponse(TAXIIMessage):
         kwargs = {}
         kwargs['collection_name'] = d['collection_name']
         kwargs['result_id'] = d.get('result_id')
-
+        kwargs['result_part_number'] = d.get('result_part_number')
         kwargs['message'] = None
         if 'message' in d:
             kwargs['message'] = d['message']
