@@ -926,6 +926,15 @@ class PollResponseTests(unittest.TestCase):
                 # content_blocks = [cb001, cb002])#optional
                 content_blocks=[])  # optional
         round_trip_message(poll_resp4)
+    
+    def test_poll_resp5(self):
+        poll_resp5 = tm11.PollResponse(
+                message_id='PollResp5',
+                in_response_to='blah',
+                collection_name='foo',
+                result_part_number=10,
+                content_blocks=[])
+        round_trip_message(poll_resp5)
 
 
 class InboxMessageTests(unittest.TestCase):
