@@ -28,11 +28,11 @@ intuitive both to Python developers and XML developers.
 Installation
 ------------
 
-Use pip:
+Use pip to install or upgrade libtaxii:
 
 .. code-block::
 
-    $ pip install libtaxii
+    $ pip install libtaxii [--upgrade]
 
 For more information, see the `Installation instructions
 <http://libtaxii.readthedocs.org/en/latest/installation.html>`_.
