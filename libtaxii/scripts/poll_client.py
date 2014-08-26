@@ -52,6 +52,10 @@ class PollClient11Script(TaxiiScript):
     
     def handle_response(self, response, args):
         super(PollClient11Script, self).handle_response(response, args)
+        if response.more:
+            print "This response has More=True, to request additional parts, use the following command:"
+            print "  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
+                     (response.collection_name, response.result_id, response.result_part_number + 1)
         if response.message_type == tm11.MSG_POLL_RESPONSE:
             for cb in response.content_blocks:
                 if cb.content_binding.binding_id == t.CB_STIX_XML_10:
