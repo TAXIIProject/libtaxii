@@ -2,11 +2,16 @@
 # For license information, see the LICENSE.txt file
 
 import argparse
+import sys
+import traceback
 import libtaxii as t
 import libtaxii.clients as tc
 import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
+
+EXIT_SUCCESS = 0
+EXIT_FAILURE = 1
 
 class ProxyAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -99,21 +104,27 @@ class TaxiiScript(object):
         """
         Invoke a TAXII Service based on the arguments
         """
-        parser = self.get_arg_parser(parser_description=self.parser_description, path=self.path)
-        args = parser.parse_args()
-        request_message = self.create_request_message(args)
-        client = self.create_client(args)
+        try:
+            parser = self.get_arg_parser(parser_description=self.parser_description, path=self.path)
+            args = parser.parse_args()
+            request_message = self.create_request_message(args)
+            client = self.create_client(args)
+
+            print "Request:\n"
+            if args.xml_output is False:
+                print request_message.to_text()
+            else:
+                print request_message.to_xml(pretty_print=True)
+
+            resp = client.callTaxiiService2(args.host, args.path, self.taxii_version, request_message.to_xml(pretty_print=True), args.port)
+            r = t.get_message_from_http_response(resp, '0')
+
+            self.handle_response(r, args)
+        except Exception as ex:
+            traceback.print_exc()
+            sys.exit(EXIT_FAILURE)
         
-        print "Request:\n"
-        if args.xml_output is False:
-            print request_message.to_text()
-        else:
-            print request_message.to_xml(pretty_print=True)
-        
-        resp = client.callTaxiiService2(args.host, args.path, self.taxii_version, request_message.to_xml(pretty_print=True), args.port)
-        r = t.get_message_from_http_response(resp, '0')
-        
-        self.handle_response(r, args)
+        sys.exit(EXIT_SUCCESS)
 
 #TODO: These are stubs that will eventually need to be moved out into their own files / scripts
 
