@@ -1,5 +1,46 @@
 Release Notes
 =============
+
+1.1.103
+-------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.102...1.1.103>`__
+
+In terms of code organization, there are a few big changes beginning to
+take place in this version of libtaxii. Constants and commonly used classes/functions
+are being moved to common locations (libtaxii.constants and libtaxii.common, respectively).
+Also, nested classes (e.g., messages_11.DiscoveryResponse.ServiceInstance) have been de-nested
+(e.g., is now messages_11.ServiceInstance). All of these changes are intended to make
+using libtaxii easier. For the time being, backward compatibility has been maintained, but
+many of these changes may result in a backward compatibility breaking change in a future,
+major release of libtaxii.
+
+Major changes:
+
+- libtaxii.constants, a new source file, was created. The definition for all constants in libtaxii have been moved to libtaxii.constants. Aliases to the previous definition locations have been retained for backward compatibility and may be removed in a future major release.
+- libtaxii.common, a new source file for containing classes and methods common to TAXII, was created. Some common classes and functions have been moved into libtaxii.common, and more will be moved over time. Aliases to the previous classes and functions have been retained for backward compatibility and may be removed in a future major release. (Thanks, @gtback!)
+- Promoted nested classes to module-level classes in messages_10, messages_11, and taxii_default_query.  Aliases to the previous, nested, classes have been retained for backward compatibility and may be removed in a future major release. (Thanks, @gtback!)
+- A ‘to_text()’ method has been added to all TAXII Message classes. ‘to_text()’ provides a “nicely formatted” human readable representation of a TAXII Message and its components. The ‘to_text()’ method was added to support libtaxii’s scripts. There is no ‘from_text()’ method as this is not intended to be a serialization/deserialization feature, but a readability feature.
+- Lowered the required version of lxml to 2.2.3, the latest available on RHEL 6. (Thanks to @mblayman for raising this)
+- Lowered the required version of python-dateutil to 1.4.1, the latest available on RHEL 6. (Thanks to @mblayman for raising this)
+- TAXII 1.1 StatusMessages now raise a ValueError when required a Status Detail is not set.
+- TAXII XML Validation has a new methodology: See validation.SchemaValidator (http://libtaxii.readthedocs.org/en/latest/api/validation.html#libtaxii.validation.SchemaValidator)
+- Related: validate_xml(…) has been deprecated and may be removed in a future major release.
+
+Minor changes:
+
+- Tons of PEP8 improvements (Thanks, @gtback!)
+- TAXII Scripts have been entirely reorganized to be more DRY.
+- Added two constants for Proxy Settings (SYSTEM_PROXY and NO_PROXY). These supersede the need to use either None or ‘noproxy’, which were not as clear to developers.
+- Improved documentation, Tox usage, and Travis-CI usage. (Thanks, @gtback!)
+- SMIME Content Binding added (application/x-pks7-mime)
+- For Python 2.6, argparse is now a requirement
+- Added constants for TAXII Default Query Parameters and Relationships
+
+Bug fixes:
+
+- In messages_11.PollResponse, the result_part_number parameter is now set by the constructor. 
+
+
 1.1.102
 -------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.101...1.1.102>`__
