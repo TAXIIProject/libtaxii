@@ -20,6 +20,7 @@ import libtaxii as t
 import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
 from libtaxii.validation import SchemaValidator
+from libtaxii.constants import *
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
@@ -326,6 +327,12 @@ class StatusMessageTests(unittest.TestCase):
                 message=None  # Optional
         )
         round_trip_message(sm09)
+    
+    def test_status_message_11(self):
+        # Per https://github.com/TAXIIProject/libtaxii/issues/111
+        kwargs = {'message_id': '1', 'in_response_to': '2', 'status_type': ST_FAILURE, 'message': {}}
+        self.assertRaises(ValueError, tm11.StatusMessage, **kwargs)
+    
     # TODO: TEst the query status types
 
 
