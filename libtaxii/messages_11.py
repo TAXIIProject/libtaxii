@@ -2943,6 +2943,15 @@ class StatusMessage(TAXIIMessage):
                      can_be_none=(not rules.required))
         self._status_detail = value
 
+    @property
+    def message(self):
+        return self._message
+    
+    @message.setter
+    def message(self, value):
+        do_check(value, 'message', type=basestring, can_be_none=True)
+        self._message = value
+
     def to_etree(self):
         xml = super(StatusMessage, self).to_etree()
         xml.attrib['status_type'] = self.status_type
