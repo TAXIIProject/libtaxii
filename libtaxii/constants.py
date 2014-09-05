@@ -235,7 +235,7 @@ CM_REGEX = 'urn:taxii.mitre.org:query:capability:regex-1'
 #: Capability Module ID for Timestamp
 CM_TIMESTAMP = 'urn:taxii.mitre.org:query:capability:timestamp-1'
 
-# Tuple of all capability modules defined in TAXII Default Query 1.0
+#: Tuple of all capability modules defined in TAXII Default Query 1.0
 CM_IDS = (CM_CORE, CM_REGEX, CM_TIMESTAMP)
 
 # Operators
@@ -244,7 +244,7 @@ OP_OR = 'OR'
 #: Operator AND
 OP_AND = 'AND'
 
-# Tuple of all operators
+#: Tuple of all operators
 OP_TYPES = (OP_OR, OP_AND)
 
 
@@ -262,7 +262,7 @@ P_MATCH_TYPE = 'match_type'
 #: Parameter name: case_sensitive
 P_CASE_SENSITIVE = 'case_sensitive'
 
-# Tuple of all parameter names
+#: Tuple of all parameter names
 P_NAMES = (P_VALUE, P_MATCH_TYPE, P_CASE_SENSITIVE)
 
 #: Relationship name: equals
@@ -290,7 +290,7 @@ R_CONTAINS = 'contains'
 #: Relationship name: matches
 R_MATCHES = 'matches'
 
-# Tuple of all relationship names
+#: Tuple of all relationship names
 R_NAMES = (R_EQUALS, R_NOT_EQUALS, R_GREATER_THAN, 
            R_GREATER_THAN_OR_EQUAL, R_LESS_THAN, 
            R_LESS_THAN_OR_EQUAL, R_DOES_NOT_EXIST, 
