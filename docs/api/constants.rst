@@ -182,6 +182,11 @@ These constants are used in :py:class:`StatusMessage`.
 
 .. autodata:: SD_TYPES_11
 
+..autodata:: SD_CAPABILITY_MODULE
+..autodata:: SD_PREFERRED_SCOPE
+..autodata:: SD_ALLOWED_SCOPE
+..autodata:: SD_TARGETING_EXPRESSION_ID
+
 Query Formats
 *************
 
