@@ -215,6 +215,15 @@ SD_TYPES_11 = ( SD_ACCEPTABLE_DESTINATION, SD_MAX_PART_NUMBER, SD_ITEM,
                 SD_SUPPORTED_BINDING, SD_SUPPORTED_CONTENT, SD_SUPPORTED_PROTOCOL,
                 SD_SUPPORTED_QUERY)
 
+#: (For TAXII Default Query) Constant identifying supported Capability Modules
+SD_CAPABILITY_MODULE = 'CAPABILITY_MODULE'
+#: (For TAXII Default Query) Constant identifying Preferred Scopes
+SD_PREFERRED_SCOPE = 'PREFERRED_SCOPE'
+#: (For TAXII Default Query) Constant identifying Allowed Scopes
+SD_ALLOWED_SCOPE = 'ALLOWED_SCOPE'
+#: (For TAXII Default Query) Constant identifying supported Targeting Expression IDs
+SD_TARGETING_EXPRESSION_ID = 'TARGETING_EXPRESSION_ID'
+
 #: Format ID for this version of TAXII Default Query
 FID_TAXII_DEFAULT_QUERY_10 = 'urn:taxii.mitre.org:query:default:1.0'
 
