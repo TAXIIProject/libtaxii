@@ -1,6 +1,6 @@
-:mod:`libtaxii` Module
-=======================
-.. module:: libtaxii
+:mod:`libtaxii.constants` Module
+================================
+.. module:: libtaxii.constants
 
 Constants
 ---------
