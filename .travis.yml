@@ -6,9 +6,10 @@ env:
 
 install:
    - pip install tox
-
+   - pip install pep8
 script:
    - tox
+   - pep8 --exclude=.tox,build
 
 notifications:
     email:
