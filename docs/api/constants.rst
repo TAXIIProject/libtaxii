@@ -1,6 +1,6 @@
-:mod:`libtaxii` Module
-=======================
-.. module:: libtaxii
+:mod:`libtaxii.constants` Module
+================================
+.. module:: libtaxii.constants
 
 Constants
 ---------
@@ -182,10 +182,10 @@ These constants are used in :py:class:`StatusMessage`.
 
 .. autodata:: SD_TYPES_11
 
-..autodata:: SD_CAPABILITY_MODULE
-..autodata:: SD_PREFERRED_SCOPE
-..autodata:: SD_ALLOWED_SCOPE
-..autodata:: SD_TARGETING_EXPRESSION_ID
+.. autodata:: SD_CAPABILITY_MODULE
+.. autodata:: SD_PREFERRED_SCOPE
+.. autodata:: SD_ALLOWED_SCOPE
+.. autodata:: SD_TARGETING_EXPRESSION_ID
 
 Query Formats
 *************
@@ -241,17 +241,17 @@ Query Relationships
 
 These constants are used to identify relationships
 
-.. autodata:  R_EQUALS
-.. autodata:  R_NOT_EQUALS
-.. autodata:  R_GREATER_THAN
-.. autodata:  R_GREATER_THAN_OR_EQUAL
-.. autodata:  R_LESS_THAN
-.. autodata:  R_LESS_THAN_OR_EQUAL
-.. autodata:  R_DOES_NOT_EXIST
-.. autodata:  R_EXISTS
-.. autodata:  R_BEGINS_WITH
-.. autodata:  R_ENDS_WITH
-.. autodata:  R_CONTAINS
-.. autodata:  R_MATCHES
+.. autodata:: R_EQUALS
+.. autodata:: R_NOT_EQUALS
+.. autodata:: R_GREATER_THAN
+.. autodata:: R_GREATER_THAN_OR_EQUAL
+.. autodata:: R_LESS_THAN
+.. autodata:: R_LESS_THAN_OR_EQUAL
+.. autodata:: R_DOES_NOT_EXIST
+.. autodata:: R_EXISTS
+.. autodata:: R_BEGINS_WITH
+.. autodata:: R_ENDS_WITH
+.. autodata:: R_CONTAINS
+.. autodata:: R_MATCHES
 
-.. autodata:  R_NAMES
+.. autodata:: R_NAMES
