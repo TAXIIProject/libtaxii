@@ -6,5 +6,5 @@ dist/
 libtaxii.egg-info/
 venv/
 .tox
-
+output.txt
 docs/_build/
