@@ -30,7 +30,7 @@ def client_example():
     # Uncomment to use certificate-based authentication
     client.setAuthType(tc.HttpClient.AUTH_CERT)
     client.setAuthCredentials({'key_file': 'keyfile',
-                            'cert_file': 'certfile'})
+                               'cert_file': 'certfile'})
 
     # Uncomment to set a proxy
     # client.setProxy(tc.HttpClient.PROXY_HTTP, 'http://proxy.company.com:80')
@@ -44,7 +44,7 @@ def client_example():
     print http_response.__class__.__name__
 
     taxii_message = t.get_message_from_http_response(http_response,
-                                                    poll_request1.message_id)
+                                                     poll_request1.message_id)
     print(taxii_message.to_xml())
 
 if __name__ == "__main__":

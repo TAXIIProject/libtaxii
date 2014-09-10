@@ -7,27 +7,28 @@ import libtaxii.messages_11 as tm11
 import libtaxii as t
 import StringIO
 
+
 class InboxClient11Script(TaxiiScript):
     parser_description = 'TAXII 1.1 Inbox Client'
     path = '/services/inbox/'
-    
+
     # http://stix.mitre.org/language/version1.1.1/#samples
     # http://stix.mitre.org/language/version1.1.1/stix_v1.0_samples_20130408.zip
     stix_watchlist = '''
 <!--
-	STIX Domain Watchlist Example
-	
-	Copyright (c) 2014, The MITRE Corporation. All rights reserved. 
+    STIX Domain Watchlist Example
+
+    Copyright (c) 2014, The MITRE Corporation. All rights reserved.
     The contents of this file are subject to the terms of the STIX License located at http://stix.mitre.org/about/termsofuse.html.
-    
-	This example demonstrates one method of representing a domain watchlist (list of malicious domains) in STIX and CybOX. It demonstrates several STIX/CybOX concepts and best practices including:
-	
-	   * Indicators
-	   * CybOX within STIX
-	   * The CybOX Domain object
-	   * Controlled vocabularies
-	
-	Created by Mark Davidson
+
+    This example demonstrates one method of representing a domain watchlist (list of malicious domains) in STIX and CybOX. It demonstrates several STIX/CybOX concepts and best practices including:
+
+       * Indicators
+       * CybOX within STIX
+       * The CybOX Domain object
+       * Controlled vocabularies
+
+    Created by Mark Davidson
 -->
 <stix:STIX_Package
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -66,8 +67,7 @@ class InboxClient11Script(TaxiiScript):
         </stix:Indicator>
     </stix:Indicators>
 </stix:STIX_Package>'''
-    
-    
+
     def get_arg_parser(self, *args, **kwargs):
         parser = super(InboxClient11Script, self).get_arg_parser(*args, **kwargs)
         parser.add_argument("--content-binding", dest="content_binding", default=t.CB_STIX_XML_111, help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_111)
@@ -75,7 +75,7 @@ class InboxClient11Script(TaxiiScript):
         parser.add_argument("--content-file", dest="content_file", default=self.stix_watchlist, help="Content of the Content Block to send. Defaults to a STIX watchlist.")
         parser.add_argument("--dcn", dest="dcn", default=None, help="The Destination Collection Name for this Inbox Message. Defaults to None. This script only supports one Destination Collection Name")
         return parser
-        
+
     def create_request_message(self, args):
         if args.content_file is self.stix_watchlist:
             c = StringIO.StringIO(self.stix_watchlist)
@@ -90,8 +90,9 @@ class InboxClient11Script(TaxiiScript):
         inbox_message = tm11.InboxMessage(message_id=tm11.generate_message_id(), content_blocks=[cb])
         if args.dcn:
             inbox_message.destination_collection_names.append(args.dcn)
-        
+
         return inbox_message
+
 
 def main():
     script = InboxClient11Script()

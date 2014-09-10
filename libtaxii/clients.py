@@ -19,6 +19,7 @@ import ssl
 import libtaxii as t
 import warnings
 
+
 class HttpClient:
 
     # Constants for authentication types
@@ -110,9 +111,9 @@ class HttpClient:
 
         :param bool bool: The new use_https value.
         """
-        if bool == True:
+        if bool is True:
             self.use_https = True
-        elif bool == False:
+        elif bool is False:
             self.use_https = False
         else:
             raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
@@ -274,7 +275,7 @@ class HttpClient:
             header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = t.VID_TAXII_HTTPS_10
 
             if (self.auth_type == HttpClient.AUTH_CERT or
-               self.auth_type == HttpClient.AUTH_CERT_BASIC):
+                    self.auth_type == HttpClient.AUTH_CERT_BASIC):
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
             else:
@@ -282,7 +283,7 @@ class HttpClient:
                 cert_file = None
 
             if (self.auth_type == HttpClient.AUTH_BASIC or
-               self.auth_type == HttpClient.AUTH_CERT_BASIC):
+                    self.auth_type == HttpClient.AUTH_CERT_BASIC):
                 header_dict['Authorization'] = self.basic_auth_header
 
             verify_server = self.verify_server
@@ -346,6 +347,7 @@ class HttpClient:
 
 # http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
 class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
+
     def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
         urllib2.HTTPSHandler.__init__(self)
         self.key_file = key_file
@@ -358,13 +360,14 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
 
     def getConnection(self, host, timeout=0):
         return VerifiableHTTPSConnection(host,
-                                       key_file=self.key_file,
-                                       cert_file=self.cert_file,
-                                       verify_server=self.verify_server,
-                                       ca_certs=self.ca_certs)
+                                         key_file=self.key_file,
+                                         cert_file=self.cert_file,
+                                         verify_server=self.verify_server,
+                                         ca_certs=self.ca_certs)
 
 
 class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
+
     def __init__(self, key, cert):
         urllib2.HTTPSHandler.__init__(self)
         self.key = key
@@ -378,6 +381,7 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
 
 
 class VerifiableHTTPSConnection(httplib.HTTPSConnection):
+
     """
     The default httplib HTTPSConnection does not verify certificates.
     This class extends HTTPSConnection and requires certificate verification.

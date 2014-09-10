@@ -21,11 +21,14 @@ from .common import TAXIIBase
 from .validation import (do_check, uri_regex, targeting_expression_regex, RegexTuple)
 from .constants import *
 
+
 class CapabilityModule(object):
+
     """
     A Capability Module has valid relationships
     Each relationship has 0-n valid parameters
     """
+
     def __init__(self, capability_module_id, relationships):
         self.capability_module_id = capability_module_id
         self.relationships = relationships
@@ -50,7 +53,9 @@ class CapabilityModule(object):
         for item in value:
             self._relationships[item.name] = item
 
+
 class Relationship(object):
+
     def __init__(self, name, parameters=None):
         self.name = name
         self.parameters = parameters or []
@@ -75,7 +80,9 @@ class Relationship(object):
         for item in value:
             self._parameters[item.name] = item
 
+
 class Parameter(object):
+
     def __init__(self, name, type, value_tuple=None):
         self.name = name
         self.type = type
@@ -131,7 +138,9 @@ cm_timestamp = CapabilityModule(CM_TIMESTAMP, [rel_ts_eq, rel_ts_gt, rel_ts_gte,
 
 capability_modules = {CM_CORE: cm_core, CM_REGEX: cm_regex, CM_TIMESTAMP: cm_timestamp}
 
+
 class DefaultQueryInfo(tm11.SupportedQuery):
+
     """ Used to describe the TAXII Default Queries that are supported.
 
         :param targeting_expression_infos: Describe the supported targeting expressions
@@ -179,7 +188,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
         d['targeting_expression_infos'] = []
         for expression_info in self.targeting_expression_infos:
             d['targeting_expression_infos'].append(expression_info.to_dict())
-        #TODO: This looks like a serialization bug
+        # TODO: This looks like a serialization bug
         d['capability_modules'] = self.capability_modules
         return d
 
@@ -219,7 +228,9 @@ class DefaultQueryInfo(tm11.SupportedQuery):
 
         return DefaultQueryInfo(**kwargs)
 
+
 class TargetingExpressionInfo(TAXIIBase):
+
     """This class describes supported Targeting Expressions
 
         :param string targeting_expression_id: The supported targeting expression ID
@@ -279,7 +290,7 @@ class TargetingExpressionInfo(TAXIIBase):
     def to_dict(self):
         d = {}
         d['targeting_expression_id'] = self.targeting_expression_id
-        #TODO: Preferred / Allowed scope look like serialization bugs
+        # TODO: Preferred / Allowed scope look like serialization bugs
         d['preferred_scope'] = self.preferred_scope
         d['allowed_scope'] = self.allowed_scope
         return d
@@ -291,7 +302,7 @@ class TargetingExpressionInfo(TAXIIBase):
             s += line_prepend + "  Preferred Scope: %s\n" % scope
         for scope in self.allowed_scope:
             s += line_prepend + "  Allowed Scope: %s\n" % scope
-        
+
         return s
 
     def __hash__(self):
@@ -320,6 +331,7 @@ class TargetingExpressionInfo(TAXIIBase):
 
 
 class DefaultQuery(tm11.Query):
+
     """Conveys a TAXII Default Query.
 
         :param string targeting_expression_id: The targeting_expression used in the query
@@ -367,7 +379,7 @@ class DefaultQuery(tm11.Query):
         s = super(DefaultQuery, self).to_text(line_prepend)
         s += line_prepend + "  Targeting Expression ID: %s\n" % self.targeting_expression_id
         s += self.criteria.to_text(line_prepend)
-        
+
         return s
 
     @staticmethod
@@ -382,7 +394,9 @@ class DefaultQuery(tm11.Query):
         criteria = DefaultQuery.Criteria.from_dict(d['criteria'])
         return DefaultQuery(tei, criteria)
 
+
 class Criteria(TAXIIBase):
+
     """Represents criteria for a :class:`DefaultQuery`. **Note**: At least one criterion OR criteria MUST be present
 
     :param str operator: The logical operator (should be one of `OP_AND` or `OP_OR`)
@@ -467,7 +481,7 @@ class Criteria(TAXIIBase):
             s += criteria.to_text(line_prepend + tm11.STD_INDENT)
         for criterion in self.criterion:
             s += criterion.to_text(line_prepend + tm11.STD_INDENT)
-        
+
         return s
 
     @staticmethod
@@ -504,7 +518,9 @@ class Criteria(TAXIIBase):
 
         return DefaultQuery.Criteria(**kwargs)
 
+
 class Criterion(TAXIIBase):
+
     """Represents criterion for a :class:`DefaultQuery.Criteria`
 
         :param string target: A targeting expression identifying the target
@@ -576,7 +592,7 @@ class Criterion(TAXIIBase):
         s += line_prepend + "  Negate: %s\n" % self.negate
         s += line_prepend + "  Target: %s\n" % self.target
         s += self.test.to_text(line_prepend + tm11.STD_INDENT)
-        
+
         return s
 
     @staticmethod
@@ -599,7 +615,9 @@ class Criterion(TAXIIBase):
 
         return DefaultQuery.Criterion(target, test, negate)
 
+
 class Test(TAXIIBase):
+
     """
         :param string capability_id: The ID of the capability module that defines the relationship & parameters
         :param string relationship: The relationship (e.g., equals)
@@ -690,7 +708,7 @@ class Test(TAXIIBase):
         s += line_prepend + "  Relationship: %s\n" % self.relationship
         for k, v in self.parameters.iteritems():
             s += line_prepend + "  Parameter: %s = %s\n" % (k, v)
-        
+
         return s
 
     @staticmethod
@@ -708,7 +726,7 @@ class Test(TAXIIBase):
                     parameters[k] = dateutil.parser.parse(v)
                 except TypeError:  # Just use it as a string
                     parameters[k] = v
-                except ValueError: # Just use it as a string
+                except ValueError:  # Just use it as a string
                     parameters[k] = v
 
         return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)

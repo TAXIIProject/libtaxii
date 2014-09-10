@@ -46,6 +46,7 @@ def parse_datetime_string(datetime_string):
         return None
     return dateutil.parser.parse(datetime_string)
 
+
 def generate_message_id(maxlen=5):
     """Generate a TAXII Message ID.
 
@@ -63,7 +64,9 @@ def generate_message_id(maxlen=5):
     message_id = random.randint(1, 10 ** maxlen)
     return str(message_id)
 
+
 class TAXIIBase(object):
+
     """
     Base class for all TAXII Messages and Message component types.
 
@@ -104,9 +107,9 @@ class TAXIIBase(object):
 
     def to_text(self, line_prepend=''):
         """Create a nice looking (this is a subjective term!)
-        textual representation of this class. Subclasses should 
+        textual representation of this class. Subclasses should
         implement this method.
-        
+
         Note that this is just a convenience method for making
         TAXII Messages nice to read for humans and may change
         drastically in future versions of libtaxii.
@@ -143,7 +146,7 @@ class TAXIIBase(object):
         etree_xml = etree.parse(xmlstr, get_xml_parser()).getroot()
         return cls.from_etree(etree_xml)
 
-    # Just noting that there is not a from_text() method. I also 
+    # Just noting that there is not a from_text() method. I also
     # don't think there will ever be one.
 
     def __str__(self):

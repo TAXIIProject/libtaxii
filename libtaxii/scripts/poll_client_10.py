@@ -6,11 +6,12 @@ from libtaxii.scripts import TaxiiScript
 import libtaxii as t
 import libtaxii.messages_10 as tm10
 
+
 class PollClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
     parser_description = 'TAXII 1.0 Poll Client'
     path = '/services/poll/'
-    
+
     def get_arg_parser(self, *args, **kwargs):
         parser = super(PollClient10Script, self).get_arg_parser(*args, **kwargs)
         parser.add_argument("--feed", dest="feed", default="default", help="Data Collection to poll. Defaults to 'default'.")
@@ -18,7 +19,7 @@ class PollClient10Script(TaxiiScript):
         parser.add_argument("--end-timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
         parser.add_argument("--subscription-id", dest="subs_id", default=None, help="The subscription ID to use. Defaults to None")
         return parser
-    
+
     def create_request_message(self, args):
         try:
             if args.begin_ts:
@@ -39,12 +40,12 @@ class PollClient10Script(TaxiiScript):
             sys.exit()
 
         poll_req = tm10.PollRequest(message_id=tm10.generate_message_id(),
-                                  feed_name=args.feed,
-                                  exclusive_begin_timestamp_label=begin_ts,
-                                  inclusive_end_timestamp_label=end_ts,
-                                  subscription_id=args.subs_id)
+                                    feed_name=args.feed,
+                                    exclusive_begin_timestamp_label=begin_ts,
+                                    inclusive_end_timestamp_label=end_ts,
+                                    subscription_id=args.subs_id)
         return poll_req
-    
+
     def handle_response(self, response, args):
         super(PollClient10Script, self).handle_response(response, args)
         if response.message_type == tm10.MSG_POLL_RESPONSE:
@@ -61,21 +62,22 @@ class PollClient10Script(TaxiiScript):
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_111:
                     format = '_STIX111_'
                     ext = '.xml'
-                else: # Format and extension are unknown
+                else:  # Format and extension are unknown
                     format = ''
                     ext = ''
-                
+
                 if cb.timestamp_label:
                     date_string = 't' + cb.timestamp_label.isoformat()
                 else:
                     date_string = 's' + datetime.datetime.now().isoformat()
-                
+
                 filename = (args.dest_dir + r.collection_name + format + date_string + ext).translate(None, '/\\:*?"<>|')
                 f = open(filename, 'w')
                 f.write(cb.content)
                 f.flush()
                 f.close()
                 print "Wrote Content Block to %s" % filename
+
 
 def main():
     script = PollClient10Script()

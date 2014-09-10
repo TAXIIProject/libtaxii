@@ -26,9 +26,10 @@ from .common import get_xml_parser, parse_datetime_string, set_xml_parser
 from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
 from constants import *
 
+
 def validate_xml(xml_string):
     """
-    Note that this function has been deprecated. Please see 
+    Note that this function has been deprecated. Please see
     libtaxii.validators.SchemaValidator.
 
     Validate XML with the TAXII XML Schema 1.0.
@@ -43,7 +44,7 @@ def validate_xml(xml_string):
     """
 
     warnings.warn('Call to deprecated function: libtaxii.messages_10.validate_xml()',
-                      category=DeprecationWarning)
+                  category=DeprecationWarning)
 
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -168,6 +169,7 @@ def get_message_from_json(json_string):
 
 
 class BaseNonMessage(object):
+
     """This class should not be used directly by libtaxii users.
 
     Base class for non-TAXII Message objects"""
@@ -249,6 +251,7 @@ class BaseNonMessage(object):
 
 
 class DeliveryParameters(BaseNonMessage):
+
     """Delivery Parameters.
 
     Args:
@@ -267,6 +270,7 @@ class DeliveryParameters(BaseNonMessage):
 
     # TODO: Should the default arguments of these change? I'm not sure these are
     # actually optional
+
     def __init__(self, inbox_protocol=None, inbox_address=None,
                  delivery_message_binding=None, content_bindings=None):
         self.inbox_protocol = inbox_protocol
@@ -361,7 +365,7 @@ class DeliveryParameters(BaseNonMessage):
             s += line_prepend + "  Content Bindings: Any Content\n"
         for cb in self.content_bindings:
             s += line_prepend + "  Content Binding: %s\n" % str(cb)
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -405,6 +409,7 @@ class DeliveryParameters(BaseNonMessage):
 
 
 class TAXIIMessage(BaseNonMessage):
+
     """Encapsulate properties common to all TAXII Messages (such as headers).
 
     This class is extended by each Message Type (e.g., DiscoveryRequest), with
@@ -514,7 +519,7 @@ class TAXIIMessage(BaseNonMessage):
         s += "\n"
         for k, v in self.extended_headers.iteritems():
             s += line_prepend + "Extended Header: %s = %s" % (k, v)
-            
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -603,6 +608,7 @@ class TAXIIMessage(BaseNonMessage):
 
 
 class ContentBlock(BaseNonMessage):
+
     """A TAXII Content Block.
 
     Args:
@@ -742,7 +748,7 @@ class ContentBlock(BaseNonMessage):
         if self.timestamp_label:
             s += line_prepend + "  Timestamp Label: %s\n" % self.timestamp_label.isoformat()
         s += line_prepend + "  Padding: %s\n" % self.padding
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -801,6 +807,7 @@ class ContentBlock(BaseNonMessage):
 # TAXII Message Classes #
 
 class DiscoveryRequest(TAXIIMessage):
+
     """
     A TAXII Discovery Request message.
 
@@ -820,6 +827,7 @@ class DiscoveryRequest(TAXIIMessage):
 
 
 class DiscoveryResponse(TAXIIMessage):
+
     """
     A TAXII Discovery Response message.
 
@@ -875,7 +883,7 @@ class DiscoveryResponse(TAXIIMessage):
         s = super(DiscoveryResponse, self).to_text(line_prepend)
         for si in self.service_instances:
             s += si.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -919,6 +927,7 @@ class DiscoveryResponse(TAXIIMessage):
 
 
 class ServiceInstance(BaseNonMessage):
+
     """
     The Service Instance component of a TAXII Discovery Response Message.
 
@@ -1085,7 +1094,7 @@ class ServiceInstance(BaseNonMessage):
             s += line_prepend + "  Inbox Service Accepts: %s\n" % isac
         s += line_prepend + "  Available: %s\n" % self.available
         s += line_prepend + "  Message: %s\n" % self.message
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1139,6 +1148,7 @@ class ServiceInstance(BaseNonMessage):
 
 
 class FeedInformationRequest(TAXIIMessage):
+
     """
     A TAXII Feed Information Request message.
 
@@ -1158,6 +1168,7 @@ class FeedInformationRequest(TAXIIMessage):
 
 
 class FeedInformationResponse(TAXIIMessage):
+
     """
     A TAXII Feed Information Response message.
 
@@ -1211,7 +1222,7 @@ class FeedInformationResponse(TAXIIMessage):
         s = super(FeedInformationResponse, self).to_text(line_prepend)
         for feed in self.feed_informations:
             s += feed.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1247,6 +1258,7 @@ class FeedInformationResponse(TAXIIMessage):
 
 
 class FeedInformation(BaseNonMessage):
+
     """
     The Feed Information component of a TAXII Feed Information Response
     Message.
@@ -1412,7 +1424,7 @@ class FeedInformation(BaseNonMessage):
             s += ps.to_text(line_prepend + STD_INDENT)
         for sm in self.subscription_methods:
             s += sm.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1487,6 +1499,7 @@ class FeedInformation(BaseNonMessage):
 
 
 class PushMethod(BaseNonMessage):
+
     """
     The Push Method component of a TAXII Feed Information
     component.
@@ -1499,6 +1512,7 @@ class PushMethod(BaseNonMessage):
             using the protocol identified in the Push Protocol field.
             **Required**
     """
+
     def __init__(self, push_protocol, push_message_bindings):
         self.push_protocol = push_protocol
         self.push_message_bindings = push_message_bindings
@@ -1543,7 +1557,7 @@ class PushMethod(BaseNonMessage):
         s += line_prepend + "  Protocol Binding: %s\n" % self.push_protocol
         for mb in self.push_message_bindings:
             s += line_prepend + "  Message Binding: %s\n" % mb
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1573,6 +1587,7 @@ class PushMethod(BaseNonMessage):
 
 
 class PollingServiceInstance(BaseNonMessage):
+
     """
     The Polling Service Instance component of a TAXII Feed
     Information component.
@@ -1636,7 +1651,7 @@ class PollingServiceInstance(BaseNonMessage):
         s += line_prepend + "  Address: %s\n" % self.poll_address
         for mb in self.poll_message_bindings:
             s += line_prepend + "  Message Binding: %s\n" % mb
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1666,6 +1681,7 @@ class PollingServiceInstance(BaseNonMessage):
 
 
 class SubscriptionMethod(BaseNonMessage):
+
     """
     The Subscription Method component of a TAXII Feed Information
     component.
@@ -1732,7 +1748,7 @@ class SubscriptionMethod(BaseNonMessage):
         s += line_prepend + "  Address: %s\n" % self.subscription_address
         for mb in self.subscription_message_bindings:
             s += line_prepend + "  Message Binding: %s\n" % mb
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1762,6 +1778,7 @@ class SubscriptionMethod(BaseNonMessage):
 
 
 class PollRequest(TAXIIMessage):
+
     """
     A TAXII Poll Request message.
 
@@ -1891,23 +1908,23 @@ class PollRequest(TAXIIMessage):
         s += line_prepend + "  Feed Name: %s\n" % self.feed_name
         if self.subscription_id:
             s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
-        
+
         if self.exclusive_begin_timestamp_label:
             s += line_prepend + "  Excl. Begin Timestamp Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
         else:
             s += line_prepend + "  Excl. Begin Timestamp Label: %s\n" % None
-        
+
         if self.inclusive_end_timestamp_label:
             s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         else:
             s += line_prepend + "  Incl. End Timestamp Label: %s\n" % None
-        
+
         if len(self.content_bindings) == 0:
             s += line_prepend + "  Content Binding: Any Content\n"
-        
+
         for cb in self.content_bindings:
             s += line_prepend + "  Content Binding: %s\n" % cb
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -1973,6 +1990,7 @@ class PollRequest(TAXIIMessage):
 
 
 class PollResponse(TAXIIMessage):
+
     """
     A TAXII Poll Response message.
 
@@ -2108,17 +2126,17 @@ class PollResponse(TAXIIMessage):
         if self.subscription_id:
             s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
         s += line_prepend + "  Message: %s\n" % self.message
-        
+
         if self.inclusive_begin_timestamp_label:
             s += line_prepend + "  Incl. Begin Timestamp Label: %s\n" % self.inclusive_begin_timestamp_label.isoformat()
         else:
             s += line_prepend + "  Incl. Begin Timestamp Label: %s\n" % None
-        
+
         s += line_prepend + "  Incl. End Timestamp Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
-        
+
         for cb in self.content_blocks:
             s += cb.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -2188,6 +2206,7 @@ class PollResponse(TAXIIMessage):
 
 
 class StatusMessage(TAXIIMessage):
+
     """
     A TAXII Status message.
 
@@ -2252,7 +2271,7 @@ class StatusMessage(TAXIIMessage):
             d['status_detail'] = self.status_detail
         if self.message is not None:
             d['message'] = self.message
-        
+
         return d
 
     def to_text(self, line_prepend=''):
@@ -2300,6 +2319,7 @@ class StatusMessage(TAXIIMessage):
 
 
 class InboxMessage(TAXIIMessage):
+
     """
     A TAXII Inbox message.
 
@@ -2389,7 +2409,7 @@ class InboxMessage(TAXIIMessage):
         s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
         for cb in self.content_blocks:
             s += cb.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     def __eq__(self, other, debug=False):
@@ -2451,6 +2471,7 @@ class InboxMessage(TAXIIMessage):
 
 
 class SubscriptionInformation(BaseNonMessage):
+
     """
     The Subscription Information component of a TAXII Inbox message.
 
@@ -2565,6 +2586,7 @@ class SubscriptionInformation(BaseNonMessage):
 
 
 class ManageFeedSubscriptionRequest(TAXIIMessage):
+
     """
     A TAXII Manage Feed Subscription Request message.
 
@@ -2695,6 +2717,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 
 
 class ManageFeedSubscriptionResponse(TAXIIMessage):
+
     """
     A TAXII Manage Feed Subscription Response message.
 
@@ -2827,6 +2850,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
 
 
 class SubscriptionInstance(BaseNonMessage):
+
     """
     The Subscription Instance component of the Manage Feed Subscription
     Response message.
@@ -2958,6 +2982,7 @@ class SubscriptionInstance(BaseNonMessage):
 
 
 class PollInstance(BaseNonMessage):
+
     """
     The Poll Instance component of the Manage Feed Subscription
     Response message.
@@ -3057,9 +3082,9 @@ class PollInstance(BaseNonMessage):
     def from_dict(d):
         return PollInstance(**d)
 
-##########################################################
-## EVERYTHING BELOW HERE IS FOR BACKWARDS COMPATIBILITY ##
-##########################################################
+########################################################
+# EVERYTHING BELOW HERE IS FOR BACKWARDS COMPATIBILITY #
+########################################################
 
 # Add top-level classes as nested classes for backwards compatibility
 DiscoveryResponse.ServiceInstance = ServiceInstance

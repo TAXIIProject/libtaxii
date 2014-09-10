@@ -6,11 +6,14 @@ from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
 
+
 class DiscoveryClient11Script(TaxiiScript):
     parser_description = 'TAXII 1.1 Discovery Client'
     path = '/services/discovery/'
+
     def create_request_message(self, args):
-        return tm11.DiscoveryRequest(message_id = tm11.generate_message_id())
+        return tm11.DiscoveryRequest(message_id=tm11.generate_message_id())
+
 
 def main():
     script = DiscoveryClient11Script()

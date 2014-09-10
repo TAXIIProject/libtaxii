@@ -13,7 +13,9 @@ import libtaxii.taxii_default_query as tdq
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
 
+
 class ProxyAction(argparse.Action):
+
     def __call__(self, parser, namespace, values, option_string=None):
         """
         Turns the 'None' string argument into the None object
@@ -24,27 +26,28 @@ class ProxyAction(argparse.Action):
 
         setattr(namespace, self.dest, values)
 
+
 class TaxiiScript(object):
-    
+
     #: taxii version to put in the request headers. Defaults to TAXII 1.1
     taxii_version = t.VID_TAXII_XML_11
     #: parser description
     parser_description = ''
     #: default path
     path = '/'
-    
+
     def get_arg_parser(self,
-                    parser_description, 
-                    path="/services/discovery/", 
-                    host="taxiitest.mitre.org",
-                    port="80",
-                    https=False,
-                    cert=None,
-                    key=None,
-                    username=None,
-                    password=None,
-                    proxy='noproxy',
-                    xml_output=False):
+                       parser_description,
+                       path="/services/discovery/",
+                       host="taxiitest.mitre.org",
+                       port="80",
+                       https=False,
+                       cert=None,
+                       key=None,
+                       username=None,
+                       password=None,
+                       proxy='noproxy',
+                       xml_output=False):
         """
         Parser things common to all scripts. Parsers for specific TAXII Services should
         add their own arguments.
@@ -64,7 +67,7 @@ class TaxiiScript(object):
                             help="If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.")
 
         return parser
-    
+
     def handle_response(self, response, args):
         """
         Default response handler. Just prints the response
@@ -74,7 +77,7 @@ class TaxiiScript(object):
             print response.to_text()
         else:
             print response.to_xml(pretty_print=True)
-    
+
     def create_client(self, args):
         client = tc.HttpClient()
         client.setUseHttps(args.https)
@@ -92,14 +95,14 @@ class TaxiiScript(object):
             client.setAuthCredentials({'username': args.username, 'password': args.password})
 
         return client
-    
+
     def create_request_message(self, args):
         """
         This function should create a request message.
         Should be implemented by child classes.
         """
         raise NotImplementedError
-    
+
     def __call__(self):
         """
         Invoke a TAXII Service based on the arguments
@@ -123,20 +126,23 @@ class TaxiiScript(object):
         except Exception as ex:
             traceback.print_exc()
             sys.exit(EXIT_FAILURE)
-        
+
         sys.exit(EXIT_SUCCESS)
 
-#TODO: These are stubs that will eventually need to be moved out into their own files / scripts
+# TODO: These are stubs that will eventually need to be moved out into their own files / scripts
+
 
 class SubscriptionClient11Script(TaxiiScript):
     parser_description = 'TAXII 1.1 Subscription Management Client'
     path = '/services/collection-management/'
     pass
 
+
 class InboxClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
     parser_description = 'TAXII 1.0 Inbox Client'
     path = '/services/inbox/'
+
 
 class SubscriptionClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
@@ -144,5 +150,4 @@ class SubscriptionClient10Script(TaxiiScript):
     path = '/services/feed-management/'
 
 
-
-#No poll fulfillment in TAXII 1.0
+# No poll fulfillment in TAXII 1.0

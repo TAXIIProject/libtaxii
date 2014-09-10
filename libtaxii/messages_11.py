@@ -23,13 +23,14 @@ import warnings
 from lxml import etree
 
 from .common import (get_xml_parser, parse_datetime_string, set_xml_parser,
-        TAXIIBase)
+                     TAXIIBase)
 from .validation import do_check, uri_regex, check_timestamp_label
 from .constants import *
 
+
 def validate_xml(xml_string):
     """
-    Note that this function has been deprecated. Please see 
+    Note that this function has been deprecated. Please see
     libtaxii.validators.SchemaValidator.
 
     Validate XML with the TAXII XML Schema 1.1.
@@ -44,7 +45,7 @@ def validate_xml(xml_string):
     """
 
     warnings.warn('Call to deprecated function: libtaxii.messages_11.validate_xml()',
-                   category=DeprecationWarning)
+                  category=DeprecationWarning)
 
     if isinstance(xml_string, basestring):
         f = StringIO.StringIO(xml_string)
@@ -240,37 +241,39 @@ def get_deserializer(format_id, type):
     # Assumes the namespace is TAXII 1.1
 
     # Arguments:
-        # name (string) - The name of the element
-        # namespace (string) - The namespace of the element
-        # value (string) - The text value of the element
-        # attrs (dict) - A dictionary of attributes
-        # parent (Element) - The parent element
+    #     name (string) - The name of the element
+    #     namespace (string) - The namespace of the element
+    #     value (string) - The text value of the element
+    #     attrs (dict) - A dictionary of attributes
+    #     parent (Element) - The parent element
     # """
     # if value is None and attrs is None:
-        # return
+    #     return
 
     # if parent is None:
-        # elt = etree.Element('{%s}%s' % (namespace, name), nsmap=ns_map)
+    #     elt = etree.Element('{%s}%s' % (namespace, name), nsmap=ns_map)
     # else:
-        # elt = etree.SubElement(parent, '{%s}%s' % (namespace, name), nsmap=ns_map)
+    #     elt = etree.SubElement(parent, '{%s}%s' % (namespace, name), nsmap=ns_map)
 
     # if value is not None:
-        # elt.text = value
+    #     elt.text = value
 
     # if attrs is not None:
-        # for k, v in attrs.items():
-            # elt.attrib[k] = v
+    #     for k, v in attrs.items():
+    #         elt.attrib[k] = v
 
     # return elt
 
 
 class SupportedQuery(TAXIIBase):
+
     """
     This class contains an instance of a supported query. It
     is expected that, generally, messages_11.SupportedQuery
     subclasses will be used in place of this class
     to represent a query
     """
+
     def __init__(self, format_id):
         """
         Arguments:
@@ -299,7 +302,6 @@ class SupportedQuery(TAXIIBase):
     def to_dict(self):
         return {'format_id': self.format_id}
 
-    
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Supported Query Information ===\n"
         s += line_prepend + "  Query Format: %s\n" % self.format_id
@@ -316,6 +318,7 @@ class SupportedQuery(TAXIIBase):
 
 
 class Query(TAXIIBase):
+
     """This class contains an instance of a query.
 
     It is expected that, generally, messages_11.Query subclasses will be used
@@ -349,7 +352,7 @@ class Query(TAXIIBase):
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Query ===\n"
         s += line_prepend + "  Query Format: %s\n" % self.format_id
-        
+
         return s
 
     @classmethod
@@ -370,6 +373,7 @@ class Query(TAXIIBase):
 
 
 class ContentBinding(TAXIIBase):
+
     """TAXII Content Binding component
 
     Args:
@@ -452,6 +456,7 @@ class ContentBinding(TAXIIBase):
 
 
 class RecordCount(TAXIIBase):
+
     """
     Information summarizing the number of records.
 
@@ -459,6 +464,7 @@ class RecordCount(TAXIIBase):
         record_count (int): The number of records
         partial_count (bool): Whether the number of records is a partial count
     """
+
     def __init__(self, record_count, partial_count=False):
         self.record_count = record_count
         self.partial_count = partial_count
@@ -503,7 +509,7 @@ class RecordCount(TAXIIBase):
         s += line_prepend + "  Record Count: %s\n" % self.record_count
         if self.partial_count:
             s += line_prepend + "  Partial Count: %s\n" % self.partial_count
-        
+
         return s
 
     @staticmethod
@@ -590,7 +596,7 @@ class _GenericParameters(TAXIIBase):
             s += "  Content Binding: %s\n" % str(binding)
         if self.query:
             s += self.query.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -630,6 +636,7 @@ class _GenericParameters(TAXIIBase):
 
 
 class SubscriptionParameters(_GenericParameters):
+
     """
     TAXII Subscription Parameters.
 
@@ -645,6 +652,7 @@ class SubscriptionParameters(_GenericParameters):
 
 
 class ContentBlock(TAXIIBase):
+
     """A TAXII Content Block.
 
     Args:
@@ -800,7 +808,6 @@ class ContentBlock(TAXIIBase):
             s += line_prepend + "  Timestamp Label: %s\n" % self.timestamp_label
         s += line_prepend + "  Padding: %s\n" % self.padding
         return s
-        
 
     @staticmethod
     def from_etree(etree_xml):
@@ -847,6 +854,7 @@ class ContentBlock(TAXIIBase):
 
 
 class PushParameters(TAXIIBase):
+
     """Set up Push Parameters.
 
     Args:
@@ -954,6 +962,7 @@ class PushParameters(TAXIIBase):
 
 # TODO: Check docstring
 class DeliveryParameters(PushParameters):
+
     """Set up Delivery Parameters.
 
     Args:
@@ -971,6 +980,7 @@ class DeliveryParameters(PushParameters):
 
 
 class TAXIIMessage(TAXIIBase):
+
     """Encapsulate properties common to all TAXII Messages (such as headers).
 
     This class is extended by each Message Type (e.g., DiscoveryRequest), with
@@ -1066,7 +1076,7 @@ class TAXIIMessage(TAXIIBase):
         s += "\n"
         for k, v in self.extended_headers.iteritems():
             s += line_prepend + "Extended Header: %s = %s\n" % (k, v)
-            
+
         return s
 
     def to_json(self):
@@ -1134,6 +1144,7 @@ class TAXIIMessage(TAXIIBase):
 
 
 class TAXIIRequestMessage(TAXIIMessage):
+
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
         if value is not None:
@@ -1142,6 +1153,7 @@ class TAXIIRequestMessage(TAXIIMessage):
 
 
 class DiscoveryRequest(TAXIIRequestMessage):
+
     """
     A TAXII Discovery Request message.
 
@@ -1155,6 +1167,7 @@ class DiscoveryRequest(TAXIIRequestMessage):
 
 
 class DiscoveryResponse(TAXIIMessage):
+
     """
     A TAXII Discovery Response message.
 
@@ -1205,7 +1218,7 @@ class DiscoveryResponse(TAXIIMessage):
         s = super(DiscoveryResponse, self).to_text()
         for si in self.service_instances:
             s += si.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -1231,6 +1244,7 @@ class DiscoveryResponse(TAXIIMessage):
 
 
 class ServiceInstance(TAXIIBase):
+
     """
     The Service Instance component of a TAXII Discovery Response Message.
 
@@ -1406,20 +1420,20 @@ class ServiceInstance(TAXIIBase):
         return d
 
     def to_text(self, line_prepend=''):
-        s = line_prepend +  "=== Service Instance ===\n"
-        s += line_prepend +  "  Service Type: %s\n" % self.service_type
-        s += line_prepend +  "  Service Version: %s\n" % self.services_version
-        s += line_prepend +  "  Protocol Binding: %s\n" % self.protocol_binding
-        s += line_prepend +  "  Service Address: %s\n" % self.service_address
+        s = line_prepend + "=== Service Instance ===\n"
+        s += line_prepend + "  Service Type: %s\n" % self.service_type
+        s += line_prepend + "  Service Version: %s\n" % self.services_version
+        s += line_prepend + "  Protocol Binding: %s\n" % self.protocol_binding
+        s += line_prepend + "  Service Address: %s\n" % self.service_address
         for mb in self.message_bindings:
-            s += line_prepend +  "  Message Binding: %s\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         if self.service_type == SVC_INBOX:
             s += line_prepend + "  Inbox Service AC: %s\n" % [ac.to_text() for ac in self.inbox_service_accepted_content]
-        s += line_prepend +  "  Available: %s\n" % self.available
-        s += line_prepend +  "  Message: %s\n" % self.message
+        s += line_prepend + "  Available: %s\n" % self.available
+        s += line_prepend + "  Message: %s\n" % self.message
         for q in self.supported_query:
             s += q.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @staticmethod
@@ -1480,6 +1494,7 @@ class ServiceInstance(TAXIIBase):
 
 
 class CollectionInformationRequest(TAXIIRequestMessage):
+
     """
     A TAXII Collection Information Request message.
 
@@ -1493,6 +1508,7 @@ class CollectionInformationRequest(TAXIIRequestMessage):
 
 
 class CollectionInformationResponse(TAXIIMessage):
+
     """
     A TAXII Collection Information Response message.
 
@@ -1544,7 +1560,7 @@ class CollectionInformationResponse(TAXIIMessage):
         s += line_prepend + "Contains %s Collection Informations\n" % len(self.collection_informations)
         for collection in self.collection_informations:
             s += collection.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -1566,6 +1582,7 @@ class CollectionInformationResponse(TAXIIMessage):
 
 
 class CollectionInformation(TAXIIBase):
+
     """
     The Collection Information component of a TAXII Collection Information
     Response Message.
@@ -1607,10 +1624,10 @@ class CollectionInformation(TAXIIBase):
     """
 
     def __init__(self, collection_name, collection_description,
-                supported_contents=None, available=None, push_methods=None,
-                polling_service_instances=None, subscription_methods=None,
-                collection_volume=None, collection_type=CT_DATA_FEED,
-                receiving_inbox_services=None):
+                 supported_contents=None, available=None, push_methods=None,
+                 polling_service_instances=None, subscription_methods=None,
+                 collection_volume=None, collection_type=CT_DATA_FEED,
+                 receiving_inbox_services=None):
         self.collection_name = collection_name
         self.available = available
         self.collection_description = collection_description
@@ -1749,7 +1766,7 @@ class CollectionInformation(TAXIIBase):
         d['collection_description'] = self.collection_description
         if self.collection_volume is not None:
             d['collection_volume'] = self.collection_volume
-        #TODO: I think this isn't a good serialization, I think a for loop is necessary
+        # TODO: I think this isn't a good serialization, I think a for loop is necessary
         # This is probably a bug
         d['supported_contents'] = self.supported_contents
 
@@ -1779,7 +1796,7 @@ class CollectionInformation(TAXIIBase):
         s += line_prepend + "  Collection Description: %s\n" % self.collection_description
         if self.collection_volume:
             s += line_prepend + "  Volume: %s\n" % self.collection_volume
-        if len(self.supported_contents) == 0:#All contents supported:
+        if len(self.supported_contents) == 0:  # All contents supported:
             s += line_prepend + "  Supported Content: %s\n" % "All"
         for contents in self.supported_contents:
             s += line_prepend + "  Supported Content: %s\n" % contents.to_text(line_prepend + STD_INDENT)
@@ -1870,6 +1887,7 @@ class CollectionInformation(TAXIIBase):
 
 
 class PushMethod(TAXIIBase):
+
     """
     The Push Method component of a TAXII Collection Information
     component.
@@ -1930,7 +1948,7 @@ class PushMethod(TAXIIBase):
         s = line_prepend + "=== Push Method ===\n"
         s += line_prepend + "  Protocol Binding: %s\n" % self.push_protocol
         for mb in self.push_message_bindings:
-            s += line_prepend +  "  Message Binding: %s\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         return s
 
     @staticmethod
@@ -1949,6 +1967,7 @@ class PushMethod(TAXIIBase):
 
 
 class PollingServiceInstance(TAXIIBase):
+
     """
     The Polling Service Instance component of a TAXII Collection
     Information component.
@@ -2034,6 +2053,7 @@ class PollingServiceInstance(TAXIIBase):
 
 
 class SubscriptionMethod(TAXIIBase):
+
     """
     The Subscription Method component of a TAXII Collection Information
     component.
@@ -2103,7 +2123,7 @@ class SubscriptionMethod(TAXIIBase):
         s += line_prepend + "  Protocol Binding: %s\n" % self.subscription_protocol
         s += line_prepend + "  Address: %s\n" % self.subscription_address
         for mb in self.subscription_message_bindings:
-            s += line_prepend +  "  Message Binding: %s\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         return s
 
     @classmethod
@@ -2122,6 +2142,7 @@ class SubscriptionMethod(TAXIIBase):
 
 
 class ReceivingInboxService(TAXIIBase):
+
     """
     The Receiving Inbox Service component of a TAXII Collection
     Information component.
@@ -2221,12 +2242,12 @@ class ReceivingInboxService(TAXIIBase):
         s += line_prepend + "  Protocol Binding: %s\n" % self.inbox_protocol
         s += line_prepend + "  Address: %s\n" % self.inbox_address
         for mb in self.inbox_message_bindings:
-            s += line_prepend +  "  Message Binding: %s\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         if len(self.supported_contents) == 0:
             s += line_prepend + "  Supported Contents: All\n"
         for sc in self.supported_contents:
             s += line_prepend + "  Supported Content: %s\n" % str(sc)
-        
+
         return s
 
     @staticmethod
@@ -2260,6 +2281,7 @@ class ReceivingInboxService(TAXIIBase):
 
 
 class PollRequest(TAXIIRequestMessage):
+
     """
     A TAXII Poll Request message.
 
@@ -2398,7 +2420,7 @@ class PollRequest(TAXIIRequestMessage):
         s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label
         if self.poll_parameters:
             s += self.poll_parameters.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -2453,6 +2475,7 @@ class PollRequest(TAXIIRequestMessage):
 
 
 class PollParameters(_GenericParameters):
+
     """
     The Poll Parameters component of a TAXII Poll Request message.
 
@@ -2556,6 +2579,7 @@ class PollParameters(_GenericParameters):
 
 
 class PollResponse(TAXIIMessage):
+
     """
     A TAXII Poll Response message.
 
@@ -2700,7 +2724,7 @@ class PollResponse(TAXIIMessage):
 
         if self.more is not None:
             xml.attrib['more'] = str(self.more).lower()
-        
+
         if self.result_part_number is not None:
             xml.attrib['result_part_number'] = str(self.result_part_number)
 
@@ -2783,7 +2807,7 @@ class PollResponse(TAXIIMessage):
         rpn = etree_xml.attrib.get('result_part_number', None)
         if rpn:
             kwargs['result_part_number'] = int(rpn)
-        
+
         subs_ids = etree_xml.xpath('./taxii_11:Subscription_ID', namespaces=ns_map)
         if len(subs_ids) > 0:
             kwargs['subscription_id'] = subs_ids[0].text
@@ -2886,6 +2910,7 @@ status_details = {
 
 
 class StatusMessage(TAXIIMessage):
+
     """
     A TAXII Status message.
 
@@ -2937,16 +2962,16 @@ class StatusMessage(TAXIIMessage):
         detail_rules = status_details[self.status_type]
         # Check defined status types for conformance
         for sd_name, rules in detail_rules.iteritems():
-            do_check(value.get(sd_name, None), 
-                     'status_detail[\'%s\']' % sd_name, 
-                     type=rules.type, 
+            do_check(value.get(sd_name, None),
+                     'status_detail[\'%s\']' % sd_name,
+                     type=rules.type,
                      can_be_none=(not rules.required))
         self._status_detail = value
 
     @property
     def message(self):
         return self._message
-    
+
     @message.setter
     def message(self, value):
         do_check(value, 'message', type=basestring, can_be_none=True)
@@ -3045,6 +3070,7 @@ class StatusMessage(TAXIIMessage):
 
 
 class InboxMessage(TAXIIMessage):
+
     """
     A TAXII Inbox message.
 
@@ -3195,7 +3221,7 @@ class InboxMessage(TAXIIMessage):
         s += line_prepend + "  Message has %s Content Blocks\n" % len(self.content_blocks)
         for cb in self.content_blocks:
             s += cb.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -3261,6 +3287,7 @@ class InboxMessage(TAXIIMessage):
 
 
 class SubscriptionInformation(TAXIIBase):
+
     """
     The Subscription Information component of a TAXII Inbox message.
 
@@ -3349,12 +3376,12 @@ class SubscriptionInformation(TAXIIBase):
         s = line_prepend + "=== Source Subscription ===\n"
         s += line_prepend + "  Collection Name: %s\n" % self.collection_name
         s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
-        
+
         if self.exclusive_begin_timestamp_label:
             s += line_prepend + "  Excl. Begin TS Label: %s\n" % self.exclusive_begin_timestamp_label.isoformat()
         else:
             s += line_prepend + "  Excl. Begin TS Label: %s\n" % None
-        
+
         if self.inclusive_end_timestamp_label:
             s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         else:
@@ -3392,6 +3419,7 @@ class SubscriptionInformation(TAXIIBase):
 
 
 class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
+
     """
     A TAXII Manage Collection Subscription Request message.
 
@@ -3511,13 +3539,13 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
         s += line_prepend + "  Collection Name: %s\n" % self.collection_name
         s += line_prepend + "  Action: %s\n" % self.action
         s += line_prepend + "  Subscription ID: %s\n" % self.subscription_id
-        
+
         if self.action == ACT_SUBSCRIBE:
             s += self.subscription_parameters.to_text(line_prepend + STD_INDENT)
-        
+
         if self.action == ACT_SUBSCRIBE and self.push_parameters:
             s += self.push_parameters.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -3565,6 +3593,7 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
 
 
 class ManageCollectionSubscriptionResponse(TAXIIMessage):
+
     """
     A TAXII Manage Collection Subscription Response message.
 
@@ -3640,7 +3669,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
         s += line_prepend + "  Message: %s\n" % self.message
         for si in self.subscription_instances:
             s += si.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @classmethod
@@ -3677,6 +3706,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
 
 
 class SubscriptionInstance(TAXIIBase):
+
     """
     The Subscription Instance component of the Manage Collection Subscription
     Response message.
@@ -3799,7 +3829,7 @@ class SubscriptionInstance(TAXIIBase):
             s += self.push_parameters.to_text(line_prepend + STD_INDENT)
         for pi in self.poll_instances:
             s += pi.to_text(line_prepend + STD_INDENT)
-        
+
         return s
 
     @staticmethod
@@ -3851,6 +3881,7 @@ class SubscriptionInstance(TAXIIBase):
 
 
 class PollInstance(TAXIIBase):
+
     """
     The Poll Instance component of the Manage Collection Subscription
     Response message.
@@ -3923,7 +3954,7 @@ class PollInstance(TAXIIBase):
         s += line_prepend + "  Protocol Binding: %s\n" % self.poll_protocol
         s += line_prepend + "  Address: %s\n" % self.poll_address
         for mb in self.poll_message_bindings:
-            s += line_prepend +  "  Message Binding: %s\n" % mb
+            s += line_prepend + "  Message Binding: %s\n" % mb
         return s
 
     @staticmethod
@@ -3942,6 +3973,7 @@ class PollInstance(TAXIIBase):
 
 
 class PollFulfillmentRequest(TAXIIRequestMessage):
+
     """
     A TAXII Poll Fulfillment Request message.
 
@@ -4032,9 +4064,9 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
         return super(PollFulfillmentRequest, cls).from_dict(d, **kwargs)
 
 
-##########################################################
-## EVERYTHING BELOW HERE IS FOR BACKWARDS COMPATIBILITY ##
-##########################################################
+########################################################
+# EVERYTHING BELOW HERE IS FOR BACKWARDS COMPATIBILITY #
+########################################################
 
 # Add top-level classes as nested classes for backwards compatibility
 DiscoveryResponse.ServiceInstance = ServiceInstance

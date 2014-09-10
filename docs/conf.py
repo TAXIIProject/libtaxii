@@ -46,10 +46,10 @@ html_theme_options = {
     'visitedlinkcolor': '#666',
 }
 html_sidebars = {"**": ['localtoc.html', 'relations.html', 'sourcelink.html',
-'searchbox.html', 'links.html']}
+                        'searchbox.html', 'links.html']}
 
 latex_elements = {}
 latex_documents = [
     ('index', 'libtaxii.tex', u'libtaxii Documentation',
-    u'The MITRE Corporation', 'manual'),
+     u'The MITRE Corporation', 'manual'),
 ]

@@ -29,6 +29,7 @@ _type_error = "%s must be of type %s. The incorrect value was of type %s"
 _regex_error = "%s must be a string conforming to %s. The incorrect value was: %s"
 _tuple_error = "%s must be one of %s. The incorrect value was %s"
 
+
 def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be_none=False):
     """
     Checks supplied var against all of the supplied checks using the following
@@ -99,15 +100,19 @@ def check_timestamp_label(timestamp_label, varname, can_be_none=False):
 
     return
 
+
 class SchemaValidationResult:
+
     def __init__(self, valid, error_log):
         self.valid = valid
         self.error_log = error_log
 
+
 class SchemaValidator(object):
+
     """
     A helper class for TAXII Schema Validation.
-    
+
     Example:
         See validate_etree(...) for an example how to use this class
     """
@@ -118,11 +123,11 @@ class SchemaValidator(object):
     def __init__(self, schema_file):
         """
         Args:
-            schema_file (str) - The file location of the schema to 
-                                validate against. Use the TAXII_11_SCHEMA 
-                                and TAXII_10_SCHEMA constants to validate 
-                                against TAXII 1.1 / 1.0. This schema file 
-                                will be used when validate_file/string/etree 
+            schema_file (str) - The file location of the schema to
+                                validate against. Use the TAXII_11_SCHEMA
+                                and TAXII_10_SCHEMA constants to validate
+                                against TAXII 1.1 / 1.0. This schema file
+                                will be used when validate_file/string/etree
                                 is used.
         """
         schema_doc = etree.parse(schema_file, get_xml_parser())

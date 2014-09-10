@@ -20,6 +20,7 @@ import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
 from .constants import *
 
+
 def get_message_from_http_response(http_response, in_response_to):
     """Create a TAXII message from an HTTPResponse object.
 
