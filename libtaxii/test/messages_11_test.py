@@ -1043,6 +1043,74 @@ class ContentBlockTests(unittest.TestCase):
         cb6 = tm11.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
         round_trip_content_block(cb6)
 
+class StatusMessageCreatorTests(unittest.TestCase):
+    def test_success(self):
+        sm = tm11.status_success('1', message='This is a message')
+        round_trip_message(sm)
+    
+    def test_async_poll_error(self):
+        sm = tm11.status_async_poll_error('1', extended_headers={'v1': 'a'})
+        round_trip_message(sm)
+
+    def test_bad_message(self):
+        sm = tm11.status_bad_message('1')
+        round_trip_message(sm)
+
+    def test_denied(self):
+        sm = tm11.status_denied('1')
+        round_trip_message(sm)
+
+    def test_destination_collection_error(self):
+        sm = tm11.status_destination_collection_error('1', status_detail={tm11.SD_ACCEPTABLE_DESTINATION: ['d1', 'd2']})
+        round_trip_message(sm)
+
+    def test_failure(self):
+        sm = tm11.status_failure('1')
+        round_trip_message(sm)
+
+    def test_invalid_response_part(self):
+        sm = tm11.status_invalid_response_part('1', status_detail={tm11.SD_MAX_PART_NUMBER: 4})
+        round_trip_message(sm)
+
+    def test_network_error(self):
+        sm = tm11.status_network_error('1')
+        round_trip_message(sm)
+
+    def test_not_found(self):
+        sm = tm11.status_not_found('1', status_detail={tm11.SD_ITEM: 'some_collection_name'})
+        round_trip_message(sm)
+
+    def test_pending(self):
+        sm = tm11.status_pending('1', status_detail={tm11.SD_ESTIMATED_WAIT: 60, tm11.SD_RESULT_ID: '1', tm11.SD_WILL_PUSH: False})
+        round_trip_message(sm)
+
+    def test_polling_not_supported(self):
+        sm = tm11.status_polling_not_supported('1')
+        round_trip_message(sm)
+
+    def test_retry(self):
+        sm = tm11.status_retry('1', status_detail={tm11.SD_ESTIMATED_WAIT: 60})
+        round_trip_message(sm)
+
+    def test_unauthorized(self):
+        sm = tm11.status_unauthorized('1')
+        round_trip_message(sm)
+
+    def test_unsupported_message_binding(self):
+        sm = tm11.status_unsupported_message_binding('1', status_detail={tm11.SD_SUPPORTED_BINDING: 'some_binding'})
+        round_trip_message(sm)
+
+    def test_unsupported_content_binding(self):
+        sm = tm11.status_unsupported_content_binding('1', status_detail={tm11.SD_SUPPORTED_BINDING: 'some_binding'})
+        round_trip_message(sm)
+
+    def test_unsupported_protocol_binding(self):
+        sm = tm11.status_unsupported_protocol_binding('1', status_detail={tm11.SD_SUPPORTED_BINDING: 'some_binding'})
+        round_trip_message(sm)
+
+    def test_unsupported_query_format(self):
+        sm = tm11.status_unsupported_query_format('1', status_detail={tm11.SD_SUPPORTED_QUERY: 'urn:some:query:format', 'x': 'my_custom_value'})
+        round_trip_message(sm)
 
 if __name__ == "__main__":
     unittest.main()
