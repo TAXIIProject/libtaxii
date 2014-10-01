@@ -3069,6 +3069,7 @@ class StatusMessage(TAXIIMessage):
         msg = super(StatusMessage, cls).from_dict(d, **kwargs)
         return msg
 
+
 class InboxMessage(TAXIIMessage):
 
     """
