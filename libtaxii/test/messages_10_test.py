@@ -11,6 +11,7 @@
 import datetime
 import StringIO
 import unittest
+import warnings
 
 from dateutil.tz import tzutc
 from lxml import etree
@@ -91,7 +92,9 @@ def round_trip_message(taxii_message):
 
     xml_string = taxii_message.to_xml()
     # This is the old, deprecated way of validating
-    valid = tm10.validate_xml(xml_string)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', DeprecationWarning)
+        valid = tm10.validate_xml(xml_string)
     if valid is not True:
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
 

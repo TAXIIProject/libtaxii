@@ -12,6 +12,7 @@ import datetime
 import StringIO
 import sys
 import unittest
+import warnings
 
 from dateutil.tz import tzutc
 from lxml import etree
@@ -144,7 +145,9 @@ def round_trip_message(taxii_message, print_xml=False):
     xml_string = taxii_message.to_xml()
 
     # The old way of validating
-    valid = tm11.validate_xml(xml_string)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', DeprecationWarning)
+        valid = tm11.validate_xml(xml_string)
     if valid is not True:
         print 'Bad XML was:'
         try:
