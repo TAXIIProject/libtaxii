@@ -228,7 +228,7 @@ class BaseNonMessage(object):
     def __eq__(self, other, debug=False):
         raise NotImplementedError()
 
-    def _checkPropertiesEq(self, other, arglist, debug=False):
+    def _check_properties_eq(self, other, arglist, debug=False):
         for arg in arglist:
             # Check to see if the arg is in both objects
             in_self = arg in self.__dict__
@@ -369,7 +369,7 @@ class DeliveryParameters(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
+        if not self._check_properties_eq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
             return False
 
         if set(self.content_bindings) != set(other.content_bindings):
@@ -526,7 +526,7 @@ class TAXIIMessage(BaseNonMessage):
         if not isinstance(other, TAXIIMessage):
             raise ValueError('Not comparing two TAXII Messages! (%s, %s)' % (self.__class__.__name__, other.__class__.__name__))
 
-        return self._checkPropertiesEq(other, ['message_type', 'message_id', 'in_response_to', 'extended_headers'], debug)
+        return self._check_properties_eq(other, ['message_type', 'message_id', 'in_response_to', 'extended_headers'], debug)
 
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
@@ -752,11 +752,11 @@ class ContentBlock(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
+        if not self._check_properties_eq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
             return False
 
         # TODO: It's pretty hard to check and see if content is equal....
-        # if not self._checkPropertiesEq(other, ['content'], debug):
+        # if not self._check_properties_eq(other, ['content'], debug):
         #    return False
 
         return True
@@ -1098,7 +1098,7 @@ class ServiceInstance(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['service_type', 'services_version', 'protocol_binding', 'service_address', 'available', 'message'], debug):
+        if not self._check_properties_eq(other, ['service_type', 'services_version', 'protocol_binding', 'service_address', 'available', 'message'], debug):
             return False
 
         if set(self.message_bindings) != set(other.message_bindings):
@@ -1428,7 +1428,7 @@ class FeedInformation(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['feed_name', 'feed_description', 'available'], debug):
+        if not self._check_properties_eq(other, ['feed_name', 'feed_description', 'available'], debug):
             return False
 
         if set(self.supported_contents) != set(other.supported_contents):
@@ -1561,7 +1561,7 @@ class PushMethod(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['push_protocol'], debug):
+        if not self._check_properties_eq(other, ['push_protocol'], debug):
             return False
 
         if set(self.push_message_bindings) != set(other.push_message_bindings):
@@ -1655,7 +1655,7 @@ class PollingServiceInstance(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['poll_protocol', 'poll_address'], debug):
+        if not self._check_properties_eq(other, ['poll_protocol', 'poll_address'], debug):
             return False
 
         if set(self.poll_message_bindings) != set(other.poll_message_bindings):
@@ -1752,7 +1752,7 @@ class SubscriptionMethod(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['subscription_protocol', 'subscription_address'], debug):
+        if not self._check_properties_eq(other, ['subscription_protocol', 'subscription_address'], debug):
             return False
 
         if set(self.subscription_message_bindings) != set(other.subscription_message_bindings):
@@ -1931,7 +1931,7 @@ class PollRequest(TAXIIMessage):
         if not super(PollRequest, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'exclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
+        if not self._check_properties_eq(other, ['feed_name', 'subscription_id', 'exclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
                 return False
 
         if set(self.content_bindings) != set(other.content_bindings):
@@ -2143,7 +2143,7 @@ class PollResponse(TAXIIMessage):
         if not super(PollResponse, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'message', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
+        if not self._check_properties_eq(other, ['feed_name', 'subscription_id', 'message', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
                 return False
 
         # TODO: Check content blocks
@@ -2286,7 +2286,7 @@ class StatusMessage(TAXIIMessage):
         if not super(StatusMessage, self).__eq__(other, debug):
             return False
 
-        return self._checkPropertiesEq(other, ['status_type', 'status_detail', 'status_message'], debug)
+        return self._check_properties_eq(other, ['status_type', 'status_detail', 'status_message'], debug)
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -2416,7 +2416,7 @@ class InboxMessage(TAXIIMessage):
         if not super(InboxMessage, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['message', 'subscription_information'], debug):
+        if not self._check_properties_eq(other, ['message', 'subscription_information'], debug):
             return False
 
         if len(self.content_blocks) != len(other.content_blocks):
@@ -2562,7 +2562,7 @@ class SubscriptionInformation(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        return self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug)
+        return self._check_properties_eq(other, ['feed_name', 'subscription_id', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug)
 
     @staticmethod
     def from_etree(etree_xml):
@@ -2691,7 +2691,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         if not super(ManageFeedSubscriptionRequest, self).__eq__(other, debug):
             return False
 
-        return self._checkPropertiesEq(other, ['feed_name', 'subscription_id', 'action', 'delivery_parameters'], debug)
+        return self._check_properties_eq(other, ['feed_name', 'subscription_id', 'action', 'delivery_parameters'], debug)
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -2804,7 +2804,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         if not super(ManageFeedSubscriptionResponse, self).__eq__(other, debug):
             return False
 
-        if not self._checkPropertiesEq(other, ['feed_name', 'message'], debug):
+        if not self._check_properties_eq(other, ['feed_name', 'message'], debug):
             return False
 
         if len(self.subscription_instances) != len(other.subscription_instances):
@@ -2942,7 +2942,7 @@ class SubscriptionInstance(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=False):
-        if not self._checkPropertiesEq(other, ['subscription_id'], debug):
+        if not self._check_properties_eq(other, ['subscription_id'], debug):
             return False
 
         # TODO: Compare delivery parameters
@@ -3058,7 +3058,7 @@ class PollInstance(BaseNonMessage):
         return s
 
     def __eq__(self, other, debug=True):
-        if not self._checkPropertiesEq(other, ['poll_protocol', 'poll_address'], debug):
+        if not self._check_properties_eq(other, ['poll_protocol', 'poll_address'], debug):
             return False
 
         if set(self.poll_message_bindings) != set(other.poll_message_bindings):
