@@ -365,9 +365,9 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
         self.ca_certs = ca_certs
 
     def https_open(self, req):
-        return self.do_open(self.getConnection, req)
+        return self.do_open(self.get_connection, req)
 
-    def getConnection(self, host, timeout=0):
+    def get_connection(self, host, timeout=0):
         return VerifiableHTTPSConnection(host,
                                          key_file=self.key_file,
                                          cert_file=self.cert_file,
@@ -383,9 +383,9 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
         self.cert = cert
 
     def https_open(self, req):
-        return self.do_open(self.getConnection, req)
+        return self.do_open(self.get_connection, req)
 
-    def getConnection(self, host, timeout=0):
+    def get_connection(self, host, timeout=0):
         return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
 
 
