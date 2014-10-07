@@ -22,17 +22,22 @@ Script Listing
 
 Common Command Line Arguments
 -----------------------------
-All scripts use these command line arguments
+All scripts use these command line arguments:
 
-* ``--host`` - Specifies the host to connect to (e.g., taxiitext.mitre.org)
-* ``--port`` - Specifies the port to connect on (e.g., 80)
-* ``--path`` - Specifies the path portion of the URL to connect to (e.g., /services/discovery)
+* ``--host`` - Specifies the host to connect to (e.g., ``taxiitext.mitre.org``)
+* ``--port`` - Specifies the port to connect on (e.g., ``80``)
+* ``--path`` - Specifies the path portion of the URL to connect to
+  (e.g., ``/services/discovery``)
 * ``--https`` - Specifies whether to use HTTPS or not (e.g., True or False)
-* ``--cert`` - Specifies the file location of the certificate to use for authentication. Must be used with key
-* ``--key`` - Specifies the file location of the key to use for authentication
-* ``--username`` - Specifies the username to use for authentication. MUST be used with pass
-* ``--pass`` - Specifies the password to use for authentication
-* ``--proxy`` - Specifies proxy settings (Define a proxy, use the system proxy, or don't use a proxy)
+* ``--cert`` - Specifies the file location of the certificate to use for
+  authentication. If provided, ``--key`` must also be provided.
+* ``--key`` - Specifies the file location of the key to use for authentication.
+* ``--username`` - Specifies the username to use for authentication. If
+  provided, ``--pass`` must also be provided.
+* ``--pass`` - Specifies the password to use for authentication.
+* ``--proxy`` - Specifies proxy settings (e.g. ``http://proxy.example.com:80/``,
+  or ``noproxy`` to not use any proxy). If omitted, the system's proxy settings
+  will be used.
 
 For example, to call the discovery_client using all these arguments, you would do: 
 ``discovery_client --host taxiitest.mitre.org --port 80 --path /services/discovery/ --https False --cert MyCert.crt --key MyKey.key --username foo --pass bar --proxy http://myproxy.example.com:80``

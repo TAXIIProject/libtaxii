@@ -62,7 +62,7 @@ class TaxiiScript(object):
         parser.add_argument("--username", dest="username", default=username, help="The username to authenticate with. Defaults to %s." % username)
         parser.add_argument("--pass", dest="password", default=password, help="The password to authenticate with. Defaults to %s." % password)
         parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default=proxy,
-                            help="A proxy to use (e.g., http://example.com:80/), or None to not use any proxy. Omit this to use the system proxy.")
+                            help="The proxy to use (e.g., http://myproxy.example.com:80/), or 'noproxy' to not use any proxy. If omitted, the system's proxy settings will be used.")
         parser.add_argument("--xml-output", dest="xml_output", action='store_true', default=xml_output,
                             help="If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.")
 
