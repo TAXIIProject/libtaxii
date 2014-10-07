@@ -7,8 +7,10 @@ Classes
 -------
 
 .. autoclass:: HttpClient
-	:members:
-	
+    :members: set_auth_type, set_auth_credentials, set_proxy, set_use_https,
+              set_verify_server, call_taxii_service, call_taxii_service2
+
+
 Examples
 --------
 
