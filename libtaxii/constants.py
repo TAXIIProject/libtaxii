@@ -2,10 +2,11 @@
 # For license information, see the LICENSE.txt file
 
 #: Namespace map of namespaces libtaxii knows about
-NS_MAP = {'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
-          'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
-          'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1',
-          }
+NS_MAP = {
+    'taxii': 'http://taxii.mitre.org/messages/taxii_xml_binding-1',
+    'taxii_11': 'http://taxii.mitre.org/messages/taxii_xml_binding-1.1',
+    'tdq': 'http://taxii.mitre.org/query/taxii_default_query-1',
+}
 
 #: alias for NS_MAP for backward compatibility
 ns_map = NS_MAP

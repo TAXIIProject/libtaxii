@@ -100,8 +100,3 @@ Format IDs
 **********
 
 .. autodata:: FID_TAXII_DEFAULT_QUERY_10
-
-Namespace Map
-*************
-
-.. autodata:: ns_map
