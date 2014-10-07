@@ -102,23 +102,33 @@ def check_timestamp_label(timestamp_label, varname, can_be_none=False):
 
 
 class SchemaValidationResult:
+    """A wrapper for the results of schema validation."""
 
     def __init__(self, valid, error_log):
         self.valid = valid
         self.error_log = error_log
 
+_pkg_dir = os.path.dirname(__file__)
+
+#: Automatically-calculated path to the bundled TAXII 1.0 schema.
+TAXII_10_SCHEMA = os.path.join(_pkg_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
+
+#: Automatically-calculated path to the bundled TAXII 1.1 schema.
+TAXII_11_SCHEMA = os.path.join(_pkg_dir, "xsd", "TAXII_XMLMessageBinding_Schema_11.xsd")
+
 
 class SchemaValidator(object):
-
     """
     A helper class for TAXII Schema Validation.
 
     Example:
         See validate_etree(...) for an example how to use this class
     """
-    package_dir, package_filename = os.path.split(__file__)
-    TAXII_11_SCHEMA = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema_11.xsd")
-    TAXII_10_SCHEMA = schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
+
+    # Create class-level variables equal to module-level variables for
+    # backwards-compatibility
+    TAXII_10_SCHEMA = TAXII_10_SCHEMA
+    TAXII_11_SCHEMA = TAXII_11_SCHEMA
 
     def __init__(self, schema_file):
         """
@@ -167,10 +177,10 @@ class SchemaValidator(object):
             .. code-block:: python
 
                 from libtaxii import messages_11
-                from libtaxii.validation import SchemaValidator
+                from libtaxii.validation import SchemaValidator, TAXII_11_SCHEMA
                 from lxml.etree import XMLSyntaxError
 
-                sv = SchemaValidator(SchemaValidator.TAXII_11_SCHEMA)
+                sv = SchemaValidator(TAXII_11_SCHEMA)
 
                 try:
                    result = sv.validate_etree(some_etree)
@@ -189,3 +199,17 @@ class SchemaValidator(object):
         """
         valid = self.xml_schema.validate(etree_xml)
         return SchemaValidationResult(valid, self.xml_schema.error_log)
+
+
+class TAXII10Validator(SchemaValidator):
+    """A :py:class:`SchemaValidator` that uses the TAXII 1.0 Schemas"""
+
+    def __init__(self):
+        super(TAXII10Validator, self).__init__(TAXII_10_SCHEMA)
+
+
+class TAXII11Validator(SchemaValidator):
+    """A :py:class:`SchemaValidator` that uses the TAXII 1.1 Schemas"""
+
+    def __init__(self):
+        super(TAXII11Validator, self).__init__(TAXII_11_SCHEMA)
