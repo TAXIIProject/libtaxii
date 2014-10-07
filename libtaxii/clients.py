@@ -20,7 +20,7 @@ import libtaxii as t
 import warnings
 
 
-class HttpClient:
+class HttpClient(object):
 
     # Constants for authentication types
     AUTH_NONE = 0  #: Do not offer any authentication credentials to the server

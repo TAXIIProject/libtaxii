@@ -7,7 +7,6 @@ Classes
 -------
 
 .. autoclass:: HttpClient
-	:show-inheritance:
 	:members:
 	
 Examples
