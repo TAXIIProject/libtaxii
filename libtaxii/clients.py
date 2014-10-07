@@ -20,7 +20,7 @@ import libtaxii as t
 import warnings
 
 
-class HttpClient:
+class HttpClient(object):
 
     # Constants for authentication types
     AUTH_NONE = 0  #: Do not offer any authentication credentials to the server
@@ -49,14 +49,14 @@ class HttpClient:
         self.auth_type = auth_type
         self.auth_credentials = {}
         if auth_credentials is not None:
-            self.setAuthCredentials(auth_credentials)
+            self.set_auth_credentials(auth_credentials)
         # These cannot currently be set in the constructor
         self.proxy_type = None
         self.proxy_string = None
         self.verify_server = False
         self.ca_file = None
 
-    def setAuthType(self, auth_type):
+    def set_auth_type(self, auth_type):
         """Set the authentication type for this client.
 
         :param string auth_type: Must be one of :attr:`AUTH_NONE`, :attr:`AUTH_BASIC`, or :attr:`AUTH_CERT`
@@ -76,7 +76,7 @@ class HttpClient:
         else:
             raise Exception('Invalid auth_type specified. Must be one of HttpClient AUTH_NONE, AUTH_BASIC, or AUTH_CERT')
 
-    def setVerifyServer(self, verify_server=False, ca_file=None):
+    def set_verify_server(self, verify_server=False, ca_file=None):
         """
         Tell libtaxii whether to verify the server's ssl certificate
         using the provided ca_file.
@@ -96,7 +96,7 @@ class HttpClient:
                                            self.auth_credentials['username'],
                                            self.auth_credentials['password']))
 
-    def setProxy(self, proxy_string=None, proxy_type=PROXY_HTTP):
+    def set_proxy(self, proxy_string=None, proxy_type=PROXY_HTTP):
         """
         Set the proxy settings to use when making a connection.
 
@@ -106,7 +106,7 @@ class HttpClient:
         self.proxy_string = proxy_string
         self.proxy_type = proxy_type
 
-    def setUseHttps(self, bool):
+    def set_use_https(self, bool):
         """Indicate whether the HttpClient should use HTTP or HTTPs. The default is HTTP.
 
         :param bool bool: The new use_https value.
@@ -118,7 +118,7 @@ class HttpClient:
         else:
             raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
 
-    def setAuthCredentials(self, auth_credentials_dict):
+    def set_auth_credentials(self, auth_credentials_dict):
         """Set the authentication credentials used later when making a request.
 
         Note that it is possible to pass in one dict containing credentials for
@@ -143,14 +143,14 @@ class HttpClient:
                 raise Exception('Invalid auth credentials. Field %s is not present' % k)
         self.auth_credentials = auth_credentials_dict
 
-    def callTaxiiService(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
+    def call_taxii_service(self, host, path, message_binding, post_data, port=None, get_params_dict=None):
         """ **DEPRECATED.** May be removed in the next version of `libtaxii`.
-            Use :func:`callTaxiiService2` instead.
+            Use :func:`call_taxii_service2` instead.
 
             Call a TAXII service.
         """
 
-        warnings.warn('Call to deprecated function: libtaxii.clients.HttpClient.callTaxiiService()',
+        warnings.warn('Call to deprecated function: libtaxii.clients.HttpClient.call_taxii_service()',
                       category=DeprecationWarning)
 
         if port is None:  # If the caller did not specify a port, use the default
@@ -166,7 +166,7 @@ class HttpClient:
                        'User-Agent': 'libtaxii.httpclient'}
 
         if self.auth_type == HttpClient.AUTH_CERT_BASIC:
-                raise Exception('AuthType AUTH_CERT_BASIC not supported by callTaxiiService. Use callTaxiiService2.')
+                raise Exception('AuthType AUTH_CERT_BASIC not supported by call_taxii_service. Use call_taxii_service2.')
 
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = t.VID_TAXII_HTTPS_10
@@ -200,12 +200,12 @@ class HttpClient:
 
         return response
 
-    def callTaxiiService2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
-                          content_type=None, headers=None):
+    def call_taxii_service2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
+                            content_type=None, headers=None):
         """Call a TAXII service.
 
         **Note:** this uses urllib2 instead of httplib, and therefore returns
-        a different kind of object than :func:`callTaxiiService`.
+        a different kind of object than :func:`call_taxii_service`.
 
         :return: :class:`urllib2.Response`
         """
@@ -344,6 +344,15 @@ class HttpClient:
         except urllib2.HTTPError, error:
             return error
 
+    # Backwards compatibility
+    setAuthType = set_auth_type
+    setVerifyServer = set_verify_server
+    setProxy = set_proxy
+    setUseHttps = set_use_https
+    setAuthCredentials = set_auth_credentials
+    callTaxiiService = call_taxii_service
+    callTaxiiService2 = call_taxii_service2
+
 
 # http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
 class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
@@ -356,9 +365,9 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
         self.ca_certs = ca_certs
 
     def https_open(self, req):
-        return self.do_open(self.getConnection, req)
+        return self.do_open(self.get_connection, req)
 
-    def getConnection(self, host, timeout=0):
+    def get_connection(self, host, timeout=0):
         return VerifiableHTTPSConnection(host,
                                          key_file=self.key_file,
                                          cert_file=self.cert_file,
@@ -374,9 +383,9 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
         self.cert = cert
 
     def https_open(self, req):
-        return self.do_open(self.getConnection, req)
+        return self.do_open(self.get_connection, req)
 
-    def getConnection(self, host, timeout=0):
+    def get_connection(self, host, timeout=0):
         return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
 
 

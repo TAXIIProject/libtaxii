@@ -88,7 +88,7 @@ def main():
         print poll_req.to_xml(pretty_print=True)
 
     client = scripts.create_client(args)
-    resp = client.callTaxiiService2(args.host, args.path, t.VID_TAXII_XML_11, poll_req.to_xml(pretty_print=True), args.port)
+    resp = client.call_taxii_service2(args.host, args.path, t.VID_TAXII_XML_11, poll_req.to_xml(pretty_print=True), args.port)
     r = t.get_message_from_http_response(resp, '0')
 
     print "Response:\n"
