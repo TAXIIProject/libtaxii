@@ -21,25 +21,25 @@ def client_example():
     client = tc.HttpClient()
 
     # Uncomment to use HTTPS
-    client.setUseHttps(True)
+    client.set_use_https(True)
 
     # Uncomment to use basic authentication
-    # client.setAuthType(tc.HttpClient.AUTH_BASIC)
-    # client.setAuthCredentials({'username':'some_username', 'password':'some_password'})
+    # client.set_auth_type(tc.HttpClient.AUTH_BASIC)
+    # client.set_auth_credentials({'username':'some_username', 'password':'some_password'})
 
     # Uncomment to use certificate-based authentication
-    client.setAuthType(tc.HttpClient.AUTH_CERT)
-    client.setAuthCredentials({'key_file': 'keyfile',
-                               'cert_file': 'certfile'})
+    client.set_auth_type(tc.HttpClient.AUTH_CERT)
+    client.set_auth_credentials({'key_file': 'keyfile',
+                                 'cert_file': 'certfile'})
 
     # Uncomment to set a proxy
-    # client.setProxy(tc.HttpClient.PROXY_HTTP, 'http://proxy.company.com:80')
+    # client.set_proxy(tc.HttpClient.PROXY_HTTP, 'http://proxy.company.com:80')
 
     # Create the poll request
     poll_request1 = tm.PollRequest(message_id=tm.generate_message_id(), feed_name='TheFeedToPoll')
 
     # Call without a proxy
-    http_response = client.callTaxiiService2('hostname', '/poll_service_path/', t.VID_TAXII_XML_10, poll_request1.to_xml())
+    http_response = client.call_taxii_service2('hostname', '/poll_service_path/', t.VID_TAXII_XML_10, poll_request1.to_xml())
 
     print http_response.__class__.__name__
 

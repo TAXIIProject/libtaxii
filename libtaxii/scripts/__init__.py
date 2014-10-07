@@ -80,19 +80,19 @@ class TaxiiScript(object):
 
     def create_client(self, args):
         client = tc.HttpClient()
-        client.setUseHttps(args.https)
-        client.setProxy(args.proxy)
+        client.set_use_https(args.https)
+        client.set_proxy(args.proxy)
         tls = (args.cert is not None and args.key is not None)
         basic = (args.username is not None and args.password is not None)
         if tls and basic:
-            client.setAuthType(tc.HttpClient.AUTH_CERT_BASIC)
-            client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert, 'username': args.username, 'password': args.password})
+            client.set_auth_type(tc.HttpClient.AUTH_CERT_BASIC)
+            client.set_auth_credentials({'key_file': args.key, 'cert_file': args.cert, 'username': args.username, 'password': args.password})
         elif tls:
-            client.setAuthType(tc.HttpClient.AUTH_CERT)
-            client.setAuthCredentials({'key_file': args.key, 'cert_file': args.cert})
+            client.set_auth_type(tc.HttpClient.AUTH_CERT)
+            client.set_auth_credentials({'key_file': args.key, 'cert_file': args.cert})
         elif basic:
-            client.setAuthType(tc.HttpClient.AUTH_BASIC)
-            client.setAuthCredentials({'username': args.username, 'password': args.password})
+            client.set_auth_type(tc.HttpClient.AUTH_BASIC)
+            client.set_auth_credentials({'username': args.username, 'password': args.password})
 
         return client
 
@@ -119,7 +119,7 @@ class TaxiiScript(object):
             else:
                 print request_message.to_xml(pretty_print=True)
 
-            resp = client.callTaxiiService2(args.host, args.path, self.taxii_version, request_message.to_xml(pretty_print=True), args.port)
+            resp = client.call_taxii_service2(args.host, args.path, self.taxii_version, request_message.to_xml(pretty_print=True), args.port)
             r = t.get_message_from_http_response(resp, '0')
 
             self.handle_response(r, args)
