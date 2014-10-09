@@ -8,3 +8,4 @@ venv/
 .tox
 output.txt
 docs/_build/
+.idea
