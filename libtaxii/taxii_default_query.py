@@ -716,18 +716,21 @@ class Test(TAXIIBase):
         capability_id = etree_xml.attrib['capability_id']
         relationship = etree_xml.attrib['relationship']
         parameters = {}
+
+        cm = capability_modules[capability_id]
+        r = cm.relationships[relationship]
+
         for parameter in etree_xml.xpath('./tdq:Parameter', namespaces=ns_map):
             k = parameter.attrib['name']
             v = parameter.text
-            if v in ('true', 'false'):  # Assume bool
+
+            if v in ('true', 'false'):  # bool is a special case
                 parameters[k] = v == 'true'
             else:
-                try:  # attempt to deserialize as a datetime
-                    parameters[k] = dateutil.parser.parse(v)
-                except TypeError:  # Just use it as a string
-                    parameters[k] = v
-                except ValueError:  # Just use it as a string
-                    parameters[k] = v
+                type_ = r.parameters[k].type
+                if type_ == basestring:  # basestring can't be instantiated, but str can be
+                    type_ = str
+                parameters[k] = type_(v)
 
         return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)
 
