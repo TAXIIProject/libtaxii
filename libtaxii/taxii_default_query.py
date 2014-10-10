@@ -730,6 +730,9 @@ class Test(TAXIIBase):
                 type_ = r.parameters[k].type
                 if type_ == basestring:  # basestring can't be instantiated, but str can be
                     type_ = str
+                elif type_ == datetime.datetime:
+                    # We can use this function to parse datetime strings.
+                    type_ = dateutil.parser.parse
                 parameters[k] = type_(v)
 
         return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)
