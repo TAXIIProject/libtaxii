@@ -717,8 +717,13 @@ class Test(TAXIIBase):
         relationship = etree_xml.attrib['relationship']
         parameters = {}
 
-        cm = capability_modules[capability_id]
-        r = cm.relationships[relationship]
+        cm = capability_modules.get(capability_id, None)
+        if cm is not None:
+            r = cm.relationships.get(relationship, None)
+            if r is None:
+                raise ValueError('Relationship (%s) not in CM (%s).' % (r, capability_id))
+        else:
+            r = None
 
         for parameter in etree_xml.xpath('./tdq:Parameter', namespaces=ns_map):
             k = parameter.attrib['name']
@@ -726,7 +731,7 @@ class Test(TAXIIBase):
 
             if v in ('true', 'false'):  # bool is a special case
                 parameters[k] = v == 'true'
-            else:
+            elif r is not None:
                 type_ = r.parameters[k].type
                 if type_ == basestring:  # basestring can't be instantiated, but str can be
                     type_ = str
@@ -734,6 +739,8 @@ class Test(TAXIIBase):
                     # We can use this function to parse datetime strings.
                     type_ = dateutil.parser.parse
                 parameters[k] = type_(v)
+            else:
+                parameters[k] = v
 
         return DefaultQuery.Criterion.Test(capability_id, relationship, parameters)
 
