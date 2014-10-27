@@ -1015,6 +1015,32 @@ class PollFulfillmentTests(unittest.TestCase):
         round_trip_message(pf1)
 
 
+class SubscriptionInformationTests(unittest.TestCase):
+
+    @unittest.expectedFailure
+    def test_110_1(self):
+        """
+        Test for https://github.com/TAXIIProject/libtaxii/issues/110
+        :return:
+        """
+
+        si = tm11.SubscriptionInformation(collection_name='foo',
+                                          subscription_id='baz',
+                                          exclusive_begin_timestamp_label='100')
+        si.to_xml()
+
+    @unittest.expectedFailure
+    def test_110_2(self):
+        """
+        Test for https://github.com/TAXIIProject/libtaxii/issues/110
+        :return:
+        """
+        si = tm11.SubscriptionInformation(collection_name='foo',
+                                          subscription_id='baz',
+                                          inclusive_end_timestamp_label='100')
+        si.to_xml()
+
+
 class ContentBlockTests(unittest.TestCase):
 
     def test_content_block01(self):

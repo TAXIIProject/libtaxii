@@ -459,6 +459,39 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
         round_trip_message(response)
 
 
+class SubscriptionInformationTests(unittest.TestCase):
+
+    @unittest.expectedFailure
+    def test_issue_110_1(self):
+        """
+        Test for issue #110
+
+        :param self:
+        :return:
+        """
+
+        si = tm10.SubscriptionInformation(feed_name='myfeed',
+                                          subscription_id='foo',
+                                          inclusive_begin_timestamp_label='100',
+                                          inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))
+        si.to_xml()
+
+    @unittest.expectedFailure
+    def test_issue_110_2(self):
+        """
+        Test for issue #110
+
+        :param self:
+        :return:
+        """
+
+        si = tm10.SubscriptionInformation(feed_name='myfeed',
+                                          subscription_id='foo',
+                                          inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
+                                          inclusive_end_timestamp_label='200')
+        si.to_xml()
+
+
 class ContentBlockTests(unittest.TestCase):
 
     def test_content_block1(self):
