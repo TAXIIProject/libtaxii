@@ -461,35 +461,25 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
 
 class SubscriptionInformationTests(unittest.TestCase):
 
-    @unittest.expectedFailure
-    def test_issue_110_1(self):
-        """
-        Test for issue #110
+    # See https://github.com/TAXIIProject/libtaxii/issues/110
+    def test_inclusive_begin_timestamp_label_must_be_datetime(self):
+        params = {
+            'feed_name': 'myfeed',
+            'subscription_id': 'foo',
+            'inclusive_begin_timestamp_label': '100',
+            'inclusive_end_timestamp_label': datetime.datetime.now(tzutc())
+        }
+        self.assertRaises(ValueError, tm10.SubscriptionInformation, **params)
 
-        :param self:
-        :return:
-        """
-
-        si = tm10.SubscriptionInformation(feed_name='myfeed',
-                                          subscription_id='foo',
-                                          inclusive_begin_timestamp_label='100',
-                                          inclusive_end_timestamp_label=datetime.datetime.now(tzutc()))
-        si.to_xml()
-
-    @unittest.expectedFailure
-    def test_issue_110_2(self):
-        """
-        Test for issue #110
-
-        :param self:
-        :return:
-        """
-
-        si = tm10.SubscriptionInformation(feed_name='myfeed',
-                                          subscription_id='foo',
-                                          inclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
-                                          inclusive_end_timestamp_label='200')
-        si.to_xml()
+    # See https://github.com/TAXIIProject/libtaxii/issues/110
+    def test_inclusive_end_timestamp_label_must_be_datetime(self):
+        params = {
+            'feed_name': 'myfeed',
+            'subscription_id': 'foo',
+            'inclusive_begin_timestamp_label': datetime.datetime.now(tzutc()),
+            'inclusive_end_timestamp_label': '200'
+        }
+        self.assertRaises(ValueError, tm10.SubscriptionInformation, **params)
 
 
 class ContentBlockTests(unittest.TestCase):

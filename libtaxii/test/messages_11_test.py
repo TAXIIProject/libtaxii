@@ -1017,28 +1017,27 @@ class PollFulfillmentTests(unittest.TestCase):
 
 class SubscriptionInformationTests(unittest.TestCase):
 
-    @unittest.expectedFailure
-    def test_110_1(self):
-        """
-        Test for https://github.com/TAXIIProject/libtaxii/issues/110
-        :return:
-        """
+    # See https://github.com/TAXIIProject/libtaxii/issues/110
+    def test_exclusive_begin_timestamp_label_must_be_datetime(self):
+        params = {
+            'collection_name': 'foo',
+            'subscription_id': 'baz',
+            'exclusive_begin_timestamp_label': '100'
+        }
+        self.assertRaises(ValueError, tm11.SubscriptionInformation, **params)
 
-        si = tm11.SubscriptionInformation(collection_name='foo',
-                                          subscription_id='baz',
-                                          exclusive_begin_timestamp_label='100')
-        si.to_xml()
-
-    @unittest.expectedFailure
+    # See https://github.com/TAXIIProject/libtaxii/issues/110
     def test_110_2(self):
         """
         Test for https://github.com/TAXIIProject/libtaxii/issues/110
         :return:
         """
-        si = tm11.SubscriptionInformation(collection_name='foo',
-                                          subscription_id='baz',
-                                          inclusive_end_timestamp_label='100')
-        si.to_xml()
+        params = {
+            'collection_name': 'foo',
+            'subscription_id': 'baz',
+            'inclusive_end_timestamp_label': '100'
+        }
+        self.assertRaises(ValueError, tm11.SubscriptionInformation, **params)
 
 
 class ContentBlockTests(unittest.TestCase):
