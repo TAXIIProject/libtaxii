@@ -13,6 +13,9 @@ import libtaxii.taxii_default_query as tdq
 import libtaxii.clients as tc
 import libtaxii.scripts as scripts
 
+import os
+from re import sub as resub
+
 
 def main():
     parser = scripts.get_base_parser("Poll Query Client", path="/services/poll/")
@@ -120,7 +123,12 @@ def main():
             else:
                 date_string = 's' + datetime.datetime.now().isoformat()
 
-            filename = (args.dest_dir + r.collection_name + format + date_string + ext).translate(None, '/\\:*?"<>|')
+            filename = (    response.collection_name.lstrip(".") +
+                            format +
+                            resub(r"[^a-zA-Z0-9]", "_", date_string) + ext
+                            ).translate(None, '/\\:*?"<>|')
+            filename = os.path.join(args.dest_dir, filename)
+
             f = open(filename, 'w')
             f.write(cb.content)
             f.flush()
