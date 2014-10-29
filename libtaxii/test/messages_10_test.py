@@ -19,6 +19,7 @@ from lxml import etree
 import libtaxii as t
 import libtaxii.messages_10 as tm10
 from libtaxii.validation import SchemaValidator
+from libtaxii.constants import *
 
 
 full_stix_doc = """<stix:STIX_Package
@@ -353,6 +354,59 @@ class StatusMessageTests(unittest.TestCase):
             message='This is a message.')  # Optional
 
         round_trip_message(status_message1)
+
+    def test_xml_ext_header(self):
+        """
+        Tests an XML extended header value of etree._Element
+
+        :return:
+        """
+
+        eh = {'my_ext_header_1': etree.XML('<x:element xmlns:x="#foo">'
+                                           '<x:subelement attribute="something"/>'
+                                           '</x:element>')}
+
+        sm = tm10.StatusMessage(message_id='1',
+                                in_response_to='2',
+                                status_type=ST_SUCCESS,
+                                extended_headers=eh)
+        round_trip_message(sm)
+
+    def test_xml_ext_header2(self):
+        """
+        Tests an XML extended header value of etree._Element
+
+        :return:
+        """
+
+        eh = {'my_ext_header_1': etree.parse(StringIO.StringIO('<x:element xmlns:x="#foo">'
+                                                               '<x:subelement attribute="something"/>'
+                                                               '</x:element>'))}
+
+        sm = tm10.StatusMessage(message_id='1',
+                                in_response_to='2',
+                                status_type=ST_SUCCESS,
+                                extended_headers=eh)
+        round_trip_message(sm)
+        # print etree.tostring(etree.XML(sm.to_xml(pretty_print=True)), pretty_print=True)
+
+    def test_xml_ext_header3(self):
+        """
+        Tests an XML extended header value of string
+
+        :return:
+        """
+
+        eh = {'my_ext_header_1': '<x:element xmlns:x="#foo">'
+                                 '<x:subelement attribute="something"/>'
+                                 '</x:element>'}
+
+        sm = tm10.StatusMessage(message_id='1',
+                                in_response_to='2',
+                                status_type=ST_SUCCESS,
+                                extended_headers=eh)
+        round_trip_message(sm)
+        # print etree.tostring(etree.XML(sm.to_xml(pretty_print=True)), pretty_print=True)
 
 
 class InboxMessageTests(unittest.TestCase):
