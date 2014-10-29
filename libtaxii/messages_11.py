@@ -22,7 +22,7 @@ import warnings
 
 from lxml import etree
 
-from .common import (get_xml_parser, parse_datetime_string, set_xml_parser,
+from .common import (get_xml_parser, parse_datetime_string, set_xml_parser, append_any_content_etree,
                      TAXIIBase)
 from .validation import do_check, uri_regex, check_timestamp_label
 from .constants import *
@@ -1049,7 +1049,8 @@ class TAXIIMessage(TAXIIBase):
             for name, value in self.extended_headers.items():
                 h = etree.SubElement(eh, '{%s}Extended_Header' % ns_map['taxii_11'], nsmap=ns_map)
                 h.attrib['name'] = name
-                h.text = value
+                append_any_content_etree(h, value)
+                # h.text = value
         return root_elt
 
     def to_dict(self):
@@ -1064,7 +1065,13 @@ class TAXIIMessage(TAXIIBase):
         d['message_id'] = self.message_id
         if self.in_response_to is not None:
             d['in_response_to'] = self.in_response_to
-        d['extended_headers'] = self.extended_headers
+        d['extended_headers'] = {}
+        for k, v in self.extended_headers.iteritems():
+            if isinstance(v, etree._Element) or isinstance(v, etree._ElementTree):
+                v = etree.tostring(v)
+            elif not isinstance(v, basestring):
+                v = str(v)
+            d['extended_headers'][k] = v
 
         return d
 
@@ -1110,7 +1117,11 @@ class TAXIIMessage(TAXIIBase):
         extended_headers = {}
         for header in extended_header_list:
             eh_name = header.xpath('./@name')[0]
-            eh_value = header.text
+            if len(header) == 0:  # This has string content
+                eh_value = header.text
+            else:  # This has XML content
+                eh_value = header[0]
+
             extended_headers[eh_name] = eh_value
 
         return cls(message_id,
@@ -1130,7 +1141,14 @@ class TAXIIMessage(TAXIIBase):
         if message_type != cls.message_type:
             raise ValueError('%s != %s' % (message_type, cls.message_type))
         message_id = d['message_id']
-        extended_headers = d['extended_headers']
+        extended_headers = {}
+        for k, v in d['extended_headers'].iteritems():
+            try:
+                v = etree.XML(v, get_xml_parser())
+            except etree.XMLSyntaxError:
+                pass
+            extended_headers[k] = v
+
         in_response_to = d.get('in_response_to')
 
         return cls(message_id,
