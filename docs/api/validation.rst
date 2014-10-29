@@ -1,6 +1,8 @@
 :mod:`libtaxii.validation` Module
 ---------------------------------
 
+.. _apivalidation:
+
 .. currentmodule:: libtaxii.validation
 
 .. autoclass:: SchemaValidator

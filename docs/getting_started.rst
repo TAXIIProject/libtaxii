@@ -114,18 +114,12 @@ and for LXML ElementTrees:
 
 Schema Validating TAXII Messages
 --------------------------------
-Example code to schema validating TAXII Messages.
+You can use libtaxii to Schema Validate XML, etree, and file representations of TAXII Messages.
+XML Schema validation cannot be performed on a TAXII Message Python object, since XML Schema validation
+can only be performed on XML.
 
-.. code:: python
+A full code example of XML Schema validation can be found in :ref:`API Documentation <apivalidation>`
 
-    import libtaxii.validation as tv
-    taxii_11_validator = tv.TAXII11Validator()
-    validation_result = taxii_11_validator.validate_etree( ... )  # Use this to validate an etree
-    validation_result = taxii_11_validator.validate_file( ... )  # Use this to validate a file
-    validation_result = taxii_11_validator.validate_string( ... )  # use this to validate an XML String
-
-    print validation_result.valid  # prints True or False
-    print res.error_log  # An lxml.etree error_log
 
 TAXII Clients
 -------------
