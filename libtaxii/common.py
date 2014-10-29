@@ -5,7 +5,7 @@ Common utility classes and functions used throughout libtaxii.
 
 from operator import attrgetter
 from StringIO import StringIO
-import re.sub as resub
+from re import sub as resub
 import dateutil.parser
 import random
 
