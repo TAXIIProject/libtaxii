@@ -5,7 +5,7 @@ Common utility classes and functions used throughout libtaxii.
 
 from operator import attrgetter
 from StringIO import StringIO
-
+import re.sub as resub
 import dateutil.parser
 import random
 
@@ -63,6 +63,24 @@ def generate_message_id(maxlen=5):
     """
     message_id = random.randint(1, 10 ** maxlen)
     return str(message_id)
+
+
+def gen_filename(collection_name, format_part, date_string, extension):
+    """
+    Creates a filename based on various properties of a Poll Request and Content Block
+
+    :param collection_name: The collection name
+    :param format_part: The format part (e.g., '_STIX_10_')
+    :param date_string: A datestring
+    :param extension: The file extension to use
+    :return: A string containing the generated filename
+    """
+
+    filename = (collection_name.lstrip(".") +
+                format_part +
+                resub(r"[^a-zA-Z0-9]", "_", date_string) + extension
+                ).translate(None, '/\\:*?"<>|')
+    return filename
 
 
 class TAXIIBase(object):

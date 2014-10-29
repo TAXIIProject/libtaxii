@@ -6,7 +6,10 @@ from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_11 as tm11
 import libtaxii as t
 import os
-from re import sub as resub
+import sys
+import dateutil.parser
+import datetime
+from ..common import gen_filename
 
 class PollClient11Script(TaxiiScript):
     parser_description = 'TAXII 1.1 Poll Client'
@@ -82,10 +85,10 @@ class PollClient11Script(TaxiiScript):
                 else:
                     date_string = 's' + datetime.datetime.now().isoformat()
 
-                filename = (    response.collection_name.lstrip(".") +
-                                format +
-                                resub(r"[^a-zA-Z0-9]", "_", date_string) + ext
-                                ).translate(None, '/\\:*?"<>|')
+                filename = gen_filename(response.collection_name,
+                                        format,
+                                        date_string,
+                                        ext)
                 filename = os.path.join(args.dest_dir, filename)
 
                 f = open(filename, 'w')
