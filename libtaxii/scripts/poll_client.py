@@ -11,6 +11,7 @@ import dateutil.parser
 import datetime
 from ..common import gen_filename
 
+
 class PollClient11Script(TaxiiScript):
     parser_description = 'TAXII 1.1 Poll Client'
     path = '/services/poll/'
