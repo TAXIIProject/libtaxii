@@ -567,7 +567,7 @@ class TAXIIMessage(BaseNonMessage):
         for header in extended_header_list:
             eh_name = header.xpath('./@name')[0]
             # eh_value = header.text
-            if len(header) == 0: # This has string content
+            if len(header) == 0:  # This has string content
                 eh_value = header.text
             else:  # This has XML content
                 eh_value = header[0]
