@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+1.1.104
+-------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.103...1.1.04>`__
+
+- Fixed a bug where libtaxii did not properly handle XML values for Extended Headers
+- Added checking for required status detail keys in Status Messages
+- Improved data validation in various places, fixed various bugs, and improved documentation
+- Improved filename generation in scripts (Thanks @guidovranken!)
+
 1.1.103
 -------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.102...1.1.103>`__
