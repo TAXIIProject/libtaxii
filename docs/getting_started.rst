@@ -10,16 +10,16 @@ Modules
 
 The libtaxii library contains the following modules:
 
-* **libtaxii** - Code and constants needed for both TAXII messages and TAXII
-  clients. (Implemented in ``libtaxii/__init__.py``)
+* **libtaxii** - Contains version info and some methods for getting TAXII Messages
+  from HTTP responses. (Implemented in ``libtaxii/__init__.py``)
+* **libtaxii.clients.** - TAXII HTTP and HTTPS clients. (Implemented in
+  ``libtaxii/clients.py``)
+* **libtaxii.common** - Contains functions and classes useful for all versions of TAXII
+* **libtaxii.constants** - Contains constants for TAXII
 * **libtaxii.messages_10** - Creating, handling, and parsing TAXII 1.0
   messages. (Implemented in ``libtaxii/messages_10.py``)
 * **libtaxii.messages_11** - Creating, handling, and parsing TAXII 1.1
   messages. (Implemented in ``libtaxii/messages_11.py``)
-* **libtaxii.messages** - An alias for **libtaxii.messages_10**. *Deprecated as
-  of libtaxii 1.1.100*.
-* **libtaxii.clients.** - TAXII HTTP and HTTPS clients. (Implemented in
-  ``libtaxii/clients.py``)
 * **libtaxii.taxii_default_query** - Creating, handling and parsing TAXII
   Default Queries. (Implemented in ``libtaxii/taxii_default_query.py``) *New in
   libtaxii 1.1.100*.
@@ -111,6 +111,14 @@ and for LXML ElementTrees:
     msg_etree = etree.Element( ... )  # Note: Invalid Element constructor
     discovery_response = tm11.DiscoveryResponse.from_etree(msg_etree)
     new_etree = discovery_response.to_etree()
+
+Schema Validating TAXII Messages
+--------------------------------
+You can use libtaxii to Schema Validate XML, etree, and file representations of TAXII Messages.
+XML Schema validation cannot be performed on a TAXII Message Python object, since XML Schema validation
+can only be performed on XML.
+
+A full code example of XML Schema validation can be found in :ref:`API Documentation <apivalidation>`
 
 
 TAXII Clients

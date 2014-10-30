@@ -2,16 +2,14 @@
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
-import sys
-
-import argparse
-import dateutil.parser
-
 import libtaxii as t
 import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
-import libtaxii.clients as tc
 import libtaxii.scripts as scripts
+import datetime
+from ..common import gen_filename
+
+import os
 
 
 def main():
@@ -120,7 +118,12 @@ def main():
             else:
                 date_string = 's' + datetime.datetime.now().isoformat()
 
-            filename = (args.dest_dir + r.collection_name + format + date_string + ext).translate(None, '/\\:*?"<>|')
+            filename = gen_filename(r.collection_name,
+                                    format,
+                                    date_string,
+                                    ext)
+            filename = os.path.join(args.dest_dir, filename)
+
             f = open(filename, 'w')
             f.write(cb.content)
             f.flush()

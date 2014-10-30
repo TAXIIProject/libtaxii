@@ -5,6 +5,11 @@
 from libtaxii.scripts import TaxiiScript
 import libtaxii as t
 import libtaxii.messages_10 as tm10
+import dateutil.parser
+import datetime
+import sys
+import os
+from ..common import gen_filename
 
 
 class PollClient10Script(TaxiiScript):
@@ -71,7 +76,12 @@ class PollClient10Script(TaxiiScript):
                 else:
                     date_string = 's' + datetime.datetime.now().isoformat()
 
-                filename = (args.dest_dir + r.collection_name + format + date_string + ext).translate(None, '/\\:*?"<>|')
+                filename = gen_filename(response.collection_name,
+                                        format,
+                                        date_string,
+                                        ext)
+                filename = os.path.join(args.dest_dir, filename)
+
                 f = open(filename, 'w')
                 f.write(cb.content)
                 f.flush()

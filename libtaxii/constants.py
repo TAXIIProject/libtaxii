@@ -269,7 +269,7 @@ P_NAMES = (P_VALUE, P_MATCH_TYPE, P_CASE_SENSITIVE)
 #: Relationship name: equals
 R_EQUALS = 'equals'
 #: Relationship name: not_requals
-R_NOT_EQUALS = 'not_requals'
+R_NOT_EQUALS = 'not_equals'
 #: Relationship name: greater_than
 R_GREATER_THAN = 'greater_than'
 #: Relationship name: greater_than_or_equal
