@@ -391,6 +391,7 @@ class StatusMessageTests(unittest.TestCase):
         round_trip_message(sm)
         # print etree.tostring(etree.XML(sm.to_xml(pretty_print=True)), pretty_print=True)
 
+
 class DiscoveryRequestTests(unittest.TestCase):
 
     def test_discovery_request(self):
