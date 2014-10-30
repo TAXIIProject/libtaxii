@@ -65,6 +65,41 @@ def generate_message_id(maxlen=5):
     return str(message_id)
 
 
+def append_any_content_etree(etree_elt, content):
+    """
+    General method for adding content to an etree element. This method can handle:
+    * etree._ElementTree
+    * etree._Element
+    * any python type that can be cast to str
+    * str
+
+
+    :param etree_elt: The etree to append the content to
+    :param content: The content to append
+    :return: The etree_elt
+    """
+
+    if isinstance(content, etree._ElementTree):  # If content is an element tree, append the root element
+        etree_elt.append(content.getroot())
+        return etree_elt
+
+    if isinstance(content, etree._Element):  # If content is an element, append it
+        etree_elt.append(content)
+        return etree_elt
+
+    if not isinstance(content, basestring):  # If content is a non-string, cast it to string and set etree_elt.text
+        etree_elt.test = str(content)
+        return etree_elt
+
+    # If content is a string, need to check if it's XML or not
+    try:
+        etree_elt.append(etree.XML(content, get_xml_parser()))
+    except etree.XMLSyntaxError:
+        etree_elt.text = content
+
+    return etree_elt
+
+
 def gen_filename(collection_name, format_part, date_string, extension):
     """
     Creates a filename based on various properties of a Poll Request and Content Block
