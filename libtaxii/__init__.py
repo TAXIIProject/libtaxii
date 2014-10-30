@@ -9,7 +9,7 @@
 The main libtaxii module
 """
 
-__version__ = "1.1.103"
+__version__ = "1.1.104"
 
 import httplib
 import urllib
