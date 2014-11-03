@@ -1124,6 +1124,13 @@ class ContentBlockTests(unittest.TestCase):
         cb6 = tm11.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
         round_trip_content_block(cb6)
 
+    def test_content_block07(self):
+        cb7 = tm11.ContentBlock(content_binding='something',
+                                content='something',
+                                message='a message',
+                                padding='the padding!')
+        round_trip_content_block(cb7)
+
 
 if __name__ == "__main__":
     unittest.main()
