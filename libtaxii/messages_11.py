@@ -772,6 +772,10 @@ class ContentBlock(TAXIIBase):
             tl = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii_11'])
             tl.text = self.timestamp_label.isoformat()
 
+        if self.message is not None:
+            m = etree.SubElement(block, '{%s}Message' % ns_map['taxii_11'])
+            m.text = self.message
+
         if self.padding is not None:
             p = etree.SubElement(block, '{%s}Padding' % ns_map['taxii_11'])
             p.text = self.padding
@@ -791,6 +795,9 @@ class ContentBlock(TAXIIBase):
         if self.timestamp_label is not None:
             block['timestamp_label'] = self.timestamp_label.isoformat()
 
+        if self.message is not None:
+            block['message'] = self.message
+
         if self.padding is not None:
             block['padding'] = self.padding
 
@@ -806,6 +813,7 @@ class ContentBlock(TAXIIBase):
         s += line_prepend + "  (Content not printed for brevity)\n"
         if self.timestamp_label:
             s += line_prepend + "  Timestamp Label: %s\n" % self.timestamp_label
+        s += line_prepend + "  Message: %s\n" % self.message
         s += line_prepend + "  Padding: %s\n" % self.padding
         return s
 
@@ -823,6 +831,11 @@ class ContentBlock(TAXIIBase):
             ts_string = ts_set[0].text
             kwargs['timestamp_label'] = parse_datetime_string(ts_string)
 
+        m_set = etree_xml.xpath('./taxii_11:Message', namespaces=ns_map)
+        if len(m_set) > 0:
+            message = m_set[0].text
+            kwargs['message'] = message
+
         content = etree_xml.xpath('./taxii_11:Content', namespaces=ns_map)[0]
         if len(content) == 0:  # This has string content
             kwargs['content'] = content.text
@@ -838,7 +851,7 @@ class ContentBlock(TAXIIBase):
         kwargs['padding'] = d.get('padding')
         if 'timestamp_label' in d:
             kwargs['timestamp_label'] = parse_datetime_string(d['timestamp_label'])
-
+        kwargs['message'] = d.get('message')
         is_xml = d.get('content_is_xml', False)
         if is_xml:
             kwargs['content'] = etree.parse(StringIO.StringIO(d['content']), get_xml_parser()).getroot()
