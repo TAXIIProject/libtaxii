@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:Discovery_Response in_response_to="urn:uuid:ac4d80f4-3dd4-47fb-81ed-67cd49911de2" message_id="1221"
+    xmlns:ns2="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <ns2:Service_Instance service_type="INBOX" available="true" service_version="urn:taxii.mitre.org:services:1.1">
+        <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:http:1.0</ns2:Protocol_Binding>
+        <ns2:Address>http://taxiitest.mitre.org/services/inbox/default</ns2:Address>
+        <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.0"/>
+    </ns2:Service_Instance>
+    <ns2:Service_Instance service_type="POLL" available="true" service_version="urn:taxii.mitre.org:services:1.1">
+        <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:http:1.0</ns2:Protocol_Binding>
+        <ns2:Address>http://taxiitest.mitre.org/services/poll</ns2:Address>
+        <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+    </ns2:Service_Instance>
+    <ns2:Service_Instance service_type="DISCOVERY" available="true" service_version="urn:taxii.mitre.org:services:1.1">
+        <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:http:1.0</ns2:Protocol_Binding>
+        <ns2:Address>http://taxiitest.mitre.org/services/discovery</ns2:Address>
+        <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+    </ns2:Service_Instance>
+</ns2:Discovery_Response>

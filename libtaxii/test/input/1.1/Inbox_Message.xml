@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Inbox_Message result_id="123" message_id="Inbox1" xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://taxii.mitre.org/messages/taxii_xml_binding-1.1">
+    <ns2:Destination_Collection_Name>collection1</ns2:Destination_Collection_Name>
+    <ns2:Destination_Collection_Name>collection2</ns2:Destination_Collection_Name>
+    <ns2:Message>Hello!</ns2:Message>
+    <ns2:Source_Subscription collection_name="SomeCollectionName">
+        <ns2:Subscription_ID>SubsId021</ns2:Subscription_ID>
+        <ns2:Exclusive_Begin_Timestamp>2014-10-21T15:21:50.895-04:00</ns2:Exclusive_Begin_Timestamp>
+        <ns2:Inclusive_End_Timestamp>2014-10-21T15:21:50.895-04:00</ns2:Inclusive_End_Timestamp>
+    </ns2:Source_Subscription>
+    <ns2:Record_Count partial_count="true">22</ns2:Record_Count>
+    <ns2:Content_Block>
+        <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1">
+            <ns2:Subtype subtype_id="test1"/>
+        </ns2:Content_Binding>
+        <ns2:Content>
+            <STIX_Package xmlns="" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#"/>
+        </ns2:Content>
+        <ns2:Timestamp_Label>2014-10-21T19:21:50.805Z</ns2:Timestamp_Label>
+        <ns2:Message>Hullo!</ns2:Message>
+        <ns2:Padding>The quick brown fox jumped over the lazy dogs.</ns2:Padding>
+    </ns2:Content_Block>
+    <ns2:Content_Block>
+        <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1"/>
+        <ns2:Content>
+            <STIX_Package xmlns="" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#"/>
+        </ns2:Content>
+    </ns2:Content_Block>
+</ns2:Inbox_Message>
+
