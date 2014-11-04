@@ -436,7 +436,7 @@ class ContentBinding(TAXIIBase):
         return {'binding_id': self.binding_id, 'subtype_ids': self.subtype_ids}
 
     def to_text(self, line_prepend=''):
-        s = line_prepend + str(self)
+        return line_prepend + str(self)
 
     def __hash__(self):
         return hash(str(self.to_dict()))
@@ -1822,7 +1822,7 @@ class CollectionInformation(TAXIIBase):
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Data Collection Information ===\n"
         s += line_prepend + "  Collection Name: %s\n" % self.collection_name
-        s += line_prepend + "  Collection Type: %s\n" % self.collection_type
+        s += line_prepend + "  Collection Type: %s\n" % (self.collection_type if (None != self.collection_type) else CT_DATA_FEED)
         s += line_prepend + "  Available: %s\n" % self.available
         s += line_prepend + "  Collection Description: %s\n" % self.collection_description
         if self.collection_volume:
