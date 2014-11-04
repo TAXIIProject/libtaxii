@@ -589,7 +589,7 @@ class Criterion(TAXIIBase):
 
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Criterion ===\n"
-        s += line_prepend + "  Negate: %s\n" % self.negate
+        s += line_prepend + "  Negate: %s\n" % (self.negate if (None != self.negate) else False)
         s += line_prepend + "  Target: %s\n" % self.target
         s += self.test.to_text(line_prepend + tm11.STD_INDENT)
 
