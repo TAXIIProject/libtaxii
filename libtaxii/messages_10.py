@@ -22,7 +22,7 @@ import warnings
 
 from lxml import etree
 
-from .common import get_xml_parser, parse_datetime_string, set_xml_parser, append_any_content_etree
+from .common import parse, parse_datetime_string, append_any_content_etree
 from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
 from constants import *
 
@@ -51,10 +51,10 @@ def validate_xml(xml_string):
     else:
         f = xml_string
 
-    etree_xml = etree.parse(f, get_xml_parser())
+    etree_xml = parse(f)
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
-    taxii_schema_doc = etree.parse(schema_file, get_xml_parser())
+    taxii_schema_doc = parse(schema_file)
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
     if not valid:
@@ -82,7 +82,7 @@ def get_message_from_xml(xml_string):
     else:
         f = xml_string
 
-    etree_xml = etree.parse(f, get_xml_parser()).getroot()
+    etree_xml = parse(f)
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)
@@ -219,7 +219,7 @@ class BaseNonMessage(object):
         else:
             f = xml
 
-        etree_xml = etree.parse(f, get_xml_parser()).getroot()
+        etree_xml = parse(f)
         return cls.from_etree(etree_xml)
 
     def __str__(self):
@@ -591,7 +591,7 @@ class TAXIIMessage(BaseNonMessage):
         else:
             f = xml
 
-        etree_xml = etree.parse(f, get_xml_parser()).getroot()
+        etree_xml = parse(f)
         return cls.from_etree(etree_xml)
 
     @classmethod
@@ -609,7 +609,7 @@ class TAXIIMessage(BaseNonMessage):
         extended_headers = {}
         for k, v in d['extended_headers'].iteritems():
             try:
-                v = etree.XML(v, get_xml_parser())
+                v = parse(v)
             except etree.XMLSyntaxError:
                 pass
             extended_headers[k] = v
@@ -702,14 +702,14 @@ class ContentBlock(BaseNonMessage):
 
         if hasattr(content, 'read'):  # The content is file-like
             try:  # Try to parse as XML
-                xml = etree.parse(content, get_xml_parser()).getroot()
+                xml = parse(content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 return content.read(), False
         else:  # The Content is not file-like
             try:  # Attempt to parse string as XML
                 sio_content = StringIO.StringIO(content)
-                xml = etree.parse(sio_content, get_xml_parser()).getroot()
+                xml = parse(sio_content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
@@ -811,7 +811,7 @@ class ContentBlock(BaseNonMessage):
 
         is_xml = d.get('content_is_xml', False)
         if is_xml:
-            kwargs['content'] = etree.parse(StringIO.StringIO(d['content']), get_xml_parser()).getroot()
+            kwargs['content'] = parse(d['content'])
         else:
             kwargs['content'] = d['content']
 

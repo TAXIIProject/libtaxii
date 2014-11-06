@@ -22,6 +22,7 @@ import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
 from libtaxii.validation import SchemaValidator
 from libtaxii.constants import *
+from libtaxii.common import *
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
@@ -345,9 +346,9 @@ class StatusMessageTests(unittest.TestCase):
         :return:
         """
 
-        eh = {'my_ext_header_1': etree.XML('<x:element xmlns:x="#foo">'
-                                           '<x:subelement attribute="something"/>'
-                                           '</x:element>')}
+        eh = {'my_ext_header_1': parse('<x:element xmlns:x="#foo">'
+                                       '<x:subelement attribute="something"/>'
+                                       '</x:element>')}
 
         sm = tm11.StatusMessage(message_id='1',
                                 in_response_to='2',
@@ -362,9 +363,9 @@ class StatusMessageTests(unittest.TestCase):
         :return:
         """
 
-        eh = {'my_ext_header_1': etree.parse(StringIO.StringIO('<x:element xmlns:x="#foo">'
-                                                               '<x:subelement attribute="something"/>'
-                                                               '</x:element>'))}
+        eh = {'my_ext_header_1': parse('<x:element xmlns:x="#foo">'
+                                       '<x:subelement attribute="something"/>'
+                                       '</x:element>')}
 
         sm = tm11.StatusMessage(message_id='1',
                                 in_response_to='2',
@@ -1102,12 +1103,12 @@ class ContentBlockTests(unittest.TestCase):
 
     def test_content_block02(self):
         cb2 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
-                                content=StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
+                                content=StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
     def test_content_block03(self):
         cb3 = tm11.ContentBlock(content_binding=tm11.ContentBinding(t.CB_STIX_XML_10),
-                                content=etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
+                                content=parse('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb3)
 
     def test_content_block04(self):
@@ -1131,6 +1132,104 @@ class ContentBlockTests(unittest.TestCase):
                                 padding='the padding!')
         round_trip_content_block(cb7)
 
+
+class TestXmlAttacks(unittest.TestCase):
+    """
+    List of XML attacks can be found here: https://pypi.python.org/pypi/defusedxml#python-xml-libraries
+    Thanks to @guidovranken for pointing these out
+
+    """
+
+    def test_billion_laughs(self):
+        """
+        Tests a "safe" variant of the "billion laughs" attack on libtaxii
+        http://en.wikipedia.org/wiki/Billion_laughs
+        :return:
+        """
+
+        billion_laughs = """<!DOCTYPE lolz [
+                             <!ENTITY lol "lol">
+                             <!ELEMENT lolz (#PCDATA)>
+                             <!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+                             <!ENTITY lol2 "&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;">
+                           ]>
+                           <lolz>&lol1;</lolz>"""
+
+        e = parse(billion_laughs)
+
+        if e.text != None:
+            raise ValueError("The text of e was not None, meaning a real attack would have succeeded!")
+
+    def test_guadratic_blowup(self):
+        """
+        Tests a "safe" variant of the quadratic blowup attack
+        http://msdn.microsoft.com/en-us/magazine/ee335713.aspx
+        :return:
+        """
+        q_blowup = """<!DOCTYPE kaboom [
+                        <!ENTITY a "aaaaaaaaaaaaaaaaaaa">
+                      ]>
+                      <kaboom>&a;</kaboom>
+                   """
+
+        e = parse(q_blowup)
+
+        if e.text != None:
+            raise ValueError('The text of e was not None, meaning a real attack would have succeeded!')
+
+    def test_xee_remote(self):
+        """
+        Tests a "safe" variant of the remote XEE attack
+        https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing
+        :return:
+        """
+
+        xee_remote = """<!DOCTYPE foo [
+                          <!ELEMENT foo ANY >
+                          <!ENTITY xxe SYSTEM "http://www.mitre.org" >]>
+                        <foo>&xxe;</foo>
+                      """
+
+        # If an XML Syntax Error is received, an attack would have succeeded
+
+        try:
+            e = parse(xee_remote)
+        except etree.XMLSyntaxError:
+            raise ValueError("An XML Syntax Error was raised, meaning a real attack would have succeeded!")
+
+    def test_xee_local(self):
+        """
+        Tests a "safe" variant of the local XEE attack
+        https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Processing
+        :return:
+        """
+
+        xee_local = """<!DOCTYPE foo [
+                          <!ELEMENT foo ANY >
+                          <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
+                        <foo>&xxe;</foo>
+                      """
+        # If an XML Syntax Error is received, an attack would have succeeded
+
+        try:
+            e = parse(xee_local)
+        except etree.XMLSyntaxError:
+            raise ValueError("An XML Syntax Error was raised, meaning a real attack would have succeeded!")
+
+    def test_dtd_retrieval(self):
+        pass
+
+    def test_gzip_bomb(self):
+        pass
+
+    def test_xpath(self):
+        pass
+
+    def test_xslt(self):
+        pass
+
+    def test_xinclude(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,22 @@ from lxml import etree
 _XML_PARSER = None
 
 
+def parse(s):
+    """
+    Uses the default parser to parse a string or file-like object
+
+    :param s: The XML String or File-like object to parse
+    :return: an etree._Element
+    """
+
+    try:
+        e = etree.parse(s,get_xml_parser()).getroot()
+    except IOError:
+        e = etree.XML(s, get_xml_parser())
+
+    return e
+
+
 def get_xml_parser():
     """Return the XML parser currently in use.
 
@@ -23,7 +39,20 @@ def get_xml_parser():
     """
     global _XML_PARSER
     if _XML_PARSER is None:
-        _XML_PARSER = etree.XMLParser(no_network=True, huge_tree=True)
+        _XML_PARSER = etree.XMLParser(attribute_defaults=False,
+                                      dtd_validation=False,
+                                      load_dtd=False,
+                                      no_network=True,
+                                      ns_clean=True,
+                                      recover=False,
+                                      remove_blank_text=False,
+                                      remove_comments=False,
+                                      remove_pis=False,
+                                      strip_cdata=True,
+                                      compact=True,
+                                      collect_ids=True,
+                                      resolve_entities=False,
+                                      huge_tree=False)
     return _XML_PARSER
 
 
@@ -196,7 +225,7 @@ class TAXIIBase(object):
         else:
             xmlstr = xml
 
-        etree_xml = etree.parse(xmlstr, get_xml_parser()).getroot()
+        etree_xml = parse(xmlstr)
         return cls.from_etree(etree_xml)
 
     # Just noting that there is not a from_text() method. I also
