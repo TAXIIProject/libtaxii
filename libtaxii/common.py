@@ -23,7 +23,8 @@ def get_xml_parser():
     """
     global _XML_PARSER
     if _XML_PARSER is None:
-        _XML_PARSER = etree.XMLParser(no_network=True, huge_tree=True)
+        _XML_PARSER = etree.XMLParser(no_network=True, huge_tree=True,
+                                      resolve_entities=False)
     return _XML_PARSER
 
 

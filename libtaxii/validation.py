@@ -148,7 +148,7 @@ class SchemaValidator(object):
         A wrapper for validate_etree. Parses file_location,
         turns it into an etree, then calls validate_etree( ... )
         """
-        doc = etree.parse(file_location, get_xml_parser)
+        doc = etree.parse(file_location, get_xml_parser())
         etree_xml = doc.getroot()
         return validate_etree(etree_xml)
 
@@ -157,7 +157,7 @@ class SchemaValidator(object):
         A wrapper for validate_etree. Parses xml_string,
         turns it into an etree, then calls validate_etree( ... )
         """
-        etree_xml = etree.XML(xml_string)
+        etree_xml = etree.XML(xml_string, get_xml_parser())
         return self.validate_etree(etree_xml)
 
     def validate_etree(self, etree_xml):
