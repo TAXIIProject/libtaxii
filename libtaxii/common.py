@@ -23,7 +23,7 @@ def parse(s):
     """
 
     try:
-        e = etree.parse(s,get_xml_parser()).getroot()
+        e = etree.parse(s, get_xml_parser()).getroot()
     except IOError:
         e = etree.XML(s, get_xml_parser())
 

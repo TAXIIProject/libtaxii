@@ -1157,7 +1157,7 @@ class TestXmlAttacks(unittest.TestCase):
 
         e = parse(billion_laughs)
 
-        if e.text != None:
+        if e.text is not None:
             raise ValueError("The text of e was not None, meaning a real attack would have succeeded!")
 
     def test_guadratic_blowup(self):
@@ -1174,7 +1174,7 @@ class TestXmlAttacks(unittest.TestCase):
 
         e = parse(q_blowup)
 
-        if e.text != None:
+        if e.text is not None:
             raise ValueError('The text of e was not None, meaning a real attack would have succeeded!')
 
     def test_xee_remote(self):
