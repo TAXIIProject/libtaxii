@@ -50,7 +50,7 @@ def get_xml_parser():
                                       remove_pis=False,
                                       strip_cdata=True,
                                       compact=True,
-                                      collect_ids=True,
+                                      #collect_ids=True,
                                       resolve_entities=False,
                                       huge_tree=False)
     return _XML_PARSER
