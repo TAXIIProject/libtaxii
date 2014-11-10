@@ -14,7 +14,7 @@ import datetime
 from lxml import etree
 import os
 
-from .common import (get_xml_parser, set_xml_parser)
+from .common import (parse)
 
 # General purpose helper methods #
 
@@ -140,7 +140,7 @@ class SchemaValidator(object):
                                 will be used when validate_file/string/etree
                                 is used.
         """
-        schema_doc = etree.parse(schema_file, get_xml_parser())
+        schema_doc = parse(schema_file)
         self.xml_schema = etree.XMLSchema(schema_doc)
 
     def validate_file(self, file_location):
@@ -148,8 +148,11 @@ class SchemaValidator(object):
         A wrapper for validate_etree. Parses file_location,
         turns it into an etree, then calls validate_etree( ... )
         """
-        doc = etree.parse(file_location, get_xml_parser())
-        etree_xml = doc.getroot()
+
+        f = open(file_location, 'r')
+        etree_xml = parse(f)
+        f.close()
+
         return validate_etree(etree_xml)
 
     def validate_string(self, xml_string):
@@ -157,7 +160,7 @@ class SchemaValidator(object):
         A wrapper for validate_etree. Parses xml_string,
         turns it into an etree, then calls validate_etree( ... )
         """
-        etree_xml = etree.XML(xml_string, get_xml_parser())
+        etree_xml = parse(xml_string)
         return self.validate_etree(etree_xml)
 
     def validate_etree(self, etree_xml):
