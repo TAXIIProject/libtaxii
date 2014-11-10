@@ -6,7 +6,7 @@ A Python library for handling TAXII Messages and invoking TAXII Services.
 :Source: https://github.com/TAXIIProject/libtaxii
 :Documentation: http://libtaxii.readthedocs.org
 :Information: http://taxii.mitre.org
-:PyPI page: https://pypi.python.org/pypi/libtaxii/
+:Download: https://pypi.python.org/pypi/libtaxii/
 
 |travis badge| |version badge| |downloads badge|
 
