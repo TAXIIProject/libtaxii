@@ -8,11 +8,14 @@ A Python library for handling TAXII Messages and invoking TAXII Services.
 :Information: http://taxii.mitre.org
 :Download: https://pypi.python.org/pypi/libtaxii/
 
-|travis badge| |version badge| |downloads badge|
+|travis badge| |landscape.io badge| |version badge| |downloads badge|
 
 .. |travis badge| image:: https://api.travis-ci.org/TAXIIProject/libtaxii.png?branch=master
    :target: https://travis-ci.org/TAXIIProject/libtaxii
    :alt: Build Status
+.. |landscape.io badge| image:: https://landscape.io/github/TAXIIProject/libtaxii/master/landscape.png
+   :target: https://landscape.io/github/TAXIIProject/libtaxii/master
+   :alt: Code Health
 .. |version badge| image:: https://pypip.in/v/libtaxii/badge.png
    :target: https://pypi.python.org/pypi/libtaxii/
 .. |downloads badge| image:: https://pypip.in/d/libtaxii/badge.png
