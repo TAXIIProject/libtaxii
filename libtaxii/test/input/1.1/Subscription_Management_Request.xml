@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Subscription_Management_Request action="SUBSCRIBE" collection_name="collection2" message_id="'SubsReq02'" xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:ns3="http://taxii.mitre.org/query/taxii_default_query-1">
+    <ns2:Subscription_Parameters>
+        <ns2:Response_Type>FULL</ns2:Response_Type>
+        <ns2:Query format_id="urn:taxii.mitre.org:query:default:1.0">
+            <ns3:Default_Query targeting_expression_id="urn:stix.mitre.org:xml:1.1">
+                <ns3:Criteria operator="AND">
+                    <ns3:Criterion>
+                        <ns3:Target>**</ns3:Target>
+                        <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:core-1" relationship="equals">
+                            <ns3:Parameter name="value">Test value</ns3:Parameter>
+                            <ns3:Parameter name="match_type">case_sensitive_string</ns3:Parameter>
+                        </ns3:Test>
+                    </ns3:Criterion>
+                    <ns3:Criterion>
+                        <ns3:Target>**/Description</ns3:Target>
+                        <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:timestamp-1" relationship="greater_than">
+                            <ns3:Parameter name="value">Tue Oct 21 15:34:33 EDT 2014</ns3:Parameter>
+                        </ns3:Test>
+                    </ns3:Criterion>
+                    <ns3:Criteria operator="OR">
+                        <ns3:Criterion>
+                            <ns3:Target>**</ns3:Target>
+                            <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:core-1" relationship="equals">
+                                <ns3:Parameter name="value">Test value</ns3:Parameter>
+                                <ns3:Parameter name="match_type">case_sensitive_string</ns3:Parameter>
+                            </ns3:Test>
+                        </ns3:Criterion>
+                        <ns3:Criterion>
+                            <ns3:Target>STIX_Package/Indicators/Indicator/@id</ns3:Target>
+                            <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:regex-1" relationship="matches">
+                                <ns3:Parameter name="value">[A-Z]*</ns3:Parameter>
+                                <ns3:Parameter name="case_sensitive">true</ns3:Parameter>
+                            </ns3:Test>
+                        </ns3:Criterion>
+                        <ns3:Criterion>
+                            <ns3:Target>**/Description</ns3:Target>
+                            <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:timestamp-1" relationship="greater_than">
+                                <ns3:Parameter name="value">Tue Oct 21 15:34:33 EDT 2014</ns3:Parameter>
+                            </ns3:Test>
+                        </ns3:Criterion>
+                    </ns3:Criteria>
+                </ns3:Criteria>
+            </ns3:Default_Query>
+        </ns2:Query>
+    </ns2:Subscription_Parameters>
+</ns2:Subscription_Management_Request>

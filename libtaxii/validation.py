@@ -148,6 +148,7 @@ class SchemaValidator(object):
         A wrapper for validate_etree. Parses file_location,
         turns it into an etree, then calls validate_etree( ... )
         """
+
         f = open(file_location, 'r')
         etree_xml = parse(f)
         f.close()

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Collection_Information_Response in_response_to="0" message_id="CIR05" xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:ns3="http://taxii.mitre.org/query/taxii_default_query-1">
+    <ns2:Collection collection_name="collection2" collection_type="DATA_SET">
+        <ns2:Description>Warrgghghglble.</ns2:Description>
+    </ns2:Collection>
+    <ns2:Collection collection_name="collection4">
+        <ns2:Description>So improve information. Much amaze.</ns2:Description>
+        <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.0.1">
+            <ns2:Subtype subtype_id="ex1"/>
+            <ns2:Subtype subtype_id="ex2"/>
+            <ns2:Subtype subtype_id="ex3"/>
+        </ns2:Content_Binding>
+        <ns2:Receiving_Inbox_Service>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:http:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/inbox/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        </ns2:Receiving_Inbox_Service>
+        <ns2:Receiving_Inbox_Service>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:http:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/inbox/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+            <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1">
+                <ns2:Subtype subtype_id="example1"/>
+                <ns2:Subtype subtype_id="example2"/>
+            </ns2:Content_Binding>
+        </ns2:Receiving_Inbox_Service>
+    </ns2:Collection>
+</ns2:Collection_Information_Response>

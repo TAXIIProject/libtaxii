@@ -53,6 +53,7 @@ def get_xml_parser():
                                       # collect_ids=True,
                                       resolve_entities=False,
                                       huge_tree=False)
+
     return _XML_PARSER
 
 

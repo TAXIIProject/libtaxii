@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns2:Subscription_Management_Response collection_name="abc123" in_response_to="xyz" message_id="SubsResp01" xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://taxii.mitre.org/messages/taxii_xml_binding-1.1" xmlns:ns3="http://taxii.mitre.org/query/taxii_default_query-1">
+    <ns2:Message>Hullo!</ns2:Message>
+    <ns2:Subscription status="ACTIVE">
+        <ns2:Subscription_ID>Subs001</ns2:Subscription_ID>
+        <ns2:Subscription_Parameters>
+            <ns2:Response_Type>COUNT_ONLY</ns2:Response_Type>
+            <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1"/>
+            <ns2:Query format_id="urn:taxii.mitre.org:query:default:1.0">
+                <ns3:Default_Query targeting_expression_id="urn:stix.mitre.org:xml:1.1">
+                    <ns3:Criteria operator="AND">
+                        <ns3:Criterion>
+                            <ns3:Target>**</ns3:Target>
+                            <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:core-1" relationship="equals">
+                                <ns3:Parameter name="value">Test value</ns3:Parameter>
+                                <ns3:Parameter name="match_type">case_sensitive_string</ns3:Parameter>
+                            </ns3:Test>
+                        </ns3:Criterion>
+                    </ns3:Criteria>
+                </ns3:Default_Query>
+            </ns2:Query>
+        </ns2:Subscription_Parameters>
+        <ns2:Push_Parameters>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/inboxAddress/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        </ns2:Push_Parameters>
+        <ns2:Poll_Instance>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/poll1/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        </ns2:Poll_Instance>
+        <ns2:Poll_Instance>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/poll2/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        </ns2:Poll_Instance>
+        <ns2:Poll_Instance>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/poll3/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        </ns2:Poll_Instance>
+    </ns2:Subscription>
+    <ns2:Subscription status="PAUSED">
+        <ns2:Subscription_ID>Subs001</ns2:Subscription_ID>
+        <ns2:Subscription_Parameters>
+            <ns2:Response_Type>COUNT_ONLY</ns2:Response_Type>
+            <ns2:Content_Binding binding_id="urn:stix.mitre.org:xml:1.1"/>
+            <ns2:Query format_id="urn:taxii.mitre.org:query:default:1.0">
+                <ns3:Default_Query targeting_expression_id="urn:stix.mitre.org:xml:1.1">
+                    <ns3:Criteria operator="AND">
+                        <ns3:Criterion>
+                            <ns3:Target>**</ns3:Target>
+                            <ns3:Test capability_id="urn:taxii.mitre.org:query:capability:core-1" relationship="equals">
+                                <ns3:Parameter name="value">Test value</ns3:Parameter>
+                                <ns3:Parameter name="match_type">case_sensitive_string</ns3:Parameter>
+                            </ns3:Test>
+                        </ns3:Criterion>
+                    </ns3:Criteria>
+                </ns3:Default_Query>
+            </ns2:Query>
+        </ns2:Subscription_Parameters>
+        <ns2:Push_Parameters>
+            <ns2:Protocol_Binding>urn:taxii.mitre.org:protocol:https:1.0</ns2:Protocol_Binding>
+            <ns2:Address>https://example.com/inboxAddress/</ns2:Address>
+            <ns2:Message_Binding>urn:taxii.mitre.org:message:xml:1.1</ns2:Message_Binding>
+        </ns2:Push_Parameters>
+    </ns2:Subscription>
+    <ns2:Subscription status="PAUSED">
+        <ns2:Subscription_ID>Subs001</ns2:Subscription_ID>
+    </ns2:Subscription>
+</ns2:Subscription_Management_Response>
