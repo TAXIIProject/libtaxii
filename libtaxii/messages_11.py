@@ -1111,10 +1111,11 @@ class TAXIIMessage(TAXIIBase):
         first, then parse their specific XML constructs.
         """
 
-        # Get the message type
-        message_type = src_etree.tag[55:]
-        if message_type != cls.message_type:
-            raise ValueError('%s != %s' % (message_type, cls.message_type))
+        # Check namespace and element name of the root element
+        expected_tag = '{%s}%s' % (ns_map['taxii_11'], cls.message_type)
+        tag = src_etree.tag
+        if tag != expected_tag:
+            raise ValueError('%s != %s' % (tag, expected_tag))
 
         # Get the message ID
         message_id = src_etree.xpath('/taxii_11:*/@message_id', namespaces=ns_map)[0]
