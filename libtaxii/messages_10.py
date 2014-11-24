@@ -170,6 +170,8 @@ def get_message_from_json(json_string):
 
 class BaseNonMessage(object):
 
+    version = VID_TAXII_XML_10
+
     """This class should not be used directly by libtaxii users.
 
     Base class for non-TAXII Message objects"""

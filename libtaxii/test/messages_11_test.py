@@ -13,6 +13,7 @@ import StringIO
 import sys
 import unittest
 import warnings
+import inspect
 
 from dateutil.tz import tzutc
 from lxml import etree
@@ -1230,6 +1231,20 @@ class TestXmlAttacks(unittest.TestCase):
 
     def test_xinclude(self):
         pass
+
+class VersionsTest(unittest.TestCase):
+
+    def test_01(self):
+        """
+        Tests that all tm10 objects have a version attribute
+
+        :return:
+        """
+        for name, obj in inspect.getmembers(tm11, inspect.isclass):
+            # Certain classes are excluded from this test:
+            if name in ('TAXIIBase', 'UnsupportedQueryException', '_StatusDetail'):
+                continue
+            obj.version
 
 if __name__ == "__main__":
     unittest.main()

@@ -265,7 +265,11 @@ def get_deserializer(format_id, type):
     # return elt
 
 
-class SupportedQuery(TAXIIBase):
+class TAXIIBase11(TAXIIBase):
+    version = VID_TAXII_XML_11
+
+
+class SupportedQuery(TAXIIBase11):
 
     """
     This class contains an instance of a supported query. It
@@ -317,7 +321,7 @@ class SupportedQuery(TAXIIBase):
         return SupportedQuery(**d)
 
 
-class Query(TAXIIBase):
+class Query(TAXIIBase11):
 
     """This class contains an instance of a query.
 
@@ -372,7 +376,7 @@ class Query(TAXIIBase):
 # - a list of "content_binding_id[>subtype]" structures
 
 
-class ContentBinding(TAXIIBase):
+class ContentBinding(TAXIIBase11):
 
     """TAXII Content Binding component
 
@@ -455,7 +459,7 @@ class ContentBinding(TAXIIBase):
         return ContentBinding(**d)
 
 
-class RecordCount(TAXIIBase):
+class RecordCount(TAXIIBase11):
 
     """
     Information summarizing the number of records.
@@ -524,7 +528,7 @@ class RecordCount(TAXIIBase):
         return RecordCount(**d)
 
 
-class _GenericParameters(TAXIIBase):
+class _GenericParameters(TAXIIBase11):
     name = 'Generic_Parameters'
 
     def __init__(self, response_type=RT_FULL, content_bindings=None, query=None):
@@ -651,7 +655,7 @@ class SubscriptionParameters(_GenericParameters):
     name = 'Subscription_Parameters'
 
 
-class ContentBlock(TAXIIBase):
+class ContentBlock(TAXIIBase11):
 
     """A TAXII Content Block.
 
@@ -866,7 +870,7 @@ class ContentBlock(TAXIIBase):
         return cls.from_dict(json.loads(json_string))
 
 
-class PushParameters(TAXIIBase):
+class PushParameters(TAXIIBase11):
 
     """Set up Push Parameters.
 
@@ -992,7 +996,7 @@ class DeliveryParameters(PushParameters):
     name = 'Delivery_Parameters'
 
 
-class TAXIIMessage(TAXIIBase):
+class TAXIIMessage(TAXIIBase11):
 
     """Encapsulate properties common to all TAXII Messages (such as headers).
 
@@ -1275,7 +1279,7 @@ class DiscoveryResponse(TAXIIMessage):
         return msg
 
 
-class ServiceInstance(TAXIIBase):
+class ServiceInstance(TAXIIBase11):
 
     """
     The Service Instance component of a TAXII Discovery Response Message.
@@ -1613,7 +1617,7 @@ class CollectionInformationResponse(TAXIIMessage):
         return msg
 
 
-class CollectionInformation(TAXIIBase):
+class CollectionInformation(TAXIIBase11):
 
     """
     The Collection Information component of a TAXII Collection Information
@@ -1918,7 +1922,7 @@ class CollectionInformation(TAXIIBase):
         return CollectionInformation(**kwargs)
 
 
-class PushMethod(TAXIIBase):
+class PushMethod(TAXIIBase11):
 
     """
     The Push Method component of a TAXII Collection Information
@@ -1998,7 +2002,7 @@ class PushMethod(TAXIIBase):
         return PushMethod(**d)
 
 
-class PollingServiceInstance(TAXIIBase):
+class PollingServiceInstance(TAXIIBase11):
 
     """
     The Polling Service Instance component of a TAXII Collection
@@ -2084,7 +2088,7 @@ class PollingServiceInstance(TAXIIBase):
         return cls(**d)
 
 
-class SubscriptionMethod(TAXIIBase):
+class SubscriptionMethod(TAXIIBase11):
 
     """
     The Subscription Method component of a TAXII Collection Information
@@ -2173,7 +2177,7 @@ class SubscriptionMethod(TAXIIBase):
         return cls(**d)
 
 
-class ReceivingInboxService(TAXIIBase):
+class ReceivingInboxService(TAXIIBase11):
 
     """
     The Receiving Inbox Service component of a TAXII Collection
@@ -3319,7 +3323,7 @@ class InboxMessage(TAXIIMessage):
         return msg
 
 
-class SubscriptionInformation(TAXIIBase):
+class SubscriptionInformation(TAXIIBase11):
 
     """
     The Subscription Information component of a TAXII Inbox message.
@@ -3738,7 +3742,7 @@ class ManageCollectionSubscriptionResponse(TAXIIMessage):
         return msg
 
 
-class SubscriptionInstance(TAXIIBase):
+class SubscriptionInstance(TAXIIBase11):
 
     """
     The Subscription Instance component of the Manage Collection Subscription
@@ -3913,7 +3917,7 @@ class SubscriptionInstance(TAXIIBase):
         return SubscriptionInstance(subscription_id, status, subscription_parameters, push_parameters, poll_instances)
 
 
-class PollInstance(TAXIIBase):
+class PollInstance(TAXIIBase11):
 
     """
     The Poll Instance component of the Manage Collection Subscription
