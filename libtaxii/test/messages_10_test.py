@@ -12,6 +12,7 @@ import datetime
 import StringIO
 import unittest
 import warnings
+import inspect
 
 from dateutil.tz import tzutc
 from lxml import etree
@@ -566,6 +567,18 @@ class ContentBlockTests(unittest.TestCase):
     def test_content_block6(self):
         cb6 = tm10.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
         round_trip_content_block(cb6)
+
+
+class VersionsTest(unittest.TestCase):
+
+    def test_01(self):
+        """
+        Tests that all tm10 objects have a version attribute
+
+        :return:
+        """
+        for name, obj in inspect.getmembers(tm10, inspect.isclass):
+            obj.version
 
 
 if __name__ == "__main__":
