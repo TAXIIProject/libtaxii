@@ -18,11 +18,28 @@ class PollClient11Script(TaxiiScript):
 
     def get_arg_parser(self, *args, **kwargs):
         parser = super(PollClient11Script, self).get_arg_parser(*args, **kwargs)
-        parser.add_argument("--collection", dest="collection", default="default", help="Data Collection to poll. Defaults to 'default'.")
-        parser.add_argument("--begin-timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
-        parser.add_argument("--end-timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
-        parser.add_argument("--subscription-id", dest="subscription_id", default=None, help="The Subscription ID for the poll request. Defaults to None.")
-        parser.add_argument("--dest-dir", dest="dest_dir", default="", help="The directory to save Content Blocks to. Defaults to the current directory.")
+        parser.add_argument("--collection",
+                            dest="collection",
+                            default="default",
+                            help="Data Collection to poll. Defaults to 'default'.")
+        parser.add_argument("--begin-timestamp",
+                            dest="begin_ts",
+                            default=None,
+                            help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) "
+                                 "for the poll request. Defaults to None.")
+        parser.add_argument("--end-timestamp",
+                            dest="end_ts",
+                            default=None,
+                            help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) "
+                                 "for the poll request. Defaults to None.")
+        parser.add_argument("--subscription-id",
+                            dest="subscription_id",
+                            default=None,
+                            help="The Subscription ID for the poll request. Defaults to None.")
+        parser.add_argument("--dest-dir",
+                            dest="dest_dir",
+                            default="",
+                            help="The directory to save Content Blocks to. Defaults to the current directory.")
         return parser
 
     def create_request_message(self, args):
@@ -41,7 +58,9 @@ class PollClient11Script(TaxiiScript):
             else:
                 end_ts = None
         except ValueError:
-            print "Unable to parse timestamp value. Timestamp should include both date and time information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll."
+            print "Unable to parse timestamp value. Timestamp should include both date and time " \
+                  "information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). " \
+                  "Aborting poll."
             sys.exit()
 
         create_kwargs = {'message_id': tm11.generate_message_id(),
@@ -66,19 +85,19 @@ class PollClient11Script(TaxiiScript):
                     (response.collection_name, response.result_id, response.result_part_number + 1)
             for cb in response.content_blocks:
                 if cb.content_binding.binding_id == t.CB_STIX_XML_10:
-                    format = '_STIX10_'
+                    format_ = '_STIX10_'
                     ext = '.xml'
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_101:
-                    format = '_STIX101_'
+                    format_ = '_STIX101_'
                     ext = '.xml'
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_11:
-                    format = '_STIX11_'
+                    format_ = '_STIX11_'
                     ext = '.xml'
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_111:
-                    format = '_STIX111_'
+                    format_ = '_STIX111_'
                     ext = '.xml'
                 else:  # Format and extension are unknown
-                    format = ''
+                    format_ = ''
                     ext = ''
 
                 if cb.timestamp_label:
@@ -87,7 +106,7 @@ class PollClient11Script(TaxiiScript):
                     date_string = 's' + datetime.datetime.now().isoformat()
 
                 filename = gen_filename(response.collection_name,
-                                        format,
+                                        format_,
                                         date_string,
                                         ext)
                 filename = os.path.join(args.dest_dir, filename)

@@ -19,10 +19,24 @@ class PollClient10Script(TaxiiScript):
 
     def get_arg_parser(self, *args, **kwargs):
         parser = super(PollClient10Script, self).get_arg_parser(*args, **kwargs)
-        parser.add_argument("--feed", dest="feed", default="default", help="Data Collection to poll. Defaults to 'default'.")
-        parser.add_argument("--begin-timestamp", dest="begin_ts", default=None, help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
-        parser.add_argument("--end-timestamp", dest="end_ts", default=None, help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. Defaults to None.")
-        parser.add_argument("--subscription-id", dest="subs_id", default=None, help="The subscription ID to use. Defaults to None")
+        parser.add_argument("--feed",
+                            dest="feed",
+                            default="default",
+                            help="Data Collection to poll. Defaults to 'default'.")
+        parser.add_argument("--begin-timestamp",
+                            dest="begin_ts",
+                            default=None,
+                            help="The begin timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll "
+                                 "request. Defaults to None.")
+        parser.add_argument("--end-timestamp",
+                            dest="end_ts",
+                            default=None,
+                            help="The end timestamp (format: YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm) for the poll request. "
+                                 "Defaults to None.")
+        parser.add_argument("--subscription-id",
+                            dest="subs_id",
+                            default=None,
+                            help="The subscription ID to use. Defaults to None")
         return parser
 
     def create_request_message(self, args):
@@ -41,7 +55,8 @@ class PollClient10Script(TaxiiScript):
             else:
                 end_ts = None
         except ValueError:
-            print "Unable to parse timestamp value. Timestamp should include both date and time information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll."
+            print "Unable to parse timestamp value. Timestamp should include both date and time information along " \
+                  "with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll."
             sys.exit()
 
         poll_req = tm10.PollRequest(message_id=tm10.generate_message_id(),
@@ -56,19 +71,19 @@ class PollClient10Script(TaxiiScript):
         if response.message_type == tm10.MSG_POLL_RESPONSE:
             for cb in response.content_blocks:
                 if cb.content_binding.binding_id == t.CB_STIX_XML_10:
-                    format = '_STIX10_'
+                    format_ = '_STIX10_'
                     ext = '.xml'
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_101:
-                    format = '_STIX101_'
+                    format_ = '_STIX101_'
                     ext = '.xml'
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_11:
-                    format = '_STIX11_'
+                    format_ = '_STIX11_'
                     ext = '.xml'
                 elif cb.content_binding.binding_id == t.CB_STIX_XML_111:
-                    format = '_STIX111_'
+                    format_ = '_STIX111_'
                     ext = '.xml'
                 else:  # Format and extension are unknown
-                    format = ''
+                    format_ = ''
                     ext = ''
 
                 if cb.timestamp_label:
@@ -77,7 +92,7 @@ class PollClient10Script(TaxiiScript):
                     date_string = 's' + datetime.datetime.now().isoformat()
 
                 filename = gen_filename(response.collection_name,
-                                        format,
+                                        format_,
                                         date_string,
                                         ext)
                 filename = os.path.join(args.dest_dir, filename)

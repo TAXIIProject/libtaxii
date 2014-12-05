@@ -13,7 +13,6 @@ import httplib
 import urllib
 import urllib2
 import base64
-import uuid
 import socket
 import ssl
 import libtaxii as t
@@ -106,14 +105,14 @@ class HttpClient(object):
         self.proxy_string = proxy_string
         self.proxy_type = proxy_type
 
-    def set_use_https(self, bool):
+    def set_use_https(self, bool_):
         """Indicate whether the HttpClient should use HTTP or HTTPs. The default is HTTP.
 
         :param bool bool: The new use_https value.
         """
-        if bool is True:
+        if bool_ is True:
             self.use_https = True
-        elif bool is False:
+        elif bool_ is False:
             self.use_https = False
         else:
             raise Exception('Invalid argument value. Must be a boolean value of \'True\' or \'False\'.')
@@ -166,7 +165,7 @@ class HttpClient(object):
                        'User-Agent': 'libtaxii.httpclient'}
 
         if self.auth_type == HttpClient.AUTH_CERT_BASIC:
-                raise Exception('AuthType AUTH_CERT_BASIC not supported by call_taxii_service. Use call_taxii_service2.')
+            raise Exception('AuthType AUTH_CERT_BASIC not supported by call_taxii_service. Use call_taxii_service2.')
 
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = t.VID_TAXII_HTTPS_10

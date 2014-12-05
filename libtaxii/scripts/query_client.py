@@ -98,19 +98,19 @@ def main():
     if r.message_type == tm11.MSG_POLL_RESPONSE:
         for cb in r.content_blocks:
             if cb.content_binding.binding_id == t.CB_STIX_XML_10:
-                format = '_STIX10_'
+                format_ = '_STIX10_'
                 ext = '.xml'
             elif cb.content_binding.binding_id == t.CB_STIX_XML_101:
-                format = '_STIX101_'
+                format_ = '_STIX101_'
                 ext = '.xml'
             elif cb.content_binding.binding_id == t.CB_STIX_XML_11:
-                format = '_STIX11_'
+                format_ = '_STIX11_'
                 ext = '.xml'
             elif cb.content_binding.binding_id == t.CB_STIX_XML_111:
-                format = '_STIX111_'
+                format_ = '_STIX111_'
                 ext = '.xml'
             else:  # Format and extension are unknown
-                format = ''
+                format_ = ''
                 ext = ''
 
             if cb.timestamp_label:
@@ -119,7 +119,7 @@ def main():
                 date_string = 's' + datetime.datetime.now().isoformat()
 
             filename = gen_filename(r.collection_name,
-                                    format,
+                                    format_,
                                     date_string,
                                     ext)
             filename = os.path.join(args.dest_dir, filename)

@@ -11,7 +11,6 @@
 Creating, handling, and parsing TAXII 1.0 messages.
 """
 
-import collections
 try:
     import simplejson as json
 except ImportError:
@@ -1054,15 +1053,6 @@ class ServiceInstance(BaseNonMessage):
         do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
         self._available = value
 
-    @property
-    def service_type(self):
-        return self._service_type
-
-    @service_type.setter
-    def service_type(self, value):
-        do_check(value, 'service_type', value_tuple=SVC_TYPES)
-        self._service_type = value
-
     def to_etree(self):
         si = etree.Element('{%s}Service_Instance' % ns_map['taxii'])
         si.attrib['service_type'] = self.service_type
@@ -1135,8 +1125,8 @@ class ServiceInstance(BaseNonMessage):
 
         return True
 
-    @staticmethod
-    def from_etree(etree_xml):  # Expects a taxii:Service_Instance element
+    @classmethod
+    def from_etree(cls, etree_xml):  # Expects a taxii:Service_Instance element
         service_type = etree_xml.attrib['service_type']
         services_version = etree_xml.attrib['service_version']
         available = None
@@ -1162,7 +1152,14 @@ class ServiceInstance(BaseNonMessage):
         if len(message_set) > 0:
             message = message_set[0].text
 
-        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_contents, available, message)
+        return ServiceInstance(service_type,
+                               services_version,
+                               protocol_binding,
+                               service_address,
+                               message_bindings,
+                               inbox_service_accepted_contents,
+                               available,
+                               message)
 
     @staticmethod
     def from_dict(d):
@@ -1953,8 +1950,11 @@ class PollRequest(TAXIIMessage):
         if not super(PollRequest, self).__eq__(other, debug):
             return False
 
-        if not self._check_properties_eq(other, ['feed_name', 'subscription_id', 'exclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
-                return False
+        if not self._check_properties_eq(other,
+                                         ['feed_name', 'subscription_id',
+                                          'exclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'],
+                                         debug):
+            return False
 
         if set(self.content_bindings) != set(other.content_bindings):
             if debug:
@@ -2165,7 +2165,10 @@ class PollResponse(TAXIIMessage):
         if not super(PollResponse, self).__eq__(other, debug):
             return False
 
-        if not self._check_properties_eq(other, ['feed_name', 'subscription_id', 'message', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug):
+        if not self._check_properties_eq(other,
+                                         ['feed_name', 'subscription_id', 'message',
+                                          'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'],
+                                         debug):
                 return False
 
         # TODO: Check content blocks

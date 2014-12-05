@@ -3,8 +3,8 @@
 # For license information, see the LICENSE.txt file
 
 import libtaxii.messages_11 as tm11
-import libtaxii.clients as tc
 from libtaxii.scripts import TaxiiScript
+from libtaxii.constants import *
 
 
 class FulfillmentClient11Script(TaxiiScript):
@@ -13,9 +13,18 @@ class FulfillmentClient11Script(TaxiiScript):
 
     def get_arg_parser(self, *args, **kwargs):
         parser = super(FulfillmentClient11Script, self).get_arg_parser(*args, **kwargs)
-        parser.add_argument("--collection", dest="collection", default="default", help="Data Collection that this Fulfillment request applies to. Defaults to 'default'.")
-        parser.add_argument("--result-id", dest="result_id", required=True, help="The result_id being requested.")
-        parser.add_argument("--result-part-number", dest="result_part_number", type=int, default=1, help="The part number being requested. Defaults to '1'.")
+        parser.add_argument("--collection",
+                            dest="collection",
+                            default="default",
+                            help="Data Collection that this Fulfillment request applies to. Defaults to 'default'.")
+        parser.add_argument("--result-id",
+                            dest="result_id",
+                            required=True, help="The result_id being requested.")
+        parser.add_argument("--result-part-number",
+                            dest="result_part_number",
+                            type=int,
+                            default=1,
+                            help="The part number being requested. Defaults to '1'.")
         return parser
 
     def create_request_message(self, args):

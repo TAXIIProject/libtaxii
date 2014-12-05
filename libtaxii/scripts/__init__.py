@@ -6,9 +6,6 @@ import sys
 import traceback
 import libtaxii as t
 import libtaxii.clients as tc
-import libtaxii.messages_10 as tm10
-import libtaxii.messages_11 as tm11
-import libtaxii.taxii_default_query as tdq
 
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
@@ -53,18 +50,51 @@ class TaxiiScript(object):
         add their own arguments.
         """
         parser = argparse.ArgumentParser(description=parser_description)
-        parser.add_argument("--host", dest="host", default=host, help="Host where the TAXII Service is hosted. Defaults to %s." % host)
-        parser.add_argument("--port", dest="port", default=port, type=int, help="Port where the TAXII Service is hosted. Defaults to %s." % port)
-        parser.add_argument("--path", dest="path", default=path, help="Path where the TAXII Service is hosted. Defaults to %s" % path)
-        parser.add_argument("--https", dest="https", default=https, type=bool, help="Whether or not to use HTTPS. Defaults to %s" % https)
-        parser.add_argument("--cert", dest="cert", default=cert, help="The file location of the certificate to use. Defaults to %s." % cert)
-        parser.add_argument("--key", dest="key", default=key, help="The file location of the private key to use. Defaults to %s." % key)
-        parser.add_argument("--username", dest="username", default=username, help="The username to authenticate with. Defaults to %s." % username)
-        parser.add_argument("--pass", dest="password", default=password, help="The password to authenticate with. Defaults to %s." % password)
-        parser.add_argument("--proxy", dest="proxy", action=ProxyAction, default=proxy,
-                            help="The proxy to use (e.g., http://myproxy.example.com:80/), or 'noproxy' to not use any proxy. If omitted, the system's proxy settings will be used.")
-        parser.add_argument("--xml-output", dest="xml_output", action='store_true', default=xml_output,
-                            help="If present, the raw XML of the response will be printed to standard out. Otherwise, a \"Rich\" output will be presented.")
+        parser.add_argument("--host",
+                            dest="host",
+                            default=host,
+                            help="Host where the TAXII Service is hosted. Defaults to %s." % host)
+        parser.add_argument("--port",
+                            dest="port",
+                            default=port,
+                            type=int,
+                            help="Port where the TAXII Service is hosted. Defaults to %s." % port)
+        parser.add_argument("--path",
+                            dest="path",
+                            default=path,
+                            help="Path where the TAXII Service is hosted. Defaults to %s" % path)
+        parser.add_argument("--https",
+                            dest="https",
+                            default=https,
+                            type=bool,
+                            help="Whether or not to use HTTPS. Defaults to %s" % https)
+        parser.add_argument("--cert",
+                            dest="cert",
+                            default=cert,
+                            help="The file location of the certificate to use. Defaults to %s." % cert)
+        parser.add_argument("--key",
+                            dest="key",
+                            default=key,
+                            help="The file location of the private key to use. Defaults to %s." % key)
+        parser.add_argument("--username",
+                            dest="username",
+                            default=username,
+                            help="The username to authenticate with. Defaults to %s." % username)
+        parser.add_argument("--pass",
+                            dest="password",
+                            default=password,
+                            help="The password to authenticate with. Defaults to %s." % password)
+        parser.add_argument("--proxy",
+                            dest="proxy",
+                            action=ProxyAction, default=proxy,
+                            help="The proxy to use (e.g., http://myproxy.example.com:80/), or 'noproxy' to not use "
+                                 "any proxy. If omitted, the system's proxy settings will be used.")
+        parser.add_argument("--xml-output",
+                            dest="xml_output",
+                            action='store_true',
+                            default=xml_output,
+                            help="If present, the raw XML of the response will be printed to standard out. "
+                                 "Otherwise, a \"Rich\" output will be presented.")
 
         return parser
 
@@ -135,7 +165,6 @@ class TaxiiScript(object):
 class SubscriptionClient11Script(TaxiiScript):
     parser_description = 'TAXII 1.1 Subscription Management Client'
     path = '/services/collection-management/'
-    pass
 
 
 class InboxClient10Script(TaxiiScript):

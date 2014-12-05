@@ -18,7 +18,7 @@ from lxml import etree
 import libtaxii.messages_11 as tm11
 
 from .common import TAXIIBase
-from .validation import (do_check, uri_regex, targeting_expression_regex, RegexTuple)
+from .validation import (do_check, uri_regex, targeting_expression_regex)
 from .constants import *
 
 

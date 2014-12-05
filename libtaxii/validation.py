@@ -101,7 +101,7 @@ def check_timestamp_label(timestamp_label, varname, can_be_none=False):
     return
 
 
-class SchemaValidationResult:
+class SchemaValidationResult(object):
     """A wrapper for the results of schema validation."""
 
     def __init__(self, valid, error_log):
@@ -153,7 +153,7 @@ class SchemaValidator(object):
         etree_xml = parse(f)
         f.close()
 
-        return validate_etree(etree_xml)
+        return self.validate_etree(etree_xml)
 
     def validate_string(self, xml_string):
         """

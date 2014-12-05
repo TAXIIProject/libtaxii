@@ -313,7 +313,7 @@ class SupportedQuery(TAXIIBase11):
 
     @staticmethod
     def from_etree(etree_xml):
-        format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
+        format_id = etree_xml.xpath('./@format_id', ns_map=ns_map)[0]
         return SupportedQuery(format_id)
 
     @staticmethod
@@ -361,7 +361,7 @@ class Query(TAXIIBase11):
 
     @classmethod
     def from_etree(cls, etree_xml, kwargs):
-        format_id = etree_xml.xpath('./@format_id', ns_map=nsmap)[0]
+        format_id = etree_xml.xpath('./@format_id', ns_map=ns_map)[0]
         return cls(format_id, **kwargs)
 
     @classmethod
@@ -1401,15 +1401,6 @@ class ServiceInstance(TAXIIBase11):
         do_check(value, 'available', value_tuple=(True, False), can_be_none=True)
         self._available = value
 
-    @property
-    def service_type(self):
-        return self._service_type
-
-    @service_type.setter
-    def service_type(self, value):
-        do_check(value, 'service_type', value_tuple=SVC_TYPES)
-        self._service_type = value
-
     def to_etree(self):
         si = etree.Element('{%s}Service_Instance' % ns_map['taxii_11'], nsmap=ns_map)
         si.attrib['service_type'] = self.service_type
@@ -1506,7 +1497,15 @@ class ServiceInstance(TAXIIBase11):
         if len(message_set) > 0:
             message = message_set[0].text
 
-        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
+        return ServiceInstance(service_type,
+                               services_version,
+                               protocol_binding,
+                               service_address,
+                               message_bindings,
+                               inbox_service_accepted_content,
+                               available,
+                               message,
+                               supported_query)
 
     @staticmethod
     def from_dict(d):
@@ -1526,7 +1525,15 @@ class ServiceInstance(TAXIIBase11):
         available = d.get('available')
         message = d.get('message')
 
-        return ServiceInstance(service_type, services_version, protocol_binding, service_address, message_bindings, inbox_service_accepted_content, available, message, supported_query)
+        return ServiceInstance(service_type,
+                               services_version,
+                               protocol_binding,
+                               service_address,
+                               message_bindings,
+                               inbox_service_accepted_content,
+                               available,
+                               message,
+                               supported_query)
 
 
 class CollectionInformationRequest(TAXIIRequestMessage):
@@ -2586,7 +2593,6 @@ class PollParameters(_GenericParameters):
     @classmethod
     def from_etree(cls, etree_xml):
         poll_parameters = super(PollParameters, cls).from_etree(etree_xml)
-        kwargs = {}
 
         allow_asynch_set = etree_xml.xpath('./@allow_asynch')
         if len(allow_asynch_set) > 0:
@@ -2601,7 +2607,6 @@ class PollParameters(_GenericParameters):
     @classmethod
     def from_dict(cls, d):
         poll_parameters = super(PollParameters, cls).from_dict(d)
-        kwargs = {}
 
         aa = d.get('allow_asynch')
         if aa is not None:
