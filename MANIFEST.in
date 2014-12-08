@@ -1,4 +1,3 @@
-include INSTALL
 include LICENSE.txt
 include README.md
 include libtaxii/xsd/*.xsd
