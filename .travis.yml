@@ -1,15 +1,15 @@
 language: python
 env:
-   - TOXENV=py26
-   - TOXENV=py27
-   - TOXENV=rhel6
+  - TOXENV=py26
+  - TOXENV=py27
+  - TOXENV=rhel6
 
 install:
-   - pip install tox
-   - pip install pep8
+  - pip install tox
+
 script:
-   - tox
+  - tox
 
 notifications:
-    email:
-        - taxii-commits-list@lists.mitre.org
+  email:
+    - taxii-commits-list@lists.mitre.org
