@@ -7,7 +7,7 @@ import libtaxii.messages_11 as tm11
 import libtaxii.taxii_default_query as tdq
 import libtaxii.scripts as scripts
 import datetime
-from ..common import gen_filename
+from libtaxii.common import gen_filename
 
 import os
 

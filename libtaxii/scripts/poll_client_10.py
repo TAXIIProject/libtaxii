@@ -9,7 +9,7 @@ import dateutil.parser
 import datetime
 import sys
 import os
-from ..common import gen_filename
+from libtaxii.common import gen_filename
 
 
 class PollClient10Script(TaxiiScript):
