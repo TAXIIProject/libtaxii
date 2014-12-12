@@ -32,5 +32,7 @@ Indices and tables
 
 Offline Documentation
 =====================
-If viewing this documentation on readthedocs.org, offline documentation (PDF, HTML) is available from the
-``v:latest`` menu at the bottom of the page.
+To download the latest documentation for offline use, please use one of these links:
+
+* PDF - https://media.readthedocs.org/pdf/libtaxii/latest/libtaxii.pdf
+* HTML - https://readthedocs.org/projects/libtaxii/downloads/htmlzip/latest/
