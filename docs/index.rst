@@ -30,3 +30,7 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+Offline Documentation
+=====================
+If viewing this documentation on readthedocs.org, offline documentation (PDF, HTML) is available from the
+``v:latest`` menu at the bottom of the page.
