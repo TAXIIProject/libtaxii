@@ -58,7 +58,7 @@ setup(
         'libtaxii/scripts/fulfillment_client.py',
         'libtaxii/scripts/inbox_client.py',
         'libtaxii/scripts/poll_client.py',
-        # 'libtaxii/scripts/query_client.py', - NOTE: Query client is still under active development
+        'libtaxii/scripts/query_client.py',
         'libtaxii/scripts/discovery_client_10.py',
         'libtaxii/scripts/feed_information_client_10.py',
         'libtaxii/scripts/poll_client_10.py',
@@ -70,7 +70,7 @@ setup(
             'fulfillment_client = libtaxii.scripts.fulfillment_client:main',
             'inbox_client = libtaxii.scripts.inbox_client:main',
             'poll_client = libtaxii.scripts.poll_client:main',
-            # 'query_client = libtaxii.scripts.query_client:main', - NOTE: Query client is still under active development
+            'query_client = libtaxii.scripts.query_client:main',
             'discovery_client_10 = libtaxii.scripts.discovery_client_10:main',
             'feed_information_client_10 = libtaxii.scripts.feed_information_client_10:main',
             'poll_client_10 = libtaxii.scripts.poll_client_10:main',
