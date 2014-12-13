@@ -3,7 +3,7 @@
 # For license information, see the LICENSE.txt file
 
 import libtaxii.messages_11 as tm11
-from libtaxii.scripts import TaxiiScript
+from libtaxii.scripts import TaxiiScript, add_poll_response_args
 from libtaxii.constants import *
 
 
@@ -25,6 +25,7 @@ class FulfillmentClient11Script(TaxiiScript):
                             type=int,
                             default=1,
                             help="The part number being requested. Defaults to '1'.")
+        add_poll_response_args(parser)
         return parser
 
     def create_request_message(self, args):
@@ -40,6 +41,7 @@ class FulfillmentClient11Script(TaxiiScript):
             print "This response has More=True, to request additional parts, use the following command:"
             print "  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
                 (response.collection_name, response.result_id, response.result_part_number + 1)
+            self.write_cbs_from_poll_response_11(response, dest_dir=args.dest_dir, write_type_=args.write_type)
 
 
 def main():

@@ -2,7 +2,7 @@
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
-from libtaxii.scripts import TaxiiScript
+from libtaxii.scripts import TaxiiScript, add_poll_response_args
 import libtaxii as t
 import libtaxii.messages_10 as tm10
 import dateutil.parser
@@ -37,6 +37,7 @@ class PollClient10Script(TaxiiScript):
                             dest="subs_id",
                             default=None,
                             help="The subscription ID to use. Defaults to None")
+        add_poll_response_args(parser)
         return parser
 
     def create_request_message(self, args):
@@ -69,39 +70,7 @@ class PollClient10Script(TaxiiScript):
     def handle_response(self, response, args):
         super(PollClient10Script, self).handle_response(response, args)
         if response.message_type == tm10.MSG_POLL_RESPONSE:
-            for cb in response.content_blocks:
-                if cb.content_binding.binding_id == t.CB_STIX_XML_10:
-                    format_ = '_STIX10_'
-                    ext = '.xml'
-                elif cb.content_binding.binding_id == t.CB_STIX_XML_101:
-                    format_ = '_STIX101_'
-                    ext = '.xml'
-                elif cb.content_binding.binding_id == t.CB_STIX_XML_11:
-                    format_ = '_STIX11_'
-                    ext = '.xml'
-                elif cb.content_binding.binding_id == t.CB_STIX_XML_111:
-                    format_ = '_STIX111_'
-                    ext = '.xml'
-                else:  # Format and extension are unknown
-                    format_ = ''
-                    ext = ''
-
-                if cb.timestamp_label:
-                    date_string = 't' + cb.timestamp_label.isoformat()
-                else:
-                    date_string = 's' + datetime.datetime.now().isoformat()
-
-                filename = gen_filename(response.collection_name,
-                                        format_,
-                                        date_string,
-                                        ext)
-                filename = os.path.join(args.dest_dir, filename)
-
-                f = open(filename, 'w')
-                f.write(cb.content)
-                f.flush()
-                f.close()
-                print "Wrote Content Block to %s" % filename
+            self.write_cbs_from_poll_response_10(response, dest_dir=args.dest_dir, write_type_=args.write_type)
 
 
 def main():

@@ -2,7 +2,7 @@
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
-from libtaxii.scripts import TaxiiScript
+from libtaxii.scripts import TaxiiScript, add_poll_response_args
 import libtaxii.messages_11 as tm11
 import libtaxii as t
 import os
@@ -36,10 +36,7 @@ class PollClient11Script(TaxiiScript):
                             dest="subscription_id",
                             default=None,
                             help="The Subscription ID for the poll request. Defaults to None.")
-        parser.add_argument("--dest-dir",
-                            dest="dest_dir",
-                            default="",
-                            help="The directory to save Content Blocks to. Defaults to the current directory.")
+        add_poll_response_args(parser)
         return parser
 
     def create_request_message(self, args):
@@ -83,39 +80,8 @@ class PollClient11Script(TaxiiScript):
                 print "This response has More=True, to request additional parts, use the following command:"
                 print "  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
                     (response.collection_name, response.result_id, response.result_part_number + 1)
-            for cb in response.content_blocks:
-                if cb.content_binding.binding_id == t.CB_STIX_XML_10:
-                    format_ = '_STIX10_'
-                    ext = '.xml'
-                elif cb.content_binding.binding_id == t.CB_STIX_XML_101:
-                    format_ = '_STIX101_'
-                    ext = '.xml'
-                elif cb.content_binding.binding_id == t.CB_STIX_XML_11:
-                    format_ = '_STIX11_'
-                    ext = '.xml'
-                elif cb.content_binding.binding_id == t.CB_STIX_XML_111:
-                    format_ = '_STIX111_'
-                    ext = '.xml'
-                else:  # Format and extension are unknown
-                    format_ = ''
-                    ext = ''
 
-                if cb.timestamp_label:
-                    date_string = 't' + cb.timestamp_label.isoformat()
-                else:
-                    date_string = 's' + datetime.datetime.now().isoformat()
-
-                filename = gen_filename(response.collection_name,
-                                        format_,
-                                        date_string,
-                                        ext)
-                filename = os.path.join(args.dest_dir, filename)
-
-                f = open(filename, 'w')
-                f.write(cb.content)
-                f.flush()
-                f.close()
-                print "Wrote Content Block to %s" % filename
+            self.write_cbs_from_poll_response_11(response, dest_dir=args.dest_dir, write_type_=args.write_type)
 
 
 def main():
