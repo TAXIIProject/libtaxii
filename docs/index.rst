@@ -34,5 +34,5 @@ Offline Documentation
 =====================
 To download the latest documentation for offline use, please use one of these links:
 
-* PDF - https://media.readthedocs.org/pdf/libtaxii/latest/libtaxii.pdf
-* HTML - https://readthedocs.org/projects/libtaxii/downloads/htmlzip/latest/
+* `PDF <https://media.readthedocs.org/pdf/libtaxii/latest/libtaxii.pdf>`_
+* `HTML <https://readthedocs.org/projects/libtaxii/downloads/htmlzip/latest/>`_
