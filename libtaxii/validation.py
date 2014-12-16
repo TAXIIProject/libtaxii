@@ -14,7 +14,7 @@ import datetime
 from lxml import etree
 import os
 
-from .common import (parse)
+from .common import (parse, parse_datetime_string)
 
 # General purpose helper methods #
 
@@ -47,10 +47,12 @@ def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be
     """
 
     if isinstance(var, list) or isinstance(var, set) or isinstance(var, tuple):
+
         x = 0
         for item in var:
             do_check(item, "%s[%s]" % (varname, x), type, regex_tuple, value_tuple, can_be_none)
             x = x + 1
+
         return
 
     if var is None and can_be_none:
@@ -83,8 +85,9 @@ def check_timestamp_label(timestamp_label, varname, can_be_none=False):
 
     1. If the timestamp_label is None and is allowed to be None, Pass
     2. If the timestamp_label is None and is not allowed to be None, Fail
-    3. If the timestamp_label does not have a tzinfo attribute, Fail
-    4. Pass
+    3. If the timestamp_label arg is a string, convert to datetime
+    4. If the timestamp_label does not have a tzinfo attribute, Fail
+    5. Pass
     """
 
     if timestamp_label is None and can_be_none:
@@ -93,12 +96,15 @@ def check_timestamp_label(timestamp_label, varname, can_be_none=False):
     if timestamp_label is None and not can_be_none:
         raise ValueError(_none_error % varname)
 
+    if isinstance(timestamp_label, basestring):
+        timestamp_label = parse_datetime_string(timestamp_label)
+
     do_check(timestamp_label, varname, type=datetime.datetime, can_be_none=can_be_none)
 
     if timestamp_label.tzinfo is None:
         raise ValueError('%s.tzinfo must not be None!' % varname)
 
-    return
+    return timestamp_label
 
 
 class SchemaValidationResult(object):

@@ -722,7 +722,7 @@ class ContentBlock(TAXIIBase11):
 
     @timestamp_label.setter
     def timestamp_label(self, value):
-        check_timestamp_label(value, 'timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'timestamp_label', can_be_none=True)
         self._timestamp_label = value
 
     def _stringify_content(self, content):
@@ -2387,7 +2387,7 @@ class PollRequest(TAXIIRequestMessage):
 
     @exclusive_begin_timestamp_label.setter
     def exclusive_begin_timestamp_label(self, value):
-        check_timestamp_label(value, 'exclusive_begin_timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'exclusive_begin_timestamp_label', can_be_none=True)
         self._exclusive_begin_timestamp_label = value
 
     @property
@@ -2396,7 +2396,7 @@ class PollRequest(TAXIIRequestMessage):
 
     @inclusive_end_timestamp_label.setter
     def inclusive_end_timestamp_label(self, value):
-        check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
         self._inclusive_end_timestamp_label = value
 
     @property
@@ -2691,7 +2691,7 @@ class PollResponse(TAXIIMessage):
 
     @inclusive_end_timestamp_label.setter
     def inclusive_end_timestamp_label(self, value):
-        check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
         self._inclusive_end_timestamp_label = value
 
     @property
@@ -2700,7 +2700,7 @@ class PollResponse(TAXIIMessage):
 
     @inclusive_begin_timestamp_label.setter
     def inclusive_begin_timestamp_label(self, value):
-        check_timestamp_label(value, 'inclusive_begin_timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'inclusive_begin_timestamp_label', can_be_none=True)
         self._inclusive_begin_timestamp_label = value
 
     @property
@@ -3376,7 +3376,7 @@ class SubscriptionInformation(TAXIIBase11):
 
     @exclusive_begin_timestamp_label.setter
     def exclusive_begin_timestamp_label(self, value):
-        check_timestamp_label(value, 'exclusive_begin_timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'exclusive_begin_timestamp_label', can_be_none=True)
         self._exclusive_begin_timestamp_label = value
 
     @property
@@ -3385,7 +3385,7 @@ class SubscriptionInformation(TAXIIBase11):
 
     @inclusive_end_timestamp_label.setter
     def inclusive_end_timestamp_label(self, value):
-        check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
+        value = check_timestamp_label(value, 'inclusive_end_timestamp_label', can_be_none=True)
         self._inclusive_end_timestamp_label = value
 
     def to_etree(self):
