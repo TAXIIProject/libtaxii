@@ -118,7 +118,7 @@ def append_any_content_etree(etree_elt, content):
         return etree_elt
 
     if not isinstance(content, basestring):  # If content is a non-string, cast it to string and set etree_elt.text
-        etree_elt.test = str(content)
+        etree_elt.text = str(content)
         return etree_elt
 
     # If content is a string, need to check if it's XML or not
