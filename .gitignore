@@ -7,5 +7,6 @@ libtaxii.egg-info/
 venv/
 .tox
 output.txt
+libtaxii/test/output/
 docs/_build/
 .idea
