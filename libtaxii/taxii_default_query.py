@@ -665,7 +665,6 @@ class Test(TAXIIBase):
     def validate(self):
         capability_module = capability_modules.get(self.capability_id)
         if capability_module is None:  # Nothing is defined for this, validation not possible
-            print 'Cannot validate'
             return True
 
         relationship = capability_module.relationships.get(self.relationship)
