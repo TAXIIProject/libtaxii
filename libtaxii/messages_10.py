@@ -197,10 +197,7 @@ class DeliveryParameters(TAXIIBase10):
         self.inbox_protocol = inbox_protocol
         self.inbox_address = inbox_address
         self.delivery_message_binding = delivery_message_binding
-        if content_bindings is None:
-            self.content_bindings = []
-        else:
-            self.content_bindings = content_bindings
+        self.content_bindings = content_bindings or []
 
     @property
     def sort_key(self):
@@ -763,10 +760,7 @@ class DiscoveryResponse(TAXIIMessage):
 
     def __init__(self, message_id, in_response_to, extended_headers=None, service_instances=None):
         super(DiscoveryResponse, self).__init__(message_id, in_response_to, extended_headers)
-        if service_instances is None:
-            self.service_instances = []
-        else:
-            self.service_instances = service_instances
+        self.service_instances = service_instances or []
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -863,10 +857,7 @@ class ServiceInstance(TAXIIBase10):
         self.protocol_binding = protocol_binding
         self.service_address = service_address
         self.message_bindings = message_bindings
-        if inbox_service_accepted_content is None:
-            self.inbox_service_accepted_content = []
-        else:
-            self.inbox_service_accepted_content = inbox_service_accepted_content
+        self.inbox_service_accepted_content = inbox_service_accepted_content or []
         self.available = available
         self.message = message
 
@@ -1072,10 +1063,7 @@ class FeedInformationResponse(TAXIIMessage):
 
     def __init__(self, message_id, in_response_to, extended_headers=None, feed_informations=None):
         super(FeedInformationResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
-        if feed_informations is None:
-            self.feed_informations = []
-        else:
-            self.feed_informations = feed_informations
+        self.feed_informations = feed_informations or []
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -1172,20 +1160,9 @@ class FeedInformation(TAXIIBase10):
         self.available = available
         self.feed_description = feed_description
         self.supported_contents = supported_contents
-        if push_methods is None:
-            self.push_methods = []
-        else:
-            self.push_methods = push_methods
-
-        if polling_service_instances is None:
-            self.polling_service_instances = []
-        else:
-            self.polling_service_instances = polling_service_instances
-
-        if subscription_methods is None:
-            self.subscription_methods = []
-        else:
-            self.subscription_methods = subscription_methods
+        self.push_methods = push_methods or []
+        self.polling_service_instances = polling_service_instances or []
+        self.subscription_methods = subscription_methods or []
 
     @property
     def sort_key(self):
@@ -1653,10 +1630,7 @@ class PollRequest(TAXIIMessage):
         self.exclusive_begin_timestamp_label = exclusive_begin_timestamp_label
         self.inclusive_end_timestamp_label = inclusive_end_timestamp_label
         self.subscription_id = subscription_id
-        if content_bindings is None:
-            self.content_bindings = []
-        else:
-            self.content_bindings = content_bindings
+        self.content_bindings = content_bindings or []
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -1854,10 +1828,7 @@ class PollResponse(TAXIIMessage):
         self.inclusive_begin_timestamp_label = inclusive_begin_timestamp_label
         self.subscription_id = subscription_id
         self.message = message
-        if content_blocks is None:
-            self.content_blocks = []
-        else:
-            self.content_blocks = content_blocks
+        self.content_blocks = content_blocks or []
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -2155,10 +2126,7 @@ class InboxMessage(TAXIIMessage):
         super(InboxMessage, self).__init__(message_id, extended_headers=extended_headers)
         self.subscription_information = subscription_information
         self.message = message
-        if content_blocks is None:
-            self.content_blocks = []
-        else:
-            self.content_blocks = content_blocks
+        self.content_blocks = content_blocks or []
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -2521,10 +2489,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         super(ManageFeedSubscriptionResponse, self).__init__(message_id, in_response_to, extended_headers=extended_headers)
         self.feed_name = feed_name
         self.message = message
-        if subscription_instances is None:
-            self.subscription_instances = []
-        else:
-            self.subscription_instances = subscription_instances
+        self.subscription_instances = subscription_instances or []
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
@@ -2633,15 +2598,8 @@ class SubscriptionInstance(TAXIIBase10):
     def __init__(self, subscription_id, delivery_parameters=None,
                  poll_instances=None):
         self.subscription_id = subscription_id
-        if delivery_parameters is None:
-            self.delivery_parameters = []
-        else:
-            self.delivery_parameters = delivery_parameters
-
-        if poll_instances is None:
-            self.poll_instances = []
-        else:
-            self.poll_instances = poll_instances
+        self.delivery_parameters = delivery_parameters or []
+        self.poll_instances = poll_instances or []
 
     @property
     def sort_key(self):
@@ -2759,10 +2717,7 @@ class PollInstance(TAXIIBase10):
     def __init__(self, poll_protocol, poll_address, poll_message_bindings=None):
         self.poll_protocol = poll_protocol
         self.poll_address = poll_address
-        if poll_message_bindings is None:
-            self.poll_message_bindings = []
-        else:
-            self.poll_message_bindings = poll_message_bindings
+        self._poll_message_bindings = poll_message_bindings or []
 
     @property
     def sort_key(self):
