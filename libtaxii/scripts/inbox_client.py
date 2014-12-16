@@ -9,7 +9,9 @@ import StringIO
 
 
 class InboxClient11Script(TaxiiScript):
-    parser_description = 'TAXII 1.1 Inbox Client'
+    parser_description = 'The TAXII 1.1 Inbox Client sends an Inbox Message to a TAXII Server and prints the ' \
+                         'Status Message response to standard out. The Inbox Client has a "built in" STIX document ' \
+                         'that is sent by default.'
     path = '/services/inbox/'
 
     # http://stix.mitre.org/language/version1.1.1/#samples

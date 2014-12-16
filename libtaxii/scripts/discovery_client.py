@@ -8,7 +8,8 @@ import libtaxii.taxii_default_query as tdq
 
 
 class DiscoveryClient11Script(TaxiiScript):
-    parser_description = 'TAXII 1.1 Discovery Client'
+    parser_description = 'The TAXII 1.1 Discovery Client sends a Discovery Request message to a TAXII Server and ' \
+                         'prints out the Discovery Response message to standard out.'
     path = '/services/discovery/'
 
     def create_request_message(self, args):

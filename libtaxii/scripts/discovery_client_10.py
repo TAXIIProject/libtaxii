@@ -10,7 +10,8 @@ from libtaxii.common import generate_message_id
 
 class DiscoveryClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
-    parser_description = 'TAXII 1.0 Discovery Client'
+    parser_description = 'The TAXII 1.0 Discovery Client sends a Discovery Request message to a TAXII Server and ' \
+                         'prints out the Discovery Response message to standard out.'
     path = '/services/discovery/'
 
     def create_request_message(self, args):

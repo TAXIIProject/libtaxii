@@ -9,7 +9,8 @@ from libtaxii.scripts import TaxiiScript
 
 class FeedInformationClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
-    parser_description = 'TAXII 1.0 Feed Information Client'
+    parser_description = 'The TAXII 1.0 Feed Information Client sends a Feed Information Request message to a ' \
+                         'TAXII Server and prints the Feed Information Response message to standard out.'
     path = '/services/feed-management/'
 
     def create_request_message(self, args):

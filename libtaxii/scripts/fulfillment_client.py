@@ -8,7 +8,9 @@ from libtaxii.constants import *
 
 
 class FulfillmentClient11Script(TaxiiScript):
-    parser_description = 'TAXII 1.1 Poll Fulfillment Client'
+    parser_description = 'The TAXII 1.1 Poll Fulfillment Client sends a Poll Fulfillment Request to a TAXII Server ' \
+                         'and prints out the Poll Response to standard out, saving the Content Blocks to disk (' \
+                         'depending on command line arguments).'
     path = '/services/poll/'
 
     def get_arg_parser(self, *args, **kwargs):

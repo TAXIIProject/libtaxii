@@ -8,7 +8,10 @@ from poll_client import PollClient11Script
 
 
 class QueryClient11Script(PollClient11Script):
-    parser_description = "TAXII 1.1 Query Client"
+    parser_description = "The TAXII 1.1 Query Client sends a Poll Request message to a TAXII Server (queries are " \
+                         "contained in Poll Request messages) and prints out the resulting Poll Response message" \
+                         "to standard out. The Content Blocks are saved to disk (depending on the command line" \
+                         "options)."
     path = '/services/poll/'
 
     def get_arg_parser(self, *args, **kwargs):

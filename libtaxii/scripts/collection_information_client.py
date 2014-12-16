@@ -9,7 +9,9 @@ from libtaxii.scripts import TaxiiScript
 
 
 class CollectionInformationClient11Script(TaxiiScript):
-    parser_description = 'TAXII 1.1 Collection Information Client'
+    parser_description = 'The TAXII 1.1 Collection Information Client sends a Collection Information Request ' \
+                         'to a TAXII Server and then prints the resulting Collection Information Response to ' \
+                         'standard out.'
     path = '/services/collection-management/'
 
     def create_request_message(self, args):

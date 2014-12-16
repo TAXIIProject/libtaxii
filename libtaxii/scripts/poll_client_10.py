@@ -14,7 +14,9 @@ from libtaxii.common import gen_filename
 
 class PollClient10Script(TaxiiScript):
     taxii_version = t.VID_TAXII_XML_10
-    parser_description = 'TAXII 1.0 Poll Client'
+    parser_description = 'The TAXII 1.0 Poll Client sends a Poll Request message to a TAXII Server and then' \
+                         'prints the Poll Response message to standard out, saving the Content Blocks to disk (' \
+                         'dependin on the command line arguments).'
     path = '/services/poll/'
 
     def get_arg_parser(self, *args, **kwargs):
