@@ -21,7 +21,7 @@ import warnings
 
 from lxml import etree
 
-from .common import parse, parse_datetime_string, append_any_content_etree
+from .common import parse, parse_datetime_string, append_any_content_etree, TAXIIBase
 from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
 from constants import *
 
@@ -167,91 +167,11 @@ def get_message_from_json(json_string):
     return get_message_from_dict(json.loads(json_string))
 
 
-class BaseNonMessage(object):
-
+class TAXIIBase10(TAXIIBase):
     version = VID_TAXII_XML_10
 
-    """This class should not be used directly by libtaxii users.
 
-    Base class for non-TAXII Message objects"""
-
-    def to_etree(self):
-        """Create an etree representation of this class.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    def to_dict(self):
-        """Create a dictionary representation of this class.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    def to_xml(self, pretty_print=False):
-        """Create an XML representation of this class."""
-        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
-
-    def to_text(self, line_prepend=''):
-        raise NotImplementedError()
-
-    @classmethod
-    def from_etree(cls, src_etree):
-        """Create an instance of this class from an etree.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def from_dict(cls, d):
-        """Create an instance of this class from a dictionary.
-
-        To be implemented by child classes.
-        """
-        raise NotImplementedError()
-
-    @classmethod
-    def from_xml(cls, xml):
-
-        if isinstance(xml, basestring):
-            f = StringIO.StringIO(xml)
-        else:
-            f = xml
-
-        etree_xml = parse(f)
-        return cls.from_etree(etree_xml)
-
-    def __str__(self):
-        return self.to_xml(pretty_print=True)
-
-    def __eq__(self, other, debug=False):
-        raise NotImplementedError()
-
-    def _check_properties_eq(self, other, arglist, debug=False):
-        for arg in arglist:
-            # Check to see if the arg is in both objects
-            in_self = arg in self.__dict__
-            in_other = arg in other.__dict__
-            if in_self != in_other:
-                if debug:
-                    print '%s presence not equal. in_self=%s, in_other=%s' % (arg, in_self, in_other)
-                return False
-
-            if in_self and in_other:
-                if self.__dict__[arg] != other.__dict__[arg]:
-                    if debug:
-                        print '%s not equal %s != %s' % (arg, self.__dict__[arg], other.__dict__[arg])
-                    return False
-
-        return True
-
-    def __ne__(self, other, debug=False):
-        return not self.__eq__(other, debug)
-
-
-class DeliveryParameters(BaseNonMessage):
+class DeliveryParameters(TAXIIBase10):
 
     """Delivery Parameters.
 
@@ -281,6 +201,10 @@ class DeliveryParameters(BaseNonMessage):
             self.content_bindings = []
         else:
             self.content_bindings = content_bindings
+
+    @property
+    def sort_key(self):
+        return self.inbox_address
 
     @property
     def inbox_protocol(self):
@@ -369,17 +293,6 @@ class DeliveryParameters(BaseNonMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['inbox_protocol', 'address', 'deliver_message_binding'], debug):
-            return False
-
-        if set(self.content_bindings) != set(other.content_bindings):
-            if debug:
-                print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
-            return False
-
-        return True
-
     @staticmethod
     def from_etree(etree_xml):
         inbox_protocol = None
@@ -409,7 +322,7 @@ class DeliveryParameters(BaseNonMessage):
         return DeliveryParameters(**d)
 
 
-class TAXIIMessage(BaseNonMessage):
+class TAXIIMessage(TAXIIBase10):
 
     """Encapsulate properties common to all TAXII Messages (such as headers).
 
@@ -530,15 +443,6 @@ class TAXIIMessage(BaseNonMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not isinstance(other, TAXIIMessage):
-            raise ValueError('Not comparing two TAXII Messages! (%s, %s)' % (self.__class__.__name__, other.__class__.__name__))
-
-        return self._check_properties_eq(other, ['message_type', 'message_id', 'in_response_to', 'extended_headers'], debug)
-
-    def __ne__(self, other, debug=False):
-        return not self.__eq__(other, debug)
-
     @classmethod
     def from_etree(cls, src_etree, **kwargs):
         """Pulls properties of a TAXII Message from an etree.
@@ -628,7 +532,7 @@ class TAXIIMessage(BaseNonMessage):
         return cls.from_dict(json.loads(json_string))
 
 
-class ContentBlock(BaseNonMessage):
+class ContentBlock(TAXIIBase10):
 
     """A TAXII Content Block.
 
@@ -651,6 +555,10 @@ class ContentBlock(BaseNonMessage):
         self.content, self.content_is_xml = self._stringify_content(content)
         self.timestamp_label = timestamp_label
         self.padding = padding
+
+    @property
+    def sort_key(self):
+        return self.content[:25]
 
     @property
     def content_binding(self):
@@ -771,16 +679,6 @@ class ContentBlock(BaseNonMessage):
         s += line_prepend + "  Padding: %s\n" % self.padding
 
         return s
-
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['content_binding', 'timestamp_label', 'padding'], debug):
-            return False
-
-        # TODO: It's pretty hard to check and see if content is equal....
-        # if not self._check_properties_eq(other, ['content'], debug):
-        #    return False
-
-        return True
 
     @staticmethod
     def from_etree(etree_xml):
@@ -907,25 +805,6 @@ class DiscoveryResponse(TAXIIMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not super(DiscoveryResponse, self).__eq__(other, debug):
-            return False
-
-        if len(self.service_instances) != len(other.service_instances):
-            if debug:
-                print 'service_instance lengths not equal: %s != %s' % (len(self.service_instances), len(other.service_instances))
-            return False
-
-        # Who knows if this is a good way to compare the service instances or not...
-        for item1, item2 in zip(sorted(self.service_instances), sorted(other.service_instances)):
-            if item1 != item2:
-                if debug:
-                    print 'service instances not equal: %s != %s' % (item1, item2)
-                    item1.__eq__(item2, debug)  # This will print why they are not equal
-                return False
-
-        return True
-
     @classmethod
     def from_etree(cls, etree_xml):
         msg = super(DiscoveryResponse, cls).from_etree(etree_xml)
@@ -947,7 +826,7 @@ class DiscoveryResponse(TAXIIMessage):
         return msg
 
 
-class ServiceInstance(BaseNonMessage):
+class ServiceInstance(TAXIIBase10):
 
     """
     The Service Instance component of a TAXII Discovery Response Message.
@@ -990,6 +869,10 @@ class ServiceInstance(BaseNonMessage):
             self.inbox_service_accepted_content = inbox_service_accepted_content
         self.available = available
         self.message = message
+
+    @property
+    def sort_key(self):
+        return self.service_address
 
     @property
     def service_type(self):
@@ -1108,22 +991,6 @@ class ServiceInstance(BaseNonMessage):
         s += line_prepend + "  Message: %s\n" % self.message
 
         return s
-
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['service_type', 'services_version', 'protocol_binding', 'service_address', 'available', 'message'], debug):
-            return False
-
-        if set(self.message_bindings) != set(other.message_bindings):
-            if debug:
-                print 'message_bindings not equal'
-            return False
-
-        if set(self.inbox_service_accepted_content) != set(other.inbox_service_accepted_content):
-            if debug:
-                print 'inbox_service_accepted_contents not equal'
-            return False
-
-        return True
 
     @classmethod
     def from_etree(cls, etree_xml):  # Expects a taxii:Service_Instance element
@@ -1244,20 +1111,6 @@ class FeedInformationResponse(TAXIIMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not super(FeedInformationResponse, self).__eq__(other, debug):
-            return False
-
-        # Who knows if this is a good way to compare the service instances or not...
-        for item1, item2 in zip(sorted(self.feed_informations), sorted(other.feed_informations)):
-            if item1 != item2:
-                if debug:
-                    print 'feed_informations not equal: %s != %s' % (item1, item2)
-                    item1.__eq__(item2, debug)  # This will print why they are not equal
-                return False
-
-        return True
-
     @classmethod
     def from_etree(cls, etree_xml):
         msg = super(FeedInformationResponse, cls).from_etree(etree_xml)
@@ -1276,7 +1129,7 @@ class FeedInformationResponse(TAXIIMessage):
         return msg
 
 
-class FeedInformation(BaseNonMessage):
+class FeedInformation(TAXIIBase10):
 
     """
     The Feed Information component of a TAXII Feed Information Response
@@ -1333,6 +1186,10 @@ class FeedInformation(BaseNonMessage):
             self.subscription_methods = []
         else:
             self.subscription_methods = subscription_methods
+
+    @property
+    def sort_key(self):
+        return self.feed_name
 
     @property
     def feed_name(self):
@@ -1421,9 +1278,9 @@ class FeedInformation(BaseNonMessage):
         d['push_methods'] = []
         for push_method in self.push_methods:
             d['push_methods'].append(push_method.to_dict())
-        d['polling_services'] = []
+        d['polling_service_instances'] = []
         for polling_service in self.polling_service_instances:
-            d['polling_services'].append(polling_service.to_dict())
+            d['polling_service_instances'].append(polling_service.to_dict())
         d['subscription_methods'] = []
         for subscription_method in self.subscription_methods:
             d['subscription_methods'].append(subscription_method.to_dict())
@@ -1445,19 +1302,6 @@ class FeedInformation(BaseNonMessage):
             s += sm.to_text(line_prepend + STD_INDENT)
 
         return s
-
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['feed_name', 'feed_description', 'available'], debug):
-            return False
-
-        if set(self.supported_contents) != set(other.supported_contents):
-            if debug:
-                print 'supported_contents not equal: %s != %s' % (self.supported_contents, other.supported_contents)
-            return False
-
-        # TODO: Test equality of: push_methods=[], polling_service_instances=[], subscription_methods=[]
-
-        return True
 
     @staticmethod
     def from_etree(etree_xml):
@@ -1517,7 +1361,7 @@ class FeedInformation(BaseNonMessage):
         return FeedInformation(**kwargs)
 
 
-class PushMethod(BaseNonMessage):
+class PushMethod(TAXIIBase10):
 
     """
     The Push Method component of a TAXII Feed Information
@@ -1535,6 +1379,10 @@ class PushMethod(BaseNonMessage):
     def __init__(self, push_protocol, push_message_bindings):
         self.push_protocol = push_protocol
         self.push_message_bindings = push_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.push_protocol
 
     @property
     def push_protocol(self):
@@ -1579,17 +1427,6 @@ class PushMethod(BaseNonMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['push_protocol'], debug):
-            return False
-
-        if set(self.push_message_bindings) != set(other.push_message_bindings):
-            if debug:
-                print 'message bindings not equal: %s != %s' % (self.push_message_bindings, other.push_message_bindings)
-            return False
-
-        return True
-
     @staticmethod
     def from_etree(etree_xml):
         kwargs = {}
@@ -1605,7 +1442,7 @@ class PushMethod(BaseNonMessage):
         return PushMethod(**d)
 
 
-class PollingServiceInstance(BaseNonMessage):
+class PollingServiceInstance(TAXIIBase10):
 
     """
     The Polling Service Instance component of a TAXII Feed
@@ -1625,6 +1462,10 @@ class PollingServiceInstance(BaseNonMessage):
         self.poll_protocol = poll_protocol
         self.poll_address = poll_address
         self.poll_message_bindings = poll_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.poll_address
 
     @property
     def poll_protocol(self):
@@ -1673,17 +1514,6 @@ class PollingServiceInstance(BaseNonMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['poll_protocol', 'poll_address'], debug):
-            return False
-
-        if set(self.poll_message_bindings) != set(other.poll_message_bindings):
-            if debug:
-                print 'poll_message_bindings not equal %s != %s' % (self.poll_message_bindings, other.poll_message_bindings)
-            return False
-
-        return True
-
     @classmethod
     def from_etree(cls, etree_xml):
         protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
@@ -1699,7 +1529,7 @@ class PollingServiceInstance(BaseNonMessage):
         return cls(**d)
 
 
-class SubscriptionMethod(BaseNonMessage):
+class SubscriptionMethod(TAXIIBase10):
 
     """
     The Subscription Method component of a TAXII Feed Information
@@ -1722,6 +1552,10 @@ class SubscriptionMethod(BaseNonMessage):
         self.subscription_protocol = subscription_protocol
         self.subscription_address = subscription_address
         self.subscription_message_bindings = subscription_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.subscription_address
 
     @property
     def subscription_protocol(self):
@@ -1769,17 +1603,6 @@ class SubscriptionMethod(BaseNonMessage):
             s += line_prepend + "  Message Binding: %s\n" % mb
 
         return s
-
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['subscription_protocol', 'subscription_address'], debug):
-            return False
-
-        if set(self.subscription_message_bindings) != set(other.subscription_message_bindings):
-            if debug:
-                print 'subscription_message_bindings not equal: %s != %s' % (self.subscription_message_bindings, other.subscription_message_bindings)
-            return False
-
-        return True
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -1945,23 +1768,6 @@ class PollRequest(TAXIIMessage):
             s += line_prepend + "  Content Binding: %s\n" % cb
 
         return s
-
-    def __eq__(self, other, debug=False):
-        if not super(PollRequest, self).__eq__(other, debug):
-            return False
-
-        if not self._check_properties_eq(other,
-                                         ['feed_name', 'subscription_id',
-                                          'exclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'],
-                                         debug):
-            return False
-
-        if set(self.content_bindings) != set(other.content_bindings):
-            if debug:
-                print 'content_bindings not equal: %s != %s' % (self.content_bindings, other.content_bindings)
-            return False
-
-        return True
 
     @classmethod
     def from_etree(cls, etree_xml):
@@ -2161,20 +1967,6 @@ class PollResponse(TAXIIMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not super(PollResponse, self).__eq__(other, debug):
-            return False
-
-        if not self._check_properties_eq(other,
-                                         ['feed_name', 'subscription_id', 'message',
-                                          'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'],
-                                         debug):
-                return False
-
-        # TODO: Check content blocks
-
-        return True
-
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -2307,12 +2099,6 @@ class StatusMessage(TAXIIMessage):
         s += line_prepend + "  Status Message: %s\n" % self.message
         return s
 
-    def __eq__(self, other, debug=None):
-        if not super(StatusMessage, self).__eq__(other, debug):
-            return False
-
-        return self._check_properties_eq(other, ['status_type', 'status_detail', 'status_message'], debug)
-
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -2437,28 +2223,6 @@ class InboxMessage(TAXIIMessage):
 
         return s
 
-    def __eq__(self, other, debug=False):
-        if not super(InboxMessage, self).__eq__(other, debug):
-            return False
-
-        if not self._check_properties_eq(other, ['message', 'subscription_information'], debug):
-            return False
-
-        if len(self.content_blocks) != len(other.content_blocks):
-            if debug:
-                print 'content block lengths not equal: %s != %s' % (len(self.content_blocks), len(other.content_blocks))
-            return False
-
-        # Who knows if this is a good way to compare the content blocks or not...
-        for item1, item2 in zip(sorted(self.content_blocks), sorted(other.content_blocks)):
-            if item1 != item2:
-                if debug:
-                    print 'content blocks not equal: %s != %s' % (item1, item2)
-                    item1.__eq__(item2, debug)  # This will print why they are not equal
-                return False
-
-        return True
-
     @classmethod
     def from_etree(cls, etree_xml):
         msg = super(InboxMessage, cls).from_etree(etree_xml)
@@ -2495,7 +2259,7 @@ class InboxMessage(TAXIIMessage):
         return msg
 
 
-class SubscriptionInformation(BaseNonMessage):
+class SubscriptionInformation(TAXIIBase10):
 
     """
     The Subscription Information component of a TAXII Inbox message.
@@ -2585,9 +2349,6 @@ class SubscriptionInformation(BaseNonMessage):
         s += line_prepend + "  Incl. Begin TS Label: %s\n" % self.inclusive_begin_timestamp_label.isoformat()
         s += line_prepend + "  Incl. End TS Label: %s\n" % self.inclusive_end_timestamp_label.isoformat()
         return s
-
-    def __eq__(self, other, debug=False):
-        return self._check_properties_eq(other, ['feed_name', 'subscription_id', 'inclusive_begin_timestamp_label', 'inclusive_end_timestamp_label'], debug)
 
     @staticmethod
     def from_etree(etree_xml):
@@ -2712,12 +2473,6 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
             s += self.delivery_parameters.to_text(line_prepend + STD_INDENT)
         return s
 
-    def __eq__(self, other, debug=False):
-        if not super(ManageFeedSubscriptionRequest, self).__eq__(other, debug):
-            return False
-
-        return self._check_properties_eq(other, ['feed_name', 'subscription_id', 'action', 'delivery_parameters'], debug)
-
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -2825,22 +2580,6 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
             s += si.to_text(line_prepend + STD_INDENT)
         return s
 
-    def __eq__(self, other, debug=False):
-        if not super(ManageFeedSubscriptionResponse, self).__eq__(other, debug):
-            return False
-
-        if not self._check_properties_eq(other, ['feed_name', 'message'], debug):
-            return False
-
-        if len(self.subscription_instances) != len(other.subscription_instances):
-            if debug:
-                print 'subscription instance lengths not equal'
-            return False
-
-        # TODO: Compare the subscription instances
-
-        return True
-
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
@@ -2874,7 +2613,7 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         return msg
 
 
-class SubscriptionInstance(BaseNonMessage):
+class SubscriptionInstance(TAXIIBase10):
 
     """
     The Subscription Instance component of the Manage Feed Subscription
@@ -2903,6 +2642,10 @@ class SubscriptionInstance(BaseNonMessage):
             self.poll_instances = []
         else:
             self.poll_instances = poll_instances
+
+    @property
+    def sort_key(self):
+        return self.subscription_id
 
     @property
     def subscription_id(self):
@@ -2966,15 +2709,6 @@ class SubscriptionInstance(BaseNonMessage):
             s += pi.to_text(line_indent + STD_INDENT)
         return s
 
-    def __eq__(self, other, debug=False):
-        if not self._check_properties_eq(other, ['subscription_id'], debug):
-            return False
-
-        # TODO: Compare delivery parameters
-        # TODO: Compare poll instances
-
-        return True
-
     @staticmethod
     def from_etree(etree_xml):
         subscription_id = etree_xml.attrib['subscription_id']
@@ -3006,7 +2740,7 @@ class SubscriptionInstance(BaseNonMessage):
         return SubscriptionInstance(subscription_id, delivery_parameters, poll_instances)
 
 
-class PollInstance(BaseNonMessage):
+class PollInstance(TAXIIBase10):
 
     """
     The Poll Instance component of the Manage Feed Subscription
@@ -3029,6 +2763,10 @@ class PollInstance(BaseNonMessage):
             self.poll_message_bindings = []
         else:
             self.poll_message_bindings = poll_message_bindings
+
+    @property
+    def sort_key(self):
+        return self.poll_address
 
     @property
     def poll_protocol(self):
@@ -3081,17 +2819,6 @@ class PollInstance(BaseNonMessage):
         for mb in self.poll_message_bindings:
             s += line_prepend + "  Message Binding: %s\n" % mb
         return s
-
-    def __eq__(self, other, debug=True):
-        if not self._check_properties_eq(other, ['poll_protocol', 'poll_address'], debug):
-            return False
-
-        if set(self.poll_message_bindings) != set(other.poll_message_bindings):
-            if debug:
-                print 'poll message bindings not equal: %s != %s' % (self.poll_message_bindings, other.poll_message_bindings)
-                return False
-
-        return True
 
     @staticmethod
     def from_etree(etree_xml):

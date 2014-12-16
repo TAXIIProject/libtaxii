@@ -578,6 +578,8 @@ class VersionsTest(unittest.TestCase):
         :return:
         """
         for name, obj in inspect.getmembers(tm10, inspect.isclass):
+            if name in ('TAXIIBase',):
+                continue
             obj.version
 
 

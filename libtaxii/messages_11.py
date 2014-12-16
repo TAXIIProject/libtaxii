@@ -893,6 +893,10 @@ class PushParameters(TAXIIBase11):
         self.delivery_message_binding = delivery_message_binding
 
     @property
+    def sort_key(self):
+        return self.inbox_address
+
+    @property
     def inbox_protocol(self):
         return self._inbox_protocol
 
