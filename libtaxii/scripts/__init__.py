@@ -387,12 +387,6 @@ class SubscriptionClient11Script(TaxiiScript):
     path = '/services/collection-management/'
 
 
-class InboxClient10Script(TaxiiScript):
-    taxii_version = VID_TAXII_XML_10
-    parser_description = 'TAXII 1.0 Inbox Client'
-    path = '/services/inbox/'
-
-
 class SubscriptionClient10Script(TaxiiScript):
     taxii_version = VID_TAXII_XML_10
     parser_description = 'TAXII 1.0 Subscription Management Client'
