@@ -114,25 +114,22 @@ class TaxiiScript(object):
         parser.add_argument("--host",
                             dest="host",
                             default=host,
-                            help="[DEPRECATED - Use --url instead] "
-                                 "Host where the TAXII Service is hosted. Defaults to %s." % host)
+                            help=argparse.SUPPRESS
+                            )
         parser.add_argument("--port",
                             dest="port",
                             default=port,
                             type=int,
-                            help="[DEPRECATED - Use --url instead] "
-                                 "Port where the TAXII Service is hosted. Defaults to %s." % port)
+                            help=argparse.SUPPRESS)
         parser.add_argument("--path",
                             dest="path",
                             default=path,
-                            help="[DEPRECATED - Use --url instead] "
-                                 "Path where the TAXII Service is hosted. Defaults to %s" % path)
+                            help=argparse.SUPPRESS)
         parser.add_argument("--https",
                             dest="https",
                             default=https,
                             type=bool,
-                            help="[DEPRECATED - Use --url instead] "
-                                 "Whether or not to use HTTPS. Defaults to %s" % https)
+                            help=argparse.SUPPRESS)
         parser.add_argument("--cert",
                             dest="cert",
                             default=cert,
