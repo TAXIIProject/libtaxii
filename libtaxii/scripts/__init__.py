@@ -7,6 +7,7 @@ import sys
 import traceback
 import datetime
 import libtaxii.clients as tc
+from urlparse import urlparse
 
 import libtaxii as t
 from libtaxii.common import gen_filename
@@ -104,24 +105,34 @@ class TaxiiScript(object):
         add their own arguments.
         """
         parser = argparse.ArgumentParser(description=parser_description)
+        url = "https" if https else "http" + "://" + host + ":" + str(port) + path
+        parser.add_argument("-u",
+                            "--url",
+                            dest="url",
+                            default=url,
+                            help="The URL to connect to. Defaults to %s." % url)
         parser.add_argument("--host",
                             dest="host",
                             default=host,
-                            help="Host where the TAXII Service is hosted. Defaults to %s." % host)
+                            help="[DEPRECATED - Use --url instead] "
+                                 "Host where the TAXII Service is hosted. Defaults to %s." % host)
         parser.add_argument("--port",
                             dest="port",
                             default=port,
                             type=int,
-                            help="Port where the TAXII Service is hosted. Defaults to %s." % port)
+                            help="[DEPRECATED - Use --url instead] "
+                                 "Port where the TAXII Service is hosted. Defaults to %s." % port)
         parser.add_argument("--path",
                             dest="path",
                             default=path,
-                            help="Path where the TAXII Service is hosted. Defaults to %s" % path)
+                            help="[DEPRECATED - Use --url instead] "
+                                 "Path where the TAXII Service is hosted. Defaults to %s" % path)
         parser.add_argument("--https",
                             dest="https",
                             default=https,
                             type=bool,
-                            help="Whether or not to use HTTPS. Defaults to %s" % https)
+                            help="[DEPRECATED - Use --url instead] "
+                                 "Whether or not to use HTTPS. Defaults to %s" % https)
         parser.add_argument("--cert",
                             dest="cert",
                             default=cert,
@@ -162,21 +173,24 @@ class TaxiiScript(object):
         else:
             print response.to_xml(pretty_print=True)
 
-    def create_client(self, args):
+    def create_client(self, use_https, proxy, cert=None, key=None, username=None, password=None):
         client = tc.HttpClient()
-        client.set_use_https(args.https)
-        client.set_proxy(args.proxy)
-        tls = (args.cert is not None and args.key is not None)
-        basic = (args.username is not None and args.password is not None)
+        client.set_use_https(use_https)
+        client.set_proxy(proxy)
+        tls = (cert is not None and key is not None)
+        basic = (username is not None and password is not None)
         if tls and basic:
             client.set_auth_type(tc.HttpClient.AUTH_CERT_BASIC)
-            client.set_auth_credentials({'key_file': args.key, 'cert_file': args.cert, 'username': args.username, 'password': args.password})
+            client.set_auth_credentials({'key_file': key,
+                                         'cert_file': cert,
+                                         'username': username,
+                                         'password': password})
         elif tls:
             client.set_auth_type(tc.HttpClient.AUTH_CERT)
-            client.set_auth_credentials({'key_file': args.key, 'cert_file': args.cert})
+            client.set_auth_credentials({'key_file': key, 'cert_file': cert})
         elif basic:
             client.set_auth_type(tc.HttpClient.AUTH_BASIC)
-            client.set_auth_credentials({'username': args.username, 'password': args.password})
+            client.set_auth_credentials({'username': username, 'password': password})
 
         return client
 
@@ -304,6 +318,33 @@ class TaxiiScript(object):
         """
         raise NotImplementedError
 
+    @staticmethod
+    def _parse_url_info(args, parser):
+        """
+        In libtaxii 1.1.106, the command line args --port, --path, --host, and --https were deprecated in favor of
+        --url. This function performs the following actions:
+
+        1. Print a warning if any deprecated arguments are used (i.e., not one of the defaults).
+        2. Raise a ValueError if --url is used in combination with any deprecated argument
+        3. If deprecated arguments were used, translate them into the --url argument
+        """
+
+        deprecated_args = ['port', 'path', 'host', 'https']
+        deprecated_arg_used = False
+        for arg in deprecated_args:
+            if str(getattr(args, arg)) != str(parser._optionals.get_default(arg)):
+                print "WARNING: use of deprecated argument: %s. Use --url instead!" % arg
+                deprecated_arg_used = True
+
+        url_used = getattr(args, 'url') != parser._optionals.get_default('url')
+        if url_used and deprecated_arg_used:
+            raise ValueError("Error: Both --url and a deprecated argument was used. Please use one or the other!")
+
+        if deprecated_arg_used:
+            url = "https" if args.https else "http" + "://" + args.host + ":" + str(args.port) + args.path
+            args.url = url
+            print "Deprecated arguments transformed into: '--url %s'" % url
+
     def __call__(self):
         """
         Invoke a TAXII Service based on the arguments
@@ -311,8 +352,15 @@ class TaxiiScript(object):
         try:
             parser = self.get_arg_parser(parser_description=self.parser_description, path=self.path)
             args = parser.parse_args()
+            TaxiiScript._parse_url_info(args, parser)
             request_message = self.create_request_message(args)
-            client = self.create_client(args)
+            url = urlparse(args.url)
+            client = self.create_client(url.scheme == 'https',
+                                        args.proxy,
+                                        args.cert,
+                                        args.key,
+                                        args.username,
+                                        args.password)
 
             print "Request:\n"
             if args.xml_output is False:
@@ -320,7 +368,11 @@ class TaxiiScript(object):
             else:
                 print request_message.to_xml(pretty_print=True)
 
-            resp = client.call_taxii_service2(args.host, args.path, self.taxii_version, request_message.to_xml(pretty_print=True), args.port)
+            resp = client.call_taxii_service2(url.hostname,
+                                              url.path,
+                                              self.taxii_version,
+                                              request_message.to_xml(pretty_print=True),
+                                              url.port)
             r = t.get_message_from_http_response(resp, '0')
 
             self.handle_response(r, args)
