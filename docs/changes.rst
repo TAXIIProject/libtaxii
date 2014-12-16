@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+1.1.105
+-------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.104...1.1.105>`__
+
+- Fixed multiple XML parsing related vulnerabilities (Thanks @guidovranken of IntelWorks for the vulnerability research!)
+
 1.1.104
 -------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.103...1.1.04>`__
