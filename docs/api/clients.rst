@@ -50,7 +50,7 @@ Using Basic HTTP Auth
 
 	client = tc.HttpClient()
 	client.set_use_https(True)
-	client.set_auth_type(tc.AUTH_BASIC)
+	client.set_auth_type(tc.HttpClient.AUTH_BASIC)
 	client.set_auth_credentials({'username': 'MyUsername', 'password': 'MyPassword'})
 
 	discovery_request = tm11.DiscoveryRequest(generate_message_id())
@@ -67,7 +67,7 @@ Using TLS Certificate Auth
 
 	client = tc.HttpClient()
 	client.set_use_https(True)
-	client.set_auth_type(tc.AUTH_CERT)
+	client.set_auth_type(tc.HttpClient.AUTH_CERT)
 	client.set_auth_credentials({'key_file': '../PATH_TO_KEY_FILE.key', 'cert_file': '../PATH_TO_CERT_FILE.crt'})
 
 	discovery_request = tm11.DiscoveryRequest(generate_message_id())
