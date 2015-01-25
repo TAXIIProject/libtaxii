@@ -2446,8 +2446,16 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         kwargs = {}
         kwargs['feed_name'] = etree_xml.xpath('./@feed_name', namespaces=ns_map)[0]
         kwargs['action'] = etree_xml.xpath('./@action', namespaces=ns_map)[0]
-        kwargs['subscription_id'] = etree_xml.xpath('./@subscription_id', namespaces=ns_map)[0]
-        kwargs['delivery_parameters'] = DeliveryParameters.from_etree(etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map)[0])
+
+        # subscription_id is not required for action 'SUBSCRIBE'
+        subscription_id_set = etree_xml.xpath('./@subscription_id', namespaces=ns_map)
+        if len(subscription_id_set) > 0:
+            kwargs['subscription_id'] = subscription_id_set[0]
+
+        # push_parameters is not required for action other than 'SUBSCRIBE'
+        delivery_parameters_set = etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map)
+        if len(delivery_parameters_set) > 0:
+            kwargs['delivery_parameters'] = DeliveryParameters.from_etree(delivery_parameters_set[0])
 
         msg = super(ManageFeedSubscriptionRequest, cls).from_etree(etree_xml, **kwargs)
         return msg
