@@ -21,7 +21,8 @@ import warnings
 
 from lxml import etree
 
-from .common import parse, parse_datetime_string, append_any_content_etree, TAXIIBase
+from .common import (parse, parse_datetime_string, append_any_content_etree, TAXIIBase,
+        get_required, get_optional, get_optional_text)
 from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
 from constants import *
 
@@ -292,24 +293,13 @@ class DeliveryParameters(TAXIIBase10):
 
     @staticmethod
     def from_etree(etree_xml):
-        inbox_protocol = None
-        inbox_protocol_set = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)
-        if len(inbox_protocol_set) > 0:
-            inbox_protocol = inbox_protocol_set[0].text
 
-        inbox_address = None
-        inbox_address_set = etree_xml.xpath('./taxii:Address', namespaces=ns_map)
-        if len(inbox_address_set) > 0:
-            inbox_address = inbox_address_set[0].text
-
-        delivery_message_binding = None
-        delivery_message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-        if len(delivery_message_binding_set) > 0:
-            delivery_message_binding = delivery_message_binding_set[0].text
+        inbox_protocol = get_optional_text(etree_xml, './taxii:Protocol_Binding', ns_map)
+        inbox_address = get_optional_text(etree_xml, './taxii:Address', ns_map)
+        delivery_message_binding = get_optional_text(etree_xml, './taxii:Message_Binding', ns_map)
 
         content_bindings = []
-        content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-        for binding in content_binding_set:
+        for binding in etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map):
             content_bindings.append(binding.text)
 
         return DeliveryParameters(inbox_protocol, inbox_address, delivery_message_binding, content_bindings)
@@ -456,13 +446,10 @@ class TAXIIMessage(TAXIIBase10):
             raise ValueError('%s != %s' % (tag, expected_tag))
 
         # Get the message ID
-        message_id = src_etree.xpath('/taxii:*/@message_id', namespaces=ns_map)[0]
+        message_id = get_required(src_etree, '/taxii:*/@message_id', ns_map)
 
         # Get in response to, if present
-        in_response_to = None
-        in_response_tos = src_etree.xpath('/taxii:*/@in_response_to', namespaces=ns_map)
-        if len(in_response_tos) > 0:
-            in_response_to = in_response_tos[0]
+        in_response_to = get_optional(src_etree, '/taxii:*/@in_response_to', ns_map)
 
         # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii:*/taxii:Extended_Headers/taxii:Extended_Header', namespaces=ns_map)
@@ -477,10 +464,8 @@ class TAXIIMessage(TAXIIBase10):
 
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id,
-                   in_response_to,
-                   extended_headers=extended_headers,
-                   **kwargs)
+        return cls(message_id, in_response_to, extended_headers=extended_headers, **kwargs)
+
 
     @classmethod
     def from_xml(cls, xml):
@@ -635,7 +620,7 @@ class ContentBlock(TAXIIBase10):
         else:
             c.text = self._content
 
-        if self.timestamp_label is not None:
+        if self.timestamp_label:
             tl = etree.SubElement(block, '{%s}Timestamp_Label' % ns_map['taxii'])
             tl.text = self.timestamp_label.isoformat()
 
@@ -655,7 +640,7 @@ class ContentBlock(TAXIIBase10):
             block['content'] = self._content
         block['content_is_xml'] = self.content_is_xml
 
-        if self.timestamp_label is not None:
+        if self.timestamp_label:
             block['timestamp_label'] = self.timestamp_label.isoformat()
 
         if self.padding is not None:
@@ -680,17 +665,17 @@ class ContentBlock(TAXIIBase10):
     @staticmethod
     def from_etree(etree_xml):
         kwargs = {}
-        kwargs['content_binding'] = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)[0].text
-        padding_set = etree_xml.xpath('./taxii:Padding', namespaces=ns_map)
-        if len(padding_set) > 0:
-            kwargs['padding'] = padding_set[0].text
 
-        ts_set = etree_xml.xpath('./taxii:Timestamp_Label', namespaces=ns_map)
-        if len(ts_set) > 0:
-            ts_string = ts_set[0].text
-            kwargs['timestamp_label'] = parse_datetime_string(ts_string)
+        kwargs['content_binding'] = get_required(etree_xml, './taxii:Content_Binding', ns_map).text
 
-        content = etree_xml.xpath('./taxii:Content', namespaces=ns_map)[0]
+        kwargs['padding'] = get_optional_text(etree_xml, './taxii:Padding', ns_map)
+
+        ts_text = get_optional_text(etree_xml, './taxii:Timestamp_Label', ns_map)
+        if ts_text:
+            kwargs['timestamp_label'] = parse_datetime_string(ts_text)
+
+        content = get_required(etree_xml, './taxii:Content', ns_map)
+
         if len(content) == 0:  # This has string content
             kwargs['content'] = content.text
         else:  # This has XML content
@@ -698,16 +683,19 @@ class ContentBlock(TAXIIBase10):
 
         return ContentBlock(**kwargs)
 
+
     @staticmethod
     def from_dict(d):
         kwargs = {}
         kwargs['content_binding'] = d['content_binding']
         kwargs['padding'] = d.get('padding')
-        if 'timestamp_label' in d:
+
+        if d.get('timestamp_label'):
             kwargs['timestamp_label'] = parse_datetime_string(d['timestamp_label'])
 
         is_xml = d.get('content_is_xml', False)
         if is_xml:
+            #FIXME: to parse or not to parse the content - this should be configurable
             kwargs['content'] = parse(d['content'])
         else:
             kwargs['content'] = d['content']
@@ -737,7 +725,7 @@ class DiscoveryRequest(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        if value is not None:
+        if value:
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
@@ -803,8 +791,7 @@ class DiscoveryResponse(TAXIIMessage):
     def from_etree(cls, etree_xml):
         msg = super(DiscoveryResponse, cls).from_etree(etree_xml)
         msg.service_instances = []
-        service_instance_set = etree_xml.xpath('./taxii:Service_Instance', namespaces=ns_map)
-        for service_instance in service_instance_set:
+        for service_instance in etree_xml.xpath('./taxii:Service_Instance', namespaces=ns_map):
             si = ServiceInstance.from_etree(service_instance)
             msg.service_instances.append(si)
         return msg
@@ -813,8 +800,7 @@ class DiscoveryResponse(TAXIIMessage):
     def from_dict(cls, d):
         msg = super(DiscoveryResponse, cls).from_dict(d)
         msg.service_instances = []
-        service_instance_set = d['service_instances']
-        for service_instance in service_instance_set:
+        for service_instance in d['service_instances']:
             si = ServiceInstance.from_dict(service_instance)
             msg.service_instances.append(si)
         return msg
@@ -931,7 +917,7 @@ class ServiceInstance(TAXIIBase10):
         si = etree.Element('{%s}Service_Instance' % ns_map['taxii'])
         si.attrib['service_type'] = self.service_type
         si.attrib['service_version'] = self.services_version
-        if self.available is not None:
+        if self.available:
             si.attrib['available'] = str(self.available).lower()
 
         protocol_binding = etree.SubElement(si, '{%s}Protocol_Binding' % ns_map['taxii'])
@@ -988,36 +974,26 @@ class ServiceInstance(TAXIIBase10):
         service_type = etree_xml.attrib['service_type']
         services_version = etree_xml.attrib['service_version']
         available = None
-        if 'available' in etree_xml.attrib:
+        if etree_xml.attrib.get('available'):
             tmp_available = etree_xml.attrib['available']
             available = tmp_available.lower() == 'true'
 
-        protocol_binding = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-        service_address = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+        protocol_binding = get_required(etree_xml, './taxii:Protocol_Binding', ns_map).text
+        service_address = get_required(etree_xml, './taxii:Address', ns_map).text
 
         message_bindings = []
-        message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-        for mb in message_binding_set:
+        for mb in etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map):
             message_bindings.append(mb.text)
 
         inbox_service_accepted_contents = []
-        inbox_service_accepted_content_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-        for cb in inbox_service_accepted_content_set:
+        for cb in etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map):
             inbox_service_accepted_contents.append(cb.text)
 
-        message = None
-        message_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
-        if len(message_set) > 0:
-            message = message_set[0].text
+        message = get_optional_text(etree_xml, './taxii:Message', ns_map)
 
-        return ServiceInstance(service_type,
-                               services_version,
-                               protocol_binding,
-                               service_address,
-                               message_bindings,
-                               inbox_service_accepted_contents,
-                               available,
-                               message)
+        return ServiceInstance(service_type, services_version, protocol_binding,
+                service_address, message_bindings, inbox_service_accepted_contents,
+                available, message)
 
     @staticmethod
     def from_dict(d):
@@ -1039,7 +1015,7 @@ class FeedInformationRequest(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        if value is not None:
+        if value:
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
@@ -1225,7 +1201,7 @@ class FeedInformation(TAXIIBase10):
     def to_etree(self):
         f = etree.Element('{%s}Feed' % ns_map['taxii'])
         f.attrib['feed_name'] = self.feed_name
-        if self.available is not None:
+        if self.available:
             f.attrib['available'] = str(self.available).lower()
         feed_description = etree.SubElement(f, '{%s}Description' % ns_map['taxii'])
         feed_description.text = self.feed_description
@@ -1248,7 +1224,7 @@ class FeedInformation(TAXIIBase10):
     def to_dict(self):
         d = {}
         d['feed_name'] = self.feed_name
-        if self.available is not None:
+        if self.available:
             d['available'] = self.available
         d['feed_description'] = self.feed_description
         d['supported_contents'] = self.supported_contents
@@ -1289,25 +1265,22 @@ class FeedInformation(TAXIIBase10):
             tmp = etree_xml.attrib['available']
             kwargs['available'] = tmp.lower() == 'true'
 
-        kwargs['feed_description'] = etree_xml.xpath('./taxii:Description', namespaces=ns_map)[0].text
+        kwargs['feed_description'] = get_required(etree_xml, './taxii:Description', ns_map).text
+
         kwargs['supported_contents'] = []
-        supported_content_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-        for binding_elt in supported_content_set:
+        for binding_elt in etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map):
             kwargs['supported_contents'].append(binding_elt.text)
 
         kwargs['push_methods'] = []
-        push_method_set = etree_xml.xpath('./taxii:Push_Method', namespaces=ns_map)
-        for push_method_elt in push_method_set:
+        for push_method_elt in etree_xml.xpath('./taxii:Push_Method', namespaces=ns_map):
             kwargs['push_methods'].append(PushMethod.from_etree(push_method_elt))
 
         kwargs['polling_service_instances'] = []
-        polling_service_set = etree_xml.xpath('./taxii:Polling_Service', namespaces=ns_map)
-        for polling_elt in polling_service_set:
+        for polling_elt in etree_xml.xpath('./taxii:Polling_Service', namespaces=ns_map):
             kwargs['polling_service_instances'].append(PollingServiceInstance.from_etree(polling_elt))
 
         kwargs['subscription_methods'] = []
-        subscription_method_set = etree_xml.xpath('./taxii:Subscription_Service', namespaces=ns_map)
-        for subscription_elt in subscription_method_set:
+        for subscription_elt in etree_xml.xpath('./taxii:Subscription_Service', namespaces=ns_map):
             kwargs['subscription_methods'].append(SubscriptionMethod.from_etree(subscription_elt))
 
         return FeedInformation(**kwargs)
@@ -1407,10 +1380,9 @@ class PushMethod(TAXIIBase10):
     @staticmethod
     def from_etree(etree_xml):
         kwargs = {}
-        kwargs['push_protocol'] = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
+        kwargs['push_protocol'] = get_required(etree_xml, './taxii:Protocol_Binding', ns_map).text
         kwargs['push_message_bindings'] = []
-        message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-        for message_binding in message_binding_set:
+        for message_binding in etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map):
             kwargs['push_message_bindings'].append(message_binding.text)
         return PushMethod(**kwargs)
 
@@ -1493,11 +1465,11 @@ class PollingServiceInstance(TAXIIBase10):
 
     @classmethod
     def from_etree(cls, etree_xml):
-        protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-        addr = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+        protocol = get_required(etree_xml, './taxii:Protocol_Binding', ns_map).text
+        addr = get_required(etree_xml, './taxii:Address', ns_map).text
+
         bindings = []
-        message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-        for message_binding in message_binding_set:
+        for message_binding in etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map):
             bindings.append(message_binding.text)
         return cls(protocol, addr, bindings)
 
@@ -1583,11 +1555,10 @@ class SubscriptionMethod(TAXIIBase10):
 
     @classmethod
     def from_etree(cls, etree_xml):
-        protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-        addr = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+        protocol = get_required(etree_xml, './taxii:Protocol_Binding', ns_map).text
+        addr = get_required(etree_xml, './taxii:Address', ns_map).text
         bindings = []
-        message_binding_set = etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map)
-        for message_binding in message_binding_set:
+        for message_binding in etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map):
             bindings.append(message_binding.text)
         return cls(protocol, addr, bindings)
 
@@ -1634,7 +1605,7 @@ class PollRequest(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        if value is not None:
+        if value:
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
@@ -1689,12 +1660,12 @@ class PollRequest(TAXIIMessage):
         if self.subscription_id is not None:
             xml.attrib['subscription_id'] = self.subscription_id
 
-        if self.exclusive_begin_timestamp_label is not None:
+        if self.exclusive_begin_timestamp_label:
             ebt = etree.SubElement(xml, '{%s}Exclusive_Begin_Timestamp' % ns_map['taxii'])
             # TODO: Add TZ Info
             ebt.text = self.exclusive_begin_timestamp_label.isoformat()
 
-        if self.inclusive_end_timestamp_label is not None:
+        if self.inclusive_end_timestamp_label:
             iet = etree.SubElement(xml, '{%s}Inclusive_End_Timestamp' % ns_map['taxii'])
             # TODO: Add TZ Info
             iet.text = self.inclusive_end_timestamp_label.isoformat()
@@ -1710,9 +1681,9 @@ class PollRequest(TAXIIMessage):
         d['feed_name'] = self.feed_name
         if self.subscription_id is not None:
             d['subscription_id'] = self.subscription_id
-        if self.exclusive_begin_timestamp_label is not None:  # TODO: Add TZ Info
+        if self.exclusive_begin_timestamp_label:  # TODO: Add TZ Info
             d['exclusive_begin_timestamp_label'] = self.exclusive_begin_timestamp_label.isoformat()
-        if self.inclusive_end_timestamp_label is not None:  # TODO: Add TZ Info
+        if self.inclusive_end_timestamp_label:  # TODO: Add TZ Info
             d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         d['content_bindings'] = []
         for bind in self.content_bindings:
@@ -1746,25 +1717,19 @@ class PollRequest(TAXIIMessage):
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = {}
-        kwargs['feed_name'] = etree_xml.xpath('./@feed_name', namespaces=ns_map)[0]
-        kwargs['subscription_id'] = None
-        subscription_id_set = etree_xml.xpath('./@subscription_id', namespaces=ns_map)
-        if len(subscription_id_set) > 0:
-            kwargs['subscription_id'] = subscription_id_set[0]
+        kwargs['feed_name'] = get_required(etree_xml, './@feed_name', ns_map)
+        kwargs['subscription_id'] = get_optional(etree_xml, './@subscription_id', ns_map)
 
-        kwargs['exclusive_begin_timestamp_label'] = None
-        begin_ts_set = etree_xml.xpath('./taxii:Exclusive_Begin_Timestamp', namespaces=ns_map)
-        if len(begin_ts_set) > 0:
-            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(begin_ts_set[0].text)
+        ebt_text = get_optional_text(etree_xml, './taxii:Exclusive_Begin_Timestamp', ns_map)
+        if ebt_text:
+            kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(ebt_text)
 
-        kwargs['inclusive_end_timestamp_label'] = None
-        end_ts_set = etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)
-        if len(end_ts_set) > 0:
-            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(end_ts_set[0].text)
+        iet_text = get_optional_text(etree_xml, './taxii:Inclusive_End_Timestamp', ns_map)
+        if iet_text:
+            kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(iet_text)
 
         kwargs['content_bindings'] = []
-        content_binding_set = etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map)
-        for binding in content_binding_set:
+        for binding in etree_xml.xpath('./taxii:Content_Binding', namespaces=ns_map):
             kwargs['content_bindings'].append(binding.text)
 
         msg = super(PollRequest, cls).from_etree(etree_xml, **kwargs)
@@ -1778,11 +1743,11 @@ class PollRequest(TAXIIMessage):
         kwargs['subscription_id'] = d.get('subscription_id')
 
         kwargs['exclusive_begin_timestamp_label'] = None
-        if 'exclusive_begin_timestamp_label' in d:
+        if d.get('exclusive_begin_timestamp_label'):
             kwargs['exclusive_begin_timestamp_label'] = parse_datetime_string(d['exclusive_begin_timestamp_label'])
 
         kwargs['inclusive_end_timestamp_label'] = None
-        if 'inclusive_end_timestamp_label' in d:
+        if d.get('inclusive_end_timestamp_label'):
             kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(d['inclusive_end_timestamp_label'])
 
         kwargs['content_bindings'] = d.get('content_bindings', [])
@@ -1890,7 +1855,7 @@ class PollResponse(TAXIIMessage):
             m = etree.SubElement(xml, '{%s}Message' % ns_map['taxii'])
             m.text = self.message
 
-        if self.inclusive_begin_timestamp_label is not None:
+        if self.inclusive_begin_timestamp_label:
             ibt = etree.SubElement(xml, '{%s}Inclusive_Begin_Timestamp' % ns_map['taxii'])
             ibt.text = self.inclusive_begin_timestamp_label.isoformat()
 
@@ -1910,7 +1875,7 @@ class PollResponse(TAXIIMessage):
             d['subscription_id'] = self.subscription_id
         if self.message is not None:
             d['message'] = self.message
-        if self.inclusive_begin_timestamp_label is not None:
+        if self.inclusive_begin_timestamp_label:
             d['inclusive_begin_timestamp_label'] = self.inclusive_begin_timestamp_label.isoformat()
         d['inclusive_end_timestamp_label'] = self.inclusive_end_timestamp_label.isoformat()
         d['content_blocks'] = []
@@ -1942,24 +1907,16 @@ class PollResponse(TAXIIMessage):
     def from_etree(cls, etree_xml):
         kwargs = {}
 
-        kwargs['feed_name'] = etree_xml.xpath('./@feed_name', namespaces=ns_map)[0]
+        kwargs['feed_name'] = get_required(etree_xml, './@feed_name', ns_map)
+        kwargs['subscription_id'] = get_optional(etree_xml, './@subscription_id', ns_map)
+        kwargs['message'] = get_optional_text(etree_xml, './taxii:Message', ns_map)
 
-        kwargs['subscription_id'] = None
-        subs_ids = etree_xml.xpath('./@subscription_id', namespaces=ns_map)
-        if len(subs_ids) > 0:
-            kwargs['subscription_id'] = subs_ids[0]
+        ibts_text = get_optional_text(etree_xml, './taxii:Inclusive_Begin_Timestamp', ns_map)
+        if ibts_text:
+            kwargs['inclusive_begin_timestamp_label'] = parse_datetime_string(ibts_text)
 
-        kwargs['message'] = None
-        messages = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
-        if len(messages) > 0:
-            kwargs['message'] = messages[0].text
-
-        kwargs['inclusive_begin_timestamp_label'] = None
-        ibts = etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)
-        if len(ibts) > 0:
-            kwargs['inclusive_begin_timestamp_label'] = parse_datetime_string(ibts[0].text)
-
-        kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+        iets_text = get_required(etree_xml, './taxii:Inclusive_End_Timestamp', ns_map).text
+        kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(iets_text)
 
         kwargs['content_blocks'] = []
         blocks = etree_xml.xpath('./taxii:Content_Block', namespaces=ns_map)
@@ -1974,14 +1931,11 @@ class PollResponse(TAXIIMessage):
         kwargs = {}
         kwargs['feed_name'] = d['feed_name']
 
-        kwargs['message'] = None
-        if 'message' in d:
-            kwargs['message'] = d['message']
-
+        kwargs['message'] = d.get('message')
         kwargs['subscription_id'] = d.get('subscription_id')
 
         kwargs['inclusive_begin_timestamp_label'] = None
-        if 'inclusive_begin_timestamp_label' in d:
+        if d.get('inclusive_begin_timestamp_label'):
             kwargs['inclusive_begin_timestamp_label'] = parse_datetime_string(d['inclusive_begin_timestamp_label'])
 
         kwargs['inclusive_end_timestamp_label'] = parse_datetime_string(d['inclusive_end_timestamp_label'])
@@ -2072,29 +2026,22 @@ class StatusMessage(TAXIIMessage):
 
     @classmethod
     def from_etree(cls, etree_xml):
-        kwargs = {}
-
-        kwargs['status_type'] = etree_xml.attrib['status_type']
-
-        kwargs['status_detail'] = None
-        sd_set = etree_xml.xpath('./taxii:Status_Detail', namespaces=ns_map)
-        if len(sd_set) > 0:
-            kwargs['status_detail'] = sd_set[0].text
-
-        kwargs['message'] = None
-        m_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
-        if len(m_set) > 0:
-            kwargs['message'] = m_set[0].text
+        kwargs = dict(
+            status_type = etree_xml.attrib['status_type'],
+            status_detail = get_optional_text(etree_xml, './taxii:Status_Detail', ns_map),
+            message = get_optional_text(etree_xml, './taxii:Message', ns_map),
+        )
 
         msg = super(StatusMessage, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
     def from_dict(cls, d):
-        kwargs = {}
-        kwargs['status_type'] = d['status_type']
-        kwargs['status_detail'] = d.get('status_detail')
-        kwargs['message'] = d.get('message')
+        kwargs = dict(
+            status_type = d['status_type'],
+            status_detail = d.get('status_detail'),
+            message = d.get('message')
+        )
 
         msg = super(StatusMessage, cls).from_dict(d, **kwargs)
         return msg
@@ -2130,7 +2077,7 @@ class InboxMessage(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        if value is not None:
+        if value:
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
@@ -2158,7 +2105,7 @@ class InboxMessage(TAXIIMessage):
             m = etree.SubElement(xml, '{%s}Message' % ns_map['taxii'])
             m.text = self.message
 
-        if self.subscription_information is not None:
+        if self.subscription_information:
             xml.append(self.subscription_information.to_etree())
 
         for block in self.content_blocks:
@@ -2171,7 +2118,7 @@ class InboxMessage(TAXIIMessage):
         if self.message is not None:
             d['message'] = self.message
 
-        if self.subscription_information is not None:
+        if self.subscription_information:
             d['subscription_information'] = self.subscription_information.to_dict()
 
         d['content_blocks'] = []
@@ -2195,13 +2142,11 @@ class InboxMessage(TAXIIMessage):
     def from_etree(cls, etree_xml):
         msg = super(InboxMessage, cls).from_etree(etree_xml)
 
-        msg_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
-        if len(msg_set) > 0:
-            msg.message = msg_set[0].text
+        msg.message = get_optional_text(etree_xml, './taxii:Message', ns_map)
 
-        subs_infos = etree_xml.xpath('./taxii:Source_Subscription', namespaces=ns_map)
-        if len(subs_infos) > 0:
-            msg.subscription_information = SubscriptionInformation.from_etree(subs_infos[0])
+        subs_info = get_optional(etree_xml, './taxii:Source_Subscription', ns_map)
+        if subs_info is not None:
+            msg.subscription_information = SubscriptionInformation.from_etree(subs_info)
 
         content_blocks = etree_xml.xpath('./taxii:Content_Block', namespaces=ns_map)
         msg.content_blocks = []
@@ -2323,8 +2268,8 @@ class SubscriptionInformation(TAXIIBase10):
         feed_name = etree_xml.attrib['feed_name']
         subscription_id = etree_xml.attrib['subscription_id']
 
-        ibtl = parse_datetime_string(etree_xml.xpath('./taxii:Inclusive_Begin_Timestamp', namespaces=ns_map)[0].text)
-        ietl = parse_datetime_string(etree_xml.xpath('./taxii:Inclusive_End_Timestamp', namespaces=ns_map)[0].text)
+        ibtl = parse_datetime_string(get_required(etree_xml, './taxii:Inclusive_Begin_Timestamp', ns_map).text)
+        ietl = parse_datetime_string(get_required(etree_xml, './taxii:Inclusive_End_Timestamp', ns_map).text)
 
         return SubscriptionInformation(feed_name, subscription_id, ibtl, ietl)
 
@@ -2371,7 +2316,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 
     @TAXIIMessage.in_response_to.setter
     def in_response_to(self, value):
-        if value is not None:
+        if value:
             raise ValueError('in_response_to must be None')
         self._in_response_to = value
 
@@ -2418,7 +2363,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         if self.subscription_id is not None:
             xml.attrib['subscription_id'] = self.subscription_id
 
-        if self.delivery_parameters is not None:
+        if self.delivery_parameters:
             xml.append(self.delivery_parameters.to_etree())
         return xml
 
@@ -2428,7 +2373,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
         d['action'] = self.action
         d['subscription_id'] = self.subscription_id
         d['delivery_parameters'] = None
-        if self.delivery_parameters is not None:
+        if self.delivery_parameters:
             d['delivery_parameters'] = self.delivery_parameters.to_dict()
         return d
 
@@ -2443,30 +2388,30 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 
     @classmethod
     def from_etree(cls, etree_xml):
-        kwargs = {}
-        kwargs['feed_name'] = etree_xml.xpath('./@feed_name', namespaces=ns_map)[0]
-        kwargs['action'] = etree_xml.xpath('./@action', namespaces=ns_map)[0]
+        kwargs = dict(
+            feed_name = get_required(etree_xml, './@feed_name', ns_map),
+            action = get_required(etree_xml, './@action', ns_map),
 
-        # subscription_id is not required for action 'SUBSCRIBE'
-        subscription_id_set = etree_xml.xpath('./@subscription_id', namespaces=ns_map)
-        if len(subscription_id_set) > 0:
-            kwargs['subscription_id'] = subscription_id_set[0]
+            # subscription_id is not required for action 'SUBSCRIBE'
+            subscription_id = get_optional(etree_xml, './@subscription_id', ns_map),
+        )
 
-        # push_parameters is not required for action other than 'SUBSCRIBE'
-        delivery_parameters_set = etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map)
-        if len(delivery_parameters_set) > 0:
-            kwargs['delivery_parameters'] = DeliveryParameters.from_etree(delivery_parameters_set[0])
+        # marked as required in spec but as optional is XSD
+        delivery = get_optional(etree_xml, './taxii:Push_Parameters', ns_map)
+        if delivery is not None:
+            kwargs['delivery_parameters'] = DeliveryParameters.from_etree(delivery)
 
         msg = super(ManageFeedSubscriptionRequest, cls).from_etree(etree_xml, **kwargs)
         return msg
 
     @classmethod
     def from_dict(cls, d):
-        kwargs = {}
-        kwargs['feed_name'] = d['feed_name']
-        kwargs['action'] = d['action']
-        kwargs['subscription_id'] = d['subscription_id']
-        kwargs['delivery_parameters'] = DeliveryParameters.from_dict(d['delivery_parameters'])
+        kwargs = dict(
+            feed_name = d['feed_name'],
+            action = d['action'],
+            subscription_id = d['subscription_id'],
+            delivery_parameters = DeliveryParameters.from_dict(d['delivery_parameters'])
+        )
 
         msg = super(ManageFeedSubscriptionRequest, cls).from_dict(d, **kwargs)
         return msg
@@ -2558,14 +2503,10 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
         kwargs = {}
         kwargs['feed_name'] = etree_xml.attrib['feed_name']
 
-        message_set = etree_xml.xpath('./taxii:Message', namespaces=ns_map)
-        if len(message_set) > 0:
-            kwargs['message'] = message_set[0].text
-
-        subscription_instance_set = etree_xml.xpath('./taxii:Subscription', namespaces=ns_map)
+        kwargs['message'] = get_optional_text(etree_xml, './taxii:Message', ns_map)
 
         kwargs['subscription_instances'] = []
-        for si in subscription_instance_set:
+        for si in etree_xml.xpath('./taxii:Subscription', namespaces=ns_map):
             kwargs['subscription_instances'].append(SubscriptionInstance.from_etree(si))
 
         msg = super(ManageFeedSubscriptionResponse, cls).from_etree(etree_xml, **kwargs)
@@ -2575,7 +2516,6 @@ class ManageFeedSubscriptionResponse(TAXIIMessage):
     def from_dict(cls, d):
         kwargs = {}
         kwargs['feed_name'] = d['feed_name']
-
         kwargs['message'] = d.get('message')
 
         kwargs['subscription_instances'] = []
@@ -2680,13 +2620,11 @@ class SubscriptionInstance(TAXIIBase10):
         subscription_id = etree_xml.attrib['subscription_id']
 
         delivery_parameters = []
-        delivery_parameter_set = etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map)
-        for delivery_parameter in delivery_parameter_set:
+        for delivery_parameter in etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map):
             delivery_parameters.append(DeliveryParameters.from_etree(delivery_parameter))
 
         poll_instances = []
-        poll_instance_set = etree_xml.xpath('./taxii:Poll_Instance', namespaces=ns_map)
-        for poll_instance in poll_instance_set:
+        for poll_instance in etree_xml.xpath('./taxii:Poll_Instance', namespaces=ns_map):
             poll_instances.append(PollInstance.from_etree(poll_instance))
 
         return SubscriptionInstance(subscription_id, delivery_parameters, poll_instances)
@@ -2785,8 +2723,9 @@ class PollInstance(TAXIIBase10):
 
     @staticmethod
     def from_etree(etree_xml):
-        poll_protocol = etree_xml.xpath('./taxii:Protocol_Binding', namespaces=ns_map)[0].text
-        address = etree_xml.xpath('./taxii:Address', namespaces=ns_map)[0].text
+        poll_protocol = get_required(etree_xml, './taxii:Protocol_Binding', ns_map).text
+        address = get_required(etree_xml, './taxii:Address', ns_map).text
+
         poll_message_bindings = []
         for b in etree_xml.xpath('./taxii:Message_Binding', namespaces=ns_map):
             poll_message_bindings.append(b.text)
