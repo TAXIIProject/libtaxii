@@ -331,3 +331,24 @@ class TAXIIBase(object):
 
     def __ne__(self, other, debug=False):
         return not self.__eq__(other, debug)
+
+
+def get_required(etree_xml, xpath, ns_map):
+    elements = etree_xml.xpath(xpath, namespaces=ns_map)
+    if len(elements) == 0:
+        raise ValueError('Element "%s" is required' % xpath)
+    return elements[0]
+
+
+def get_optional(etree_xml, xpath, ns_map):
+    try:
+        return get_required(etree_xml, xpath, ns_map)
+    except ValueError:
+        pass
+
+def get_optional_text(etree_xml, xpath, ns_map):
+    try:
+        return get_required(etree_xml, xpath, ns_map).text
+    except ValueError:
+        pass
+
