@@ -3087,7 +3087,7 @@ class InboxMessage(TAXIIMessage):
             use as Extended Headers. **Optional**
         message (str): prose information for the message recipient. **Optional**
         result_id (str): the result id. **Optional**
-        destination_collection_name (list of str): Each string indicates a
+        destination_collection_names (list of str): Each string indicates a
              destination collection name. **Optional**
         subscription_information (SubscriptionInformation): This
             field is only present if this message is being sent to provide
