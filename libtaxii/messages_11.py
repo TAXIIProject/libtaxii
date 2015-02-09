@@ -608,7 +608,7 @@ class _GenericParameters(TAXIIBase11):
 
         response_type = get_optional_text(etree_xml, './taxii_11:Response_Type', ns_map)
         if response_type is None:
-            respnse_type = RT_FULL
+            response_type = RT_FULL
 
         content_bindings = []
         for binding in etree_xml.xpath('./taxii_11:Content_Binding', namespaces=ns_map):
