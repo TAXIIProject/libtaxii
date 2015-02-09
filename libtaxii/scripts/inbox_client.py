@@ -5,7 +5,6 @@
 from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_11 as tm11
 import libtaxii as t
-import StringIO
 
 
 class InboxClient11Script(TaxiiScript):
@@ -97,12 +96,12 @@ class InboxClient11Script(TaxiiScript):
 
     def create_request_message(self, args):
         if args.content_file is self.stix_watchlist:
-            c = StringIO.StringIO(self.stix_watchlist)
+            data = self.stix_watchlist
         else:
-            c = open(args.content_file, 'r')
+            with open(args.content_file, 'r') as f:
+                data = f.read()
 
-        cb = tm11.ContentBlock(tm11.ContentBinding(args.content_binding), c.read())
-        c.close()
+        cb = tm11.ContentBlock(tm11.ContentBinding(args.content_binding), data)
         if args.subtype is not None:
             cb.content_binding.subtype_ids.append(args.subtype)
 

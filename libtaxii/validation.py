@@ -155,9 +155,8 @@ class SchemaValidator(object):
         turns it into an etree, then calls validate_etree( ... )
         """
 
-        f = open(file_location, 'r')
-        etree_xml = parse(f)
-        f.close()
+        with open(file_location, 'r') as f:
+            etree_xml = parse(f)
 
         return self.validate_etree(etree_xml)
 
