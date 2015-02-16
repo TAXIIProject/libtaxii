@@ -8,8 +8,10 @@ from StringIO import StringIO
 from re import sub as resub
 import dateutil.parser
 import random
-
+from libtaxii.constants import VID_TAXII_SERVICES_10, VID_TAXII_SERVICES_11
 from lxml import etree
+from uuid import uuid4
+import sys
 
 _XML_PARSER = None
 
@@ -77,7 +79,7 @@ def parse_datetime_string(datetime_string):
     return dateutil.parser.parse(datetime_string)
 
 
-def generate_message_id(maxlen=5):
+def generate_message_id(maxlen=5, version=VID_TAXII_SERVICES_10):
     """Generate a TAXII Message ID.
 
     Args:
@@ -91,8 +93,13 @@ def generate_message_id(maxlen=5):
             # Or...
             message = tm11.DiscoveryRequest(tm11.generate_message_id())
     """
-    message_id = random.randint(1, 10 ** maxlen)
-    return str(message_id)
+    if version == VID_TAXII_SERVICES_10:
+        message_id = str(uuid4().int % sys.maxint)
+    elif version == VID_TAXII_SERVICES_11:
+        message_id = str(uuid4())
+    else:
+        raise ValueError('Unknown TAXII Version: %s. Must be a TAXII Services Version ID!', version)
+    return message_id
 
 
 def append_any_content_etree(etree_elt, content):
