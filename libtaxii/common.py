@@ -98,7 +98,7 @@ def generate_message_id(maxlen=5, version=VID_TAXII_SERVICES_10):
     elif version == VID_TAXII_SERVICES_11:
         message_id = str(uuid4())
     else:
-        raise ValueError('Unknown TAXII Version: %s. Must be a TAXII Services Version ID!', version)
+        raise ValueError('Unknown TAXII Version: %s. Must be a TAXII Services Version ID!' % version)
     return message_id
 
 
