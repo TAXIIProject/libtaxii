@@ -1277,7 +1277,7 @@ class ServiceInstance(TAXIIBase11):
             TAXII Daemon that hosts this Service. **Required**
         message_bindings (list of strings): identifies the message
             bindings supported by this Service instance. **Required**
-        inbox_service_accepted_content (list of strings): identifies
+        inbox_service_accepted_content (list of ContentBinding objects): identifies
             content bindings that this Inbox Service is willing to accept.
             **Optional**
         available (boolean): indicates whether the identity of the
