@@ -1113,6 +1113,8 @@ class TAXIIMessage(TAXIIBase11):
 
         # Get in response to, if present
         in_response_to = get_optional(src_etree, '/taxii_11:*/@in_response_to', ns_map)
+        if in_response_to:
+            kwargs['in_response_to'] = in_response_to
 
         # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii_11:*/taxii_11:Extended_Headers/taxii_11:Extended_Header', namespaces=ns_map)
@@ -1126,7 +1128,7 @@ class TAXIIMessage(TAXIIBase11):
 
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id, in_response_to, extended_headers=extended_headers, **kwargs)
+        return cls(message_id, extended_headers=extended_headers, **kwargs)
 
 
     @classmethod
@@ -1150,11 +1152,10 @@ class TAXIIMessage(TAXIIBase11):
             extended_headers[k] = v
 
         in_response_to = d.get('in_response_to')
+        if in_response_to:
+            kwargs['in_response_to'] = in_response_to
 
-        return cls(message_id,
-                   in_response_to,
-                   extended_headers=extended_headers,
-                   **kwargs)
+        return cls(message_id, extended_headers=extended_headers, **kwargs)
 
     @classmethod
     def from_json(cls, json_string):
@@ -2331,7 +2332,7 @@ class PollRequest(TAXIIRequestMessage):
     """
     message_type = MSG_POLL_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+    def __init__(self, message_id, extended_headers=None,
                  collection_name=None, exclusive_begin_timestamp_label=None,
                  inclusive_end_timestamp_label=None, subscription_id=None,
                  poll_parameters=None):
@@ -3442,7 +3443,7 @@ class ManageCollectionSubscriptionRequest(TAXIIRequestMessage):
 
     message_type = MSG_MANAGE_COLLECTION_SUBSCRIPTION_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+    def __init__(self, message_id, extended_headers=None,
                  collection_name=None, action=None, subscription_id=None,
                  subscription_parameters=None, push_parameters=None):
 
@@ -3977,7 +3978,7 @@ class PollFulfillmentRequest(TAXIIRequestMessage):
     """
     message_type = MSG_POLL_FULFILLMENT_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+    def __init__(self, message_id, extended_headers=None,
                  collection_name=None, result_id=None, result_part_number=None):
         super(PollFulfillmentRequest, self).__init__(message_id, extended_headers=extended_headers)
         self.collection_name = collection_name
