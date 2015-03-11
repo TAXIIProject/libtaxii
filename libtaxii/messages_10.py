@@ -2547,7 +2547,7 @@ class SubscriptionInstance(TAXIIBase10):
     def __init__(self, subscription_id, delivery_parameters=None,
                  poll_instances=None):
         self.subscription_id = subscription_id
-        self.delivery_parameters = delivery_parameters or []
+        self.delivery_parameters = delivery_parameters
         self.poll_instances = poll_instances or []
 
     @property
@@ -2569,7 +2569,7 @@ class SubscriptionInstance(TAXIIBase10):
 
     @delivery_parameters.setter
     def delivery_parameters(self, value):
-        do_check(value, 'delivery_parameters', type=DeliveryParameters, can_be_none=False)
+        do_check(value, 'delivery_parameters', type=DeliveryParameters, can_be_none=True)
         self._delivery_parameters = value
 
     @property
@@ -2585,8 +2585,8 @@ class SubscriptionInstance(TAXIIBase10):
         xml = etree.Element('{%s}Subscription' % ns_map['taxii'])
         xml.attrib['subscription_id'] = self.subscription_id
 
-        for delivery_parameter in self.delivery_parameters:
-            xml.append(delivery_parameter.to_etree())
+        if self.delivery_parameters:
+            xml.append(self.delivery_parameters.to_etree())
 
         for poll_instance in self.poll_instances:
             xml.append(poll_instance.to_etree())
@@ -2597,9 +2597,10 @@ class SubscriptionInstance(TAXIIBase10):
         d = {}
         d['subscription_id'] = self.subscription_id
 
-        d['delivery_parameters'] = []
-        for delivery_parameter in self.delivery_parameters:
-            d['delivery_parameters'].append(delivery_parameter.to_dict())
+        if self.delivery_parameters:
+            d['delivery_parameters'] = self.delivery_parameters.to_dict()
+        else:
+            d['delivery_parameters'] = None
 
         d['poll_instances'] = []
         for poll_instance in self.poll_instances:
@@ -2610,8 +2611,8 @@ class SubscriptionInstance(TAXIIBase10):
     def to_text(self, line_indent=''):
         s = line_indent + "=== Subscription Instance ===\n"
         s += line_indent + "  Subscription ID: %s\n" % self.subscription_id
-        for dp in self.delivery_parameters:
-            s += dp.to_text(line_indent + STD_INDENT)
+        if self.delivery_parameters:
+            s += self.delivery_parameters.to_text(line_indent + STD_INDENT)
         for pi in self.poll_instances:
             s += pi.to_text(line_indent + STD_INDENT)
         return s
@@ -2620,9 +2621,11 @@ class SubscriptionInstance(TAXIIBase10):
     def from_etree(etree_xml):
         subscription_id = etree_xml.attrib['subscription_id']
 
-        delivery_parameters = []
-        for delivery_parameter in etree_xml.xpath('./taxii:Push_Parameters', namespaces=ns_map):
-            delivery_parameters.append(DeliveryParameters.from_etree(delivery_parameter))
+        _delivery_parameters = get_optional(etree_xml, './taxii:Push_Parameters', ns_map)
+        if _delivery_parameters:
+            delivery_parameters = DeliveryParameters.from_etree(_delivery_parameters)
+        else:
+            delivery_parameters = None
 
         poll_instances = []
         for poll_instance in etree_xml.xpath('./taxii:Poll_Instance', namespaces=ns_map):
@@ -2634,9 +2637,10 @@ class SubscriptionInstance(TAXIIBase10):
     def from_dict(d):
         subscription_id = d['subscription_id']
 
-        delivery_parameters = []
-        for delivery_parameter in d['delivery_parameters']:
-            delivery_parameters.append(DeliveryParameters.from_dict(delivery_parameter))
+        if d.get('delivery_parameters'):
+            delivery_parameters = DeliveryParameters.from_dict(d['delivery_parameters'])
+        else:
+            delivery_parameters = None
 
         poll_instances = []
         for poll_instance in d['poll_instances']:
