@@ -450,6 +450,8 @@ class TAXIIMessage(TAXIIBase10):
 
         # Get in response to, if present
         in_response_to = get_optional(src_etree, '/taxii:*/@in_response_to', ns_map)
+        if in_response_to:
+            kwargs['in_response_to'] = in_response_to
 
         # Get the Extended headers
         extended_header_list = src_etree.xpath('/taxii:*/taxii:Extended_Headers/taxii:Extended_Header', namespaces=ns_map)
@@ -464,7 +466,7 @@ class TAXIIMessage(TAXIIBase10):
 
             extended_headers[eh_name] = eh_value
 
-        return cls(message_id, in_response_to, extended_headers=extended_headers, **kwargs)
+        return cls(message_id, extended_headers=extended_headers, **kwargs)
 
 
     @classmethod
@@ -503,11 +505,10 @@ class TAXIIMessage(TAXIIBase10):
             extended_headers[k] = v
 
         in_response_to = d.get('in_response_to')
+        if in_response_to:
+            kwargs['in_response_to'] = in_response_to
 
-        return cls(message_id,
-                   in_response_to,
-                   extended_headers=extended_headers,
-                   **kwargs)
+        return cls(message_id, extended_headers=extended_headers, **kwargs)
 
     @classmethod
     def from_json(cls, json_string):
@@ -1592,7 +1593,7 @@ class PollRequest(TAXIIMessage):
     """
     message_type = MSG_POLL_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+    def __init__(self, message_id, extended_headers=None,
                  feed_name=None, exclusive_begin_timestamp_label=None,
                  inclusive_end_timestamp_label=None, subscription_id=None,
                  content_bindings=None):
@@ -2305,7 +2306,7 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
 
     message_type = MSG_MANAGE_FEED_SUBSCRIPTION_REQUEST
 
-    def __init__(self, message_id, in_response_to=None, extended_headers=None,
+    def __init__(self, message_id, extended_headers=None,
                  feed_name=None, action=None, subscription_id=None,
                  delivery_parameters=None):
         super(ManageFeedSubscriptionRequest, self).__init__(message_id, extended_headers=extended_headers)
