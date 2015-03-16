@@ -598,8 +598,12 @@ class _GenericParameters(TAXIIBase11):
         s = line_prepend + "=== %s ===\n" % self.name
         for binding in self.content_bindings:
             s += "  Content Binding: %s\n" % str(binding)
+
         if self.query:
             s += self.query.to_text(line_prepend + STD_INDENT)
+
+        if self.response_type:
+            s += line_prepend + "  Response type: %s\n" % str(self.response_type)
 
         return s
 

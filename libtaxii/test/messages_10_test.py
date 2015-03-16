@@ -478,7 +478,7 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
 
         subscription_instance1 = tm10.SubscriptionInstance(
             subscription_id='SubsId234',  # required
-            delivery_parameters=[delivery_parameters1],  # Required if message is responding to a status action. Optional otherwise
+            delivery_parameters=delivery_parameters1,  # Required if message is responding to a status action. Optional otherwise
             poll_instances=[poll_instance1])  # Required if action was polling subscription. Optional otherwise
 
         manage_feed_subscription_response1 = tm10.ManageFeedSubscriptionResponse(
@@ -502,7 +502,7 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
 
         subscription = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
             subscription_id='SubsId234',
-            delivery_parameters=[delivery_parameters1],
+            delivery_parameters=delivery_parameters1,
             poll_instances=[poll])
 
         response = tm10.ManageFeedSubscriptionResponse(
