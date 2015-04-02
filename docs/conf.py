@@ -1,3 +1,5 @@
+import os
+
 import libtaxii
 
 project = u'libtaxii'
@@ -28,27 +30,14 @@ rst_prolog = """
 exclude_patterns = ['_build']
 pygments_style = 'sphinx'
 
-html_theme = 'default'
-html_style = '/default.css'
-html_static_path = ['_static']
-htmlhelp_basename = 'libtaxiidoc'
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+else:
+    html_theme = 'default'
 
-html_theme_options = {
-    'codebgcolor': '#EEE',
-    'footerbgcolor': '#FFF',
-    'footertextcolor': '#000',
-    'headbgcolor': '#CCC',
-    'headtextcolor': '#000',
-    'headlinkcolor': '#ED8603',
-    'linkcolor': '#666',
-    'relbarbgcolor': '#EDB603',
-    'relbarlinkcolor': '#000',
-    'relbartextcolor': '#FFF',
-    'sidebarbgcolor': '#EEE',
-    'sidebarlinkcolor': '#666',
-    'sidebartextcolor': '#000',
-    'visitedlinkcolor': '#666',
-}
 html_sidebars = {"**": ['localtoc.html', 'relations.html', 'sourcelink.html',
                         'searchbox.html', 'links.html']}
 
