@@ -9,8 +9,6 @@
 The main libtaxii module
 """
 
-__version__ = "1.1.107.dev0"
-
 import httplib
 import urllib
 import urllib2
@@ -20,6 +18,7 @@ import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
 from .constants import *
 
+from .version import __version__  # noqa
 
 def get_message_from_http_response(http_response, in_response_to):
     """Create a TAXII message from an HTTPResponse object.
