@@ -50,7 +50,6 @@ class HttpClient(object):
         if auth_credentials is not None:
             self.set_auth_credentials(auth_credentials)
         # These cannot currently be set in the constructor
-        self.proxy_type = None
         self.proxy_string = None
         self.verify_server = False
         self.ca_file = None
@@ -95,15 +94,13 @@ class HttpClient(object):
                                            self.auth_credentials['username'],
                                            self.auth_credentials['password']))
 
-    def set_proxy(self, proxy_string=None, proxy_type=PROXY_HTTP):
+    def set_proxy(self, proxy_string=None):
         """
         Set the proxy settings to use when making a connection.
 
         :param string proxy_string: Proxy address formatted like http://proxy.example.com:80. Set to :attr:`SYSTEM_PROXY` to use the system proxy; set to :attr:`NO_PROXY` to use no proxy.
-        :param string proxy_type: Either :attr:`PROXY_HTTP` or :attr:`PROXY_HTTPS`
         """
         self.proxy_string = proxy_string
-        self.proxy_type = proxy_type
 
     def set_use_https(self, bool_):
         """Indicate whether the HttpClient should use HTTP or HTTPs. The default is HTTP.
@@ -316,7 +313,7 @@ class HttpClient(object):
                 # Dont use any proxy, including the system-specified proxy
                 handler_list.append(urllib2.ProxyHandler({}))
             else:  # Use a specific proxy
-                handler_list.append(urllib2.ProxyHandler({self.proxy_type: self.proxy_string}))
+                handler_list.append(urllib2.ProxyHandler({self.PROXY_HTTP: self.proxy_string, self.PROXY_HTTPS: self.proxy_string}))
 
         opener = urllib2.build_opener(*handler_list)
         urllib2.install_opener(opener)
