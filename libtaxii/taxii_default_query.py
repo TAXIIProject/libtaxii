@@ -8,6 +8,7 @@
 Creating, handling, and parsing TAXII Default Queries.
 """
 
+import numbers
 import datetime
 from operator import attrgetter
 import os
@@ -689,6 +690,8 @@ class Test(TAXIIBase):
                 p.text = str(v).lower()
             elif isinstance(v, datetime.datetime):
                 p.text = v.isoformat()
+            elif isinstance(v, numbers.Number):
+                p.text = str(v)
             else:
                 p.text = v
 
