@@ -21,7 +21,7 @@ from .common import (parse, parse_datetime_string)
 RegexTuple = collections.namedtuple('_RegexTuple', ['regex', 'title'])
 # URI regex per http://tools.ietf.org/html/rfc3986
 uri_regex = RegexTuple("(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?", "URI Format")
-message_id_regex_10 = RegexTuple("[0-9]+", "Numbers only")
+message_id_regex_10 = RegexTuple("^[0-9]+$", "Numbers only")
 targeting_expression_regex = RegexTuple("^(@?\w+|\*{1,2})(/(@?\w+|\*{1,2}))*$", "Targeting Expression Syntax")
 
 _none_error = "%s is not allowed to be None and the provided value was None"
@@ -155,9 +155,8 @@ class SchemaValidator(object):
         turns it into an etree, then calls validate_etree( ... )
         """
 
-        f = open(file_location, 'r')
-        etree_xml = parse(f)
-        f.close()
+        with open(file_location, 'r') as f:
+            etree_xml = parse(f)
 
         return self.validate_etree(etree_xml)
 

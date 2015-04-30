@@ -1,3 +1,5 @@
+import os
+
 import libtaxii
 
 project = u'libtaxii'
@@ -10,6 +12,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.ifconfig',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
     'sphinxcontrib.napoleon',
 ]
 
@@ -21,32 +24,21 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-exclude_patterns = ['_build']
-pygments_style = 'sphinx'
+rst_prolog = """
+**Version**: {0}
+""".format(release)
 
-html_theme = 'default'
-html_style = '/default.css'
-html_static_path = ['_static']
-htmlhelp_basename = 'libtaxiidoc'
+exclude_patterns = [
+    '_build',
+]
 
-html_theme_options = {
-    'codebgcolor': '#EEE',
-    'footerbgcolor': '#FFF',
-    'footertextcolor': '#000',
-    'headbgcolor': '#CCC',
-    'headtextcolor': '#000',
-    'headlinkcolor': '#ED8603',
-    'linkcolor': '#666',
-    'relbarbgcolor': '#EDB603',
-    'relbarlinkcolor': '#000',
-    'relbartextcolor': '#FFF',
-    'sidebarbgcolor': '#EEE',
-    'sidebarlinkcolor': '#666',
-    'sidebartextcolor': '#000',
-    'visitedlinkcolor': '#666',
-}
-html_sidebars = {"**": ['localtoc.html', 'relations.html', 'sourcelink.html',
-                        'searchbox.html', 'links.html']}
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+else:
+    html_theme = 'default'
 
 latex_elements = {}
 latex_documents = [

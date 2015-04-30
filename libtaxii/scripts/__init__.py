@@ -259,10 +259,8 @@ class TaxiiScript(object):
         write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
         if write:
-            f = open(filename, 'w')
-            f.write(cb.content)
-            f.flush()
-            f.close()
+            with open(filename, 'w') as f:
+                f.write(cb.content)
 
         print "%s%s" % (message, filename)
 
@@ -301,10 +299,8 @@ class TaxiiScript(object):
             write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
             if write:
-                f = open(filename, 'w')
-                f.write(cb.content)
-                f.flush()
-                f.close()
+                with open(filename, 'w') as f:
+                    f.write(cb.content)
 
             print "%s%s" % (message, filename)
 

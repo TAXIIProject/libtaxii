@@ -1,45 +1,38 @@
+#!/usr/bin/env python
+# Copyright (c) 2015, The MITRE Corporation. All rights reserved.
+# For license information, see the LICENSE.txt file
 
-import unittest
-import os
 import glob
+import os
 import libtaxii.messages_11 as tm11
-import libtaxii.taxii_default_query as tdq
-# from libtaxii.validation import SchemaValidator
 
 
-class To_text_11_test(unittest.TestCase):
-    input_path = os.path.join('input', '1.1')
-    output_path = os.path.join('output', '1.1')
+input_path = os.path.join('input', '1.1')
+output_path = os.path.join('output', '1.1')
 
-    def test_to_text_11_test(self):
-        input_filenames = glob.glob(os.path.join(self.input_path, '*.xml'))
-        for input_filename in input_filenames:
-            input_file = open(input_filename, 'r')
-            input_text = input_file.read()
+def main():
+    input_fns = glob.glob(os.path.join(input_path, '*.xml'))
 
-            # parse the file to a TAXII message/object
-            msg_from_xml = tm11.get_message_from_xml(input_text)
+    for input_fn in input_fns:
+        with open(input_fn, 'r') as f:
+            text = f.read()
 
-            # serialize the object to XML and text
-            xml_from_msg = msg_from_xml.to_xml(True)
-            txt_from_msg = msg_from_xml.to_text()
+        # parse the file to a TAXII message/object
+        msg = tm11.get_message_from_xml(text)
 
-            # create the output files
-            basename = os.path.basename(input_filename)
-            name_no_ext = os.path.splitext(basename)[0]
+        # create the output files
+        basename = os.path.splitext(os.path.basename(input_fn))[0]
 
-            txt_output_filename = os.path.join(self.output_path, name_no_ext + ".txt")
-            xml_output_filename = os.path.join(self.output_path, name_no_ext + ".xml")
+        # write XML and text to files.
+        xml_out = os.path.join(output_path, basename + ".xml")
+        with open(xml_out, 'w') as f:
+            f.write(msg.to_xml(pretty_print=True))
 
-            txt_output_file = open(txt_output_filename, 'w')
-            xml_output_file = open(xml_output_filename, 'w')
+        txt_out = os.path.join(output_path, basename + ".txt")
+        with open(txt_out, 'w') as f:
+            f.write(msg.to_text())
+        raise
 
-            # write XML and text to files.
-            txt_output_file.write(txt_from_msg)
-            xml_output_file.write(xml_from_msg)
-
-            txt_output_file.close()
-            xml_output_file.close()
 
 if __name__ == '__main__':
-    unittest.main()
+    main()

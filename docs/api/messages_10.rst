@@ -266,7 +266,6 @@ Other Classes
 -------------
 
 .. autoclass:: TAXIIMessage
-.. autoclass:: BaseNonMessage
 
 .. autoclass:: ContentBlock
 

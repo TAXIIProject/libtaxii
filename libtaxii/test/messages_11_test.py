@@ -230,6 +230,20 @@ def round_trip_content_block(content_block):
     # print '***** All tests completed!'
 
 
+class GenericParametersTests(unittest.TestCase):
+
+    # https://github.com/TAXIIProject/libtaxii/issues/165
+    def test_typo_165(self):
+        # Explicitly set `response_type` to None.
+        sub_params = tm11.SubscriptionParameters(response_type=None)
+        params_xml = sub_params.to_xml()
+
+        # When parsing from XML, if no response_type is provided, it should be
+        # set to RT_FULL.
+        new_params = tm11.SubscriptionParameters.from_xml(params_xml)
+        self.assertEqual(tm11.RT_FULL, new_params.response_type)
+
+
 class StatusMessageTests(unittest.TestCase):
 
     def test_status_message_01(self):
