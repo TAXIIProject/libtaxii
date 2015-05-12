@@ -96,8 +96,10 @@ Default Query
 	##############################################################################
 	# query1 and query2 would be able to be used in TAXII requests that
 	# contain queries (e.g., PollRequest Messages)
-	query1 = tdq.DefaultQuery(CB_STIX_XML_11, criteria1)
-	query2 = tdq.DefaultQuery(CB_STIX_XML_11, criteria3)
+	query1 = tdq.DefaultQuery(targeting_expression_id=CB_STIX_XML_11, 
+				  criteria=criteria1)
+	query2 = tdq.DefaultQuery(targeting_expression_id=CB_STIX_XML_11, 
+				  criteria=criteria3)
 
 
 Default Query Info
