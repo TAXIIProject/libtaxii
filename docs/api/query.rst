@@ -117,32 +117,34 @@ Default Query Info
 
 .. code-block:: python
 	
-	import libtaxii as t
 	import libtaxii.taxii_default_query as tdq
 	from libtaxii.taxii_default_query import TargetingExpressionInfo
 	from libtaxii.constants import *
-	import datetime
-	from dateutil.tz import tzutc
-		
+	
+	##############################################################################
+	# *TargetingExpressionInfo* describes which expressions are available to 
+	# a consumer when submitting a query to a taxii service. A 
+	# `targetting_expression_id` indicates a suppoted targetting vocabulary  
+	# TargetingExpressionInfo also contains the permissible scope of queries.
+	
 	# This example has no preferred scope, and allows any scope
 	tei_01 = TargetingExpressionInfo(
-	    # Indicates a supported targeting vocabulary (in this case STIX 1.1)
-	    targeting_expression_id=CB_STIX_XML_10,
+	    targeting_expression_id=CB_STIX_XML_111,
 	    preferred_scope=[],
 	    allowed_scope=['**'])
 	
 	# This example prefers the Indicator scope and allows no other scope
 	tei_02 = TargetingExpressionInfo(
-	    # Indicates a supported targeting vocabulary (in this case STIX 1.1)
-	    targeting_expression_id=CB_STIX_XML_11,
-	    # At least one of Preferred/Allowed must be present. Indicates Preferred
-	    # and allowed search scope.
+	    targeting_expression_id=CB_STIX_XML_111,
 	    preferred_scope=['STIX_Package/Indicators/Indicator/**'],
 	    allowed_scope=[])
-	
-	# Required, 1-n. Indicates which capability modules can be used.
+
+
+	##############################################################################
+	# *DefaultQueryInfo* describes the TAXII Default Queries that are supported
+	# using a list of TargetExpressionInfo objects, and a list of capability 
+	# module identifiers.
 	tdqi1 = tdq.DefaultQueryInfo(
-	    # Required, 1-n. Indicates what targeting expressions are supported
 	    targeting_expression_infos=[tei_01, tei_02],
 	    capability_modules=[CM_CORE])
 
