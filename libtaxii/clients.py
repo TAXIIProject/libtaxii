@@ -15,7 +15,6 @@ import urllib2
 import base64
 import socket
 import ssl
-import libtaxii as t
 import warnings
 from libtaxii.constants import *
 
@@ -383,7 +382,7 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout=0):
-        return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
+        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
 
 
 class VerifiableHTTPSConnection(httplib.HTTPSConnection):

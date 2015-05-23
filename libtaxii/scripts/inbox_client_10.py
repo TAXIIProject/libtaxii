@@ -4,7 +4,6 @@
 
 from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_10 as tm10
-import libtaxii as t
 from libtaxii.constants import *
 from libtaxii.common import generate_message_id
 

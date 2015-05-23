@@ -4,7 +4,6 @@
 
 from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_11 as tm11
-import libtaxii as t
 from libtaxii.constants import *
 
 class InboxClient11Script(TaxiiScript):

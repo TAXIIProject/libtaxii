@@ -3,7 +3,6 @@
 # For license information, see the LICENSE.txt file
 
 from libtaxii.scripts import TaxiiScript, add_poll_response_args
-import libtaxii as t
 import libtaxii.messages_10 as tm10
 import dateutil.parser
 import datetime

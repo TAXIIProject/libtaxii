@@ -3,7 +3,6 @@
 # For license information, see the LICENSE.txt file
 
 from libtaxii.scripts import TaxiiScript
-import libtaxii as t
 import libtaxii.messages_10 as tm10
 from libtaxii.common import generate_message_id
 from libtaxii.constants import *
