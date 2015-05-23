@@ -11,7 +11,7 @@ from dateutil.tz import tzutc
 import libtaxii as t
 import libtaxii.clients as tc
 import libtaxii.messages as tm
-
+from libtaxii.constants import *
 
 # NOTE: This cannot currently be run as a unit test because it needs a server
 # to connect to.
@@ -39,7 +39,7 @@ def client_example():
     poll_request1 = tm.PollRequest(message_id=tm.generate_message_id(), feed_name='TheFeedToPoll')
 
     # Call without a proxy
-    http_response = client.call_taxii_service2('hostname', '/poll_service_path/', t.VID_TAXII_XML_10, poll_request1.to_xml())
+    http_response = client.call_taxii_service2('hostname', '/poll_service_path/', VID_TAXII_XML_10, poll_request1.to_xml())
 
     print http_response.__class__.__name__
 

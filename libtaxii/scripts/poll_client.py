@@ -10,7 +10,7 @@ import sys
 import dateutil.parser
 import datetime
 from libtaxii.common import gen_filename
-
+from libtaxii.constants import *
 
 class PollClient11Script(TaxiiScript):
     parser_description = 'The TAXII 1.1 Poll Client sends a Poll Request to a TAXII Poll Service then,' \

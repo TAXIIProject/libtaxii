@@ -10,10 +10,10 @@ import datetime
 import sys
 import os
 from libtaxii.common import gen_filename
-
+from libtaxii.constants import *
 
 class PollClient10Script(TaxiiScript):
-    taxii_version = t.VID_TAXII_XML_10
+    taxii_version = VID_TAXII_XML_10
     parser_description = 'The TAXII 1.0 Poll Client sends a Poll Request message to a TAXII Server and then' \
                          'prints the Poll Response message to standard out, saving the Content Blocks to disk (' \
                          'depending on the command line arguments).'

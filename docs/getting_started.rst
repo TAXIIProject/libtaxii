@@ -136,6 +136,7 @@ Example usage of clients:
     import libtaxii as t
     import libtaxii.clients as tc
     import libtaxii.messages_11 as tm11
+    from libtaxii.constants import *
 
     client = tc.HttpClient()
     client.set_auth_type(tc.HttpClient.AUTH_BASIC)
@@ -145,6 +146,6 @@ Example usage of clients:
     discovery_request = tm11.DiscoveryRequest(tm11.generate_message_id())
     discovery_xml = discovery_request.to_xml()
 
-    http_resp = client.call_taxii_service2('example.com', '/pollservice/', t.VID_TAXII_XML_11, discovery_xml)
+    http_resp = client.call_taxii_service2('example.com', '/pollservice/', VID_TAXII_XML_11, discovery_xml)
     taxii_message = t.get_message_from_http_response(http_resp, discovery_request.message_id)
     print taxii_message.to_xml()

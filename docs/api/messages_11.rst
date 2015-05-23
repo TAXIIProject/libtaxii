@@ -34,7 +34,7 @@ Status Message
     sm03 = tm11.StatusMessage(
             message_id='SM03',
             in_response_to=tm11.generate_message_id(),
-            status_type=tm11.ST_DESTINATION_COLLECTION_ERROR,
+            status_type=ST_DESTINATION_COLLECTION_ERROR,
             status_detail={'ACCEPTABLE_DESTINATION': ['Collection1','Collection2']})
 
 
@@ -68,11 +68,11 @@ Discovery Response
             in_response_to=discovery_request.message_id)
 
     service_instance = tm11.ServiceInstance(
-            service_type=tm11.SVC_POLL,
-            services_version=t.VID_TAXII_SERVICES_11,
-            protocol_binding=t.VID_TAXII_HTTP_10,
+            service_type=SVC_POLL,
+            services_version=VID_TAXII_SERVICES_11,
+            protocol_binding=VID_TAXII_HTTP_10,
             service_address='http://example.com/poll/',
-            message_bindings=[t.VID_TAXII_XML_11],
+            message_bindings=[VID_TAXII_XML_11],
             available=True,
             message='This is a message.',
             #supported_query=[tdq1],
@@ -120,40 +120,40 @@ Collection Information Response
 .. testcode::
 
     push_method1 = tm11.PushMethod(
-            push_protocol=t.VID_TAXII_HTTP_10,
-            push_message_bindings=[t.VID_TAXII_XML_11])
+            push_protocol=VID_TAXII_HTTP_10,
+            push_message_bindings=[VID_TAXII_XML_11])
 
     poll_service1 = tm11.PollingServiceInstance(
-            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_protocol=VID_TAXII_HTTPS_10,
             poll_address='https://example.com/PollService1',
-            poll_message_bindings=[t.VID_TAXII_XML_11])
+            poll_message_bindings=[VID_TAXII_XML_11])
 
     poll_service2 = tm11.PollingServiceInstance(
-            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_protocol=VID_TAXII_HTTPS_10,
             poll_address='https://example.com/PollService2',
-            poll_message_bindings=[t.VID_TAXII_XML_11])
+            poll_message_bindings=[VID_TAXII_XML_11])
 
     subs_method1 = tm11.SubscriptionMethod(
-            subscription_protocol=t.VID_TAXII_HTTPS_10,
+            subscription_protocol=VID_TAXII_HTTPS_10,
             subscription_address='https://example.com/SubscriptionService',
-            subscription_message_bindings=[t.VID_TAXII_XML_11])
+            subscription_message_bindings=[VID_TAXII_XML_11])
 
     inbox_service1 = tm11.ReceivingInboxService(
-            inbox_protocol=t.VID_TAXII_HTTPS_10,
+            inbox_protocol=VID_TAXII_HTTPS_10,
             inbox_address='https://example.com/InboxService',
-            inbox_message_bindings=[t.VID_TAXII_XML_11],
+            inbox_message_bindings=[VID_TAXII_XML_11],
             supported_contents=None)
 
     collection1 = tm11.CollectionInformation(
             collection_name='collection1',
             collection_description='This is a collection',
-            supported_contents=[tm11.ContentBinding(t.CB_STIX_XML_101)],
+            supported_contents=[tm11.ContentBinding(CB_STIX_XML_101)],
             available=False,
             push_methods=[push_method1],
             polling_service_instances=[poll_service1, poll_service2],
             subscription_methods=[subs_method1],
             collection_volume=4,
-            collection_type=tm11.CT_DATA_FEED,
+            collection_type=CT_DATA_FEED,
             receiving_inbox_services=[inbox_service1])
 
     collection_response1 = tm11.CollectionInformationResponse(
@@ -176,7 +176,7 @@ Manage Collection Subscription Request
 
     subs_req1 = tm11.ManageCollectionSubscriptionRequest(
             message_id='SubsReq01',
-            action=tm11.ACT_SUBSCRIBE,
+            action=ACT_SUBSCRIBE,
             collection_name='collection1',
             subscription_parameters=subscription_parameters1,
             push_parameters=push_parameters1)
@@ -198,13 +198,13 @@ Manage Collection Subscription Response
 
 
     poll_instance1 = tm11.PollInstance(
-            poll_protocol=t.VID_TAXII_HTTPS_10,
+            poll_protocol=VID_TAXII_HTTPS_10,
             poll_address='https://example.com/poll1/',
-            poll_message_bindings=[t.VID_TAXII_XML_11])
+            poll_message_bindings=[VID_TAXII_XML_11])
 
     subs1 = tm11.SubscriptionInstance(
             subscription_id='Subs001',
-            status=tm11.SS_ACTIVE,
+            status=SS_ACTIVE,
             subscription_parameters=subscription_parameters1,
             push_parameters=push_parameters1,
             poll_instances=[poll_instance1])
@@ -228,14 +228,14 @@ Poll Request
 .. testcode::
 
     delivery_parameters1 = tm11.DeliveryParameters(
-            inbox_protocol=t.VID_TAXII_HTTPS_10,
+            inbox_protocol=VID_TAXII_HTTPS_10,
             inbox_address='https://example.com/inboxAddress/',
-            delivery_message_binding=t.VID_TAXII_XML_11)
+            delivery_message_binding=VID_TAXII_XML_11)
 
     poll_params1 = tm11.PollParameters(
             allow_asynch=False,
-            response_type=tm11.RT_COUNT_ONLY,
-            content_bindings=[tm11.ContentBinding(binding_id=t.CB_STIX_XML_11)],
+            response_type=RT_COUNT_ONLY,
+            content_bindings=[tm11.ContentBinding(binding_id=CB_STIX_XML_11)],
             #query=query1,
             delivery_parameters=delivery_parameters1)
 
@@ -256,8 +256,8 @@ Poll Response
 
 .. testcode::
 
-    cb1 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
-    cb2 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
+    cb1 = tm11.ContentBlock(CB_STIX_XML_11, "")
+    cb2 = tm11.ContentBlock(CB_STIX_XML_11, "")
 
     count = tm11.RecordCount(record_count=22, partial_count=False)
 
@@ -286,8 +286,8 @@ Inbox Message
 
 .. testcode::
 
-    cb1 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
-    cb2 = tm11.ContentBlock(t.CB_STIX_XML_11, "")
+    cb1 = tm11.ContentBlock(CB_STIX_XML_11, "")
+    cb2 = tm11.ContentBlock(CB_STIX_XML_11, "")
 
     subs_info1 = tm11.SubscriptionInformation(
             collection_name='SomeCollectionName',
@@ -334,7 +334,7 @@ Other Classes
 .. testcode::
 
     cb001 = tm11.ContentBlock(
-            content_binding=tm11.ContentBinding(t.CB_STIX_XML_11),
+            content_binding=tm11.ContentBinding(CB_STIX_XML_11),
             content='<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>',
             timestamp_label=datetime.datetime.now(tzutc()),
             message='Hullo!',

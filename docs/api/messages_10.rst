@@ -13,6 +13,7 @@
         from dateutil.tz import tzutc
         import libtaxii as t
         import libtaxii.messages_10 as tm10
+	from libtaxii.constants import *
 
 .. testsetup::
 
@@ -20,7 +21,7 @@
     from dateutil.tz import tzutc
     import libtaxii as t
     import libtaxii.messages_10 as tm10
-
+    from libtaxii.constants import *
 
 Status Message
 --------------
@@ -34,7 +35,7 @@ Status Message
     status_message1 = tm10.StatusMessage(
             message_id=tm10.generate_message_id(),
             in_response_to="12345",
-            status_type=tm10.ST_SUCCESS,
+            status_type=ST_SUCCESS,
             status_detail='Machine-processable info here!',
             message='This is a message.')
 
@@ -69,12 +70,12 @@ Discovery Response
             in_response_to=discovery_request.message_id)
 
     service_instance = tm10.ServiceInstance(
-            service_type=tm10.SVC_INBOX,
-            services_version=t.VID_TAXII_SERVICES_10,
-            protocol_binding=t.VID_TAXII_HTTPS_10,
+            service_type=SVC_INBOX,
+            services_version=VID_TAXII_SERVICES_10,
+            protocol_binding=VID_TAXII_HTTPS_10,
             service_address='https://example.com/inbox/',
-            message_bindings=[t.VID_TAXII_XML_10],
-            inbox_service_accepted_content=[t.CB_STIX_XML_10],
+            message_bindings=[VID_TAXII_XML_10],
+            inbox_service_accepted_content=[CB_STIX_XML_10],
             available=True,
             message='This is a sample inbox service instance')
 
@@ -119,23 +120,23 @@ Feed Information Response
 .. testcode::
 
     push_method1 = tm10.PushMethod(
-            push_protocol=t.VID_TAXII_HTTP_10,
-            push_message_bindings=[t.VID_TAXII_XML_10])
+            push_protocol=VID_TAXII_HTTP_10,
+            push_message_bindings=[VID_TAXII_XML_10])
 
     polling_service1 = tm10.PollingServiceInstance(
-            poll_protocol=t.VID_TAXII_HTTP_10,
+            poll_protocol=VID_TAXII_HTTP_10,
             poll_address='http://example.com/PollService/',
-            poll_message_bindings=[t.VID_TAXII_XML_10])
+            poll_message_bindings=[VID_TAXII_XML_10])
 
     subscription_service1 = tm10.SubscriptionMethod(
-            subscription_protocol=t.VID_TAXII_HTTP_10,
+            subscription_protocol=VID_TAXII_HTTP_10,
             subscription_address='http://example.com/SubsService/',
-            subscription_message_bindings=[t.VID_TAXII_XML_10])
+            subscription_message_bindings=[VID_TAXII_XML_10])
 
     feed1 = tm10.FeedInformation(
             feed_name='Feed1',
             feed_description='Description of a feed',
-            supported_contents=[t.CB_STIX_XML_10],
+            supported_contents=[CB_STIX_XML_10],
             available=True,
             push_methods=[push_method1],
             polling_service_instances=[polling_service1],
@@ -157,15 +158,15 @@ Manage Feed Subscription Request
 .. testcode::
 
     delivery_parameters1 = tm10.DeliveryParameters(
-            inbox_protocol=t.VID_TAXII_HTTP_10,
+            inbox_protocol=VID_TAXII_HTTP_10,
             inbox_address='http://example.com/inbox',
-            delivery_message_binding=t.VID_TAXII_XML_10,
-            content_bindings=[t.CB_STIX_XML_10])
+            delivery_message_binding=VID_TAXII_XML_10,
+            content_bindings=[CB_STIX_XML_10])
 
     manage_feed_subscription_request1 = tm10.ManageFeedSubscriptionRequest(
             message_id=tm10.generate_message_id(),
             feed_name='SomeFeedName',
-            action=tm10.ACT_UNSUBSCRIBE,
+            action=ACT_UNSUBSCRIBE,
             subscription_id='SubsId056',
             delivery_parameters=delivery_parameters1)
 
@@ -182,9 +183,9 @@ Manage Feed Subscription Response
 .. testcode::
 
     poll_instance1 = tm10.PollInstance(
-            poll_protocol=t.VID_TAXII_HTTP_10,
+            poll_protocol=VID_TAXII_HTTP_10,
             poll_address='http://example.com/poll',
-            poll_message_bindings=[t.VID_TAXII_XML_10])
+            poll_message_bindings=[VID_TAXII_XML_10])
 
     subscription_instance1 = tm10.SubscriptionInstance(
             subscription_id='SubsId234',
@@ -214,7 +215,7 @@ Poll Request
             exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),
             inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),
             subscription_id='SubsId002',
-            content_bindings=[t.CB_STIX_XML_10])
+            content_bindings=[CB_STIX_XML_10])
 
 
 Poll Response
@@ -247,7 +248,7 @@ Inbox Message
 
 .. testcode::
 
-    cb1 = tm10.ContentBlock(t.CB_STIX_XML_11, "")
+    cb1 = tm10.ContentBlock(CB_STIX_XML_11, "")
 
     subscription_information1 = tm10.SubscriptionInformation(
             feed_name='SomeFeedName',
@@ -274,7 +275,7 @@ Other Classes
 .. testcode::
 
     cb1 = tm10.ContentBlock(
-            content_binding=t.CB_STIX_XML_10,
+            content_binding=CB_STIX_XML_10,
             content='<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')
 
 .. autoclass:: DeliveryParameters

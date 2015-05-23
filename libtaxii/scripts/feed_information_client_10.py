@@ -5,10 +5,10 @@
 import libtaxii as t
 import libtaxii.messages_10 as tm10
 from libtaxii.scripts import TaxiiScript
-
+from libtaxii.constants import *
 
 class FeedInformationClient10Script(TaxiiScript):
-    taxii_version = t.VID_TAXII_XML_10
+    taxii_version = VID_TAXII_XML_10
     parser_description = 'The TAXII 1.0 Feed Information Client sends a Feed Information Request message to a ' \
                          'TAXII Server and prints the Feed Information Response message to standard out.'
     path = '/services/feed-management/'
