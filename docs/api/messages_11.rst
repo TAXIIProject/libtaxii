@@ -13,6 +13,7 @@
         from dateutil.tz import tzutc
         import libtaxii as t
         import libtaxii.messages_11 as tm11
+	from libtaxii.constants import *
 
 .. testsetup::
 
@@ -20,7 +21,7 @@
     from dateutil.tz import tzutc
     import libtaxii as t
     import libtaxii.messages_11 as tm11
-
+    from libtaxii.constants import *
 
 Status Message
 --------------
