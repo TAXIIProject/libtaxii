@@ -196,7 +196,7 @@ class DefaultQueryInfo(tm11.SupportedQuery):
     def to_text(self, line_prepend=''):
         s = super(DefaultQueryInfo, self).to_text(line_prepend)
         for expression_info in self.targeting_expression_infos:
-            s += expression_info.to_text(line_prepend + tm11.STD_INDENT)
+            s += expression_info.to_text(line_prepend + STD_INDENT)
         for capability_module in self.capability_modules:
             s += line_prepend + "  Capability Module: %s\n" % capability_module
         return s
@@ -479,9 +479,9 @@ class Criteria(TAXIIBase):
         s = line_prepend + "=== Criteria ===\n"
         s += line_prepend + "  Operator: %s\n" % self.operator
         for criteria in self.criteria:
-            s += criteria.to_text(line_prepend + tm11.STD_INDENT)
+            s += criteria.to_text(line_prepend + STD_INDENT)
         for criterion in self.criterion:
-            s += criterion.to_text(line_prepend + tm11.STD_INDENT)
+            s += criterion.to_text(line_prepend + STD_INDENT)
 
         return s
 
@@ -592,7 +592,7 @@ class Criterion(TAXIIBase):
         s = line_prepend + "=== Criterion ===\n"
         s += line_prepend + "  Negate: %s\n" % (self.negate if (None != self.negate) else False)
         s += line_prepend + "  Target: %s\n" % self.target
-        s += self.test.to_text(line_prepend + tm11.STD_INDENT)
+        s += self.test.to_text(line_prepend + STD_INDENT)
 
         return s
 

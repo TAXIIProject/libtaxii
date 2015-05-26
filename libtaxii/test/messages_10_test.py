@@ -68,7 +68,7 @@ full_stix_etree = etree.parse(StringIO.StringIO(full_stix_doc)).getroot()
 stix_etree = etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')).getroot()
 
 xml_content_block1 = tm10.ContentBlock(
-    content_binding=t.CB_STIX_XML_10,  # Required
+    content_binding=CB_STIX_XML_10,  # Required
     content=full_stix_etree,  # Required. Can be etree or string
     padding='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',  # Optional
     timestamp_label=datetime.datetime.now(tzutc()))  # Optional
@@ -80,10 +80,10 @@ string_content_block1 = tm10.ContentBlock(
     timestamp_label=datetime.datetime.now(tzutc()))  # Optional
 
 delivery_parameters1 = tm10.DeliveryParameters(
-    inbox_protocol=t.VID_TAXII_HTTP_10,  # Required if requesting push messaging
+    inbox_protocol=VID_TAXII_HTTP_10,  # Required if requesting push messaging
     inbox_address='http://example.com/inbox',  # Yes, if requesting push messaging
-    delivery_message_binding=t.VID_TAXII_XML_10,  # Required if requesting push messaging
-    content_bindings=[t.CB_STIX_XML_10])  # Optional - absence means accept all content bindings
+    delivery_message_binding=VID_TAXII_XML_10,  # Required if requesting push messaging
+    content_bindings=[CB_STIX_XML_10])  # Optional - absence means accept all content bindings
 
 
 def round_trip_message(taxii_message):
@@ -184,12 +184,12 @@ class DiscoveryResponseTests(unittest.TestCase):
 
     def test_discovery_response(self):
         service_instance1 = tm10.ServiceInstance(
-            service_type=tm10.SVC_INBOX,  # Required
-            services_version=t.VID_TAXII_SERVICES_10,  # Required
-            protocol_binding=t.VID_TAXII_HTTP_10,  # Required
+            service_type=SVC_INBOX,  # Required
+            services_version=VID_TAXII_SERVICES_10,  # Required
+            protocol_binding=VID_TAXII_HTTP_10,  # Required
             service_address='http://example.com/inboxservice/',  # Required
-            message_bindings=[t.VID_TAXII_XML_10],  # Required, must have at least one value in the list
-            inbox_service_accepted_content=[t.CB_STIX_XML_10],  # Optional for service_type=SVC_INBOX, prohibited otherwise
+            message_bindings=[VID_TAXII_XML_10],  # Required, must have at least one value in the list
+            inbox_service_accepted_content=[CB_STIX_XML_10],  # Optional for service_type=SVC_INBOX, prohibited otherwise
                                                                 # If this is absent and service_type=SVC_INBOX,
                                                                 # It means the inbox service accepts all content
             available=True,  # Optional - defaults to None, which means 'Unknown'
@@ -208,11 +208,11 @@ class DiscoveryResponseTests(unittest.TestCase):
         #   DiscoveryResponse.ServiceInstance
 
         service_instance1 = tm10.DiscoveryResponse.ServiceInstance(
-            service_type=tm10.SVC_INBOX,
-            services_version=t.VID_TAXII_SERVICES_10,
-            protocol_binding=t.VID_TAXII_HTTP_10,
+            service_type=SVC_INBOX,
+            services_version=VID_TAXII_SERVICES_10,
+            protocol_binding=VID_TAXII_HTTP_10,
             service_address='http://example.com/inboxservice/',
-            message_bindings=[t.VID_TAXII_XML_10])
+            message_bindings=[VID_TAXII_XML_10])
 
         discovery_response1 = tm10.DiscoveryResponse(
             message_id=tm10.generate_message_id(),
@@ -235,23 +235,23 @@ class FeedInformationResponseTests(unittest.TestCase):
 
     def test_feed_information_response1(self):
         push_method1 = tm10.PushMethod(
-            push_protocol=t.VID_TAXII_HTTP_10,  # Required
-            push_message_bindings=[t.VID_TAXII_XML_10])  # Required
+            push_protocol=VID_TAXII_HTTP_10,  # Required
+            push_message_bindings=[VID_TAXII_XML_10])  # Required
 
         polling_service1 = tm10.PollingServiceInstance(
-            poll_protocol=t.VID_TAXII_HTTP_10,  # Required
+            poll_protocol=VID_TAXII_HTTP_10,  # Required
             poll_address='http://example.com/PollService/',  # Required
-            poll_message_bindings=[t.VID_TAXII_XML_10])  # Required
+            poll_message_bindings=[VID_TAXII_XML_10])  # Required
 
         subscription_service1 = tm10.SubscriptionMethod(
-            subscription_protocol=t.VID_TAXII_HTTP_10,  # Required
+            subscription_protocol=VID_TAXII_HTTP_10,  # Required
             subscription_address='http://example.com/SubsService/',  # Required
-            subscription_message_bindings=[t.VID_TAXII_XML_10])  # Required
+            subscription_message_bindings=[VID_TAXII_XML_10])  # Required
 
         feed1 = tm10.FeedInformation(
             feed_name='Feed1',  # Required
             feed_description='Description of a feed',  # Required
-            supported_contents=[t.CB_STIX_XML_10],  # Required. List of supported content binding IDs
+            supported_contents=[CB_STIX_XML_10],  # Required. List of supported content binding IDs
             available=True,  # Optional. Defaults to None (aka Unknown)
             push_methods=[push_method1],  # Required if there are no polling_services. Optional otherwise
             polling_service_instances=[polling_service1],  # Required if there are no push_methods. Optional otherwise.
@@ -272,23 +272,23 @@ class FeedInformationResponseTests(unittest.TestCase):
         #   FeedInformationResponse.FeedInformation.SubscriptionMethod
 
         push_method1 = tm10.FeedInformationResponse.FeedInformation.PushMethod(
-            push_protocol=t.VID_TAXII_HTTP_10,
-            push_message_bindings=[t.VID_TAXII_XML_10])
+            push_protocol=VID_TAXII_HTTP_10,
+            push_message_bindings=[VID_TAXII_XML_10])
 
         polling_service1 = tm10.FeedInformationResponse.FeedInformation.PollingServiceInstance(
-            poll_protocol=t.VID_TAXII_HTTP_10,
+            poll_protocol=VID_TAXII_HTTP_10,
             poll_address='http://example.com/PollService/',
-            poll_message_bindings=[t.VID_TAXII_XML_10])
+            poll_message_bindings=[VID_TAXII_XML_10])
 
         subscription_service1 = tm10.FeedInformationResponse.FeedInformation.SubscriptionMethod(
-            subscription_protocol=t.VID_TAXII_HTTP_10,
+            subscription_protocol=VID_TAXII_HTTP_10,
             subscription_address='http://example.com/SubsService/',
-            subscription_message_bindings=[t.VID_TAXII_XML_10])
+            subscription_message_bindings=[VID_TAXII_XML_10])
 
         feed1 = tm10.FeedInformationResponse.FeedInformation(
             feed_name='Feed1',
             feed_description='Description of a feed',
-            supported_contents=[t.CB_STIX_XML_10],
+            supported_contents=[CB_STIX_XML_10],
             push_methods=[push_method1],
             polling_service_instances=[polling_service1],
             subscription_methods=[subscription_service1])
@@ -310,7 +310,7 @@ class PollResponseTests(unittest.TestCase):
             subscription_id='SubsId002',  # Optional
             exclusive_begin_timestamp_label=datetime.datetime.now(tzutc()),  # Optional - Absence means 'no lower bound'
             inclusive_end_timestamp_label=datetime.datetime.now(tzutc()),  # Optional - Absence means 'no upper bound'
-            content_bindings=[t.CB_STIX_XML_10])  # Optional - defaults to accepting all content bindings
+            content_bindings=[CB_STIX_XML_10])  # Optional - defaults to accepting all content bindings
 
         round_trip_message(poll_request1)
 
@@ -350,7 +350,7 @@ class StatusMessageTests(unittest.TestCase):
         status_message1 = tm10.StatusMessage(
             message_id=tm10.generate_message_id(),  # Required
             in_response_to=tm10.generate_message_id(),  # Required. Should be the ID of the corresponding request
-            status_type=tm10.ST_SUCCESS,  # Required
+            status_type=ST_SUCCESS,  # Required
             status_detail='Machine-processable info here!',  # May be optional or not allowed, depending on status_type
             message='This is a message.')  # Optional
 
@@ -461,7 +461,7 @@ class ManageFeedSubscriptionRequestTests(unittest.TestCase):
         manage_feed_subscription_request1 = tm10.ManageFeedSubscriptionRequest(
             message_id=tm10.generate_message_id(),  # Required
             feed_name='SomeFeedName',   # Required
-            action=tm10.ACT_UNSUBSCRIBE,  # Required
+            action=ACT_UNSUBSCRIBE,  # Required
             subscription_id='SubsId056',  # Required for unsubscribe, prohibited otherwise
             delivery_parameters=delivery_parameters1)  # Required
 
@@ -472,9 +472,9 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
 
     def test_manage_feed_subscription_response(self):
         poll_instance1 = tm10.PollInstance(
-            poll_protocol=t.VID_TAXII_HTTP_10,  # Required
+            poll_protocol=VID_TAXII_HTTP_10,  # Required
             poll_address='http://example.com/poll',  # Required
-            poll_message_bindings=[t.VID_TAXII_XML_10])  # Required
+            poll_message_bindings=[VID_TAXII_XML_10])  # Required
 
         subscription_instance1 = tm10.SubscriptionInstance(
             subscription_id='SubsId234',  # required
@@ -496,9 +496,9 @@ class ManageFeedSubscriptionResponseTests(unittest.TestCase):
         #   ManageFeedSubscriptionResponse.SubscriptionInstance
 
         poll = tm10.ManageFeedSubscriptionResponse.PollInstance(
-            poll_protocol=t.VID_TAXII_HTTP_10,
+            poll_protocol=VID_TAXII_HTTP_10,
             poll_address='http://example.com/poll',
-            poll_message_bindings=[t.VID_TAXII_XML_10])
+            poll_message_bindings=[VID_TAXII_XML_10])
 
         subscription = tm10.ManageFeedSubscriptionResponse.SubscriptionInstance(
             subscription_id='SubsId234',
@@ -540,27 +540,27 @@ class SubscriptionInformationTests(unittest.TestCase):
 class ContentBlockTests(unittest.TestCase):
 
     def test_content_block1(self):
-        cb1 = tm10.ContentBlock(content_binding=t.CB_STIX_XML_10,
+        cb1 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
                                 content='<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')
         round_trip_content_block(cb1)
 
     def test_content_block2(self):
-        cb2 = tm10.ContentBlock(content_binding=t.CB_STIX_XML_10,
+        cb2 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
                                 content=StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
     def test_content_block3(self):
-        cb3 = tm10.ContentBlock(content_binding=t.CB_STIX_XML_10,
+        cb3 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
                                 content=etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
         round_trip_content_block(cb3)
 
     def test_content_block4(self):
-        cb4 = tm10.ContentBlock(content_binding=t.CB_STIX_XML_10,
+        cb4 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
                                 content='<Something thats not XML')
         round_trip_content_block(cb4)
 
     def test_content_block5(self):
-        cb5 = tm10.ContentBlock(content_binding=t.CB_STIX_XML_10,
+        cb5 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
                                 content='Something thats not XML <xml/>')
         round_trip_content_block(cb5)
 

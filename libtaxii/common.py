@@ -8,7 +8,7 @@ from StringIO import StringIO
 from re import sub as resub
 import dateutil.parser
 import random
-from libtaxii.constants import VID_TAXII_SERVICES_10, VID_TAXII_SERVICES_11
+from libtaxii.constants import *
 from lxml import etree
 from uuid import uuid4
 import sys

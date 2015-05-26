@@ -15,8 +15,8 @@ import urllib2
 import base64
 import socket
 import ssl
-import libtaxii as t
 import warnings
+from libtaxii.constants import *
 
 
 class HttpClient(object):
@@ -165,7 +165,7 @@ class HttpClient(object):
             raise Exception('AuthType AUTH_CERT_BASIC not supported by call_taxii_service. Use call_taxii_service2.')
 
         if self.use_https:
-            header_dict['X-TAXII-Protocol'] = t.VID_TAXII_HTTPS_10
+            header_dict['X-TAXII-Protocol'] = VID_TAXII_HTTPS_10
             if self.auth_type == HttpClient.AUTH_NONE:
                 conn = httplib.HTTPSConnection(host, port)
             elif self.auth_type == HttpClient.AUTH_BASIC:
@@ -176,7 +176,7 @@ class HttpClient(object):
                 cert_file = self.auth_credentials['cert_file']
                 conn = httplib.HTTPSConnection(host, port, key_file, cert_file)
         else:  # Not using https
-            header_dict['X-TAXII-Protocol'] = t.VID_TAXII_HTTP_10
+            header_dict['X-TAXII-Protocol'] = VID_TAXII_HTTP_10
             if self.auth_type == HttpClient.AUTH_NONE:
                 conn = httplib.HTTPConnection(host, port)
             # TODO: Consider deleting because this is a terrible idea
@@ -215,9 +215,9 @@ class HttpClient(object):
         header_dict['User-Agent'] = 'libtaxii.httpclient'
         header_dict[HttpClient.HEADER_X_TAXII_CONTENT_TYPE] = message_binding
 
-        content_type_map = {t.VID_TAXII_XML_10: 'application/xml',
-                            t.VID_TAXII_XML_11: 'application/xml',
-                            t.VID_CERT_EU_JSON_10: 'application/json'}
+        content_type_map = {VID_TAXII_XML_10: 'application/xml',
+                            VID_TAXII_XML_11: 'application/xml',
+                            VID_CERT_EU_JSON_10: 'application/json'}
 
         if content_type is not None:  # Set the content type to the user-provided value
             header_dict[HttpClient.HEADER_CONTENT_TYPE] = content_type
@@ -257,9 +257,9 @@ class HttpClient(object):
 
         # If the X-TAXII-Services header is not set by the user,
         # Attempt to use the library's default mapping
-        services_map = {t.VID_TAXII_XML_10: t.VID_TAXII_SERVICES_10,
-                        t.VID_TAXII_XML_11: t.VID_TAXII_SERVICES_11,
-                        t.VID_CERT_EU_JSON_10: t.VID_TAXII_SERVICES_10}
+        services_map = {VID_TAXII_XML_10: VID_TAXII_SERVICES_10,
+                        VID_TAXII_XML_11: VID_TAXII_SERVICES_11,
+                        VID_CERT_EU_JSON_10: VID_TAXII_SERVICES_10}
         if header_dict.get(HttpClient.HEADER_X_TAXII_SERVICES) is None:  # The X-TAXII-Services header was not set by the user
             if message_binding not in services_map:
                 raise ValueError('x-taxii-services header not specified, and the message_binding is unrecognized')
@@ -268,7 +268,7 @@ class HttpClient(object):
         handler_list = []
 
         if self.use_https:
-            header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = t.VID_TAXII_HTTPS_10
+            header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = VID_TAXII_HTTPS_10
 
             if (self.auth_type == HttpClient.AUTH_CERT or
                     self.auth_type == HttpClient.AUTH_CERT_BASIC):
@@ -291,7 +291,7 @@ class HttpClient(object):
                                                      ca_certs=ca_file))
 
         else:  # Not using https
-            header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = t.VID_TAXII_HTTP_10
+            header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = VID_TAXII_HTTP_10
 
             if self.auth_type == HttpClient.AUTH_NONE:
                 handler_list.append(urllib2.HTTPHandler())
@@ -382,7 +382,7 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout=0):
-        return httplib.HTTPConnection(host, key_file=self.key, cert_file=self.cert)
+        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
 
 
 class VerifiableHTTPSConnection(httplib.HTTPSConnection):

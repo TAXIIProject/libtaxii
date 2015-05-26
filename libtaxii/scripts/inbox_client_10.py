@@ -4,7 +4,6 @@
 
 from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_10 as tm10
-import libtaxii as t
 from libtaxii.constants import *
 from libtaxii.common import generate_message_id
 
@@ -81,8 +80,8 @@ class InboxClient10Script(TaxiiScript):
         parser = super(InboxClient10Script, self).get_arg_parser(*args, **kwargs)
         parser.add_argument("--content-binding",
                             dest="content_binding",
-                            default=t.CB_STIX_XML_111,
-                            help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_111)
+                            default=CB_STIX_XML_111,
+                            help="Content binding of the Content Block to send. Defaults to %s" % CB_STIX_XML_111)
         parser.add_argument("--subtype",
                             dest="subtype",
                             default=None,

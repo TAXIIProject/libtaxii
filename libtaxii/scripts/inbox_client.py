@@ -4,8 +4,7 @@
 
 from libtaxii.scripts import TaxiiScript
 import libtaxii.messages_11 as tm11
-import libtaxii as t
-
+from libtaxii.constants import *
 
 class InboxClient11Script(TaxiiScript):
     parser_description = 'The TAXII 1.1 Inbox Client sends an Inbox Message to a TAXII Server and prints the ' \
@@ -77,8 +76,8 @@ class InboxClient11Script(TaxiiScript):
         parser = super(InboxClient11Script, self).get_arg_parser(*args, **kwargs)
         parser.add_argument("--content-binding",
                             dest="content_binding",
-                            default=t.CB_STIX_XML_111,
-                            help="Content binding of the Content Block to send. Defaults to %s" % t.CB_STIX_XML_111)
+                            default=CB_STIX_XML_111,
+                            help="Content binding of the Content Block to send. Defaults to %s" % CB_STIX_XML_111)
         parser.add_argument("--subtype",
                             dest="subtype",
                             default=None,

@@ -87,7 +87,7 @@ class QueryClient11Script(PollClient11Script):
                         parameters=params)
 
         criterion = tdq.Criterion(target=args.target, test=test)
-        criteria = tdq.Criteria(operator=tdq.OP_AND, criterion=[criterion])
+        criteria = tdq.Criteria(operator=OP_AND, criterion=[criterion])
         q = tdq.DefaultQuery(args.tev, criteria)
         msg.poll_parameters.query = q
 

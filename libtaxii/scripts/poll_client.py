@@ -4,13 +4,12 @@
 
 from libtaxii.scripts import TaxiiScript, add_poll_response_args
 import libtaxii.messages_11 as tm11
-import libtaxii as t
 import os
 import sys
 import dateutil.parser
 import datetime
 from libtaxii.common import gen_filename
-
+from libtaxii.constants import *
 
 class PollClient11Script(TaxiiScript):
     parser_description = 'The TAXII 1.1 Poll Client sends a Poll Request to a TAXII Poll Service then,' \
@@ -78,7 +77,7 @@ class PollClient11Script(TaxiiScript):
     def handle_response(self, response, args):
         super(PollClient11Script, self).handle_response(response, args)
 
-        if response.message_type == tm11.MSG_POLL_RESPONSE:
+        if response.message_type == MSG_POLL_RESPONSE:
             if response.more:
                 print "This response has More=True, to request additional parts, use the following command:"
                 print "  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
