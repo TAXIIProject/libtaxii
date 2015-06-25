@@ -270,16 +270,12 @@ class TAXIIBase(object):
             return False
 
         # Get all member properties that start with '_'
-        members = [attr for attr in dir(self) if not callable(attr) and attr.startswith('_') and not attr.startswith('__')]
+        members = [attr for attr in vars(self) if attr.startswith('_') and not attr.startswith('__')]
         for member in members:
-            # TODO: The attr for attr... statement includes functions for some strange reason...
-            if member not in self.__dict__:
-                continue
-
             if debug:
                 print 'member name: %s' % member
-            self_value = self.__dict__[member]
-            other_value = other.__dict__[member]
+            self_value = getattr(self, member)
+            other_value = getattr(other, member)
 
             if isinstance(self_value, TAXIIBase):
                 # A debuggable equals comparison can be made
