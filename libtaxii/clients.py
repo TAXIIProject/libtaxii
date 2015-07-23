@@ -9,8 +9,6 @@
 TAXII Clients
 """
 
-
-import six.moves.http_client
 import base64
 import socket
 import ssl

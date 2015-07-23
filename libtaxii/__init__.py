@@ -9,8 +9,7 @@
 The main libtaxii module
 """
 
-
-import six.moves.http_client
+import six
 from six.moves import urllib
 
 import libtaxii.messages_10 as tm10
@@ -19,7 +18,7 @@ import libtaxii.clients as tc
 from .constants import *
 
 from .version import __version__  # noqa
-import six
+
 
 def get_message_from_http_response(http_response, in_response_to):
     """Create a TAXII message from an HTTPResponse object.

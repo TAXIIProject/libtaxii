@@ -14,7 +14,7 @@ from lxml import etree
 from uuid import uuid4
 import sys
 import six
-from six.moves import zip
+
 try:
     import simplejson as json
 except ImportError:
@@ -320,7 +320,7 @@ class TAXIIBase(object):
                         # All TAXIIBase objects have the 'sort_key' property implemented
                         self_value = sorted(self_value, key=attrgetter('sort_key'))
                         other_value = sorted(other_value, key=attrgetter('sort_key'))
-                        for self_item, other_item in zip(self_value, other_value):
+                        for self_item, other_item in six.moves.zip(self_value, other_value):
                             # Compare the ordered lists element by element
                             eq = self_item.__eq__(other_item, debug)
                     else:
