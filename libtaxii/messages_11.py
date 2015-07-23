@@ -19,7 +19,6 @@ try:
 except ImportError:
     import json
 import os
-import io
 import warnings
 
 from lxml import etree
@@ -50,7 +49,7 @@ def validate_xml(xml_string):
                   category=DeprecationWarning)
 
     if isinstance(xml_string, six.string_types):
-        f = io.StringIO(xml_string)
+        f = six.BytesIO(xml_string)
     else:
         f = xml_string
 
@@ -82,7 +81,7 @@ def get_message_from_xml(xml_string):
             new_message = tm11.get_message_from_xml(message_xml)
     """
     if isinstance(xml_string, six.string_types):
-        f = io.StringIO(xml_string)
+        f = six.BytesIO(xml_string)
     else:
         f = xml_string
 
@@ -748,7 +747,7 @@ class ContentBlock(TAXIIBase11):
                 return content.read(), False
         else:  # The Content is not file-like
             try:  # Attempt to parse string as XML
-                sio_content = io.StringIO(content)
+                sio_content = six.StringIO(content)
                 xml = parse(sio_content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string

@@ -1121,7 +1121,7 @@ class ContentBlockTests(unittest.TestCase):
 
     def test_content_block02(self):
         cb2 = tm11.ContentBlock(content_binding=tm11.ContentBinding(CB_STIX_XML_10),
-                                content=StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
+                                content=six.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
     def test_content_block03(self):

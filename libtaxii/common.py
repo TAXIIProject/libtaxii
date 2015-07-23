@@ -6,7 +6,6 @@ Common utility classes and functions used throughout libtaxii.
 
 
 from operator import attrgetter
-from io import StringIO
 from re import sub as resub
 import dateutil.parser
 import random
@@ -233,7 +232,7 @@ class TAXIIBase(object):
         Subclasses should not need to implement this method.
         """
         if isinstance(xml, six.string_types):
-            xmlstr = StringIO(xml)
+            xmlstr = six.BytesIO(xml)
         else:
             xmlstr = xml
 
