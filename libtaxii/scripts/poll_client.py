@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 #!/usr/bin/env python
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
@@ -57,9 +59,9 @@ class PollClient11Script(TaxiiScript):
             else:
                 end_ts = None
         except ValueError:
-            print "Unable to parse timestamp value. Timestamp should include both date and time " \
+            print("Unable to parse timestamp value. Timestamp should include both date and time " \
                   "information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). " \
-                  "Aborting poll."
+                  "Aborting poll.")
             sys.exit()
 
         create_kwargs = {'message_id': tm11.generate_message_id(),
@@ -79,9 +81,9 @@ class PollClient11Script(TaxiiScript):
 
         if response.message_type == MSG_POLL_RESPONSE:
             if response.more:
-                print "This response has More=True, to request additional parts, use the following command:"
-                print "  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
-                    (response.collection_name, response.result_id, response.result_part_number + 1)
+                print("This response has More=True, to request additional parts, use the following command:")
+                print("  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
+                    (response.collection_name, response.result_id, response.result_part_number + 1))
 
             self.write_cbs_from_poll_response_11(response, dest_dir=args.dest_dir, write_type_=args.write_type)
 

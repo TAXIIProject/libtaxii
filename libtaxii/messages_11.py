@@ -10,8 +10,10 @@
 """
 Creating, handling, and parsing TAXII 1.1 messages.
 """
+from __future__ import absolute_import
 
 import collections
+import six
 try:
     import simplejson as json
 except ImportError:
@@ -47,7 +49,7 @@ def validate_xml(xml_string):
     warnings.warn('Call to deprecated function: libtaxii.messages_11.validate_xml()',
                   category=DeprecationWarning)
 
-    if isinstance(xml_string, basestring):
+    if isinstance(xml_string, six.string_types):
         f = StringIO.StringIO(xml_string)
     else:
         f = xml_string
@@ -79,7 +81,7 @@ def get_message_from_xml(xml_string):
             message_xml = message.to_xml()
             new_message = tm11.get_message_from_xml(message_xml)
     """
-    if isinstance(xml_string, basestring):
+    if isinstance(xml_string, six.string_types):
         f = StringIO.StringIO(xml_string)
     else:
         f = xml_string
@@ -186,7 +188,7 @@ def _sanitize_content_binding(binding):
     """
     if isinstance(binding, ContentBinding):  # It's already good to go
         return binding
-    elif isinstance(binding, basestring):  # Convert it to a ContentBinding
+    elif isinstance(binding, six.string_types):  # Convert it to a ContentBinding
         return ContentBinding.from_string(binding)
     else:  # Don't know what to do with it.
         raise ValueError('Type cannot be converted to ContentBinding: %s' % binding.__class__.__name__)
@@ -750,7 +752,7 @@ class ContentBlock(TAXIIBase11):
                 xml = parse(sio_content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
-                if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
+                if isinstance(content, six.string_types):  # It's a string of some kind, unicode or otherwise
                     return content, False
                 else:  # It's some other datatype that needs casting to string
                     return str(content), False
@@ -761,7 +763,7 @@ class ContentBlock(TAXIIBase11):
 
     @message.setter
     def message(self, value):
-        do_check(value, 'message', type=basestring, can_be_none=True)
+        do_check(value, 'message', type=six.string_types, can_be_none=True)
         self._message = value
 
     def to_etree(self):
@@ -1035,7 +1037,7 @@ class TAXIIMessage(TAXIIBase11):
 
     @extended_headers.setter
     def extended_headers(self, value):
-        do_check(value.keys(), 'extended_headers.keys()', regex_tuple=uri_regex)
+        do_check(list(value.keys()), 'extended_headers.keys()', regex_tuple=uri_regex)
         self._extended_headers = value
 
     def to_etree(self):
@@ -1054,7 +1056,7 @@ class TAXIIMessage(TAXIIBase11):
         if len(self.extended_headers) > 0:
             eh = etree.SubElement(root_elt, '{%s}Extended_Headers' % ns_map['taxii_11'], nsmap=ns_map)
 
-            for name, value in self.extended_headers.items():
+            for name, value in list(self.extended_headers.items()):
                 h = etree.SubElement(eh, '{%s}Extended_Header' % ns_map['taxii_11'], nsmap=ns_map)
                 h.attrib['name'] = name
                 append_any_content_etree(h, value)
@@ -1074,10 +1076,10 @@ class TAXIIMessage(TAXIIBase11):
         if self.in_response_to is not None:
             d['in_response_to'] = self.in_response_to
         d['extended_headers'] = {}
-        for k, v in self.extended_headers.iteritems():
+        for k, v in six.iteritems(self.extended_headers):
             if isinstance(v, etree._Element) or isinstance(v, etree._ElementTree):
                 v = etree.tostring(v)
-            elif not isinstance(v, basestring):
+            elif not isinstance(v, six.string_types):
                 v = str(v)
             d['extended_headers'][k] = v
 
@@ -1089,7 +1091,7 @@ class TAXIIMessage(TAXIIBase11):
         if self.in_response_to:
             s += "; In Response To: %s" % self.in_response_to
         s += "\n"
-        for k, v in self.extended_headers.iteritems():
+        for k, v in six.iteritems(self.extended_headers):
             s += line_prepend + "Extended Header: %s = %s\n" % (k, v)
 
         return s
@@ -1148,7 +1150,7 @@ class TAXIIMessage(TAXIIBase11):
             raise ValueError('%s != %s' % (message_type, cls.message_type))
         message_id = d['message_id']
         extended_headers = {}
-        for k, v in d['extended_headers'].iteritems():
+        for k, v in six.iteritems(d['extended_headers']):
             try:
                 v = parse(v)
             except etree.XMLSyntaxError:
@@ -2205,7 +2207,7 @@ class ReceivingInboxService(TAXIIBase11):
 
     @inbox_protocol.setter
     def inbox_protocol(self, value):
-        do_check(value, 'inbox_protocol', type=basestring, regex_tuple=uri_regex)
+        do_check(value, 'inbox_protocol', type=six.string_types, regex_tuple=uri_regex)
         self._inbox_protocol = value
 
     @property
@@ -2969,10 +2971,10 @@ class StatusMessage(TAXIIMessage):
 
     @status_detail.setter
     def status_detail(self, value):
-        do_check(value.keys(), 'status_detail.keys()', regex_tuple=uri_regex)
+        do_check(list(value.keys()), 'status_detail.keys()', regex_tuple=uri_regex)
         detail_rules = status_details.get(self.status_type, {})
         # Check defined status types for conformance
-        for sd_name, rules in detail_rules.iteritems():
+        for sd_name, rules in six.iteritems(detail_rules):
             do_check(value.get(sd_name, None),
                      'status_detail[\'%s\']' % sd_name,
                      type=rules.type,
@@ -2986,7 +2988,7 @@ class StatusMessage(TAXIIMessage):
 
     @message.setter
     def message(self, value):
-        do_check(value, 'message', type=basestring, can_be_none=True)
+        do_check(value, 'message', type=six.string_types, can_be_none=True)
         self._message = value
 
     def to_etree(self):
@@ -2995,7 +2997,7 @@ class StatusMessage(TAXIIMessage):
 
         if len(self.status_detail) > 0:
             sd = etree.SubElement(xml, '{%s}Status_Detail' % ns_map['taxii_11'])
-            for k, v in self.status_detail.iteritems():
+            for k, v in six.iteritems(self.status_detail):
                 if not isinstance(v, list):
                     v = [v]
                 for item in v:
@@ -3024,7 +3026,7 @@ class StatusMessage(TAXIIMessage):
     def to_text(self, line_prepend=''):
         s = super(StatusMessage, self).to_text(line_prepend)
         s += line_prepend + "Status Type: %s\n" % self.status_type
-        for k, v in self.status_detail.iteritems():
+        for k, v in six.iteritems(self.status_detail):
             s += line_prepend + "Status Detail: %s = %s\n" % (k, v)
         if self.message:
             s += line_prepend + "Message: %s\n" % self.message
@@ -4085,4 +4087,4 @@ CT_TYPES = CT_TYPES_11
 SVC_TYPES = SVC_TYPES_11
 SD_TYPES = SD_TYPES_11
 
-from common import (generate_message_id)
+from .common import (generate_message_id)

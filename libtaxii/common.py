@@ -2,6 +2,8 @@
 Common utility classes and functions used throughout libtaxii.
 
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 from operator import attrgetter
 from StringIO import StringIO
@@ -12,6 +14,8 @@ from libtaxii.constants import *
 from lxml import etree
 from uuid import uuid4
 import sys
+import six
+from six.moves import zip
 
 _XML_PARSER = None
 
@@ -124,7 +128,7 @@ def append_any_content_etree(etree_elt, content):
         etree_elt.append(content)
         return etree_elt
 
-    if not isinstance(content, basestring):  # If content is a non-string, cast it to string and set etree_elt.text
+    if not isinstance(content, six.string_types):  # If content is a non-string, cast it to string and set etree_elt.text
         etree_elt.text = str(content)
         return etree_elt
 
@@ -228,7 +232,7 @@ class TAXIIBase(object):
 
         Subclasses should not need to implement this method.
         """
-        if isinstance(xml, basestring):
+        if isinstance(xml, six.string_types):
             xmlstr = StringIO(xml)
         else:
             xmlstr = xml
@@ -261,19 +265,19 @@ class TAXIIBase(object):
         """
         if other is None:
             if debug:
-                print 'other was None!'
+                print('other was None!')
             return False
 
         if self.__class__.__name__ != other.__class__.__name__:
             if debug:
-                print 'class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__)
+                print('class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__))
             return False
 
         # Get all member properties that start with '_'
         members = [attr for attr in vars(self) if attr.startswith('_') and not attr.startswith('__')]
         for member in members:
             if debug:
-                print 'member name: %s' % member
+                print('member name: %s' % member)
             self_value = getattr(self, member)
             other_value = getattr(other, member)
 
@@ -309,12 +313,12 @@ class TAXIIBase(object):
                 # Dictionary to compare
                 if len(set(self_value.keys()) - set(other_value.keys())) != 0:
                     if debug:
-                        print 'dict keys not equal: %s != %s' % (self_value, other_value)
+                        print('dict keys not equal: %s != %s' % (self_value, other_value))
                     eq = False
-                for k, v in self_value.iteritems():
+                for k, v in six.iteritems(self_value):
                     if other_value[k] != v:
                         if debug:
-                            print 'dict values not equal: %s != %s' % (v, other_value[k])
+                            print('dict values not equal: %s != %s' % (v, other_value[k]))
                         eq = False
                 eq = True
             elif isinstance(self_value, etree._Element):
@@ -327,7 +331,7 @@ class TAXIIBase(object):
             # TODO: is this duplicate?
             if not eq:
                 if debug:
-                    print '%s was not equal: %s != %s' % (member, self_value, other_value)
+                    print('%s was not equal: %s != %s' % (member, self_value, other_value))
                 return False
 
         return True

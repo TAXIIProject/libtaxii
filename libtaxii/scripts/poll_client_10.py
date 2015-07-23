@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 #!/usr/bin/env python
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
@@ -57,8 +59,8 @@ class PollClient10Script(TaxiiScript):
             else:
                 end_ts = None
         except ValueError:
-            print "Unable to parse timestamp value. Timestamp should include both date and time information along " \
-                  "with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll."
+            print("Unable to parse timestamp value. Timestamp should include both date and time information along " \
+                  "with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll.")
             sys.exit()
 
         poll_req = tm10.PollRequest(message_id=tm10.generate_message_id(),

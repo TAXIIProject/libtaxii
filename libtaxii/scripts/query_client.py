@@ -1,10 +1,11 @@
+from __future__ import absolute_import
 #!/usr/bin/env python
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
 import libtaxii.taxii_default_query as tdq
 from libtaxii.constants import *
-from poll_client import PollClient11Script
+from .poll_client import PollClient11Script
 
 
 class QueryClient11Script(PollClient11Script):

@@ -8,5 +8,6 @@ was added (in messages_11.py), the contents of this file were moved to
 messages_10.py. This file allows existing code (referring to libtaxii.messages)
 to continue working as before.
 """
+from __future__ import absolute_import
 
 from libtaxii.messages_10 import *

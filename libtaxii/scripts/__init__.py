@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
@@ -12,6 +14,7 @@ from urlparse import urlparse
 import libtaxii as t
 from libtaxii.common import gen_filename
 from libtaxii.constants import *
+from six.moves import input
 
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
@@ -164,11 +167,11 @@ class TaxiiScript(object):
         """
         Default response handler. Just prints the response
         """
-        print "Response:\n"
+        print("Response:\n")
         if args.xml_output is False:
-            print response.to_text()
+            print(response.to_text())
         else:
-            print response.to_xml(pretty_print=True)
+            print(response.to_xml(pretty_print=True))
 
     def create_client(self, use_https, proxy, cert=None, key=None, username=None, password=None):
         client = tc.HttpClient()
@@ -205,7 +208,7 @@ class TaxiiScript(object):
         elif file_exists and write_type_ == W_PROMPT:
             var = None
             while var not in ('y', 'n'):
-                var = raw_input("Overwrite file (%s)? (y/n): " % filename)
+                var = input("Overwrite file (%s)? (y/n): " % filename)
             if var == 'y':
                 write = True
                 message = MSG_FILE_OVERWRITTEN
@@ -262,7 +265,7 @@ class TaxiiScript(object):
             with open(filename, 'w') as f:
                 f.write(cb.content)
 
-        print "%s%s" % (message, filename)
+        print("%s%s" % (message, filename))
 
     def write_cbs_from_poll_response_11(self, poll_response, dest_dir, write_type_=W_CLOBBER):
         """
@@ -302,7 +305,7 @@ class TaxiiScript(object):
                 with open(filename, 'w') as f:
                     f.write(cb.content)
 
-            print "%s%s" % (message, filename)
+            print("%s%s" % (message, filename))
 
     def create_request_message(self, args):
         """
@@ -326,7 +329,7 @@ class TaxiiScript(object):
         deprecated_arg_used = False
         for arg in deprecated_args:
             if str(getattr(args, arg)) != str(parser._optionals.get_default(arg)):
-                print "WARNING: use of deprecated argument: %s. Use --url instead!" % arg
+                print("WARNING: use of deprecated argument: %s. Use --url instead!" % arg)
                 deprecated_arg_used = True
 
         url_used = getattr(args, 'url') != parser._optionals.get_default('url')
@@ -336,7 +339,7 @@ class TaxiiScript(object):
         if deprecated_arg_used:
             url = "https" if args.https else "http" + "://" + args.host + ":" + str(args.port) + args.path
             args.url = url
-            print "Deprecated arguments transformed into: '--url %s'" % url
+            print("Deprecated arguments transformed into: '--url %s'" % url)
 
     def __call__(self):
         """
@@ -355,11 +358,11 @@ class TaxiiScript(object):
                                         args.username,
                                         args.password)
 
-            print "Request:\n"
+            print("Request:\n")
             if args.xml_output is False:
-                print request_message.to_text()
+                print(request_message.to_text())
             else:
-                print request_message.to_xml(pretty_print=True)
+                print(request_message.to_xml(pretty_print=True))
 
             resp = client.call_taxii_service2(url.hostname,
                                               url.path,

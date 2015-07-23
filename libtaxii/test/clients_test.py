@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # Copyright (C) 2013 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
@@ -41,11 +43,11 @@ def client_example():
     # Call without a proxy
     http_response = client.call_taxii_service2('hostname', '/poll_service_path/', VID_TAXII_XML_10, poll_request1.to_xml())
 
-    print http_response.__class__.__name__
+    print(http_response.__class__.__name__)
 
     taxii_message = t.get_message_from_http_response(http_response,
                                                      poll_request1.message_id)
-    print(taxii_message.to_xml())
+    print((taxii_message.to_xml()))
 
 if __name__ == "__main__":
     client_example()

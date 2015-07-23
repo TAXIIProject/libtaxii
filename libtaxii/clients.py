@@ -8,8 +8,9 @@
 """
 TAXII Clients
 """
+from __future__ import absolute_import
 
-import httplib
+import six.moves.http_client
 import urllib
 import urllib2
 import base64
@@ -17,6 +18,7 @@ import socket
 import ssl
 import warnings
 from libtaxii.constants import *
+import six
 
 
 class HttpClient(object):
@@ -167,26 +169,26 @@ class HttpClient(object):
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = VID_TAXII_HTTPS_10
             if self.auth_type == HttpClient.AUTH_NONE:
-                conn = httplib.HTTPSConnection(host, port)
+                conn = six.moves.http_client.HTTPSConnection(host, port)
             elif self.auth_type == HttpClient.AUTH_BASIC:
                 header_dict['Authorization'] = self.basic_auth_header
-                conn = httplib.HTTPSConnection(host, port)
+                conn = six.moves.http_client.HTTPSConnection(host, port)
             else:  # AUTH_CERT
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
-                conn = httplib.HTTPSConnection(host, port, key_file, cert_file)
+                conn = six.moves.http_client.HTTPSConnection(host, port, key_file, cert_file)
         else:  # Not using https
             header_dict['X-TAXII-Protocol'] = VID_TAXII_HTTP_10
             if self.auth_type == HttpClient.AUTH_NONE:
-                conn = httplib.HTTPConnection(host, port)
+                conn = six.moves.http_client.HTTPConnection(host, port)
             # TODO: Consider deleting because this is a terrible idea
             elif self.auth_type == HttpClient.AUTH_BASIC:  # Sending credentials in cleartext.. tsk tsk
                 header_dict['Authorization'] = self.basic_auth_header
-                conn = httplib.HTTPConnection(host, port)
+                conn = six.moves.http_client.HTTPConnection(host, port)
             else:  # AUTH_CERT
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
-                conn = httplib.HTTPConnection(host, port, key_file, cert_file)
+                conn = six.moves.http_client.HTTPConnection(host, port, key_file, cert_file)
 
         header_dict['Content-Type'] = 'application/xml'
         header_dict['X-TAXII-Content-Type'] = message_binding
@@ -209,7 +211,7 @@ class HttpClient(object):
         header_dict = {}
 
         if headers is not None:
-            for k, v in headers.iteritems():
+            for k, v in six.iteritems(headers):
                 header_dict[k.lower()] = v
 
         header_dict['User-Agent'] = 'libtaxii.httpclient'
@@ -337,7 +339,7 @@ class HttpClient(object):
         try:
             response = urllib2.urlopen(req)
             return response
-        except urllib2.HTTPError, error:
+        except urllib2.HTTPError as error:
             return error
 
     # Backwards compatibility
@@ -382,10 +384,10 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout=0):
-        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
+        return six.moves.http_client.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
 
 
-class VerifiableHTTPSConnection(httplib.HTTPSConnection):
+class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
 
     """
     The default httplib HTTPSConnection does not verify certificates.
@@ -396,7 +398,7 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     def __init__(self, host, port=None, key_file=None, cert_file=None,
                  strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                  source_address=None, verify_server=False, ca_certs=None):
-        httplib.HTTPSConnection.__init__(self, host, port, key_file,
+        six.moves.http_client.HTTPSConnection.__init__(self, host, port, key_file,
                                          cert_file, strict, timeout,
                                          source_address)
 
