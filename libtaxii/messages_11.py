@@ -24,7 +24,7 @@ import warnings
 from lxml import etree
 
 from .common import (parse, parse_datetime_string, append_any_content_etree, TAXIIBase,
-        get_required, get_optional, get_optional_text)
+                     get_required, get_optional, get_optional_text, parse_xml_string)
 from .validation import do_check, uri_regex, check_timestamp_label
 from .constants import *
 
@@ -48,12 +48,7 @@ def validate_xml(xml_string):
     warnings.warn('Call to deprecated function: libtaxii.messages_11.validate_xml()',
                   category=DeprecationWarning)
 
-    if isinstance(xml_string, six.string_types):
-        f = six.BytesIO(xml_string)
-    else:
-        f = xml_string
-
-    etree_xml = parse(f)
+    etree_xml = parse_xml_string(xml_string)
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema_11.xsd")
     taxii_schema_doc = parse(schema_file)
@@ -80,12 +75,7 @@ def get_message_from_xml(xml_string):
             message_xml = message.to_xml()
             new_message = tm11.get_message_from_xml(message_xml)
     """
-    if isinstance(xml_string, six.string_types):
-        f = six.BytesIO(xml_string)
-    else:
-        f = xml_string
-
-    etree_xml = parse(f)
+    etree_xml = parse_xml_string(xml_string)
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii_11']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)

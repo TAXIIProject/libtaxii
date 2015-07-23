@@ -23,7 +23,7 @@ import warnings
 from lxml import etree
 
 from .common import (parse, parse_datetime_string, append_any_content_etree, TAXIIBase,
-        get_required, get_optional, get_optional_text)
+                     get_required, get_optional, get_optional_text, parse_xml_string)
 from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
 from .constants import *
 
@@ -47,12 +47,7 @@ def validate_xml(xml_string):
     warnings.warn('Call to deprecated function: libtaxii.messages_10.validate_xml()',
                   category=DeprecationWarning)
 
-    if isinstance(xml_string, six.string_types):
-        f = six.BytesIO(xml_string)
-    else:
-        f = xml_string
-
-    etree_xml = parse(f)
+    etree_xml = parse_xml_string(xml_string)
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
     taxii_schema_doc = parse(schema_file)
@@ -78,12 +73,7 @@ def get_message_from_xml(xml_string):
             message_xml = message.to_xml()
             new_message = tm10.get_message_from_xml(message_xml)
     """
-    if isinstance(xml_string, six.string_types):
-        f = six.BytesIO(xml_string)
-    else:
-        f = xml_string
-
-    etree_xml = parse(f)
+    etree_xml = parse_xml_string(xml_string)
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)
@@ -474,12 +464,7 @@ class TAXIIMessage(TAXIIBase10):
         Subclasses shouldn't implemnet this method, as it is mainly a wrapper
         for cls.from_etree.
         """
-        if isinstance(xml, six.string_types):
-            f = six.BytesIO(xml)
-        else:
-            f = xml
-
-        etree_xml = parse(f)
+        etree_xml = parse_xml_string(xml)
         return cls.from_etree(etree_xml)
 
     @classmethod
@@ -599,8 +584,7 @@ class ContentBlock(TAXIIBase10):
                 return content.read(), False
         else:  # The Content is not file-like
             try:  # Attempt to parse string as XML
-                sio_content = six.StringIO(content)
-                xml = parse(sio_content)
+                xml = parse_xml_string(content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 if isinstance(content, six.string_types):  # It's a string of some kind, unicode or otherwise

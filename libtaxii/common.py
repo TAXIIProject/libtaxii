@@ -40,6 +40,21 @@ def parse(s):
     return e
 
 
+def parse_xml_string(xmlstr):
+    """Parse an XML string (binary or unicode) with the default parser.
+
+    :param xmlstr: An XML String to parse
+    :return: an etree._Element
+    """
+    if isinstance(xmlstr, six.binary_type):
+        xmlstr = six.BytesIO(xmlstr)
+    elif isinstance(xmlstr, six.text_type):
+        xmlstr = six.StringIO(xmlstr)
+
+    return parse(xmlstr)
+
+
+
 def get_xml_parser():
     """Return the XML parser currently in use.
 
@@ -249,12 +264,7 @@ class TAXIIBase(object):
 
         Subclasses should not need to implement this method.
         """
-        if isinstance(xml, six.string_types):
-            xmlstr = six.BytesIO(xml)
-        else:
-            xmlstr = xml
-
-        etree_xml = parse(xmlstr)
+        etree_xml = parse_xml_string(xml)
         return cls.from_etree(etree_xml)
 
     # Just noting that there is not a from_text() method. I also
