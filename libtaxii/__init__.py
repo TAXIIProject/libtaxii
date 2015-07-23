@@ -8,12 +8,12 @@
 """
 The main libtaxii module
 """
-from __future__ import absolute_import
+
 
 import six.moves.http_client
 from six.moves import urllib
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 
 import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
@@ -46,7 +46,7 @@ def get_message_from_http_response(http_response, in_response_to):
     """
     if isinstance(http_response, six.moves.http_client.HTTPResponse):
         return get_message_from_httplib_http_response(http_response, in_response_to)
-    elif isinstance(http_response, urllib2.HTTPError):
+    elif isinstance(http_response, urllib.error.HTTPError):
         return get_message_from_urllib2_httperror(http_response, in_response_to)
     elif isinstance(http_response, urllib.addinfourl):
         return get_message_from_urllib_addinfourl(http_response, in_response_to)

@@ -2,11 +2,11 @@
 Common utility classes and functions used throughout libtaxii.
 
 """
-from __future__ import absolute_import
-from __future__ import print_function
+
+
 
 from operator import attrgetter
-from StringIO import StringIO
+from io import StringIO
 from re import sub as resub
 import dateutil.parser
 import random
@@ -98,7 +98,7 @@ def generate_message_id(maxlen=5, version=VID_TAXII_SERVICES_10):
             message = tm11.DiscoveryRequest(tm11.generate_message_id())
     """
     if version == VID_TAXII_SERVICES_10:
-        message_id = str(uuid4().int % sys.maxint)
+        message_id = str(uuid4().int % sys.maxsize)
     elif version == VID_TAXII_SERVICES_11:
         message_id = str(uuid4())
     else:

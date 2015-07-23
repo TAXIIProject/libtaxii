@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 # Copyright (C) 2105 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 

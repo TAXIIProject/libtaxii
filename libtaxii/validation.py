@@ -7,7 +7,7 @@
 """
 Common data validation functions used across libtaxii
 """
-from __future__ import absolute_import
+
 
 import collections
 import re

@@ -8,11 +8,11 @@
 """
 TAXII Clients
 """
-from __future__ import absolute_import
+
 
 import six.moves.http_client
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import base64
 import socket
 import ssl
@@ -158,7 +158,7 @@ class HttpClient(object):
                 port = 80
 
         if get_params_dict is not None:  # Add the query params to the URL
-            path += '?' + urllib.urlencode(get_params_dict)
+            path += '?' + urllib.parse.urlencode(get_params_dict)
 
         header_dict = {'Content-Type': 'application/xml',
                        'User-Agent': 'libtaxii.httpclient'}
@@ -296,7 +296,7 @@ class HttpClient(object):
             header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = VID_TAXII_HTTP_10
 
             if self.auth_type == HttpClient.AUTH_NONE:
-                handler_list.append(urllib2.HTTPHandler())
+                handler_list.append(urllib.request.HTTPHandler())
             elif self.auth_type == HttpClient.AUTH_BASIC:
                 header_dict['Authorization'] = self.basic_auth_header
             elif self.auth_type == HttpClient.AUTH_CERT:
@@ -308,17 +308,17 @@ class HttpClient(object):
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
-            handler_list.append(urllib2.HTTPHandler())
+            handler_list.append(urllib.request.HTTPHandler())
 
         if self.proxy_string is not None:
             if self.proxy_string == 'noproxy':
                 # Dont use any proxy, including the system-specified proxy
-                handler_list.append(urllib2.ProxyHandler({}))
+                handler_list.append(urllib.request.ProxyHandler({}))
             else:  # Use a specific proxy
-                handler_list.append(urllib2.ProxyHandler({self.PROXY_HTTP: self.proxy_string, self.PROXY_HTTPS: self.proxy_string}))
+                handler_list.append(urllib.request.ProxyHandler({self.PROXY_HTTP: self.proxy_string, self.PROXY_HTTPS: self.proxy_string}))
 
-        opener = urllib2.build_opener(*handler_list)
-        urllib2.install_opener(opener)
+        opener = urllib.request.build_opener(*handler_list)
+        urllib.request.install_opener(opener)
 
         if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:
@@ -333,13 +333,13 @@ class HttpClient(object):
 
         url = scheme + host + ':' + str(port) + path
         if get_params_dict is not None:
-            url += '?' + urllib.urlencode(get_params_dict)
+            url += '?' + urllib.parse.urlencode(get_params_dict)
 
-        req = urllib2.Request(url, post_data, header_dict)
+        req = urllib.request.Request(url, post_data, header_dict)
         try:
-            response = urllib2.urlopen(req)
+            response = urllib.request.urlopen(req)
             return response
-        except urllib2.HTTPError as error:
+        except urllib.error.HTTPError as error:
             return error
 
     # Backwards compatibility
@@ -353,10 +353,10 @@ class HttpClient(object):
 
 
 # http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
-class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
+class LibtaxiiHTTPSHandler(urllib.request.HTTPSHandler):
 
     def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
-        urllib2.HTTPSHandler.__init__(self)
+        urllib.request.HTTPSHandler.__init__(self)
         self.key_file = key_file
         self.cert_file = cert_file
         self.verify_server = verify_server
@@ -373,10 +373,10 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
                                          ca_certs=self.ca_certs)
 
 
-class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
+class HTTPClientAuthHandler(urllib.request.HTTPSHandler):  # TODO: Is this used / is this possible?
 
     def __init__(self, key, cert):
-        urllib2.HTTPSHandler.__init__(self)
+        urllib.request.HTTPSHandler.__init__(self)
         self.key = key
         self.cert = cert
 

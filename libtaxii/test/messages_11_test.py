@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
+
+
 # Copyright (C) 2013 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
@@ -11,7 +11,7 @@ from __future__ import print_function
 # * Mark Davidson - mdavidson@mitre.org
 
 import datetime
-import StringIO
+import io
 import sys
 import unittest
 import warnings

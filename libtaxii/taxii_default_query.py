@@ -7,7 +7,7 @@
 """
 Creating, handling, and parsing TAXII Default Queries.
 """
-from __future__ import absolute_import
+
 
 import numbers
 import datetime

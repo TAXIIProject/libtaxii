@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
+
+
 # Copyright (c) 2014, The MITRE Corporation. All rights reserved.
 # For license information, see the LICENSE.txt file
 
@@ -9,7 +9,7 @@ import sys
 import traceback
 import datetime
 import libtaxii.clients as tc
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import libtaxii as t
 from libtaxii.common import gen_filename
@@ -208,7 +208,7 @@ class TaxiiScript(object):
         elif file_exists and write_type_ == W_PROMPT:
             var = None
             while var not in ('y', 'n'):
-                var = input("Overwrite file (%s)? (y/n): " % filename)
+                var = eval(input("Overwrite file (%s)? (y/n): " % filename))
             if var == 'y':
                 write = True
                 message = MSG_FILE_OVERWRITTEN

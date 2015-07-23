@@ -10,7 +10,7 @@
 """
 Creating, handling, and parsing TAXII 1.0 messages.
 """
-from __future__ import absolute_import
+
 import six
 
 try:
@@ -18,7 +18,7 @@ try:
 except ImportError:
     import json
 import os
-import StringIO
+import io
 import warnings
 
 from lxml import etree
@@ -49,7 +49,7 @@ def validate_xml(xml_string):
                   category=DeprecationWarning)
 
     if isinstance(xml_string, six.string_types):
-        f = StringIO.StringIO(xml_string)
+        f = io.StringIO(xml_string)
     else:
         f = xml_string
 
@@ -80,7 +80,7 @@ def get_message_from_xml(xml_string):
             new_message = tm10.get_message_from_xml(message_xml)
     """
     if isinstance(xml_string, six.string_types):
-        f = StringIO.StringIO(xml_string)
+        f = io.StringIO(xml_string)
     else:
         f = xml_string
 
@@ -479,7 +479,7 @@ class TAXIIMessage(TAXIIBase10):
         for cls.from_etree.
         """
         if isinstance(xml, six.string_types):
-            f = StringIO.StringIO(xml)
+            f = io.StringIO(xml)
         else:
             f = xml
 
@@ -603,7 +603,7 @@ class ContentBlock(TAXIIBase10):
                 return content.read(), False
         else:  # The Content is not file-like
             try:  # Attempt to parse string as XML
-                sio_content = StringIO.StringIO(content)
+                sio_content = io.StringIO(content)
                 xml = parse(sio_content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string

@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import print_function
+
+
 # Copyright (C) 2013 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
@@ -11,7 +11,7 @@ from __future__ import print_function
 # * Mark Davidson - mdavidson@mitre.org
 
 import datetime
-import StringIO
+import io
 import unittest
 import warnings
 import inspect
@@ -64,11 +64,11 @@ full_stix_doc = """<stix:STIX_Package
     </stix:Indicators>
 </stix:STIX_Package>"""
 
-full_stix_etree = etree.parse(StringIO.StringIO(full_stix_doc)).getroot()
+full_stix_etree = etree.parse(io.StringIO(full_stix_doc)).getroot()
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
-stix_etree = etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')).getroot()
+stix_etree = etree.parse(io.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')).getroot()
 
 xml_content_block1 = tm10.ContentBlock(
     content_binding=CB_STIX_XML_10,  # Required
@@ -383,7 +383,7 @@ class StatusMessageTests(unittest.TestCase):
         :return:
         """
 
-        eh = {'my_ext_header_1': etree.parse(StringIO.StringIO('<x:element xmlns:x="#foo">'
+        eh = {'my_ext_header_1': etree.parse(io.StringIO('<x:element xmlns:x="#foo">'
                                                                '<x:subelement attribute="something"/>'
                                                                '</x:element>'))}
 
@@ -549,12 +549,12 @@ class ContentBlockTests(unittest.TestCase):
 
     def test_content_block2(self):
         cb2 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
-                                content=StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
+                                content=io.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
     def test_content_block3(self):
         cb3 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
-                                content=etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
+                                content=etree.parse(io.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
         round_trip_content_block(cb3)
 
     def test_content_block4(self):
