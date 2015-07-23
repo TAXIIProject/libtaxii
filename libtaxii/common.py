@@ -15,6 +15,11 @@ from uuid import uuid4
 import sys
 import six
 from six.moves import zip
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 _XML_PARSER = None
 
@@ -191,6 +196,13 @@ class TAXIIBase(object):
         """
         raise NotImplementedError()
 
+    def to_json(self):
+        """Create a JSON object of this class.
+
+        Assumes any binary content will be UTF-8 encoded.
+        """
+        raise NotImplementedError()
+
     def to_xml(self, pretty_print=False):
         """Create an XML representation of this class.
 
@@ -357,4 +369,3 @@ def get_optional_text(etree_xml, xpath, ns_map):
         return get_required(etree_xml, xpath, ns_map).text
     except ValueError:
         pass
-

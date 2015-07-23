@@ -810,9 +810,6 @@ class ContentBlock(TAXIIBase11):
 
         return block
 
-    def to_json(self):
-        return json.dumps(self.to_dict())
-
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Content Block ===\n"
         s += line_prepend + "  Content Binding: %s\n" % str(self.content_binding)
@@ -1094,9 +1091,6 @@ class TAXIIMessage(TAXIIBase11):
             s += line_prepend + "Extended Header: %s = %s\n" % (k, v)
 
         return s
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
     @classmethod
     def from_etree(cls, src_etree, **kwargs):

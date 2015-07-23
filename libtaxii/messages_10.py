@@ -417,9 +417,6 @@ class TAXIIMessage(TAXIIBase10):
 
         return d
 
-    def to_json(self):
-        return json.dumps(self.to_dict())
-
     def to_text(self, line_prepend=''):
         s = line_prepend + "Message Type: %s\n" % self.message_type
         s += line_prepend + "Message ID: %s" % self.message_id
@@ -650,9 +647,6 @@ class ContentBlock(TAXIIBase10):
 
         return block
 
-    def to_json(self):
-        return json.dumps(self.to_dict())
-
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Content Block ===\n"
         s += line_prepend + "  Content Binding: %s\n" % self.content_binding
@@ -778,9 +772,6 @@ class DiscoveryResponse(TAXIIMessage):
         for service_instance in self.service_instances:
             d['service_instances'].append(service_instance.to_dict())
         return d
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
     def to_text(self, line_prepend=''):
         s = super(DiscoveryResponse, self).to_text(line_prepend)
