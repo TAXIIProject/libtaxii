@@ -12,8 +12,6 @@ The main libtaxii module
 
 import six.moves.http_client
 from six.moves import urllib
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
 
 import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
@@ -48,7 +46,7 @@ def get_message_from_http_response(http_response, in_response_to):
         return get_message_from_httplib_http_response(http_response, in_response_to)
     elif isinstance(http_response, urllib.error.HTTPError):
         return get_message_from_urllib2_httperror(http_response, in_response_to)
-    elif isinstance(http_response, urllib.addinfourl):
+    elif isinstance(http_response, urllib.response.addinfourl):
         return get_message_from_urllib_addinfourl(http_response, in_response_to)
     else:
         raise ValueError('Unsupported response type: %s.' % http_response.__class__.__name__)

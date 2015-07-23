@@ -11,14 +11,13 @@ TAXII Clients
 
 
 import six.moves.http_client
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
 import base64
 import socket
 import ssl
 import warnings
 from libtaxii.constants import *
 import six
+from six.moves import urllib
 
 
 class HttpClient(object):

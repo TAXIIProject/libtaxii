@@ -9,7 +9,7 @@ import sys
 import traceback
 import datetime
 import libtaxii.clients as tc
-from urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import libtaxii as t
 from libtaxii.common import gen_filename
