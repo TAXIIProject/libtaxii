@@ -201,7 +201,13 @@ class TAXIIBase(object):
 
         Assumes any binary content will be UTF-8 encoded.
         """
-        raise NotImplementedError()
+        content_dict = self.to_dict()
+
+        for k, v in content_dict.items():
+            if isinstance(v, six.binary_type):
+                content_dict[k] = v.decode('utf-8')
+
+        return json.dumps(content_dict)
 
     def to_xml(self, pretty_print=False):
         """Create an XML representation of this class.
