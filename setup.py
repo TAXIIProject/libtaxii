@@ -11,6 +11,7 @@ from setuptools import setup, find_packages
 BASE_DIR = dirname(abspath(__file__))
 VERSION_FILE = join(BASE_DIR, 'libtaxii', 'version.py')
 
+
 def get_version():
     with open(VERSION_FILE) as f:
         for line in f.readlines():
@@ -23,7 +24,12 @@ def get_version():
 if sys.version_info < (2, 6):
     raise Exception('libtaxii requires Python 2.6 or higher.')
 
-install_requires = ['lxml>=2.2.3', 'python-dateutil>=1.4.1']
+install_requires = [
+    'lxml>=2.2.3',
+    'python-dateutil>=1.4.1',
+    'six>=1.9.0',
+]
+
 try:
     import argparse
 except ImportError:
