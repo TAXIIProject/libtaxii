@@ -218,9 +218,7 @@ class TAXIIBase(object):
         """
         content_dict = self.to_dict()
 
-        for k, v in content_dict.items():
-            if isinstance(v, six.binary_type):
-                content_dict[k] = v.decode('utf-8')
+        _decode_binary_fields(content_dict)
 
         return json.dumps(content_dict)
 
@@ -380,8 +378,23 @@ def get_optional(etree_xml, xpath, ns_map):
     except ValueError:
         pass
 
+
 def get_optional_text(etree_xml, xpath, ns_map):
     try:
         return get_required(etree_xml, xpath, ns_map).text
     except ValueError:
         pass
+
+
+def _decode_binary_fields(dict_obj):
+    """Given a dict, decode any binary values, assuming UTF-8 encoding.
+    Will recurse into nested dicts.
+    Modifies the values in-place.
+    """
+    for key, value in dict_obj.items():
+
+        if isinstance(value, six.binary_type):
+            dict_obj[key] = value.decode('utf-8')
+
+        elif isinstance(value, dict):
+            _decode_binary_fields(value)
