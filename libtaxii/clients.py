@@ -8,7 +8,7 @@
 """
 TAXII Clients
 """
-
+import sys
 import base64
 import socket
 import ssl
@@ -395,9 +395,24 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
     def __init__(self, host, port=None, key_file=None, cert_file=None,
                  strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                  source_address=None, verify_server=False, ca_certs=None):
-        six.moves.http_client.HTTPSConnection.__init__(self, host, port, key_file,
-                                         cert_file, strict, timeout,
-                                         source_address)
+
+        # The httplib.HTTPSConnection init arguments have changed over different Python versions:
+        # Py 2.6: httplib.HTTPSConnection(host[, port[, key_file[, cert_file[, strict[, timeout]]]]])
+        # Py 2.7: httplib.HTTPSConnection(host[, port[, key_file[, cert_file[, strict[, timeout[, source_address[, context]]]]]]])
+        # Py 3.4: http.client.HTTPSConnection(host, port=None, key_file=None, cert_file=None, [timeout, ]source_address=None, *, context=None, check_hostname=None)
+
+        if sys.version_info.major == 2 and sys.version_info.minor == 6:
+            super(VerifiableHTTPSConnection, self).__init__(
+                host, port, key_file, cert_file, strict, timeout)
+        elif sys.version_info.major == 2 and sys.version_info.minor == 7:
+            super(VerifiableHTTPSConnection, self).__init__(
+                host, port, key_file, cert_file, strict, timeout, source_address)
+        elif sys.version_info.major == 3 and sys.version_info.minor == 4:
+            super(VerifiableHTTPSConnection, self).__init__(
+                host, port, key_file, cert_file, timeout, source_address)
+        else:
+            raise RuntimeError("Unsupported Python version: '{0}'".format(sys.version))
+
 
         if verify_server:
             self.cert_reqs = ssl.CERT_REQUIRED
@@ -408,9 +423,15 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
     def connect(self):
         # overrides the version in httplib so that we do
         # certificate verification
-        sock = socket.create_connection((self.host, self.port),
-                                        self.timeout,
-                                        self.source_address)
+
+        if sys.version_info.major == 2 and sys.version_info.minor == 6:
+            # Python 2.6 socket.create_connection has no source_address argument:
+            sock = socket.create_connection(
+                (self.host, self.port), self.timeout)
+        else:
+            sock = socket.create_connection(
+                (self.host, self.port), self.timeout, self.source_address)
+
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()
