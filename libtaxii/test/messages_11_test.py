@@ -1,3 +1,5 @@
+
+
 # Copyright (C) 2013 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
@@ -9,7 +11,7 @@
 # * Mark Davidson - mdavidson@mitre.org
 
 import datetime
-import StringIO
+import io
 import sys
 import unittest
 import warnings
@@ -24,6 +26,7 @@ import libtaxii.taxii_default_query as tdq
 from libtaxii.validation import SchemaValidator
 from libtaxii.constants import *
 from libtaxii.common import *
+import six
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
@@ -151,11 +154,11 @@ def round_trip_message(taxii_message, print_xml=False):
         warnings.simplefilter('ignore', DeprecationWarning)
         valid = tm11.validate_xml(xml_string)
     if valid is not True:
-        print 'Bad XML was:'
+        print('Bad XML was:')
         try:
-            print etree.tostring(taxii_message.to_etree(), pretty_print=True)
+            print(etree.tostring(taxii_message.to_etree(), pretty_print=True))
         except Exception as e:
-            print xml_string
+            print(xml_string)
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
 
     # The new way of validating
@@ -170,24 +173,24 @@ def round_trip_message(taxii_message, print_xml=False):
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % errors)
 
     if print_xml:
-        print etree.tostring(taxii_message.to_etree(), pretty_print=True)
+        print(etree.tostring(taxii_message.to_etree(), pretty_print=True))
 
     msg_from_xml = tm11.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()
     msg_from_dict = tm11.get_message_from_dict(dictionary)
     taxii_message.to_text()  # to_text() returns a string, this just makes sure the call succeeds but doesn't validate the response
     if taxii_message != msg_from_xml:
-        print '\t Failure of test #2 - running equals w/ debug:'
+        print('\t Failure of test #2 - running equals w/ debug:')
         taxii_message.__eq__(msg_from_xml, True)
         raise Exception('Test #2 failed - taxii_message != msg_from_xml')
 
     if taxii_message != msg_from_dict:
-        print '\t Failure of test #3 - running equals w/ debug:'
+        print('\t Failure of test #3 - running equals w/ debug:')
         taxii_message.__eq__(msg_from_dict, True)
         raise Exception('Test #3 failed - taxii_message != msg_from_dict')
 
     if msg_from_xml != msg_from_dict:
-        print '\t Failure of test #4 - running equals w/ debug:'
+        print('\t Failure of test #4 - running equals w/ debug:')
         msg_from_xml.__eq__(msg_from_dict, True)
         raise Exception('Test #4 failed - msg_from_xml != msg_from_dict')
 
@@ -209,21 +212,21 @@ def round_trip_content_block(content_block):
     content_block.to_text()
 
     if content_block != block_from_xml:
-        print '\t Failure of test #1 - running equals w/ debug:'
+        print('\t Failure of test #1 - running equals w/ debug:')
         content_block.__eq__(block_from_xml, True)
         raise Exception('Test #1 failed - content_block != block_from_xml')
 
     if content_block != block_from_dict:
-        print '\t Failure of test #2 - running equals w/ debug:'
+        print('\t Failure of test #2 - running equals w/ debug:')
         content_block.__eq__(block_from_dict, True)
         raise Exception('Test #2 failed - content_block != block_from_dict')
 
     if block_from_xml != block_from_dict:
-        print '\t Failure of test #3 - running equals w/ debug:'
+        print('\t Failure of test #3 - running equals w/ debug:')
         block_from_xml.__eq__(block_from_dict, True)
         raise Exception('Test #3 failed - block_from_xml != block_from_dict')
     if block_from_json != block_from_dict:
-        print '\t Failure of test #3 - running equals w/ debug:'
+        print('\t Failure of test #3 - running equals w/ debug:')
         block_from_json.__eq__(block_from_dict, True)
         raise Exception('Test #3 failed - block_from_json != block_from_dict')
 
@@ -1118,7 +1121,7 @@ class ContentBlockTests(unittest.TestCase):
 
     def test_content_block02(self):
         cb2 = tm11.ContentBlock(content_binding=tm11.ContentBinding(CB_STIX_XML_10),
-                                content=StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
+                                content=six.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
     def test_content_block03(self):
@@ -1137,7 +1140,7 @@ class ContentBlockTests(unittest.TestCase):
         round_trip_content_block(cb5)
 
     def test_content_block06(self):
-        cb6 = tm11.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
+        cb6 = tm11.ContentBlock(content_binding='RandomUnicodeString', content=six.text_type('abcdef'))
         round_trip_content_block(cb6)
 
     def test_content_block07(self):

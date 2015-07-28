@@ -8,6 +8,7 @@
 Creating, handling, and parsing TAXII Default Queries.
 """
 
+
 import numbers
 import datetime
 from operator import attrgetter
@@ -21,6 +22,7 @@ import libtaxii.messages_11 as tm11
 from .common import TAXIIBase
 from .validation import (do_check, uri_regex, targeting_expression_regex)
 from .constants import *
+import six
 
 
 class CapabilityModule(object):
@@ -40,7 +42,7 @@ class CapabilityModule(object):
 
     @capability_module_id.setter
     def capability_module_id(self, value):
-        do_check(value, 'capability_module_id', type=basestring)
+        do_check(value, 'capability_module_id', type=six.string_types)
         self._capability_module_id = value
 
     @property
@@ -67,7 +69,7 @@ class Relationship(object):
 
     @name.setter
     def name(self, value):
-        do_check(value, 'name', type=basestring)
+        do_check(value, 'name', type=six.string_types)
         self._name = value
 
     @property
@@ -94,10 +96,10 @@ class Parameter(object):
         return True, 'OK'
 
 # params - Define parameters for the Core/Regex/Timestamp capability modules
-param_str_value = Parameter(P_VALUE, basestring)
+param_str_value = Parameter(P_VALUE, six.string_types)
 param_float_value = Parameter(P_VALUE, float)
 param_ts_value = Parameter(P_VALUE, datetime.datetime)
-param_match_type = Parameter(P_MATCH_TYPE, basestring, ('case_sensitive_string', 'case_insensitive_string', 'number'))
+param_match_type = Parameter(P_MATCH_TYPE, six.string_types, ('case_sensitive_string', 'case_insensitive_string', 'number'))
 param_case_sensitive = Parameter(P_CASE_SENSITIVE, bool, (True, False))
 
 # CORE Relationships - Define relationships for the core capability module
@@ -265,7 +267,7 @@ class TargetingExpressionInfo(TAXIIBase):
 
     @preferred_scope.setter
     def preferred_scope(self, value):
-        do_check(value, 'preferred_scope', type=basestring, regex_tuple=targeting_expression_regex)
+        do_check(value, 'preferred_scope', type=six.string_types, regex_tuple=targeting_expression_regex)
         self._preferred_scope = value
 
     @property
@@ -274,7 +276,7 @@ class TargetingExpressionInfo(TAXIIBase):
 
     @allowed_scope.setter
     def allowed_scope(self, value):
-        do_check(value, 'allowed_scope', type=basestring, regex_tuple=targeting_expression_regex)
+        do_check(value, 'allowed_scope', type=six.string_types, regex_tuple=targeting_expression_regex)
         self._allowed_scope = value
 
     def to_etree(self):
@@ -554,7 +556,7 @@ class Criterion(TAXIIBase):
 
     @target.setter
     def target(self, value):
-        do_check(value, 'target', type=basestring)
+        do_check(value, 'target', type=six.string_types)
         self._target = value
 
     @property
@@ -650,7 +652,7 @@ class Test(TAXIIBase):
     def relationship(self, value):
         # TODO: For known capability IDs, check that the relationship is valid
         # TODO: provide a way to register other capability IDs
-        do_check(value, 'relationship', type=basestring)
+        do_check(value, 'relationship', type=six.string_types)
         self._relationship = value
 
     @property
@@ -659,7 +661,7 @@ class Test(TAXIIBase):
 
     @parameters.setter
     def parameters(self, value):
-        do_check(value.keys(), 'parameters.keys()', regex_tuple=uri_regex)
+        do_check(list(value.keys()), 'parameters.keys()', regex_tuple=uri_regex)
         self._parameters = value
 
     # TODO: Can this be done better?
@@ -670,12 +672,12 @@ class Test(TAXIIBase):
 
         relationship = capability_module.relationships.get(self.relationship)
         if relationship is None:
-            raise Exception('relationship not in defined relationships. %s not in %s' % (self.relationship, capability_module.relationships.keys()))
+            raise Exception('relationship not in defined relationships. %s not in %s' % (self.relationship, list(capability_module.relationships.keys())))
 
-        for name, value in self.parameters.items():
+        for name, value in list(self.parameters.items()):
             param = relationship.parameters.get(name)
             if param is None:
-                raise Exception('name not valid. %s not in %s' % (name, relationship.parameters.keys()))
+                raise Exception('name not valid. %s not in %s' % (name, list(relationship.parameters.keys())))
             param.verify(value)
 
     def to_etree(self):
@@ -683,7 +685,7 @@ class Test(TAXIIBase):
         t.attrib['capability_id'] = self.capability_id
         t.attrib['relationship'] = self.relationship
 
-        for k, v in self.parameters.items():
+        for k, v in list(self.parameters.items()):
             p = etree.SubElement(t, '{%s}Parameter' % ns_map['tdq'])
             p.attrib['name'] = k
             if isinstance(v, bool):
@@ -708,7 +710,7 @@ class Test(TAXIIBase):
         s = line_prepend + "=== Test ==\n"
         s += line_prepend + "  Capability ID: %s\n" % self.capability_id
         s += line_prepend + "  Relationship: %s\n" % self.relationship
-        for k, v in self.parameters.iteritems():
+        for k, v in six.iteritems(self.parameters):
             s += line_prepend + "  Parameter: %s = %s\n" % (k, v)
 
         return s
@@ -735,7 +737,7 @@ class Test(TAXIIBase):
                 parameters[k] = v == 'true'
             elif r is not None:
                 type_ = r.parameters[k].type
-                if type_ == basestring:  # basestring can't be instantiated, but str can be
+                if type_ == six.string_types:  # basestring can't be instantiated, but str can be
                     type_ = str
                 elif type_ == datetime.datetime:
                     # We can use this function to parse datetime strings.

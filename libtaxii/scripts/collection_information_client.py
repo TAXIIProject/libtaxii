@@ -4,6 +4,7 @@
 # For license information, see the LICENSE.txt file
 """
 
+
 import libtaxii.messages_11 as tm11
 from libtaxii.scripts import TaxiiScript
 

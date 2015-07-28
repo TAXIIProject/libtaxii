@@ -9,9 +9,8 @@
 The main libtaxii module
 """
 
-import httplib
-import urllib
-import urllib2
+import six
+from six.moves import urllib
 
 import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
@@ -19,6 +18,7 @@ import libtaxii.clients as tc
 from .constants import *
 
 from .version import __version__  # noqa
+
 
 def get_message_from_http_response(http_response, in_response_to):
     """Create a TAXII message from an HTTPResponse object.
@@ -41,11 +41,11 @@ def get_message_from_http_response(http_response, in_response_to):
             parse
         in_reponse_to (str): the default value for in_response_to
     """
-    if isinstance(http_response, httplib.HTTPResponse):
+    if isinstance(http_response, six.moves.http_client.HTTPResponse):
         return get_message_from_httplib_http_response(http_response, in_response_to)
-    elif isinstance(http_response, urllib2.HTTPError):
+    elif isinstance(http_response, urllib.error.HTTPError):
         return get_message_from_urllib2_httperror(http_response, in_response_to)
-    elif isinstance(http_response, urllib.addinfourl):
+    elif isinstance(http_response, urllib.response.addinfourl):
         return get_message_from_urllib_addinfourl(http_response, in_response_to)
     else:
         raise ValueError('Unsupported response type: %s.' % http_response.__class__.__name__)
@@ -79,7 +79,7 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
         message = []
-        header_dict = http_response.info().dict.iteritems()
+        header_dict = six.iteritems(http_response.info().dict)
         for k, v in header_dict:
             message.append(k + ': ' + v + '\r\n')
         message.append('\r\n')

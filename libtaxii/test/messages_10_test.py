@@ -1,3 +1,5 @@
+
+
 # Copyright (C) 2013 - The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
@@ -9,7 +11,6 @@
 # * Mark Davidson - mdavidson@mitre.org
 
 import datetime
-import StringIO
 import unittest
 import warnings
 import inspect
@@ -21,6 +22,7 @@ import libtaxii as t
 import libtaxii.messages_10 as tm10
 from libtaxii.validation import SchemaValidator
 from libtaxii.constants import *
+import six
 
 
 full_stix_doc = """<stix:STIX_Package
@@ -61,11 +63,11 @@ full_stix_doc = """<stix:STIX_Package
     </stix:Indicators>
 </stix:STIX_Package>"""
 
-full_stix_etree = etree.parse(StringIO.StringIO(full_stix_doc)).getroot()
+full_stix_etree = etree.parse(six.StringIO(full_stix_doc)).getroot()
 
 # TODO: This is bad practice. Refactor this.
 # Set up some things used across multiple tests.
-stix_etree = etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')).getroot()
+stix_etree = etree.parse(six.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')).getroot()
 
 xml_content_block1 = tm10.ContentBlock(
     content_binding=CB_STIX_XML_10,  # Required
@@ -90,7 +92,7 @@ def round_trip_message(taxii_message):
     if not isinstance(taxii_message, tm10.TAXIIMessage):
         raise ValueError('taxii_message was not an instance of TAXIIMessage')
 
-    print '***** Message type = %s; id = %s' % (taxii_message.message_type, taxii_message.message_id)
+    print('***** Message type = %s; id = %s' % (taxii_message.message_type, taxii_message.message_id))
 
     xml_string = taxii_message.to_xml()
     # This is the old, deprecated way of validating
@@ -116,28 +118,28 @@ def round_trip_message(taxii_message):
     msg_from_dict = tm10.get_message_from_dict(dictionary)
     taxii_message.to_text()
     if taxii_message != msg_from_xml:
-        print '\t Failure of test #2 - running equals w/ debug:'
+        print('\t Failure of test #2 - running equals w/ debug:')
         taxii_message.__eq__(msg_from_xml, True)
         raise Exception('Test #2 failed - taxii_message != msg_from_xml')
 
     if taxii_message != msg_from_dict:
-        print '\t Failure of test #3 - running equals w/ debug:'
+        print('\t Failure of test #3 - running equals w/ debug:')
         taxii_message.__eq__(msg_from_dict, True)
         raise Exception('Test #3 failed - taxii_message != msg_from_dict')
 
     if msg_from_xml != msg_from_dict:
-        print '\t Failure of test #4 - running equals w/ debug:'
+        print('\t Failure of test #4 - running equals w/ debug:')
         msg_from_xml.__eq__(msg_from_dict, True)
         raise Exception('Test #4 failed - msg_from_xml != msg_from_dict')
 
-    print '***** All tests completed!'
+    print('***** All tests completed!')
 
 
 def round_trip_content_block(content_block):
     if not isinstance(content_block, tm10.ContentBlock):
         raise ValueError('content_block was not an instance of ContentBlock')
 
-    print '***** Starting Content Block tests'
+    print('***** Starting Content Block tests')
 
     xml_string = content_block.to_xml()
     block_from_xml = tm10.ContentBlock.from_xml(xml_string)
@@ -148,25 +150,25 @@ def round_trip_content_block(content_block):
     content_block.to_text()
 
     if content_block != block_from_xml:
-        print '\t Failure of test #1 - running equals w/ debug:'
+        print('\t Failure of test #1 - running equals w/ debug:')
         content_block.__equals(block_from_xml, True)
         raise Exception('Test #1 failed - content_block != block_from_xml')
 
     if content_block != block_from_dict:
-        print '\t Failure of test #2 - running equals w/ debug:'
+        print('\t Failure of test #2 - running equals w/ debug:')
         content_block.__eq__(block_from_dict, True)
         raise Exception('Test #2 failed - content_block != block_from_dict')
 
     if block_from_xml != block_from_dict:
-        print '\t Failure of test #3 - running equals w/ debug:'
+        print('\t Failure of test #3 - running equals w/ debug:')
         block_from_xml.__eq__(block_from_dict, True)
         raise Exception('Test #3 failed - block_from_xml != block_from_dict')
     if block_from_json != block_from_dict:
-        print '\t Failure of test #3 - running equals w/ debug:'
+        print('\t Failure of test #3 - running equals w/ debug:')
         block_from_json.__eq__(block_from_dict, True)
         raise Exception('Test #3 failed - block_from_json != block_from_dict')
 
-    print '***** All tests completed!'
+    print('***** All tests completed!')
 
 
 class DiscoveryRequestTests(unittest.TestCase):
@@ -380,7 +382,7 @@ class StatusMessageTests(unittest.TestCase):
         :return:
         """
 
-        eh = {'my_ext_header_1': etree.parse(StringIO.StringIO('<x:element xmlns:x="#foo">'
+        eh = {'my_ext_header_1': etree.parse(six.StringIO('<x:element xmlns:x="#foo">'
                                                                '<x:subelement attribute="something"/>'
                                                                '</x:element>'))}
 
@@ -546,12 +548,12 @@ class ContentBlockTests(unittest.TestCase):
 
     def test_content_block2(self):
         cb2 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
-                                content=StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
+                                content=six.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>'))
         round_trip_content_block(cb2)
 
     def test_content_block3(self):
         cb3 = tm10.ContentBlock(content_binding=CB_STIX_XML_10,
-                                content=etree.parse(StringIO.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
+                                content=etree.parse(six.StringIO('<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"/>')))
         round_trip_content_block(cb3)
 
     def test_content_block4(self):
@@ -565,7 +567,7 @@ class ContentBlockTests(unittest.TestCase):
         round_trip_content_block(cb5)
 
     def test_content_block6(self):
-        cb6 = tm10.ContentBlock(content_binding='RandomUnicodeString', content=unicode('abcdef'))
+        cb6 = tm10.ContentBlock(content_binding='RandomUnicodeString', content=six.text_type('abcdef'))
         round_trip_content_block(cb6)
 
 

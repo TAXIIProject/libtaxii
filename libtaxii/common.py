@@ -3,8 +3,9 @@ Common utility classes and functions used throughout libtaxii.
 
 """
 
+
+
 from operator import attrgetter
-from StringIO import StringIO
 from re import sub as resub
 import dateutil.parser
 import random
@@ -12,6 +13,13 @@ from libtaxii.constants import *
 from lxml import etree
 from uuid import uuid4
 import sys
+import six
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
 
 _XML_PARSER = None
 
@@ -30,6 +38,21 @@ def parse(s):
         e = etree.XML(s, get_xml_parser())
 
     return e
+
+
+def parse_xml_string(xmlstr):
+    """Parse an XML string (binary or unicode) with the default parser.
+
+    :param xmlstr: An XML String to parse
+    :return: an etree._Element
+    """
+    if isinstance(xmlstr, six.binary_type):
+        xmlstr = six.BytesIO(xmlstr)
+    elif isinstance(xmlstr, six.text_type):
+        xmlstr = six.StringIO(xmlstr)
+
+    return parse(xmlstr)
+
 
 
 def get_xml_parser():
@@ -94,7 +117,7 @@ def generate_message_id(maxlen=5, version=VID_TAXII_SERVICES_10):
             message = tm11.DiscoveryRequest(tm11.generate_message_id())
     """
     if version == VID_TAXII_SERVICES_10:
-        message_id = str(uuid4().int % sys.maxint)
+        message_id = str(uuid4().int % sys.maxsize)
     elif version == VID_TAXII_SERVICES_11:
         message_id = str(uuid4())
     else:
@@ -124,7 +147,7 @@ def append_any_content_etree(etree_elt, content):
         etree_elt.append(content)
         return etree_elt
 
-    if not isinstance(content, basestring):  # If content is a non-string, cast it to string and set etree_elt.text
+    if not isinstance(content, six.string_types):  # If content is a non-string, cast it to string and set etree_elt.text
         etree_elt.text = str(content)
         return etree_elt
 
@@ -188,6 +211,17 @@ class TAXIIBase(object):
         """
         raise NotImplementedError()
 
+    def to_json(self):
+        """Create a JSON object of this class.
+
+        Assumes any binary content will be UTF-8 encoded.
+        """
+        content_dict = self.to_dict()
+
+        _decode_binary_fields(content_dict)
+
+        return json.dumps(content_dict)
+
     def to_xml(self, pretty_print=False):
         """Create an XML representation of this class.
 
@@ -228,12 +262,7 @@ class TAXIIBase(object):
 
         Subclasses should not need to implement this method.
         """
-        if isinstance(xml, basestring):
-            xmlstr = StringIO(xml)
-        else:
-            xmlstr = xml
-
-        etree_xml = parse(xmlstr)
+        etree_xml = parse_xml_string(xml)
         return cls.from_etree(etree_xml)
 
     # Just noting that there is not a from_text() method. I also
@@ -261,19 +290,19 @@ class TAXIIBase(object):
         """
         if other is None:
             if debug:
-                print 'other was None!'
+                print('other was None!')
             return False
 
         if self.__class__.__name__ != other.__class__.__name__:
             if debug:
-                print 'class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__)
+                print('class names not equal: %s != %s' % (self.__class__.__name__, other.__class__.__name__))
             return False
 
         # Get all member properties that start with '_'
         members = [attr for attr in vars(self) if attr.startswith('_') and not attr.startswith('__')]
         for member in members:
             if debug:
-                print 'member name: %s' % member
+                print('member name: %s' % member)
             self_value = getattr(self, member)
             other_value = getattr(other, member)
 
@@ -299,7 +328,7 @@ class TAXIIBase(object):
                         # All TAXIIBase objects have the 'sort_key' property implemented
                         self_value = sorted(self_value, key=attrgetter('sort_key'))
                         other_value = sorted(other_value, key=attrgetter('sort_key'))
-                        for self_item, other_item in zip(self_value, other_value):
+                        for self_item, other_item in six.moves.zip(self_value, other_value):
                             # Compare the ordered lists element by element
                             eq = self_item.__eq__(other_item, debug)
                     else:
@@ -309,12 +338,12 @@ class TAXIIBase(object):
                 # Dictionary to compare
                 if len(set(self_value.keys()) - set(other_value.keys())) != 0:
                     if debug:
-                        print 'dict keys not equal: %s != %s' % (self_value, other_value)
+                        print('dict keys not equal: %s != %s' % (self_value, other_value))
                     eq = False
-                for k, v in self_value.iteritems():
+                for k, v in six.iteritems(self_value):
                     if other_value[k] != v:
                         if debug:
-                            print 'dict values not equal: %s != %s' % (v, other_value[k])
+                            print('dict values not equal: %s != %s' % (v, other_value[k]))
                         eq = False
                 eq = True
             elif isinstance(self_value, etree._Element):
@@ -327,7 +356,7 @@ class TAXIIBase(object):
             # TODO: is this duplicate?
             if not eq:
                 if debug:
-                    print '%s was not equal: %s != %s' % (member, self_value, other_value)
+                    print('%s was not equal: %s != %s' % (member, self_value, other_value))
                 return False
 
         return True
@@ -349,9 +378,23 @@ def get_optional(etree_xml, xpath, ns_map):
     except ValueError:
         pass
 
+
 def get_optional_text(etree_xml, xpath, ns_map):
     try:
         return get_required(etree_xml, xpath, ns_map).text
     except ValueError:
         pass
 
+
+def _decode_binary_fields(dict_obj):
+    """Given a dict, decode any binary values, assuming UTF-8 encoding.
+    Will recurse into nested dicts.
+    Modifies the values in-place.
+    """
+    for key, value in dict_obj.items():
+
+        if isinstance(value, six.binary_type):
+            dict_obj[key] = value.decode('utf-8')
+
+        elif isinstance(value, dict):
+            _decode_binary_fields(value)

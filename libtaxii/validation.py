@@ -8,6 +8,7 @@
 Common data validation functions used across libtaxii
 """
 
+
 import collections
 import re
 import datetime
@@ -15,6 +16,7 @@ from lxml import etree
 import os
 
 from .common import (parse, parse_datetime_string)
+import six
 
 # General purpose helper methods #
 
@@ -67,7 +69,7 @@ def do_check(var, varname, type=None, regex_tuple=None, value_tuple=None, can_be
             raise ValueError(_type_error % (varname, type, bad_type))
 
     if regex_tuple is not None:
-        if not isinstance(var, basestring):
+        if not isinstance(var, six.string_types):
             raise ValueError('%s was about to undergo a regex check, but is not of type basestring! Regex check was not performed' % (varname))
         if re.match(regex_tuple.regex, var) is None:
             raise ValueError(_regex_error % (varname, regex_tuple.title, var))
@@ -96,7 +98,7 @@ def check_timestamp_label(timestamp_label, varname, can_be_none=False):
     if timestamp_label is None and not can_be_none:
         raise ValueError(_none_error % varname)
 
-    if isinstance(timestamp_label, basestring):
+    if isinstance(timestamp_label, six.string_types):
         timestamp_label = parse_datetime_string(timestamp_label)
 
     do_check(timestamp_label, varname, type=datetime.datetime, can_be_none=can_be_none)

@@ -11,20 +11,21 @@
 Creating, handling, and parsing TAXII 1.0 messages.
 """
 
+import six
+
 try:
     import simplejson as json
 except ImportError:
     import json
 import os
-import StringIO
 import warnings
 
 from lxml import etree
 
 from .common import (parse, parse_datetime_string, append_any_content_etree, TAXIIBase,
-        get_required, get_optional, get_optional_text)
+                     get_required, get_optional, get_optional_text, parse_xml_string)
 from .validation import do_check, uri_regex, check_timestamp_label, message_id_regex_10
-from constants import *
+from .constants import *
 
 
 def validate_xml(xml_string):
@@ -46,12 +47,7 @@ def validate_xml(xml_string):
     warnings.warn('Call to deprecated function: libtaxii.messages_10.validate_xml()',
                   category=DeprecationWarning)
 
-    if isinstance(xml_string, basestring):
-        f = StringIO.StringIO(xml_string)
-    else:
-        f = xml_string
-
-    etree_xml = parse(f)
+    etree_xml = parse_xml_string(xml_string)
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema.xsd")
     taxii_schema_doc = parse(schema_file)
@@ -77,12 +73,7 @@ def get_message_from_xml(xml_string):
             message_xml = message.to_xml()
             new_message = tm10.get_message_from_xml(message_xml)
     """
-    if isinstance(xml_string, basestring):
-        f = StringIO.StringIO(xml_string)
-    else:
-        f = xml_string
-
-    etree_xml = parse(f)
+    etree_xml = parse_xml_string(xml_string)
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)
@@ -360,7 +351,7 @@ class TAXIIMessage(TAXIIBase10):
 
     @extended_headers.setter
     def extended_headers(self, value):
-        do_check(value.keys(), 'extended_headers.keys()', regex_tuple=uri_regex)
+        do_check(list(value.keys()), 'extended_headers.keys()', regex_tuple=uri_regex)
         self._extended_headers = value
 
     def to_etree(self):
@@ -379,7 +370,7 @@ class TAXIIMessage(TAXIIBase10):
         if len(self.extended_headers) > 0:
             eh = etree.SubElement(root_elt, '{%s}Extended_Headers' % ns_map['taxii'])
 
-            for name, value in self.extended_headers.items():
+            for name, value in list(self.extended_headers.items()):
                 h = etree.SubElement(eh, '{%s}Extended_Header' % ns_map['taxii'])
                 h.attrib['name'] = name
                 append_any_content_etree(h, value)
@@ -407,17 +398,14 @@ class TAXIIMessage(TAXIIBase10):
         if self.in_response_to is not None:
             d['in_response_to'] = self.in_response_to
         d['extended_headers'] = {}
-        for k, v in self.extended_headers.iteritems():
+        for k, v in six.iteritems(self.extended_headers):
             if isinstance(v, etree._Element) or isinstance(v, etree._ElementTree):
                 v = etree.tostring(v)
-            elif not isinstance(v, basestring):
+            elif not isinstance(v, six.string_types):
                 v = str(v)
             d['extended_headers'][k] = v
 
         return d
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
     def to_text(self, line_prepend=''):
         s = line_prepend + "Message Type: %s\n" % self.message_type
@@ -425,7 +413,7 @@ class TAXIIMessage(TAXIIBase10):
         if self.in_response_to:
             s += "; In Response To: %s" % self.in_response_to
         s += "\n"
-        for k, v in self.extended_headers.iteritems():
+        for k, v in six.iteritems(self.extended_headers):
             s += line_prepend + "Extended Header: %s = %s" % (k, v)
 
         return s
@@ -476,12 +464,7 @@ class TAXIIMessage(TAXIIBase10):
         Subclasses shouldn't implemnet this method, as it is mainly a wrapper
         for cls.from_etree.
         """
-        if isinstance(xml, basestring):
-            f = StringIO.StringIO(xml)
-        else:
-            f = xml
-
-        etree_xml = parse(f)
+        etree_xml = parse_xml_string(xml)
         return cls.from_etree(etree_xml)
 
     @classmethod
@@ -497,7 +480,7 @@ class TAXIIMessage(TAXIIBase10):
             raise ValueError('%s != %s' % (message_type, cls.message_type))
         message_id = d['message_id']
         extended_headers = {}
-        for k, v in d['extended_headers'].iteritems():
+        for k, v in six.iteritems(d['extended_headers']):
             try:
                 v = parse(v)
             except etree.XMLSyntaxError:
@@ -601,11 +584,10 @@ class ContentBlock(TAXIIBase10):
                 return content.read(), False
         else:  # The Content is not file-like
             try:  # Attempt to parse string as XML
-                sio_content = StringIO.StringIO(content)
-                xml = parse(sio_content)
+                xml = parse_xml_string(content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
-                if isinstance(content, basestring):  # It's a string of some kind, unicode or otherwise
+                if isinstance(content, six.string_types):  # It's a string of some kind, unicode or otherwise
                     return content, False
                 else:  # It's some other datatype that needs casting to string
                     return str(content), False
@@ -648,9 +630,6 @@ class ContentBlock(TAXIIBase10):
             block['padding'] = self.padding
 
         return block
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
     def to_text(self, line_prepend=''):
         s = line_prepend + "=== Content Block ===\n"
@@ -777,9 +756,6 @@ class DiscoveryResponse(TAXIIMessage):
         for service_instance in self.service_instances:
             d['service_instances'].append(service_instance.to_dict())
         return d
-
-    def to_json(self):
-        return json.dumps(self.to_dict())
 
     def to_text(self, line_prepend=''):
         s = super(DiscoveryResponse, self).to_text(line_prepend)
@@ -2761,4 +2737,4 @@ ST_TYPES = ST_TYPES_10
 ACT_TYPES = ACT_TYPES_10
 SVC_TYPES = SVC_TYPES_10
 
-from common import (generate_message_id)
+from .common import (generate_message_id)

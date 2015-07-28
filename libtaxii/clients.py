@@ -8,15 +8,14 @@
 """
 TAXII Clients
 """
-
-import httplib
-import urllib
-import urllib2
+import sys
 import base64
 import socket
 import ssl
 import warnings
 from libtaxii.constants import *
+import six
+from six.moves import urllib
 
 
 class HttpClient(object):
@@ -156,7 +155,7 @@ class HttpClient(object):
                 port = 80
 
         if get_params_dict is not None:  # Add the query params to the URL
-            path += '?' + urllib.urlencode(get_params_dict)
+            path += '?' + urllib.parse.urlencode(get_params_dict)
 
         header_dict = {'Content-Type': 'application/xml',
                        'User-Agent': 'libtaxii.httpclient'}
@@ -167,26 +166,26 @@ class HttpClient(object):
         if self.use_https:
             header_dict['X-TAXII-Protocol'] = VID_TAXII_HTTPS_10
             if self.auth_type == HttpClient.AUTH_NONE:
-                conn = httplib.HTTPSConnection(host, port)
+                conn = six.moves.http_client.HTTPSConnection(host, port)
             elif self.auth_type == HttpClient.AUTH_BASIC:
                 header_dict['Authorization'] = self.basic_auth_header
-                conn = httplib.HTTPSConnection(host, port)
+                conn = six.moves.http_client.HTTPSConnection(host, port)
             else:  # AUTH_CERT
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
-                conn = httplib.HTTPSConnection(host, port, key_file, cert_file)
+                conn = six.moves.http_client.HTTPSConnection(host, port, key_file, cert_file)
         else:  # Not using https
             header_dict['X-TAXII-Protocol'] = VID_TAXII_HTTP_10
             if self.auth_type == HttpClient.AUTH_NONE:
-                conn = httplib.HTTPConnection(host, port)
+                conn = six.moves.http_client.HTTPConnection(host, port)
             # TODO: Consider deleting because this is a terrible idea
             elif self.auth_type == HttpClient.AUTH_BASIC:  # Sending credentials in cleartext.. tsk tsk
                 header_dict['Authorization'] = self.basic_auth_header
-                conn = httplib.HTTPConnection(host, port)
+                conn = six.moves.http_client.HTTPConnection(host, port)
             else:  # AUTH_CERT
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
-                conn = httplib.HTTPConnection(host, port, key_file, cert_file)
+                conn = six.moves.http_client.HTTPConnection(host, port, key_file, cert_file)
 
         header_dict['Content-Type'] = 'application/xml'
         header_dict['X-TAXII-Content-Type'] = message_binding
@@ -209,7 +208,7 @@ class HttpClient(object):
         header_dict = {}
 
         if headers is not None:
-            for k, v in headers.iteritems():
+            for k, v in six.iteritems(headers):
                 header_dict[k.lower()] = v
 
         header_dict['User-Agent'] = 'libtaxii.httpclient'
@@ -294,7 +293,7 @@ class HttpClient(object):
             header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = VID_TAXII_HTTP_10
 
             if self.auth_type == HttpClient.AUTH_NONE:
-                handler_list.append(urllib2.HTTPHandler())
+                handler_list.append(urllib.request.HTTPHandler())
             elif self.auth_type == HttpClient.AUTH_BASIC:
                 header_dict['Authorization'] = self.basic_auth_header
             elif self.auth_type == HttpClient.AUTH_CERT:
@@ -306,17 +305,17 @@ class HttpClient(object):
                 k = self.auth_credentials['key_file']
                 c = self.auth_credentials['cert_file']
                 handler_list.append(HTTPSClientAuthHandler(k, c))
-            handler_list.append(urllib2.HTTPHandler())
+            handler_list.append(urllib.request.HTTPHandler())
 
         if self.proxy_string is not None:
             if self.proxy_string == 'noproxy':
                 # Dont use any proxy, including the system-specified proxy
-                handler_list.append(urllib2.ProxyHandler({}))
+                handler_list.append(urllib.request.ProxyHandler({}))
             else:  # Use a specific proxy
-                handler_list.append(urllib2.ProxyHandler({self.PROXY_HTTP: self.proxy_string, self.PROXY_HTTPS: self.proxy_string}))
+                handler_list.append(urllib.request.ProxyHandler({self.PROXY_HTTP: self.proxy_string, self.PROXY_HTTPS: self.proxy_string}))
 
-        opener = urllib2.build_opener(*handler_list)
-        urllib2.install_opener(opener)
+        opener = urllib.request.build_opener(*handler_list)
+        urllib.request.install_opener(opener)
 
         if port is None:  # If the caller did not specify a port, use the default
             if self.use_https:
@@ -331,13 +330,13 @@ class HttpClient(object):
 
         url = scheme + host + ':' + str(port) + path
         if get_params_dict is not None:
-            url += '?' + urllib.urlencode(get_params_dict)
+            url += '?' + urllib.parse.urlencode(get_params_dict)
 
-        req = urllib2.Request(url, post_data, header_dict)
+        req = urllib.request.Request(url, post_data, header_dict)
         try:
-            response = urllib2.urlopen(req)
+            response = urllib.request.urlopen(req)
             return response
-        except urllib2.HTTPError, error:
+        except urllib.error.HTTPError as error:
             return error
 
     # Backwards compatibility
@@ -351,10 +350,10 @@ class HttpClient(object):
 
 
 # http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
-class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
+class LibtaxiiHTTPSHandler(urllib.request.HTTPSHandler):
 
     def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
-        urllib2.HTTPSHandler.__init__(self)
+        urllib.request.HTTPSHandler.__init__(self)
         self.key_file = key_file
         self.cert_file = cert_file
         self.verify_server = verify_server
@@ -371,10 +370,10 @@ class LibtaxiiHTTPSHandler(urllib2.HTTPSHandler):
                                          ca_certs=self.ca_certs)
 
 
-class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is this possible?
+class HTTPClientAuthHandler(urllib.request.HTTPSHandler):  # TODO: Is this used / is this possible?
 
     def __init__(self, key, cert):
-        urllib2.HTTPSHandler.__init__(self)
+        urllib.request.HTTPSHandler.__init__(self)
         self.key = key
         self.cert = cert
 
@@ -382,10 +381,10 @@ class HTTPClientAuthHandler(urllib2.HTTPSHandler):  # TODO: Is this used / is th
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout=0):
-        return httplib.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
+        return six.moves.http_client.HTTPSConnection(host, key_file=self.key, cert_file=self.cert, timeout=timeout)
 
 
-class VerifiableHTTPSConnection(httplib.HTTPSConnection):
+class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
 
     """
     The default httplib HTTPSConnection does not verify certificates.
@@ -396,9 +395,24 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     def __init__(self, host, port=None, key_file=None, cert_file=None,
                  strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                  source_address=None, verify_server=False, ca_certs=None):
-        httplib.HTTPSConnection.__init__(self, host, port, key_file,
-                                         cert_file, strict, timeout,
-                                         source_address)
+
+        # The httplib.HTTPSConnection init arguments have changed over different Python versions:
+        # Py 2.6: httplib.HTTPSConnection(host[, port[, key_file[, cert_file[, strict[, timeout]]]]])
+        # Py 2.7: httplib.HTTPSConnection(host[, port[, key_file[, cert_file[, strict[, timeout[, source_address[, context]]]]]]])
+        # Py 3.4: http.client.HTTPSConnection(host, port=None, key_file=None, cert_file=None, [timeout, ]source_address=None, *, context=None, check_hostname=None)
+
+        if sys.version_info.major == 2 and sys.version_info.minor == 6:
+            super(VerifiableHTTPSConnection, self).__init__(
+                host, port, key_file, cert_file, strict, timeout)
+        elif sys.version_info.major == 2 and sys.version_info.minor == 7:
+            super(VerifiableHTTPSConnection, self).__init__(
+                host, port, key_file, cert_file, strict, timeout, source_address)
+        elif sys.version_info.major == 3 and sys.version_info.minor == 4:
+            super(VerifiableHTTPSConnection, self).__init__(
+                host, port, key_file, cert_file, timeout, source_address)
+        else:
+            raise RuntimeError("Unsupported Python version: '{0}'".format(sys.version))
+
 
         if verify_server:
             self.cert_reqs = ssl.CERT_REQUIRED
@@ -409,9 +423,15 @@ class VerifiableHTTPSConnection(httplib.HTTPSConnection):
     def connect(self):
         # overrides the version in httplib so that we do
         # certificate verification
-        sock = socket.create_connection((self.host, self.port),
-                                        self.timeout,
-                                        self.source_address)
+
+        if sys.version_info.major == 2 and sys.version_info.minor == 6:
+            # Python 2.6 socket.create_connection has no source_address argument:
+            sock = socket.create_connection(
+                (self.host, self.port), self.timeout)
+        else:
+            sock = socket.create_connection(
+                (self.host, self.port), self.timeout, self.source_address)
+
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()

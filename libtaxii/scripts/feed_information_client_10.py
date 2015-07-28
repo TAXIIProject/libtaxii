@@ -4,6 +4,7 @@
 # For license information, see the LICENSE.txt file
 """
 
+
 import libtaxii.messages_10 as tm10
 from libtaxii.scripts import TaxiiScript
 from libtaxii.constants import VID_TAXII_XML_10
