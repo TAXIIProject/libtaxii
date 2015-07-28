@@ -9,12 +9,13 @@ import sys
 import traceback
 import datetime
 import libtaxii.clients as tc
+import six
 from six.moves.urllib.parse import urlparse
 
 import libtaxii as t
 from libtaxii.common import gen_filename
 from libtaxii.constants import *
-from six.moves import input
+
 
 EXIT_SUCCESS = 0
 EXIT_FAILURE = 1
@@ -208,7 +209,7 @@ class TaxiiScript(object):
         elif file_exists and write_type_ == W_PROMPT:
             var = None
             while var not in ('y', 'n'):
-                var = eval(input("Overwrite file (%s)? (y/n): " % filename))
+                var = six.moves.input("Overwrite file (%s)? (y/n): " % filename)
             if var == 'y':
                 write = True
                 message = MSG_FILE_OVERWRITTEN
