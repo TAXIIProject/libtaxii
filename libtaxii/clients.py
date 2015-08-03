@@ -402,11 +402,11 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
         # Py 3.4: http.client.HTTPSConnection(host, port=None, key_file=None, cert_file=None, [timeout, ]source_address=None, *, context=None, check_hostname=None)
 
         if sys.version_info.major == 2 and sys.version_info.minor == 6:
-            super(VerifiableHTTPSConnection, self).__init__(
-                host, port, key_file, cert_file, strict, timeout)
+            six.moves.http_client.HTTPSConnection.__init__(
+                self, host, port, key_file, cert_file, strict, timeout)
         elif sys.version_info.major == 2 and sys.version_info.minor == 7:
-            super(VerifiableHTTPSConnection, self).__init__(
-                host, port, key_file, cert_file, strict, timeout, source_address)
+            six.moves.http_client.HTTPSConnection.__init__(
+                self, host, port, key_file, cert_file, strict, timeout, source_address)
         elif sys.version_info.major == 3 and sys.version_info.minor == 4:
             super(VerifiableHTTPSConnection, self).__init__(
                 host, port, key_file, cert_file, timeout, source_address)
