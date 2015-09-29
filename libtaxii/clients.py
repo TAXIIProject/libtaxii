@@ -89,9 +89,11 @@ class HttpClient(object):
     @property
     def basic_auth_header(self):
         """Returns a Base64-encoded HTTP Basic Authorization Header."""
-        return "Basic " + base64.b64encode('%s:%s' % (
-                                           self.auth_credentials['username'],
-                                           self.auth_credentials['password']))
+        credentials = '{}:{}'.format(
+                self.auth_credentials['username'],
+                self.auth_credentials['password']
+            ).encode('utf-8')
+        return b'Basic ' + base64.b64encode(credentials)
 
     def set_proxy(self, proxy_string=None):
         """
