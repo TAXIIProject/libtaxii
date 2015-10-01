@@ -89,9 +89,11 @@ class HttpClient(object):
     @property
     def basic_auth_header(self):
         """Returns a Base64-encoded HTTP Basic Authorization Header."""
-        return "Basic " + base64.b64encode('%s:%s' % (
-                                           self.auth_credentials['username'],
-                                           self.auth_credentials['password']))
+        credentials = '{}:{}'.format(
+                self.auth_credentials['username'],
+                self.auth_credentials['password']
+            ).encode('utf-8')
+        return b'Basic ' + base64.b64encode(credentials)
 
     def set_proxy(self, proxy_string=None):
         """
@@ -273,9 +275,11 @@ class HttpClient(object):
                     self.auth_type == HttpClient.AUTH_CERT_BASIC):
                 key_file = self.auth_credentials['key_file']
                 cert_file = self.auth_credentials['cert_file']
+                key_password = self.auth_credentials.get('key_password')
             else:
                 key_file = None
                 cert_file = None
+                key_password = None
 
             if (self.auth_type == HttpClient.AUTH_BASIC or
                     self.auth_type == HttpClient.AUTH_CERT_BASIC):
@@ -284,10 +288,12 @@ class HttpClient(object):
             verify_server = self.verify_server
             ca_file = self.ca_file
 
-            handler_list.append(LibtaxiiHTTPSHandler(key_file=key_file,
-                                                     cert_file=cert_file,
-                                                     verify_server=verify_server,
-                                                     ca_certs=ca_file))
+            handler_list.append(LibtaxiiHTTPSHandler(
+                key_file=key_file,
+                cert_file=cert_file,
+                verify_server=verify_server,
+                ca_certs=ca_file,
+                key_password=key_password))
 
         else:  # Not using https
             header_dict[HttpClient.HEADER_X_TAXII_PROTOCOL] = VID_TAXII_HTTP_10
@@ -352,12 +358,14 @@ class HttpClient(object):
 # http://stackoverflow.com/questions/5896380/https-connection-using-pem-certificate
 class LibtaxiiHTTPSHandler(urllib.request.HTTPSHandler):
 
-    def __init__(self, key_file=None, cert_file=None, verify_server=False, ca_certs=None):
+    def __init__(self, key_file=None, cert_file=None, verify_server=False,
+                 ca_certs=None, key_password=None):
         urllib.request.HTTPSHandler.__init__(self)
         self.key_file = key_file
         self.cert_file = cert_file
         self.verify_server = verify_server
         self.ca_certs = ca_certs
+        self.key_password = key_password
 
     def https_open(self, req):
         return self.do_open(self.get_connection, req)
@@ -367,7 +375,8 @@ class LibtaxiiHTTPSHandler(urllib.request.HTTPSHandler):
                                          key_file=self.key_file,
                                          cert_file=self.cert_file,
                                          verify_server=self.verify_server,
-                                         ca_certs=self.ca_certs)
+                                         ca_certs=self.ca_certs,
+                                         key_password=self.key_password)
 
 
 class HTTPClientAuthHandler(urllib.request.HTTPSHandler):  # TODO: Is this used / is this possible?
@@ -393,7 +402,8 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
     """
 
     def __init__(self, host, port=None, key_file=None, cert_file=None,
-                 strict=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+                 key_password=None, strict=None,
+                 timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
                  source_address=None, verify_server=False, ca_certs=None):
 
         # The httplib.HTTPSConnection init arguments have changed over different Python versions:
@@ -404,15 +414,32 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
         if sys.version_info.major == 2 and sys.version_info.minor == 6:
             six.moves.http_client.HTTPSConnection.__init__(
                 self, host, port, key_file, cert_file, strict, timeout)
-        elif sys.version_info.major == 2 and sys.version_info.minor == 7:
-            six.moves.http_client.HTTPSConnection.__init__(
-                self, host, port, key_file, cert_file, strict, timeout, source_address)
-        elif sys.version_info.major == 3 and sys.version_info.minor == 4:
-            super(VerifiableHTTPSConnection, self).__init__(
-                host, port, key_file, cert_file, timeout, source_address)
+
+            self.context = None
+        elif ((sys.version_info.major == 2 and sys.version_info.minor == 7)
+                or (sys.version_info.major == 3 and sys.version_info.minor == 4)):
+
+            self.context = ssl._create_default_https_context(
+                ssl.Purpose.CLIENT_AUTH, cafile=ca_certs)
+
+            if cert_file or key_file:
+                self.context.load_cert_chain(
+                    cert_file, key_file, password=key_password)
+
+            if sys.version_info.major == 2 and sys.version_info.minor == 7:
+                six.moves.http_client.HTTPSConnection.__init__(
+                    self, host, port, strict=strict, timeout=timeout,
+                    source_address=source_address, context=self.context)
+
+            elif sys.version_info.major == 3 and sys.version_info.minor == 4:
+                super(VerifiableHTTPSConnection, self).__init__(
+                    host, port, timeout=timeout, source_address=source_address,
+                    context=self.context)
         else:
             raise RuntimeError("Unsupported Python version: '{0}'".format(sys.version))
 
+        self.cert_file = cert_file
+        self.key_file = key_file
 
         if verify_server:
             self.cert_reqs = ssl.CERT_REQUIRED
@@ -436,8 +463,12 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
             self.sock = sock
             self._tunnel()
 
-        self.sock = ssl.wrap_socket(sock,
-                                    keyfile=self.key_file,
-                                    certfile=self.cert_file,
-                                    cert_reqs=self.cert_reqs,
-                                    ca_certs=self.ca_certs)
+        if self.context:
+            self.sock = self.context.wrap_socket(sock)
+        else:
+            self.sock = ssl.wrap_socket(
+                sock,
+                keyfile=self.key_file,
+                certfile=self.cert_file,
+                cert_reqs=self.cert_reqs,
+                ca_certs=self.ca_certs)
