@@ -60,7 +60,7 @@ def validate_xml(xml_string):
     return valid
 
 
-def get_message_from_xml(xml_string):
+def get_message_from_xml(xml_string, encoding='utf_8'):
     """Create a TAXIIMessage object from an XML string.
 
     This function automatically detects which type of Message should be created
@@ -68,6 +68,7 @@ def get_message_from_xml(xml_string):
 
     Args:
         xml_string (str): The XML to parse into a TAXII message.
+        encoding (str): The encoding of the string; defaults to UTF-8
 
     Example:
         .. code-block:: python
@@ -75,7 +76,8 @@ def get_message_from_xml(xml_string):
             message_xml = message.to_xml()
             new_message = tm11.get_message_from_xml(message_xml)
     """
-    etree_xml = parse_xml_string(xml_string)
+    decoded_string = xml_string.decode(encoding, 'replace')
+    etree_xml = parse_xml_string(decoded_string)
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii_11']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)
@@ -153,7 +155,7 @@ def get_message_from_dict(d):
     raise ValueError('Unknown message_type: %s' % message_type)
 
 
-def get_message_from_json(json_string):
+def get_message_from_json(json_string, encoding='utf_8'):
     """Create a TAXIIMessage object from a JSON string.
 
     This function automatically detects which type of Message should be created
@@ -162,7 +164,8 @@ def get_message_from_json(json_string):
     Args:
         json_string (str): The JSON to parse into a TAXII message.
     """
-    return get_message_from_dict(json.loads(json_string))
+    decoded_string = json_string.decode(encoding, 'replace')
+    return get_message_from_dict(json.loads(decoded_string))
 
 
 def _sanitize_content_binding(binding):

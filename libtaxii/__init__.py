@@ -17,6 +17,8 @@ import libtaxii.messages_11 as tm11
 import libtaxii.clients as tc
 from .constants import *
 
+import cgi
+
 from .version import __version__  # noqa
 
 
@@ -54,17 +56,19 @@ def get_message_from_http_response(http_response, in_response_to):
 def get_message_from_urllib2_httperror(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
+    _, params = cgi.parse_header(http_response.info().getheader('Content-Type'))
+    encoding = params.get('charset', 'utf-8')
     response_message = http_response.read()
 
     if taxii_content_type is None:
         m = str(http_response) + '\r\n' + str(http_response.info()) + '\r\n' + response_message
         return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message)
+        return tm10.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message)
+        return tm11.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message)
+        return tm10.get_message_from_json(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
@@ -74,6 +78,8 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
 def get_message_from_urllib_addinfourl(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
+    _, params = cgi.parse_header(http_response.info().getheader('Content-Type'))
+    encoding = params.get('charset', 'utf-8')
     response_message = http_response.read()
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
@@ -90,11 +96,11 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
         return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message)
+        return tm10.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message)
+        return tm11.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message)
+        return tm10.get_message_from_json(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
@@ -104,6 +110,8 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
 def get_message_from_httplib_http_response(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
     taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
+    _, params = cgi.parse_header(http_response.getheader('Content-Type'))
+    encoding = params.get('charset', 'utf-8')
     response_message = http_response.read()
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
@@ -120,9 +128,9 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
         return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message)
+        return tm10.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message)
+        return tm11.get_message_from_xml(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
