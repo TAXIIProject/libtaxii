@@ -425,8 +425,6 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
             if cert_file or key_file:
                 self.context.load_cert_chain(
                     cert_file, key_file, password=key_password)
-#            if ca_certs:
-#                self.context.load_verify_locations(ca_certs)
 
             if sys.version_info.major == 2 and sys.version_info.minor == 7:
                 six.moves.http_client.HTTPSConnection.__init__(
