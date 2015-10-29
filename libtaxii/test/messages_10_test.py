@@ -694,6 +694,8 @@ class EncodingsTest(unittest.TestCase):
         """
         
         for encoding in PYTHON_ENCODINGS:
+            if encoding == 'cp720' and (sys.version_info[0] == 2 and sys.version_info[1] == 6):
+                continue  # This encoding is not supported in Python 2.6
             encoded_doc = xml_taxii_message_10.encode(encoding, 'strict')
             try:
                 msg = tm10.get_message_from_xml(encoded_doc, encoding)
@@ -707,6 +709,8 @@ class EncodingsTest(unittest.TestCase):
         """
         
         for encoding in PYTHON_ENCODINGS:
+            if encoding == 'cp720' and (sys.version_info[0] == 2 and sys.version_info[1] == 6):
+                continue  # This encoding is not supported in Python 2.6
             encoded_doc = json_taxii_message_10.encode(encoding, 'strict')
             try:
                 msg = tm10.get_message_from_json(encoded_doc, encoding)
