@@ -24,6 +24,8 @@ from libtaxii.validation import SchemaValidator
 from libtaxii.constants import *
 import six
 
+import sys
+
 xml_taxii_message_10 = '<taxii:Discovery_Request xmlns:taxii="http://taxii.mitre.org/messages/taxii_xml_binding-1" message_id="1"/>'
 json_taxii_message_10 = '{"extended_headers": {}, "message_type": "Discovery_Request", "message_id": "1"}'
 
