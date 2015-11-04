@@ -1380,7 +1380,7 @@ class EncodingsTest(unittest.TestCase):
             try:
                 msg = tm11.get_message_from_xml(encoded_doc, encoding)
             except Exception as e:
-                print 'Bad codec was: %s' % encoding
+                print('Bad codec was: %s' % encoding)
                 raise
 
     def test_02(self):
@@ -1395,7 +1395,7 @@ class EncodingsTest(unittest.TestCase):
             try:
                 msg = tm11.get_message_from_json(encoded_doc, encoding)
             except Exception as e:
-                print 'Bad codec was: %s' % encoding
+                print('Bad codec was: %s' % encoding)
                 raise
 
 
