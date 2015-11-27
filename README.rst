@@ -5,7 +5,7 @@ A Python library for handling TAXII Messages and invoking TAXII Services.
 
 :Source: https://github.com/TAXIIProject/libtaxii
 :Documentation: http://libtaxii.readthedocs.org
-:Information: http://taxii.mitre.org
+:Information: http://taxiiproject.github.io/
 :Download: https://pypi.python.org/pypi/libtaxii/
 
 |travis badge| |landscape.io badge| |version badge| |downloads badge|
@@ -70,7 +70,4 @@ Releases of libtaxii are given ``major.minor.revision`` version numbers, where
 Feedback
 --------
 
-You are encouraged to provide feedback by commenting on open issues or signing
-up for the `TAXII discussion list
-<http://taxii.mitre.org/community/registration.html>`_ and posting your
-questions.
+Please provide feedback and/or comments on open issues to taxii@mitre.org.
