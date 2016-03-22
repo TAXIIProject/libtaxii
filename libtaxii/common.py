@@ -60,7 +60,7 @@ def get_xml_parser():
 
     If one has not already been set (via :py:func:`set_xml_parser()`), a new
     ``etree.XMLParser`` is constructed with ``no_network=True`` and
-    ``huge_tree=True``.
+    ``huge_tree=False``.
     """
     global _XML_PARSER
     if _XML_PARSER is None:
