@@ -16,9 +16,9 @@ A Python library for handling TAXII Messages and invoking TAXII Services.
 .. |landscape.io badge| image:: https://landscape.io/github/TAXIIProject/libtaxii/master/landscape.png
    :target: https://landscape.io/github/TAXIIProject/libtaxii/master
    :alt: Code Health
-.. |version badge| image:: https://pypip.in/v/libtaxii/badge.png
+.. |version badge| image:: https://img.shields.io/pypi/v/libtaxii.png?maxAge=2592000
    :target: https://pypi.python.org/pypi/libtaxii/
-.. |downloads badge| image:: https://pypip.in/d/libtaxii/badge.png
+.. |downloads badge| image:: https://img.shields.io/pypi/dm/libtaxii.png?maxAge=2592000
    :target: https://pypi.python.org/pypi/libtaxii/
 
 Overview
