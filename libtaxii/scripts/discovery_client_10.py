@@ -12,7 +12,7 @@ class DiscoveryClient10Script(TaxiiScript):
     taxii_version = VID_TAXII_XML_10
     parser_description = 'The TAXII 1.0 Discovery Client sends a Discovery Request message to a TAXII Server and ' \
                          'prints out the Discovery Response message to standard out.'
-    path = '/services/discovery/'
+    path = '/taxii-discovery-service'
 
     def create_request_message(self, args):
         return tm10.DiscoveryRequest(message_id=generate_message_id())

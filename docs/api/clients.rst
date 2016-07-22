@@ -33,13 +33,13 @@ Using No Credentials
 .. code-block:: python
 
 	client = tc.HttpClient()
-	client.set_auth_type(tc.AUTH_NONE)
+	client.set_auth_type(tc.HttpClient.AUTH_NONE)
 	client.set_use_https(False)
 
 	discovery_request = tm11.DiscoveryRequest(generate_message_id())
 	discovery_xml = discovery_request.to_xml(pretty_print=True)
 
-	http_resp = client.call_taxii_service2('taxiitest.mitre.org', '/services/discovery/', VID_TAXII_XML_11, discovery_xml)
+	http_resp = client.call_taxii_service2('hailataxii.com', '/taxii-discovery-service', VID_TAXII_XML_11, discovery_xml)
 	taxii_message = t.get_message_from_http_response(http_resp, discovery_request.message_id)
 	print taxii_message.to_xml(pretty_print=True)
 
@@ -49,19 +49,20 @@ Using Basic HTTP Auth
 .. code-block:: python
 
 	client = tc.HttpClient()
-	client.set_use_https(True)
 	client.set_auth_type(tc.HttpClient.AUTH_BASIC)
-	client.set_auth_credentials({'username': 'MyUsername', 'password': 'MyPassword'})
+	client.set_auth_credentials({'username': 'guest', 'password': 'guest'})
 
 	discovery_request = tm11.DiscoveryRequest(generate_message_id())
 	discovery_xml = discovery_request.to_xml(pretty_print=True)
 
-	http_resp = client.call_taxii_service2('taxiitest.mitre.org', '/services/discovery/', VID_TAXII_XML_11, discovery_xml)
+	http_resp = client.call_taxii_service2('hailataxii.com', '/taxii-discovery-service', VID_TAXII_XML_11, discovery_xml)
 	taxii_message = t.get_message_from_http_response(http_resp, discovery_request.message_id)
 	print taxii_message.to_xml(pretty_print=True)
 	
 Using TLS Certificate Auth
 **************************
+
+Note: The following code is provided as an example of this authentication method, but will not work as-is, because Hail A Taxii does not support TLS.
 
 .. code-block:: python
 
@@ -73,6 +74,6 @@ Using TLS Certificate Auth
 	discovery_request = tm11.DiscoveryRequest(generate_message_id())
 	discovery_xml = discovery_request.to_xml(pretty_print=True)
 
-	http_resp = client.call_taxii_service2('taxiitest.mitre.org', '/services/discovery/', VID_TAXII_XML_11, discovery_xml)
+	http_resp = client.call_taxii_service2('hailataxii.com', '/taxii-discovery-service/', VID_TAXII_XML_11, discovery_xml)
 	taxii_message = t.get_message_from_http_response(http_resp, discovery_request.message_id)
 	print taxii_message.to_xml(pretty_print=True)

@@ -18,7 +18,7 @@ class FeedInformationClient10Script(TaxiiScript):
         'Request message to a TAXII Server and prints the Feed Information ' \
         'Response message to standard out.'
 
-    path = '/services/feed-management/'
+    path = '/taxii-data'
 
     def create_request_message(self, args):
         message_id = tm10.generate_message_id()

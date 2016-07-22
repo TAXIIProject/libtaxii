@@ -18,7 +18,7 @@ class PollClient11Script(TaxiiScript):
                          ' depending on the ' \
                          'provided command line arguments, writes the Content Blocks in the response to disk. ' \
                          'Various options for the Poll Request can be set on the command line.'
-    path = '/services/poll/'
+    path = '/taxii-data'
 
     def get_arg_parser(self, *args, **kwargs):
         parser = super(PollClient11Script, self).get_arg_parser(*args, **kwargs)

@@ -2,7 +2,7 @@ Scripts
 =======
 
 This page provides documentation on the scripts that are included with libtaxii. All 
-clients are configured to use the TAXII Test Server (http://taxiitest.mitre.org) by
+clients are configured to use the Hail A TAXII server (http://hailataxii.com/) by
 default; provide command line options for specifying most aspects of the script (e.g., 
 host, port, client certs, username/password, HTTP or HTTPS, etc); and support TAXII 1.1
 unless otherwise noted.
@@ -39,14 +39,14 @@ All scripts use these command line arguments:
 
 Note: As of libtaxii 1.1.106, the following arguments are now deprecated in favor of ``--url``
 
-* ``--host`` - Specifies the host to connect to (e.g., ``taxiitext.mitre.org``)
+* ``--host`` - Specifies the host to connect to (e.g., ``hailataxii.com``)
 * ``--port`` - Specifies the port to connect on (e.g., ``80``)
 * ``--path`` - Specifies the path portion of the URL to connect to
   (e.g., ``/services/discovery``)
 * ``--https`` - Specifies whether to use HTTPS or not (e.g., True or False)
 
 For example, to call the discovery_client using all these arguments, you would do: 
-``discovery_client --url http://taxiitest.mitre.org/services/discovery/ --cert MyCert.crt --key MyKey.key --username foo --pass bar --proxy http://myproxy.example.com:80 --xml-output``
+``discovery_client --url http://hailataxii.com/taxii-discovery-service --cert MyCert.crt --key MyKey.key --username foo --pass bar --proxy http://myproxy.example.com:80 --xml-output``
 
 Additional Discovery Client Command Line Arguments
 --------------------------------------------------

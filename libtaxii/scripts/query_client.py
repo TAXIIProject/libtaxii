@@ -13,7 +13,7 @@ class QueryClient11Script(PollClient11Script):
                          "contained in Poll Request messages) and prints out the resulting Poll Response message" \
                          "to standard out. The Content Blocks are saved to disk (depending on the command line" \
                          "options)."
-    path = '/services/poll/'
+    path = '/taxii-data'
 
     def get_arg_parser(self, *args, **kwargs):
         parser = super(QueryClient11Script, self).get_arg_parser(*args, **kwargs)

@@ -11,7 +11,7 @@ class InboxClient11Script(TaxiiScript):
     parser_description = 'The TAXII 1.1 Inbox Client sends an Inbox Message to a TAXII Server and prints the ' \
                          'Status Message response to standard out. The Inbox Client has a "built in" STIX document ' \
                          'that is sent by default.'
-    path = '/services/inbox/'
+    path = '/taxii-data'
 
     # http://stix.mitre.org/language/version1.1.1/#samples
     # http://stix.mitre.org/language/version1.1.1/stix_v1.0_samples_20130408.zip
