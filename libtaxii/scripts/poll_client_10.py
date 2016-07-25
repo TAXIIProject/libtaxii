@@ -18,7 +18,7 @@ class PollClient10Script(TaxiiScript):
     parser_description = 'The TAXII 1.0 Poll Client sends a Poll Request message to a TAXII Server and then' \
                          'prints the Poll Response message to standard out, saving the Content Blocks to disk (' \
                          'depending on the command line arguments).'
-    path = '/services/poll/'
+    path = '/taxii-data'
 
     def get_arg_parser(self, *args, **kwargs):
         parser = super(PollClient10Script, self).get_arg_parser(*args, **kwargs)

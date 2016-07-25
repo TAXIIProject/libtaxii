@@ -17,7 +17,7 @@ class CollectionInformationClient11Script(TaxiiScript):
         'to a TAXII Server and then prints the resulting Collection Information Response to ' \
         'standard out.'
 
-    path = '/services/collection-management/'
+    path = '/taxii-data'
 
     def create_request_message(self, args):
         message_id = tm11.generate_message_id()

@@ -94,8 +94,8 @@ class TaxiiScript(object):
 
     def get_arg_parser(self,
                        parser_description,
-                       path="/services/discovery/",
-                       host="taxiitest.mitre.org",
+                       path="/taxii-discovery-service",
+                       host="hailataxii.com",
                        port="80",
                        https=False,
                        cert=None,

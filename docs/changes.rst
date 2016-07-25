@@ -7,7 +7,7 @@ Release Notes
 
 - Thank you to the multiple contributors for this release: @traut, @gtback, @wbolster, and @MarkDavidson, and thank you to those who filed issues that were fixed in this release.
 - Timestamp labels can now be provided as a string or as a python datetime object. Previously, only datetime objects were permitted.
-- Some big changes to TAXII Client command line args. Deprecated URL compenents (e.g., --host, --port) in favor of specifying a single url (--url)
+- Some big changes to TAXII Client command line args. Deprecated URL components (e.g., --host, --port) in favor of specifying a single url (--url)
 - Added a TAXII Inbox 1.0 client
 - Decreased the likelihood of future message ID collisions
 - A variety of improvements in the following areas: data validation, typos, documentation, DRY-ness, overall repo quality (thanks @gtback)

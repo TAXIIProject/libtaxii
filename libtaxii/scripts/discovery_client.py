@@ -11,7 +11,7 @@ import libtaxii.taxii_default_query as tdq
 class DiscoveryClient11Script(TaxiiScript):
     parser_description = 'The TAXII 1.1 Discovery Client sends a Discovery Request message to a TAXII Server and ' \
                          'prints out the Discovery Response message to standard out.'
-    path = '/services/discovery/'
+    path = '/taxii-discovery-service'
 
     def create_request_message(self, args):
         return tm11.DiscoveryRequest(message_id=tm11.generate_message_id())
