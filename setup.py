@@ -21,8 +21,9 @@ def get_version():
         raise AttributeError("Package does not have a __version__")
 
 
-if sys.version_info < (2, 6):
-    raise Exception('libtaxii requires Python 2.6 or higher.')
+py_maj, py_minor = sys.version_info[:2]
+ if (py_maj, py_minor) < (2, 6) or (py_maj == 3 and py_minor < 3):
+    raise Exception('libtaxii requires Python 2.6, 2.7 or 3.3+')
 
 install_requires = [
     'lxml>=2.2.3',
