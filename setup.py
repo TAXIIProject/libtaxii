@@ -22,7 +22,7 @@ def get_version():
 
 
 py_maj, py_minor = sys.version_info[:2]
- if (py_maj, py_minor) < (2, 6) or (py_maj == 3 and py_minor < 3):
+if (py_maj, py_minor) < (2, 6) or (py_maj == 3 and py_minor < 3):
     raise Exception('libtaxii requires Python 2.6, 2.7 or 3.3+')
 
 install_requires = [
