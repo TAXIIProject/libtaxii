@@ -10,15 +10,15 @@ A Python library for handling TAXII Messages and invoking TAXII Services.
 
 |travis badge| |landscape.io badge| |version badge| |downloads badge|
 
-.. |travis badge| image:: https://api.travis-ci.org/TAXIIProject/libtaxii.png?branch=master
+.. |travis badge| image:: https://api.travis-ci.org/TAXIIProject/libtaxii.svg?branch=master
    :target: https://travis-ci.org/TAXIIProject/libtaxii
    :alt: Build Status
-.. |landscape.io badge| image:: https://landscape.io/github/TAXIIProject/libtaxii/master/landscape.png
+.. |landscape.io badge| image:: https://landscape.io/github/TAXIIProject/libtaxii/master/landscape.svg?style=flat
    :target: https://landscape.io/github/TAXIIProject/libtaxii/master
    :alt: Code Health
-.. |version badge| image:: https://img.shields.io/pypi/v/libtaxii.png?maxAge=2592000
+.. |version badge| image:: https://img.shields.io/pypi/v/libtaxii.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/libtaxii/
-.. |downloads badge| image:: https://img.shields.io/pypi/dm/libtaxii.png?maxAge=2592000
+.. |downloads badge| image:: https://img.shields.io/pypi/dm/libtaxii.svg?maxAge=3600
    :target: https://pypi.python.org/pypi/libtaxii/
 
 Overview
