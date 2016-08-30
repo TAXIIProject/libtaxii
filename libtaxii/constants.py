@@ -333,6 +333,6 @@ CB_CAP_11 = 'urn:oasis:names:tc:emergency:cap:1.1'
 #: Content Binding ID for XML Encryption
 CB_XENC_122002 = 'http://www.w3.org/2001/04/xmlenc#'
 #: Content Binding ID for SMIME
-CB_SMIME = 'application/x-pks7-mime'
+CB_SMIME = 'application/x-pkcs7-mime'
 
 STD_INDENT = '  '  # A "Standard Indent" to use for to_text() methods
