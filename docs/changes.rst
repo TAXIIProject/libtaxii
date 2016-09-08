@@ -1,6 +1,30 @@
 Release Notes
 =============
 
+1.1.109 (2015-11-16)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.108...1.1.109>`__
+
+- Fix #203 - Fix SSL context on older Python 2.7 versions (@traut)
+
+1.1.108 (2015-10-29)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.107...1.1.108>`__
+
+- Support password-protected SSL keys (@traut)
+- Fix #200 - Bad encodings no longer generate Exceptions (@MarkDavidson)
+
+1.1.107 (2015-08-05)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.106...1.1.107>`__
+
+- Fix #184 - Use proxy for both HTTP and HTTPS (@nadavc)
+- Fix #187 - Handle numeric values in taxii_default_query (@stkyle)
+- Update Example Query documentation (@stkyle)
+- Fix #189 - Update how constants are used and referenced (@stkyle)
+- Show HTTP error code in StatusMessage.message (@ahippo)
+- Python 3 compatibility (@rjprins)
+
 1.1.106
 -------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.105...1.1.106>`__
