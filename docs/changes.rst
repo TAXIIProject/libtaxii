@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+1.1.110 (2016-09-08)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.109...1.1.110>`__
+
+- Fix #210 - Use hailataxii.com in examples instead of taxiitest.mitre.org (@clenk)
+- Fix #183 - Update incorrect comment (@daybarr)
+- Fix SMIME Content Binding ID typo (@brlogan)
+
 1.1.109 (2015-11-16)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.108...1.1.109>`__
