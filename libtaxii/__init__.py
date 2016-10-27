@@ -62,17 +62,17 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
 
     if taxii_content_type is None:
         m = str(http_response) + '\r\n' + str(http_response.info()) + '\r\n' + response_message
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
+        return response_message,tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
+        return response_message,tm10.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
+        return response_message,tm11.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message, encoding)
+        return response_message,tm10.get_message_from_json(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
+    return response_message,None
 
 
 def get_message_from_urllib_addinfourl(http_response, in_response_to):
@@ -93,18 +93,18 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
 
         m = ''.join(message)
 
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
+        return response_message,tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
+        return response_message,tm10.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
+        return response_message,tm11.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message, encoding)
+        return response_message,tm10.get_message_from_json(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
+    return response_message,None
 
 
 def get_message_from_httplib_http_response(http_response, in_response_to):
@@ -125,13 +125,13 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
 
         m = ''.join(message)
 
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
+        return response_message,tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
+        return response_message,tm10.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
+        return response_message,tm11.get_message_from_xml(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
+    return response_message,None
