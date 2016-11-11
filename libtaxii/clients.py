@@ -198,7 +198,7 @@ class HttpClient(object):
         return response
 
     def call_taxii_service2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
-                            content_type=None, headers=None):
+                            content_type=None, headers=None, user_agent=None):
         """Call a TAXII service.
 
         **Note:** this uses urllib2 instead of httplib, and therefore returns
@@ -213,7 +213,11 @@ class HttpClient(object):
             for k, v in six.iteritems(headers):
                 header_dict[k.lower()] = v
 
-        header_dict['User-Agent'] = 'libtaxii.httpclient'
+        if user_agent is not None:
+            header_dict['User-Agent'] = user_agent
+        else:
+            header_dict['User-Agent'] = 'libtaxii.httpclient'
+
         header_dict[HttpClient.HEADER_X_TAXII_CONTENT_TYPE] = message_binding
 
         content_type_map = {VID_TAXII_XML_10: 'application/xml',
