@@ -10,3 +10,4 @@ output.txt
 libtaxii/test/output/
 docs/_build/
 .idea
+.cache
