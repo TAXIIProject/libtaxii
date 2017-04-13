@@ -1,18 +1,15 @@
 """
 Common utility classes and functions used throughout libtaxii.
-
 """
 
-
-
 from operator import attrgetter
-from re import sub as resub
-import dateutil.parser
 import random
-from libtaxii.constants import *
-from lxml import etree
-from uuid import uuid4
+import re
 import sys
+from uuid import uuid4
+
+import dateutil.parser
+from lxml import etree
 import six
 
 try:
@@ -20,6 +17,7 @@ try:
 except ImportError:
     import json
 
+from libtaxii.constants import *
 
 _XML_PARSER = None
 
@@ -49,10 +47,17 @@ def parse_xml_string(xmlstr):
     if isinstance(xmlstr, six.binary_type):
         xmlstr = six.BytesIO(xmlstr)
     elif isinstance(xmlstr, six.text_type):
-        xmlstr = six.StringIO(xmlstr)
+        # LXML doesn't accept Unicode strings with an explicit encoding, so
+        # try to detect and encode to bytes before passing to LXML.
+        encoding = re.findall(r'encoding="([0-9A-Za-z_\-]+)"', xmlstr[:50], re.I)
+        # re.findall returns a list of matching strings. We only care about the
+        # first one.
+        if encoding:
+            xmlstr = six.BytesIO(xmlstr.encode(encoding[0]))
+        else:
+            xmlstr = six.StringIO(xmlstr)
 
     return parse(xmlstr)
-
 
 
 def get_xml_parser():
@@ -173,7 +178,7 @@ def gen_filename(collection_name, format_part, date_string, extension):
 
     filename = (collection_name.lstrip(".") +
                 format_part +
-                resub(r"[^a-zA-Z0-9]", "_", date_string) + extension
+                re.sub(r"[^a-zA-Z0-9]", "_", date_string) + extension
                 ).translate(None, '/\\:*?"<>|')
     return filename
 

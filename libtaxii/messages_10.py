@@ -73,8 +73,9 @@ def get_message_from_xml(xml_string, encoding='utf_8'):
             message_xml = message.to_xml()
             new_message = tm10.get_message_from_xml(message_xml)
     """
-    decoded_string = xml_string.decode(encoding, 'replace')
-    etree_xml = parse_xml_string(decoded_string)
+    if isinstance(xml_string, six.binary_type):
+        xml_string = xml_string.decode(encoding, 'replace')
+    etree_xml = parse_xml_string(xml_string)
     qn = etree.QName(etree_xml)
     if qn.namespace != ns_map['taxii']:
         raise ValueError('Unsupported namespace: %s' % qn.namespace)
