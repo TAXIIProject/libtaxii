@@ -198,7 +198,7 @@ class HttpClient(object):
         return response
 
     def call_taxii_service2(self, host, path, message_binding, post_data, port=None, get_params_dict=None,
-                            content_type=None, headers=None, user_agent=None):
+                            content_type=None, headers=None, user_agent=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
         """Call a TAXII service.
 
         **Note:** this uses urllib2 instead of httplib, and therefore returns
@@ -344,7 +344,7 @@ class HttpClient(object):
 
         req = urllib.request.Request(url, post_data, header_dict)
         try:
-            response = urllib.request.urlopen(req)
+            response = urllib.request.urlopen(req, timeout=timeout)
             return response
         except urllib.error.HTTPError as error:
             return error
