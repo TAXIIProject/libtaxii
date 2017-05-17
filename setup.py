@@ -39,17 +39,6 @@ except ImportError:
 with open("README.rst") as f:
     long_description = f.read()
 
-extras_require = {
-    'docs': [
-        'Sphinx==1.3.1',
-        'sphinx_rtd_theme==0.1.8',
-    ],
-    'test': [
-        "pytest==3.0.6",
-        "tox==2.6.0",
-    ],
-}
-
 setup(
     name='libtaxii',
     description='TAXII Library.',
@@ -59,7 +48,6 @@ setup(
     version=get_version(),
     packages=find_packages(),
     install_requires=install_requires,
-    extras_require=extras_require,
     scripts=[
         'libtaxii/scripts/collection_information_client.py',
         'libtaxii/scripts/discovery_client.py',
@@ -89,4 +77,17 @@ setup(
     package_data={'libtaxii': ['xsd/*.xsd']},
     long_description=long_description,
     keywords="taxii libtaxii",
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+    ]
 )

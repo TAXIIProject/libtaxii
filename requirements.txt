@@ -1,1 +1,6 @@
--e .[docs,test]
+Sphinx==1.6.1
+sphinx_rtd_theme==0.2.4
+pytest==3.0.7
+tox==2.7.0
+
+-e  .
