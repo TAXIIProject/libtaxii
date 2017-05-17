@@ -1,22 +1,14 @@
 language: python
-env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py33
-  - TOXENV=py34
-  - TOXENV=py35
-  - TOXENV=rhel6
-
-install:
-  - pip install tox
-
-script:
-  - tox
-
-branches:
-  only:
-    - master
-
+sudo: false   # Since this is an older project, this is not the default.
+cache: pip
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+install: pip install tox-travis
+script: tox
 notifications:
   email:
     - gback@mitre.org
