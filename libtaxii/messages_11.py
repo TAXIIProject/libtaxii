@@ -674,7 +674,7 @@ class ContentBlock(TAXIIBase11):
     def __init__(self, content_binding, content, timestamp_label=None,
                  padding=None, message=None):
         self.content_binding = content_binding
-        self.content, self.content_is_xml = stringify_content(content)
+        self.content = content
         self.timestamp_label = timestamp_label
         self.message = message
         self.padding = padding
