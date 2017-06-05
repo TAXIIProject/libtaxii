@@ -246,6 +246,8 @@ class TaxiiScript(object):
             elif cb.content_binding == CB_STIX_XML_111:
                 format_ = '_STIX111_'
                 ext = '.xml'
+            elif cb.content_binding == CB_STIX_XML_12:
+                format_ = '_STIX12_'
             else:  # Format and extension are unknown
                 format_ = ''
                 ext = ''
@@ -285,6 +287,9 @@ class TaxiiScript(object):
                 ext = '.xml'
             elif cb.content_binding.binding_id == CB_STIX_XML_111:
                 format_ = '_STIX111_'
+                ext = '.xml'
+            elif cb.content_binding.binding_id == CB_STIX_XML_12:
+                format_ = '_STIX12_'
                 ext = '.xml'
             else:  # Format and extension are unknown
                 format_ = ''

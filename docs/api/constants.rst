@@ -31,6 +31,7 @@ The following constants should be used as the Content Binding ID for STIX XML.
 .. autodata:: CB_STIX_XML_101
 .. autodata:: CB_STIX_XML_11
 .. autodata:: CB_STIX_XML_111
+.. autodata:: CB_STIX_XML_12
 
 These other Content Binding IDs are included for convenience as well.
 
