@@ -741,8 +741,7 @@ class ContentBlock(TAXIIBase11):
                 return content.read(), False
         else:  # The Content is not file-like
             try:  # Attempt to parse string as XML
-                sio_content = six.StringIO(content)
-                xml = parse(sio_content)
+                xml = parse_xml_string(content)
                 return xml, True
             except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
                 if isinstance(content, six.string_types):  # It's a string of some kind, unicode or otherwise
