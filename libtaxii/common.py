@@ -403,3 +403,31 @@ def _decode_binary_fields(dict_obj):
 
         elif isinstance(value, dict):
             _decode_binary_fields(value)
+
+
+def stringify_content(content):
+    """Always a string or raises an error.
+    Returns the string representation and whether the data is XML.
+    """
+    # If it's an etree, it's definitely XML
+    if isinstance(content, etree._ElementTree):
+        return content.getroot(), True
+
+    if isinstance(content, etree._Element):
+        return content, True
+
+    if hasattr(content, 'read'):  # The content is file-like
+        try:  # Try to parse as XML
+            xml = parse(content)
+            return xml, True
+        except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
+            return content.read(), False
+    else:  # The Content is not file-like
+        try:  # Attempt to parse string as XML
+            xml = parse_xml_string(content)
+            return xml, True
+        except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
+            if isinstance(content, six.string_types):  # It's a string of some kind, unicode or otherwise
+                return content, False
+            else:  # It's some other datatype that needs casting to string
+                return str(content), False

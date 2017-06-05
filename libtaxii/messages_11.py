@@ -24,7 +24,8 @@ import warnings
 from lxml import etree
 
 from .common import (parse, parse_datetime_string, append_any_content_etree, TAXIIBase,
-                     get_required, get_optional, get_optional_text, parse_xml_string)
+                     get_required, get_optional, get_optional_text, parse_xml_string,
+                     stringify_content)
 from .validation import do_check, uri_regex, check_timestamp_label
 from .constants import *
 
@@ -673,7 +674,7 @@ class ContentBlock(TAXIIBase11):
     def __init__(self, content_binding, content, timestamp_label=None,
                  padding=None, message=None):
         self.content_binding = content_binding
-        self.content, self.content_is_xml = self._stringify_content(content)
+        self.content, self.content_is_xml = stringify_content(content)
         self.timestamp_label = timestamp_label
         self.message = message
         self.padding = padding
@@ -702,7 +703,7 @@ class ContentBlock(TAXIIBase11):
     @content.setter
     def content(self, value):
         do_check(value, 'content')  # Just check for not None
-        self._content, self.content_is_xml = self._stringify_content(value)
+        self._content, self.content_is_xml = stringify_content(value)
 
     @property
     def content_is_xml(self):
@@ -721,33 +722,6 @@ class ContentBlock(TAXIIBase11):
     def timestamp_label(self, value):
         value = check_timestamp_label(value, 'timestamp_label', can_be_none=True)
         self._timestamp_label = value
-
-    def _stringify_content(self, content):
-        """Always a string or raises an error.
-        Returns the string representation and whether the data is XML.
-        """
-        # If it's an etree, it's definitely XML
-        if isinstance(content, etree._ElementTree):
-            return content.getroot(), True
-
-        if isinstance(content, etree._Element):
-            return content, True
-
-        if hasattr(content, 'read'):  # The content is file-like
-            try:  # Try to parse as XML
-                xml = parse(content)
-                return xml, True
-            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
-                return content.read(), False
-        else:  # The Content is not file-like
-            try:  # Attempt to parse string as XML
-                xml = parse_xml_string(content)
-                return xml, True
-            except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
-                if isinstance(content, six.string_types):  # It's a string of some kind, unicode or otherwise
-                    return content, False
-                else:  # It's some other datatype that needs casting to string
-                    return str(content), False
 
     @property
     def message(self):
