@@ -416,20 +416,20 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
         # The httplib.HTTPSConnection init arguments have changed over different Python versions:
         # Py 2.6: httplib.HTTPSConnection(host[, port[, key_file[, cert_file[, strict[, timeout]]]]])
         # Py 2.7: httplib.HTTPSConnection(host[, port[, key_file[, cert_file[, strict[, timeout[, source_address[, context]]]]]]])
-        # Py 3.4: http.client.HTTPSConnection(host, port=None, key_file=None, cert_file=None, [timeout, ]source_address=None, *, context=None, check_hostname=None)
+        # Py 3.3: http.client.HTTPSConnection(host, port=None, key_file=None, cert_file=None[, strict][, timeout], source_address=None, *, context=None, check_hostname=None)
+        # Py 3.4-3.6: http.client.HTTPSConnection(host, port=None, key_file=None, cert_file=None, [timeout, ]source_address=None, *, context=None, check_hostname=None)
 
+        python_version = sys.version_info[0:2]  # (e.g. 2.6, 2.7, 3.3, etc.)
         self.context = None
 
-        if sys.version_info.major == 2 and sys.version_info.minor == 6:
+        if python_version == (2, 6):
             six.moves.http_client.HTTPSConnection.__init__(
                 self, host, port, key_file, cert_file, strict, timeout)
 
             if key_password:
                 warnings.warn('Key password is not supported in Python 2.6. Ignoring')
 
-        elif ((sys.version_info.major == 2 and sys.version_info.minor == 7)
-                or (sys.version_info.major == 3 and sys.version_info.minor == 4)):
-
+        elif python_version == (2, 7) or six.PY3:
             if hasattr(ssl, "create_default_context"):
                 self.context = ssl.create_default_context(
                     ssl.Purpose.CLIENT_AUTH, cafile=ca_certs)
@@ -441,7 +441,7 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
             if not self.context and key_password:
                 warnings.warn('Key password is not supported in Python <2.7.9. Ignoring')
 
-            if sys.version_info.major == 2 and sys.version_info.minor == 7:
+            if python_version == (2, 7):
                 if self.context:
                     six.moves.http_client.HTTPSConnection.__init__(
                         self, host, port, strict=strict, timeout=timeout,
@@ -451,12 +451,12 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
                         self, host, port, strict=strict, timeout=timeout,
                         source_address=source_address)
 
-            elif sys.version_info.major == 3 and sys.version_info.minor == 4:
+            elif six.PY3:
                 super(VerifiableHTTPSConnection, self).__init__(
                     host, port, timeout=timeout, source_address=source_address,
                     context=self.context)
         else:
-            raise RuntimeError("Unsupported Python version: '{0}'".format(sys.version))
+            raise RuntimeError("Unsupported Python version: '{0}'".format(python_version))
 
         self.cert_file = cert_file
         self.key_file = key_file
