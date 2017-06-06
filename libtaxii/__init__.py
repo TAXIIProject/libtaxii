@@ -52,8 +52,13 @@ def get_message_from_http_response(http_response, in_response_to):
     else:
         raise ValueError('Unsupported response type: %s.' % http_response.__class__.__name__)
 
+def return_check(return_message,message,object):
+    if return_message:
+        return message,object
+    else:
+        return object
 
-def get_message_from_urllib2_httperror(http_response, in_response_to):
+def get_message_from_urllib2_httperror(http_response, in_response_to, return_message=False):
     """ This function should not be called by libtaxii users directly. """
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
     _, params = cgi.parse_header(http_response.info().getheader('Content-Type'))
@@ -62,20 +67,20 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
 
     if taxii_content_type is None:
         m = str(http_response) + '\r\n' + str(http_response.info()) + '\r\n' + response_message
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
+        return return_check(return_message,response_message,tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m))
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
+        return return_check(return_message,response_message,tm10.get_message_from_xml(response_message, encoding))
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
+        return return_check(return_message,response_message,tm11.get_message_from_xml(response_message, encoding))
     elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message, encoding)
+        return return_check(return_message,response_message,tm10.get_message_from_json(response_message, encoding))
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
+    return return_check(return_message,response_message,None)
 
 
-def get_message_from_urllib_addinfourl(http_response, in_response_to):
+def get_message_from_urllib_addinfourl(http_response, in_response_to, return_message=False):
     """ This function should not be called by libtaxii users directly. """
     taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
     _, params = cgi.parse_header(http_response.info().getheader('Content-Type'))
@@ -93,21 +98,21 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
 
         m = ''.join(message)
 
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
+        return return_check(return_message,response_message,tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m))
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
+        return return_check(return_message,response_message,tm10.get_message_from_xml(response_message, encoding))
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
+        return return_check(return_message,response_message,tm11.get_message_from_xml(response_message, encoding))
     elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message, encoding)
+        return return_check(return_message,response_message,tm10.get_message_from_json(response_message, encoding))
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
+    return return_check(return_message,response_message,None)
 
 
-def get_message_from_httplib_http_response(http_response, in_response_to):
+def get_message_from_httplib_http_response(http_response, in_response_to, return_message=False):
     """ This function should not be called by libtaxii users directly. """
     taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
     _, params = cgi.parse_header(http_response.getheader('Content-Type'))
@@ -125,13 +130,13 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
 
         m = ''.join(message)
 
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
+        return return_check(return_message,response_message,tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m))
 
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
+        return return_check(return_message,response_message,tm10.get_message_from_xml(response_message, encoding))
     elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
+        return return_check(return_message,response_message,tm11.get_message_from_xml(response_message, encoding))
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
+    return return_check(return_message,response_message,None)
