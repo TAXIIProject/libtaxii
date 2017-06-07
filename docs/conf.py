@@ -1,9 +1,12 @@
+# Copyright (c) 2017, The MITRE Corporation
+# For license information, see the LICENSE.txt file
+
 import os
 
 import libtaxii
 
 project = u'libtaxii'
-copyright = u'2014, The MITRE Corporation'
+copyright = u'2017, The MITRE Corporation'
 version = libtaxii.__version__
 release = version
 

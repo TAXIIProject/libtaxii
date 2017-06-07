@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2015 - The MITRE Corporation
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
 from os.path import abspath, dirname, join
@@ -42,9 +42,9 @@ with open("README.rst") as f:
 setup(
     name='libtaxii',
     description='TAXII Library.',
-    author='Mark Davidson',
-    author_email='mdavidson@mitre.org',
-    url="http://taxii.mitre.org/",
+    author='The MITRE Corporation',
+    author_email='taxii@mitre.org',
+    url="https://taxiiproject.github.io/",
     version=get_version(),
     packages=find_packages(),
     install_requires=install_requires,

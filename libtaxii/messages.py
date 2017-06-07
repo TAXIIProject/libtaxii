@@ -1,4 +1,4 @@
-# Copyright (C) 2014 - The MITRE Corporation
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
 """Backwards compatibility for TAXII 1.0.

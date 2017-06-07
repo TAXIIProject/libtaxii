@@ -1,10 +1,5 @@
-
-
-# Copyright (C) 2013 - The MITRE Corporation
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
-
-# Contributors:
-# * Mark Davidson - mdavidson@mitre.org
 
 import datetime
 

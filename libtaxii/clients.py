@@ -1,9 +1,5 @@
-# Copyright (C) 2013 - The MITRE Corporation
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
-
-# Contributors:
-# * Alex Ciobanu - calex@cert.europa.eu
-# * Mark Davidson - mdavidson@mitre.org
 
 """
 TAXII Clients

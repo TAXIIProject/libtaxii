@@ -1,7 +1,6 @@
-
-
 #!/usr/bin/env python
-# Copyright (c) 2014, The MITRE Corporation. All rights reserved.
+
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
 from libtaxii.scripts import TaxiiScript, add_poll_response_args

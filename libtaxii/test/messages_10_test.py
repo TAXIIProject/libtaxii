@@ -1,14 +1,9 @@
-
-
-# Copyright (C) 2013 - The MITRE Corporation
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
 # This file has two purposes:
 # 1. To provide a rough unit test of libtaxii.messages
 # 2. To provide examples of how to use libtaxii.messages
-
-# Contributors:
-# * Mark Davidson - mdavidson@mitre.org
 
 import datetime
 import unittest
@@ -692,7 +687,7 @@ class EncodingsTest(unittest.TestCase):
         """
         Test all the encodings for TAXII 1.0 XML
         """
-        
+
         for encoding in PYTHON_ENCODINGS:
             if encoding in ('cp720', 'cp858', 'iso8859_11') and (sys.version_info[0] == 2 and sys.version_info[1] == 6):
                 continue  # This encoding is not supported in Python 2.6
@@ -707,7 +702,7 @@ class EncodingsTest(unittest.TestCase):
         """
         Test all the encodings for TAXII 1.0 JSON
         """
-        
+
         for encoding in PYTHON_ENCODINGS:
             if encoding in ('cp720', 'cp858', 'iso8859_11') and (sys.version_info[0] == 2 and sys.version_info[1] == 6):
                 continue  # This encoding is not supported in Python 2.6

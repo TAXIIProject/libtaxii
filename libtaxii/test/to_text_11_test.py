@@ -1,6 +1,6 @@
-
 #!/usr/bin/env python
-# Copyright (c) 2015, The MITRE Corporation. All rights reserved.
+
+# Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
 import glob
