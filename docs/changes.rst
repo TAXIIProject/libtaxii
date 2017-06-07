@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+1.1.111 (2017-06-07)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.110...1.1.111>`__
+
+- Fix #222, #224 - Update clients.py to work with Python 2.6, 3.3, 3.5, and 3.6.
+- Fix #221 - Add Python 3.6 support.
+- Fix #219 - Handle Unicode- and byte-strings consistently.
+- Fix #214 - Add timeout parameter to call_taxii_service2 (@mbekavac)
+- Fix #192 - Add support for STIX 1.2.
+- Add user_agent parameter to call_taxii_service2 (@kralka)
+
+
 1.1.110 (2016-09-08)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.109...1.1.110>`__
@@ -97,7 +109,7 @@ Minor changes:
 
 Bug fixes:
 
-- In messages_11.PollResponse, the result_part_number parameter is now set by the constructor. 
+- In messages_11.PollResponse, the result_part_number parameter is now set by the constructor.
 
 
 1.1.102
