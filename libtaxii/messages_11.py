@@ -3012,7 +3012,7 @@ class StatusMessage(TAXIIMessage):
                 if name not in kwargs['status_detail']:
                     kwargs['status_detail'][name] = v
                 else:  # It already exists
-                    if not isinstance(kwargs['status_detail'], list):
+                    if not isinstance(kwargs['status_detail'][name], list):
                         kwargs['status_detail'][name] = [kwargs['status_detail'][name]]  # Make it a list
                     kwargs['status_detail'][name].append(v)
             else:

@@ -355,6 +355,27 @@ class StatusMessageTests(unittest.TestCase):
         kwargs = {'message_id': '1', 'in_response_to': '2', 'status_type': ST_FAILURE, 'message': {}}
         self.assertRaises(ValueError, tm11.StatusMessage, **kwargs)
 
+    def test_status_message_12(self):
+        # https://github.com/TAXIIProject/libtaxii/issues/230
+        collections = ['Collection1', 'Collection2', 'Collection3']
+        sm12 = tm11.StatusMessage(
+            message_id='SM12',  # Required
+            in_response_to=tm11.generate_message_id(),  # Required, should be the ID of the message that this is in response to
+            status_type=ST_DESTINATION_COLLECTION_ERROR,  # Required
+            status_detail={'ACCEPTABLE_DESTINATION': collections}, # Add 3 collections to trigger the bug
+            message=None  # Optional
+        )
+        round_trip_message(sm12)
+
+        self.assertEqual(sm12.status_detail['ACCEPTABLE_DESTINATION'], collections)
+
+        # Parse the XML
+        parsed_sm12 = tm11.StatusMessage.from_xml(sm12.to_xml())
+
+        # If the bug is present the value returned will be:
+        # [['Collection1', 'Collection2'], 'Collection3']
+        self.assertEqual(parsed_sm12.status_detail['ACCEPTABLE_DESTINATION'], collections)
+
     # TODO: TEst the query status types
 
     def test_xml_ext_header(self):
