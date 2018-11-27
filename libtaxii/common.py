@@ -175,12 +175,16 @@ def gen_filename(collection_name, format_part, date_string, extension):
     :param extension: The file extension to use
     :return: A string containing the generated filename
     """
-
-    filename = (collection_name.lstrip(".") +
+    if six.PY3:
+        return (collection_name.lstrip(".") +
+                format_part +
+                re.sub(r"[^a-zA-Z0-9]", "_", date_string) + extension
+                ).translate('/\\:*?"<>|')
+    else:
+        return (collection_name.lstrip(".") +
                 format_part +
                 re.sub(r"[^a-zA-Z0-9]", "_", date_string) + extension
                 ).translate(None, '/\\:*?"<>|')
-    return filename
 
 
 class TAXIIBase(object):

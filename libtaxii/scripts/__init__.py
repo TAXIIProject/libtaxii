@@ -2,6 +2,7 @@
 # For license information, see the LICENSE.txt file
 
 import argparse
+import io
 import os
 import sys
 import traceback
@@ -263,7 +264,7 @@ class TaxiiScript(object):
         write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
         if write:
-            with open(filename, 'w') as f:
+            with io.open(filename, 'wb') as f:
                 f.write(cb.content)
 
         print("%s%s" % (message, filename))
@@ -306,7 +307,7 @@ class TaxiiScript(object):
             write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
             if write:
-                with open(filename, 'w') as f:
+                with io.open(filename, 'wb') as f:
                     f.write(cb.content)
 
             print("%s%s" % (message, filename))
