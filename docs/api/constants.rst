@@ -1,5 +1,6 @@
 :mod:`libtaxii.constants` Module
 ================================
+
 .. module:: libtaxii.constants
 
 Constants

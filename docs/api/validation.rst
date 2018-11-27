@@ -1,9 +1,12 @@
 :mod:`libtaxii.validation` Module
----------------------------------
+=================================
 
 .. _apivalidation:
 
 .. currentmodule:: libtaxii.validation
+
+Validate TAXII Content
+----------------------
 
 .. autoclass:: SchemaValidator
     :members:

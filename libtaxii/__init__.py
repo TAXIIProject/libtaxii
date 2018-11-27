@@ -37,7 +37,7 @@ def get_message_from_http_response(http_response, in_response_to):
     Args:
         http_response (httplib.HTTPResponse): the HTTP response to
             parse
-        in_reponse_to (str): the default value for in_response_to
+        in_response_to (str): the default value for in_response_to
     """
     if isinstance(http_response, six.moves.http_client.HTTPResponse):
         return get_message_from_httplib_http_response(http_response, in_response_to)

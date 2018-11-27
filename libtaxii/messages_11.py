@@ -2468,7 +2468,7 @@ class PollParameters(_GenericParameters):
         query (Query): The query for this poll parameters. **Optional**
         allow_asynch (bool): Indicates whether the client supports
             asynchronous polling. **Optional**, defaults to ``False``
-        delivery_parameters (DeliveryParameters): The requested delivery
+        delivery_parameters (libtaxii.messages_11.DeliveryParameters): The requested delivery
             parameters for this object. **Optional**
 
     If ``content_bindings`` in not provided, this indicates that all
@@ -3050,7 +3050,7 @@ class InboxMessage(TAXIIMessage):
         result_id (str): the result id. **Optional**
         destination_collection_names (list of str): Each string indicates a
              destination collection name. **Optional**
-        subscription_information (SubscriptionInformation): This
+        subscription_information (libtaxii.messages_11.SubscriptionInformation): This
             field is only present if this message is being sent to provide
             content in accordance with an existing TAXII Data Collection
             subscription. **Optional**

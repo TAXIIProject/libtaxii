@@ -2005,7 +2005,7 @@ class InboxMessage(TAXIIMessage):
         extended_headers (dict): A dictionary of name/value pairs for
             use as Extended Headers. **Optional**
         message (str): prose information for the message recipient. **Optional**
-        subscription_information (SubscriptionInformation): This
+        subscription_information (libtaxii.messages_10.SubscriptionInformation): This
             field is only present if this message is being sent to provide
             content in accordance with an existing TAXII Data Feed
             subscription. **Optional**
@@ -2482,7 +2482,7 @@ class SubscriptionInstance(TAXIIBase10):
 
     Args:
         subscription_id (str): the id of the subscription. **Required**
-        delivery_parameters (DeliveryParameters): the parameters
+        delivery_parameters (libtaxii.messages_10.DeliveryParameters): the parameters
             for this subscription. **Required** if responding to message
             with ``action==``:py:data:`ACT_STATUS`, otherwise **Prohibited**
         poll_instances (list of PollInstance): Each Poll

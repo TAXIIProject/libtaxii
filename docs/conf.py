@@ -20,7 +20,7 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/', None),
+    'python': ('https://docs.python.org/', None),
 }
 
 templates_path = ['_templates']

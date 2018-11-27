@@ -1,5 +1,6 @@
 :mod:`libtaxii.taxii_default_query` Module
 ==========================================
+
 .. automodule:: libtaxii.taxii_default_query
 
 Classes
@@ -147,5 +148,3 @@ Default Query Info
 	tdqi1 = tdq.DefaultQueryInfo(
 	    targeting_expression_infos=[tei_01, tei_02],
 	    capability_modules=[CM_CORE])
-
-
