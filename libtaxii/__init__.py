@@ -68,8 +68,6 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
-
 
 def get_message_from_urllib_addinfourl(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
@@ -100,8 +98,6 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
 
-    return None
-
 
 def get_message_from_httplib_http_response(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
@@ -129,5 +125,3 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
         return tm11.get_message_from_xml(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
-
-    return None
