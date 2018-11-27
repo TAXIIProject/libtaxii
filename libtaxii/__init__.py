@@ -51,8 +51,15 @@ def get_message_from_http_response(http_response, in_response_to):
 
 def get_message_from_urllib2_httperror(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
-    taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
-    _, params = cgi.parse_header(http_response.info().getheader('Content-Type'))
+    info = http_response.info()
+
+    if hasattr(info, 'getheader'):
+        taxii_content_type = info.getheader('X-TAXII-Content-Type')
+        _, params = cgi.parse_header(info.getheader('Content-Type'))
+    else:
+        taxii_content_type = info.get('X-TAXII-Content-Type')
+        _, params = cgi.parse_header(info.get('Content-Type'))
+
     encoding = params.get('charset', 'utf-8')
     response_message = http_response.read()
 
@@ -71,8 +78,15 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
 
 def get_message_from_urllib_addinfourl(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
-    taxii_content_type = http_response.info().getheader('X-TAXII-Content-Type')
-    _, params = cgi.parse_header(http_response.info().getheader('Content-Type'))
+    info = http_response.info()
+
+    if hasattr(info, 'getheader'):
+        taxii_content_type = info.getheader('X-TAXII-Content-Type')
+        _, params = cgi.parse_header(info.getheader('Content-Type'))
+    else:
+        taxii_content_type = info.get('X-TAXII-Content-Type')
+        _, params = cgi.parse_header(info.get('Content-Type'))
+
     encoding = params.get('charset', 'utf-8')
     response_message = http_response.read()
 
@@ -101,8 +115,13 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
 
 def get_message_from_httplib_http_response(http_response, in_response_to):
     """ This function should not be called by libtaxii users directly. """
-    taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
-    _, params = cgi.parse_header(http_response.getheader('Content-Type'))
+    if hasattr(http_response, 'getheader'):
+        taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
+        _, params = cgi.parse_header(http_response.getheader('Content-Type'))
+    else:
+        taxii_content_type = http_response.get('X-TAXII-Content-Type')
+        _, params = cgi.parse_header(http_response.get('Content-Type'))
+
     encoding = params.get('charset', 'utf-8')
     response_message = http_response.read()
 
