@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+1.1.112 (2018-11-27)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.111...1.1.112>`__
+
+- #227 Fixes to poll_client script (Python3 compatibility)
+- #226 Clean-up documentation warnings
+- #228 Fix 'HTTPMessage' has no attribute 'getheader' (Python3 compatibility)
+- #225 Fix checks that involve xpath (lxml) to prevent FutureWarning message
+- #230 Fix parsing status message round-trip (@danielsamuels)
+
 1.1.111 (2017-06-07)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.110...1.1.111>`__
