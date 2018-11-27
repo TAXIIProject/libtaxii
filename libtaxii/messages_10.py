@@ -454,7 +454,6 @@ class TAXIIMessage(TAXIIBase10):
 
         return cls(message_id, extended_headers=extended_headers, **kwargs)
 
-
     @classmethod
     def from_xml(cls, xml):
         """Parse a Message from XML.
@@ -1975,9 +1974,9 @@ class StatusMessage(TAXIIMessage):
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = dict(
-            status_type = etree_xml.attrib['status_type'],
-            status_detail = get_optional_text(etree_xml, './taxii:Status_Detail', ns_map),
-            message = get_optional_text(etree_xml, './taxii:Message', ns_map),
+            status_type=etree_xml.attrib['status_type'],
+            status_detail=get_optional_text(etree_xml, './taxii:Status_Detail', ns_map),
+            message=get_optional_text(etree_xml, './taxii:Message', ns_map),
         )
 
         msg = super(StatusMessage, cls).from_etree(etree_xml, **kwargs)
@@ -1986,9 +1985,9 @@ class StatusMessage(TAXIIMessage):
     @classmethod
     def from_dict(cls, d):
         kwargs = dict(
-            status_type = d['status_type'],
-            status_detail = d.get('status_detail'),
-            message = d.get('message')
+            status_type=d['status_type'],
+            status_detail=d.get('status_detail'),
+            message=d.get('message')
         )
 
         msg = super(StatusMessage, cls).from_dict(d, **kwargs)
@@ -2337,11 +2336,11 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     @classmethod
     def from_etree(cls, etree_xml):
         kwargs = dict(
-            feed_name = get_required(etree_xml, './@feed_name', ns_map),
-            action = get_required(etree_xml, './@action', ns_map),
+            feed_name=get_required(etree_xml, './@feed_name', ns_map),
+            action=get_required(etree_xml, './@action', ns_map),
 
             # subscription_id is not required for action 'SUBSCRIBE'
-            subscription_id = get_optional(etree_xml, './@subscription_id', ns_map),
+            subscription_id=get_optional(etree_xml, './@subscription_id', ns_map),
         )
 
         # marked as required in spec but as optional is XSD
@@ -2355,10 +2354,10 @@ class ManageFeedSubscriptionRequest(TAXIIMessage):
     @classmethod
     def from_dict(cls, d):
         kwargs = dict(
-            feed_name = d['feed_name'],
-            action = d['action'],
-            subscription_id = d['subscription_id'],
-            delivery_parameters = DeliveryParameters.from_dict(d['delivery_parameters'])
+            feed_name=d['feed_name'],
+            action=d['action'],
+            subscription_id=d['subscription_id'],
+            delivery_parameters=DeliveryParameters.from_dict(d['delivery_parameters'])
         )
 
         msg = super(ManageFeedSubscriptionRequest, cls).from_dict(d, **kwargs)
