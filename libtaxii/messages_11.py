@@ -1073,7 +1073,7 @@ class TAXIIMessage(TAXIIBase11):
 
         # Get in response to, if present
         in_response_to = get_optional(src_etree, '/taxii_11:*/@in_response_to', ns_map)
-        if in_response_to:
+        if in_response_to is not None:
             kwargs['in_response_to'] = in_response_to
 
         # Get the Extended headers

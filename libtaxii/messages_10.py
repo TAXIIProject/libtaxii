@@ -436,7 +436,7 @@ class TAXIIMessage(TAXIIBase10):
 
         # Get in response to, if present
         in_response_to = get_optional(src_etree, '/taxii:*/@in_response_to', ns_map)
-        if in_response_to:
+        if in_response_to is not None:
             kwargs['in_response_to'] = in_response_to
 
         # Get the Extended headers
@@ -2568,7 +2568,7 @@ class SubscriptionInstance(TAXIIBase10):
         subscription_id = etree_xml.attrib['subscription_id']
 
         _delivery_parameters = get_optional(etree_xml, './taxii:Push_Parameters', ns_map)
-        if _delivery_parameters:
+        if _delivery_parameters is not None:
             delivery_parameters = DeliveryParameters.from_etree(_delivery_parameters)
         else:
             delivery_parameters = None
