@@ -12,11 +12,12 @@ import os
 from libtaxii.common import gen_filename
 from libtaxii.constants import *
 
+
 class PollClient10Script(TaxiiScript):
     taxii_version = VID_TAXII_XML_10
-    parser_description = 'The TAXII 1.0 Poll Client sends a Poll Request message to a TAXII Server and then' \
-                         'prints the Poll Response message to standard out, saving the Content Blocks to disk (' \
-                         'depending on the command line arguments).'
+    parser_description = ('The TAXII 1.0 Poll Client sends a Poll Request message to a TAXII Server and then'
+                          'prints the Poll Response message to standard out, saving the Content Blocks to disk ('
+                          'depending on the command line arguments).')
     path = '/taxii-data'
 
     def get_arg_parser(self, *args, **kwargs):
@@ -58,7 +59,7 @@ class PollClient10Script(TaxiiScript):
             else:
                 end_ts = None
         except ValueError:
-            print("Unable to parse timestamp value. Timestamp should include both date and time information along " \
+            print("Unable to parse timestamp value. Timestamp should include both date and time information along "
                   "with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). Aborting poll.")
             sys.exit()
 
@@ -78,6 +79,7 @@ class PollClient10Script(TaxiiScript):
 def main():
     script = PollClient10Script()
     script()
+
 
 if __name__ == "__main__":
     main()

@@ -12,11 +12,11 @@ import datetime
 from libtaxii.common import gen_filename
 from libtaxii.constants import *
 
+
 class PollClient11Script(TaxiiScript):
-    parser_description = 'The TAXII 1.1 Poll Client sends a Poll Request to a TAXII Poll Service then,' \
-                         ' depending on the ' \
-                         'provided command line arguments, writes the Content Blocks in the response to disk. ' \
-                         'Various options for the Poll Request can be set on the command line.'
+    parser_description = ('The TAXII 1.1 Poll Client sends a Poll Request to a TAXII Poll Service then, depending on'
+                          ' the provided command line arguments, writes the Content Blocks in the response to disk.'
+                          ' Various options for the Poll Request can be set on the command line.')
     path = '/taxii-data'
 
     def get_arg_parser(self, *args, **kwargs):
@@ -58,8 +58,8 @@ class PollClient11Script(TaxiiScript):
             else:
                 end_ts = None
         except ValueError:
-            print("Unable to parse timestamp value. Timestamp should include both date and time " \
-                  "information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). " \
+            print("Unable to parse timestamp value. Timestamp should include both date and time "
+                  "information along with a timezone or UTC offset (e.g., YYYY-MM-DDTHH:MM:SS.ssssss+/-hh:mm). "
                   "Aborting poll.")
             sys.exit()
 
@@ -81,8 +81,8 @@ class PollClient11Script(TaxiiScript):
         if response.message_type == MSG_POLL_RESPONSE:
             if response.more:
                 print("This response has More=True, to request additional parts, use the following command:")
-                print("  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" % \
-                    (response.collection_name, response.result_id, response.result_part_number + 1))
+                print("  fulfillment_client --collection %s --result-id %s --result-part-number %s\r\n" %
+                      (response.collection_name, response.result_id, response.result_part_number + 1))
 
             self.write_cbs_from_poll_response_11(response, dest_dir=args.dest_dir, write_type_=args.write_type)
 
@@ -90,6 +90,7 @@ class PollClient11Script(TaxiiScript):
 def main():
     script = PollClient11Script()
     script()
+
 
 if __name__ == "__main__":
     main()

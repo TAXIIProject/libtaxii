@@ -11,6 +11,7 @@ import libtaxii.messages_11 as tm11
 input_path = os.path.join('input', '1.1')
 output_path = os.path.join('output', '1.1')
 
+
 def main():
     input_fns = glob.glob(os.path.join(input_path, '*.xml'))
 
@@ -32,7 +33,6 @@ def main():
         txt_out = os.path.join(output_path, basename + ".txt")
         with open(txt_out, 'w') as f:
             f.write(msg.to_text())
-        raise
 
 
 if __name__ == '__main__':

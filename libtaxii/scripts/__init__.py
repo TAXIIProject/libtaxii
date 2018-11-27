@@ -32,6 +32,7 @@ MSG_FILE_OVERWRITTEN = "File overwritten: "
 MSG_FILE_SKIPPED = "File write skipped: "
 MSG_FILE_CREATED = "File created: "
 
+
 def write_type(s):
     s = s.lower()
     if s == 'clobber':
@@ -56,9 +57,9 @@ def add_poll_response_args(parser):
     :return:
     """
     parser.add_argument("--dest-dir",
-                            dest="dest_dir",
-                            default="",
-                            help="The directory to save Content Blocks to. Defaults to the current directory.")
+                        dest="dest_dir",
+                        default="",
+                        help="The directory to save Content Blocks to. Defaults to the current directory.")
 
     parser.add_argument("--write",
                         dest="write_type",
@@ -152,7 +153,7 @@ class TaxiiScript(object):
                             dest="proxy",
                             action=ProxyAction, default=proxy,
                             help="The proxy to use (e.g., http://myproxy.example.com:80/), or 'noproxy' to not use "
-                                 "any proxy. If omitted, the system's proxy settings will be used.")
+                                 "any proxy. If omitted, 'noproxy' will be used.")
         parser.add_argument("--xml-output",
                             dest="xml_output",
                             action='store_true',
@@ -225,7 +226,6 @@ class TaxiiScript(object):
 
         return write, message
 
-
     def write_cbs_from_poll_response_10(self, poll_response, dest_dir, write_type_=W_CLOBBER):
         """
         This function writes content blocks to file from a TAXII 1.0 Poll Response
@@ -251,7 +251,7 @@ class TaxiiScript(object):
                 ext = ''
 
         if cb.timestamp_label:
-                date_string = 't' + cb.timestamp_label.isoformat()
+            date_string = 't' + cb.timestamp_label.isoformat()
         else:
             date_string = 's' + datetime.datetime.now().isoformat()
 
