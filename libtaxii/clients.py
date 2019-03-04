@@ -478,13 +478,19 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()
+            server_hostname = self._tunnel_host
+        else:
+            server_hostname = self.host
 
         if self.context:
-            self.sock = self.context.wrap_socket(sock)
+            self.sock = self.context.wrap_socket(
+                sock,
+                server_hostname=server_hostname)
         else:
             self.sock = ssl.wrap_socket(
                 sock,
                 keyfile=self.key_file,
                 certfile=self.cert_file,
                 cert_reqs=self.cert_reqs,
-                ca_certs=self.ca_certs)
+                ca_certs=self.ca_certs,
+                server_hostname=server_hostname)
