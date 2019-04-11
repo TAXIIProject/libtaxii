@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+1.1.113 (2019-04-11)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.112...1.1.113>`__
+
+- #234 Add ability to load a configuration file when executing a script
+- #232 Fix TLS handshake failure when a server requires SNI (@marcelslotema)
+
+
 1.1.112 (2018-11-27)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.111...1.1.112>`__
@@ -10,6 +18,7 @@ Release Notes
 - #228 Fix 'HTTPMessage' has no attribute 'getheader' (Python3 compatibility)
 - #225 Fix checks that involve xpath (lxml) to prevent FutureWarning message
 - #230 Fix parsing status message round-trip (@danielsamuels)
+
 
 1.1.111 (2017-06-07)
 --------------------
@@ -31,11 +40,13 @@ Release Notes
 - Fix #183 - Update incorrect comment (@daybarr)
 - Fix SMIME Content Binding ID typo (@brlogan)
 
+
 1.1.109 (2015-11-16)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.108...1.1.109>`__
 
 - Fix #203 - Fix SSL context on older Python 2.7 versions (@traut)
+
 
 1.1.108 (2015-10-29)
 --------------------
@@ -43,6 +54,7 @@ Release Notes
 
 - Support password-protected SSL keys (@traut)
 - Fix #200 - Bad encodings no longer generate Exceptions (@MarkDavidson)
+
 
 1.1.107 (2015-08-05)
 --------------------
@@ -54,6 +66,7 @@ Release Notes
 - Fix #189 - Update how constants are used and referenced (@stkyle)
 - Show HTTP error code in StatusMessage.message (@ahippo)
 - Python 3 compatibility (@rjprins)
+
 
 1.1.106
 -------
@@ -67,11 +80,13 @@ Release Notes
 - A variety of improvements in the following areas: data validation, typos, documentation, DRY-ness, overall repo quality (thanks @gtback)
 - Multiple code cleanup changes (Thanks in part to @traut of IntelWorks)
 
+
 1.1.105
 -------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.104...1.1.105>`__
 
 - Fixed multiple XML parsing related vulnerabilities (Thanks @guidovranken of IntelWorks for the vulnerability research!)
+
 
 1.1.104
 -------
@@ -81,6 +96,7 @@ Release Notes
 - Added checking for required status detail keys in Status Messages
 - Improved data validation in various places, fixed various bugs, and improved documentation
 - Improved filename generation in scripts (Thanks @guidovranken!)
+
 
 1.1.103
 -------
@@ -149,6 +165,7 @@ We also had a number of bug fixes and impprovements for this version of libtaxii
 -  Added the three TAXII Default Query Status Type to libtaxii.taxii_default_query
 -  Fixed a bug where custom Status Types were prohibited
 -  Added Travis CI
+
 
 1.1.101
 -------
