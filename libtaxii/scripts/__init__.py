@@ -9,6 +9,7 @@ import traceback
 import datetime
 import libtaxii.clients as tc
 import six
+from six.moves.configparser import SafeConfigParser
 from six.moves.urllib.parse import urlparse
 
 import libtaxii as t
@@ -70,6 +71,19 @@ def add_poll_response_args(parser):
                              "to \'clobber\'")
 
 
+class ArgParserConfig(SafeConfigParser):
+
+    def as_args(self, section, raw=False, vars=None):
+        """
+        Returns format friendly list for parse_args e.g., ["--url", "http://hailataxii.com:80", "--arg1", "something"]
+        """
+        arg_list = []
+        for arg, val in self.items(section, raw, vars):
+            arg_list.append("--" + arg)
+            arg_list.append(val)
+        return arg_list
+
+
 class ProxyAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -81,6 +95,17 @@ class ProxyAction(argparse.Action):
             values = None
 
         setattr(namespace, self.dest, values)
+
+
+class LoadFromFile(argparse.Action):
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        config_file = ArgParserConfig()
+        with values as f:
+            config_file.readfp(f)
+
+        # Overrides initial values if present on config file
+        parser.parse_known_args(config_file.as_args('libtaxii'), namespace=namespace)
 
 
 class TaxiiScript(object):
@@ -103,7 +128,8 @@ class TaxiiScript(object):
                        username=None,
                        password=None,
                        proxy='noproxy',
-                       xml_output=False):
+                       xml_output=False,
+                       from_file=None):
         """
         Parser things common to all scripts. Parsers for specific TAXII Services should
         add their own arguments.
@@ -161,6 +187,13 @@ class TaxiiScript(object):
                             default=xml_output,
                             help="If present, the raw XML of the response will be printed to standard out. "
                                  "Otherwise, a \"Rich\" output will be presented.")
+        parser.add_argument("--from-file",
+                            dest="from_file",
+                            action=LoadFromFile,
+                            default=from_file,
+                            type=open,
+                            help="Use a configuration file to load arguments into the script. The contents of the "
+                                 "configuration file will take precedence over passed flags.")
 
         return parser
 
