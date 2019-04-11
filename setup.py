@@ -31,14 +31,19 @@ if (py_maj, py_minor) < (2, 6) or (py_maj == 3 and py_minor < 3):
     raise Exception('libtaxii requires Python 2.6, 2.7 or 3.3+')
 
 
-# lxml has dropped support for Python 2.6, 3.3 after version 4.2.6
 install_requires = [
-    'lxml>=2.2.3,<4.3.0 ; python_version == "2.6" or python_version == "3.3"',
-    'lxml>=2.2.3 ; python_version != "2.6" or python_version != "3.3"',
     'python-dateutil>=1.4.1',
     'six>=1.9.0',
-    'argparse ; python_version == "2.6"',
 ]
+
+# lxml has dropped support for Python 2.6, 3.3 after version 4.2.6
+if (py_maj, py_minor) == (2, 6) or (py_maj, py_minor) == (3, 3):
+    install_requires.append('lxml>=2.2.3,<4.3.0')
+else:
+    install_requires.append('lxml>=2.2.3')
+
+if (py_maj, py_minor) < (2, 7):
+    install_requires.append('argparse')
 
 setup(
     name='libtaxii',
