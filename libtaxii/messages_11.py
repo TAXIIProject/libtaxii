@@ -169,6 +169,7 @@ def _sanitize_content_binding(binding):
     Takes in one of:
     1. ContentBinding object
     2. string
+    3. dict
     and returns a ContentBinding object.
 
     This supports function calls where a string or ContentBinding can be
@@ -178,6 +179,8 @@ def _sanitize_content_binding(binding):
         return binding
     elif isinstance(binding, six.string_types):  # Convert it to a ContentBinding
         return ContentBinding.from_string(binding)
+    elif isinstance(binding, dict):  # Convert it to a ContentBinding
+        return ContentBinding.from_dict(binding)
     else:  # Don't know what to do with it.
         raise ValueError('Type cannot be converted to ContentBinding: %s' % binding.__class__.__name__)
 
