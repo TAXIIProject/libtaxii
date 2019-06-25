@@ -759,7 +759,7 @@ class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
         subs_req3 = tm11.ManageCollectionSubscriptionRequest(
             message_id='SubsReq03',  # Required
             action=ACT_SUBSCRIBE,  # Required
-            collection_name='collection213',  # Required
+            collection_name='collection2',  # Required
             # subscription_id = None, #Prohibited for action = SUBSCRIBE
             subscription_parameters=subscription_parameters3)  # optional - absence means there are not any subscription parameters
         # delivery_parameters = None)#Optional - absence means push messaging not requested
@@ -816,6 +816,21 @@ class ManageCollectionSubscriptionRequestTests(unittest.TestCase):
         # subscription_parameters, delivery_parameters prohibited if action != SUBSCRIBE
 
         round_trip_message(subs_req8)
+
+    def test_subs_req9(self):
+        # https://github.com/TAXIIProject/libtaxii/pull/237
+        subscription = """{"content_bindings": [{"binding_id": "urn:stix.mitre.org:xml:1.2"}], "query": null, "response_type": "FULL"}"""
+        subscription_dict = json.loads(subscription)
+        subscription_parameters3 = tm11.SubscriptionParameters(**subscription_dict)  # Use all the defaults
+        subs_req3 = tm11.ManageCollectionSubscriptionRequest(
+            message_id='SubsReq09',  # Required
+            action=ACT_SUBSCRIBE,  # Required
+            collection_name='collection2',  # Required
+            # subscription_id = None, #Prohibited for action = SUBSCRIBE
+            subscription_parameters=subscription_parameters3)  # optional - absence means there are not any subscription parameters
+        # delivery_parameters = None)#Optional - absence means push messaging not requested
+
+        round_trip_message(subs_req3)
 
 
 class ManageCollectionSubscriptionResponseTests(unittest.TestCase):
