@@ -9,9 +9,11 @@ python:
   - "3.6"
 matrix:
   include:
-    - python: 3.7 # https://github.com/travis-ci/travis-ci/issues/9069#issuecomment-425720905
-      dist: xenial
-      sudo: true
+    # https://travis-ci.community/t/issue-with-python-2-6-on-linux/3861/2
+    # https://blog.travis-ci.com/2019-04-15-xenial-default-build-environment
+    - python: 2.6
+      dist: trusty
+      sudo: false
 install:
   - pip install -U pip setuptools
   - pip install tox-travis
