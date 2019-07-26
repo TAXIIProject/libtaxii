@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.1.114 (2019-07-26)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.113...1.1.114>`__
+
+- #237 Support converting dicts to content bindings (@danielsamuels)
+- #238 Provide XMLParser copies instead of reusing the cached instance. Prevents future messages to lose namespace
+
 1.1.113 (2019-04-11)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.112...1.1.113>`__
