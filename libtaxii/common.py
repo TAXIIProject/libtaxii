@@ -3,7 +3,6 @@ Common utility classes and functions used throughout libtaxii.
 """
 
 from operator import attrgetter
-import random
 import re
 import sys
 from uuid import uuid4
@@ -69,22 +68,23 @@ def get_xml_parser():
     """
     global _XML_PARSER
     if _XML_PARSER is None:
-        _XML_PARSER = etree.XMLParser(attribute_defaults=False,
-                                      dtd_validation=False,
-                                      load_dtd=False,
-                                      no_network=True,
-                                      ns_clean=True,
-                                      recover=False,
-                                      remove_blank_text=False,
-                                      remove_comments=False,
-                                      remove_pis=False,
-                                      strip_cdata=True,
-                                      compact=True,
-                                      # collect_ids=True,
-                                      resolve_entities=False,
-                                      huge_tree=False)
-
-    return _XML_PARSER
+        _XML_PARSER = etree.XMLParser(
+            attribute_defaults=False,
+            dtd_validation=False,
+            load_dtd=False,
+            no_network=True,
+            ns_clean=True,
+            recover=False,
+            remove_blank_text=False,
+            remove_comments=False,
+            remove_pis=False,
+            strip_cdata=True,
+            compact=True,
+            collect_ids=True,
+            resolve_entities=False,
+            huge_tree=False
+        )
+    return _XML_PARSER.copy()
 
 
 def set_xml_parser(xml_parser=None):
