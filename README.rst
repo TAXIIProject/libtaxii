@@ -1,11 +1,11 @@
 libtaxii
 ========
 
-A Python library for handling TAXII Messages and invoking TAXII Services.
+A Python library for handling `Trusted Automated eXchange of Indicator Information (TAXII™) <https://taxiiproject.github.io/>`_ v1.x Messages and invoking TAXII Services.
 
-:Source: https://github.com/TAXIIProject/libtaxii
-:Documentation: http://libtaxii.readthedocs.org
-:Information: http://taxiiproject.github.io/
+:Source: https://github.com/TAXIIProject/libtaxii/
+:Documentation: https://libtaxii.readthedocs.io/
+:Information: https://taxiiproject.github.io/
 :Download: https://pypi.python.org/pypi/libtaxii/
 
 |travis badge| |landscape.io badge| |version badge| |downloads badge|

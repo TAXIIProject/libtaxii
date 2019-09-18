@@ -3,6 +3,7 @@
 # Copyright (c) 2017, The MITRE Corporation
 # For license information, see the LICENSE.txt file
 
+from io import open
 from os.path import abspath, dirname, join
 import sys
 
@@ -22,7 +23,7 @@ def get_version():
 
 
 def get_long_description():
-    with open('README.rst') as f:
+    with open('README.rst', encoding='utf-8') as f:
         return f.read()
 
 
@@ -98,5 +99,10 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-    ]
+    ],
+    project_urls={
+        'Documentation': 'https://libtaxii.readthedocs.io/',
+        'Source Code': 'https://github.com/TAXIIProject/libtaxii/',
+        'Bug Tracker': 'https://github.com/TAXIIProject/libtaxii/issues/',
+    },
 )
