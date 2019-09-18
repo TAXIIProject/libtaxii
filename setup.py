@@ -40,6 +40,9 @@ install_requires = [
 # lxml has dropped support for Python 2.6, 3.3 after version 4.2.6
 if (py_maj, py_minor) == (2, 6) or (py_maj, py_minor) == (3, 3):
     install_requires.append('lxml>=2.2.3,<4.3.0')
+# lxml has dropped support for Python 2.6, 3.3, 3.4 after version 4.4.0
+elif (py_maj, py_minor) == (2, 6) or (py_maj, py_minor) == (3, 4):
+    install_requires.append('lxml>=2.2.3,<4.4.0')
 else:
     install_requires.append('lxml>=2.2.3')
 
