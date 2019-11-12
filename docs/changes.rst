@@ -1,12 +1,20 @@
 Release Notes
 =============
 
+1.1.115 (2019-11-12)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.114...1.1.115>`__
+
+- #239 Convert the HTTP response body to a string type (PY3 this will be bytes) (@sddj)
+
+
 1.1.114 (2019-07-26)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.113...1.1.114>`__
 
 - #237 Support converting dicts to content bindings (@danielsamuels)
 - #238 Provide XMLParser copies instead of reusing the cached instance. Prevents future messages to lose namespace
+
 
 1.1.113 (2019-04-11)
 --------------------
