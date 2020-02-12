@@ -90,7 +90,7 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
         _, params = cgi.parse_header(info.get('Content-Type'))
 
     encoding = params.get('charset', 'utf-8')
-    response_message = http_response.read()
+    response_message = six.ensure_text(http_response.read(), errors='replace')
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
@@ -125,7 +125,7 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
         _, params = cgi.parse_header(http_response.get('Content-Type'))
 
     encoding = params.get('charset', 'utf-8')
-    response_message = http_response.read()
+    response_message = six.ensure_text(http_response.read(, errors='replace'))
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
