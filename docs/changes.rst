@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.1.116 (2020-02-14)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.115...1.1.116>`__
+
+- #240 PY3 Compatibility changes for HTTP Response Body (@nschwane)
+
+
 1.1.115 (2019-11-12)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.114...1.1.115>`__
