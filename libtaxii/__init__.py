@@ -61,11 +61,9 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
         _, params = cgi.parse_header(info.get('Content-Type'))
 
     encoding = params.get('charset', 'utf-8')
-    response_message = http_response.read()
+    response_message = six.ensure_text(http_response.read(), errors='replace')
 
     if taxii_content_type is None:
-        if isinstance(response_message, six.binary_type):
-            response_message = response_message.decode(encoding, 'replace')
         m = str(http_response) + '\r\n' + str(http_response.info()) + '\r\n' + response_message
         return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
@@ -90,7 +88,7 @@ def get_message_from_urllib_addinfourl(http_response, in_response_to):
         _, params = cgi.parse_header(info.get('Content-Type'))
 
     encoding = params.get('charset', 'utf-8')
-    response_message = http_response.read()
+    response_message = six.ensure_text(http_response.read(), errors='replace')
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
@@ -125,7 +123,7 @@ def get_message_from_httplib_http_response(http_response, in_response_to):
         _, params = cgi.parse_header(http_response.get('Content-Type'))
 
     encoding = params.get('charset', 'utf-8')
-    response_message = http_response.read()
+    response_message = six.ensure_text(http_response.read(), errors='replace')
 
     if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
 
