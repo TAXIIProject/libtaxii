@@ -1,3 +1,4 @@
+os: linux
 language: python
 cache: pip
 dist: xenial
@@ -7,6 +8,7 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+  - "3.8"
 matrix:
   include:
     # https://blog.travis-ci.com/2019-04-15-xenial-default-build-environment
