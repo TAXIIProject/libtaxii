@@ -402,6 +402,7 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
     The default httplib HTTPSConnection does not verify certificates.
     This class extends HTTPSConnection and requires certificate verification.
     Borrowed from http://thejosephturner.com/blog/2011/03/19/https-certificate-verification-in-python-with-urllib2/
+    (moved to https://thejosephturner.com/blog/post/https-certificate-verification-in-python-with-urllib2/)
     """
 
     def __init__(self, host, port=None, key_file=None, cert_file=None,
@@ -429,6 +430,10 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
             if hasattr(ssl, "create_default_context"):
                 self.context = ssl.create_default_context(
                     ssl.Purpose.CLIENT_AUTH, cafile=ca_certs)
+
+                self.context.load_verify_locations(cafile=ca_certs)
+                self.context.check_hostname = True
+                self.context.verify_mode = ssl.CERT_REQUIRED
 
                 if cert_file or key_file:
                     self.context.load_cert_chain(
