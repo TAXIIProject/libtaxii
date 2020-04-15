@@ -234,8 +234,6 @@ class TaxiiScript(object):
             client.set_auth_credentials({'username': username, 'password': password})
         if verify_server is not None:
             client.set_verify_server(verify_server=True, ca_file=verify_server)
-#            client.verify_server = True
-#            client.ca_file = verify_server
 
         return client
 
