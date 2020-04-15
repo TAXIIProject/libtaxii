@@ -431,9 +431,9 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
                 self.context = ssl.create_default_context(
                     ssl.Purpose.CLIENT_AUTH, cafile=ca_certs)
 
-                self.context.load_verify_locations(cafile=ca_certs)
-                self.context.check_hostname = True
-                self.context.verify_mode = ssl.CERT_REQUIRED
+#                self.context.load_verify_locations(cafile=ca_certs)
+#                self.context.check_hostname = True
+#                self.context.verify_mode = ssl.CERT_REQUIRED
 
                 if cert_file or key_file:
                     self.context.load_cert_chain(
