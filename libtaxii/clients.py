@@ -435,6 +435,10 @@ class VerifiableHTTPSConnection(six.moves.http_client.HTTPSConnection):
                     self.context.load_cert_chain(
                         cert_file, key_file, password=key_password)
 
+                self.context.load_verify_locations(cafile=ca_certs)
+                self.context.check_hostname = True
+                self.context.verify_mode = ssl.CERT_REQUIRED
+
             if not self.context and key_password:
                 warnings.warn('Key password is not supported in Python <2.7.9. Ignoring')
 
