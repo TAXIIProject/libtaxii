@@ -280,27 +280,30 @@ class TaxiiScript(object):
                 ext = '.xml'
             elif cb.content_binding == CB_STIX_XML_12:
                 format_ = '_STIX12_'
+                ext = '.xml'
             else:  # Format and extension are unknown
                 format_ = ''
                 ext = ''
 
-        if cb.timestamp_label:
-            date_string = 't' + cb.timestamp_label.isoformat()
-        else:
-            date_string = 's' + datetime.datetime.now().isoformat()
+            if cb.timestamp_label:
+                date_string = 't' + cb.timestamp_label.isoformat()
+            else:
+                date_string = 's' + datetime.datetime.now().isoformat()
 
-        filename = gen_filename(poll_response.collection_name,
-                                format_,
-                                date_string,
-                                ext)
-        filename = os.path.join(dest_dir, filename)
-        write, message = TaxiiScript.get_write_and_message(filename, write_type_)
+            filename = gen_filename(
+                poll_response.collection_name,
+                format_,
+                date_string,
+                ext
+            )
+            filename = os.path.join(dest_dir, filename)
+            write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
-        if write:
-            with io.open(filename, 'wb') as f:
-                f.write(cb.content)
+            if write:
+                with io.open(filename, mode='w', encoding='utf-8') as f:
+                    f.write(cb.content)
 
-        print("%s%s" % (message, filename))
+            print("%s%s" % (message, filename))
 
     def write_cbs_from_poll_response_11(self, poll_response, dest_dir, write_type_=W_CLOBBER):
         """
@@ -332,15 +335,17 @@ class TaxiiScript(object):
             else:
                 date_string = 's' + datetime.datetime.now().isoformat()
 
-            filename = gen_filename(poll_response.collection_name,
-                                    format_,
-                                    date_string,
-                                    ext)
+            filename = gen_filename(
+                poll_response.collection_name,
+                format_,
+                date_string,
+                ext
+            )
             filename = os.path.join(dest_dir, filename)
             write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
             if write:
-                with io.open(filename, 'wb') as f:
+                with io.open(filename, mode='w', encoding='utf-8') as f:
                     f.write(cb.content)
 
             print("%s%s" % (message, filename))
