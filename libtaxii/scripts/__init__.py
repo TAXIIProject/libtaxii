@@ -300,7 +300,7 @@ class TaxiiScript(object):
             write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
             if write:
-                with io.open(filename, mode='w', encoding='utf-8') as f:
+                with io.open(filename, 'wb') as f:
                     f.write(cb.content)
 
             print("%s%s" % (message, filename))
@@ -345,7 +345,7 @@ class TaxiiScript(object):
             write, message = TaxiiScript.get_write_and_message(filename, write_type_)
 
             if write:
-                with io.open(filename, mode='w', encoding='utf-8') as f:
+                with io.open(filename, 'wb') as f:
                     f.write(cb.content)
 
             print("%s%s" % (message, filename))
