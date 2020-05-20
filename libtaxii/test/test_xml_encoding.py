@@ -104,6 +104,6 @@ def test_content_block_10_unicode():
     content_block = ContentBlock10(CB_STIX_XML_111, stix_package_unicode)
 
     assert content_block.content_is_xml is True
-    assert isinstance(content_block._content, etree._Element)
     # Content is always in bytes
+    assert isinstance(content_block._content, etree._Element)
     assert b"Indicator-ba1d406e-937c-414f-9231-6e1dbe64fe8b" in content_block.content
