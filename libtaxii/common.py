@@ -236,7 +236,7 @@ class TAXIIBase(object):
 
         Subclasses should not need to implement this method.
         """
-        return etree.tostring(self.to_etree(), pretty_print=pretty_print, encoding='unicode')
+        return six.ensure_binary(etree.tostring(self.to_etree(), pretty_print=pretty_print, encoding='unicode'))
 
     def to_text(self, line_prepend=''):
         """Create a nice looking (this is a subjective term!)
@@ -357,7 +357,10 @@ class TAXIIBase(object):
                 eq = True
             elif isinstance(self_value, etree._Element):
                 # Non-TAXII etree element (i.e. STIX)
-                eq = (etree.tostring(self_value, encoding='unicode') == etree.tostring(other_value, encoding='unicode'))
+                eq = (
+                        six.ensure_binary(etree.tostring(self_value, encoding='unicode')) ==
+                        six.ensure_binary(etree.tostring(other_value, encoding='unicode'))
+                )
             else:
                 # Do a direct comparison
                 eq = (self_value == other_value)
