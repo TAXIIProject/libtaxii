@@ -82,6 +82,7 @@ def get_xml_parser():
             compact=True,
             # collect_ids=True,
             resolve_entities=False,
+            encoding='utf-8',
             huge_tree=False
         )
     return _XML_PARSER.copy()
