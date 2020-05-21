@@ -82,7 +82,6 @@ def get_xml_parser():
             compact=True,
             # collect_ids=True,
             resolve_entities=False,
-            encoding='utf-8',
             huge_tree=False
         )
     return _XML_PARSER.copy()
@@ -237,7 +236,7 @@ class TAXIIBase(object):
 
         Subclasses should not need to implement this method.
         """
-        return six.ensure_binary(etree.tostring(self.to_etree(), pretty_print=pretty_print, encoding='unicode'))
+        return etree.tostring(self.to_etree(), pretty_print=pretty_print, encoding='utf-8')
 
     def to_text(self, line_prepend=''):
         """Create a nice looking (this is a subjective term!)
@@ -358,10 +357,7 @@ class TAXIIBase(object):
                 eq = True
             elif isinstance(self_value, etree._Element):
                 # Non-TAXII etree element (i.e. STIX)
-                eq = (
-                        six.ensure_binary(etree.tostring(self_value, encoding='unicode')) ==
-                        six.ensure_binary(etree.tostring(other_value, encoding='unicode'))
-                )
+                eq = (etree.tostring(self_value, encoding='utf-8') == etree.tostring(other_value, encoding='utf-8'))
             else:
                 # Do a direct comparison
                 eq = (self_value == other_value)
