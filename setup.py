@@ -34,7 +34,7 @@ if (py_maj, py_minor) < (2, 6) or (py_maj == 3 and py_minor < 3):
 
 install_requires = [
     'python-dateutil>=1.4.1',
-    'six>=1.13.0',
+    'six>=1.9.0',
 ]
 
 # lxml has dropped support for Python 2.6, 3.3 after version 4.2.6
