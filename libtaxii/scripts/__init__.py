@@ -129,7 +129,8 @@ class TaxiiScript(object):
                        password=None,
                        proxy='noproxy',
                        xml_output=False,
-                       from_file=None):
+                       from_file=None,
+                       verify_server=None):
         """
         Parser things common to all scripts. Parsers for specific TAXII Services should
         add their own arguments.
@@ -197,7 +198,7 @@ class TaxiiScript(object):
         parser.add_argument("--verify-server",
                             dest="verify_server",
                             action="store",
-                            default=None,
+                            default=verify_server,
                             metavar="CA-ROOT-FILE",
                             help="Specify ca-bundle file to verify server-side certification. "
                                  "None (default) implies not to verify.")
