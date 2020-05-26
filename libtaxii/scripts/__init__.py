@@ -129,7 +129,8 @@ class TaxiiScript(object):
                        password=None,
                        proxy='noproxy',
                        xml_output=False,
-                       from_file=None):
+                       from_file=None,
+                       verify_server=None):
         """
         Parser things common to all scripts. Parsers for specific TAXII Services should
         add their own arguments.
@@ -194,6 +195,13 @@ class TaxiiScript(object):
                             type=open,
                             help="Use a configuration file to load arguments into the script. The contents of the "
                                  "configuration file will take precedence over passed flags.")
+        parser.add_argument("--verify-server",
+                            dest="verify_server",
+                            action="store",
+                            default=verify_server,
+                            metavar="CA-ROOT-FILE",
+                            help="Specify ca-bundle file to verify server-side certification. "
+                                 "None (default) implies not to verify.")
 
         return parser
 
@@ -207,7 +215,7 @@ class TaxiiScript(object):
         else:
             print(response.to_xml(pretty_print=True))
 
-    def create_client(self, use_https, proxy, cert=None, key=None, username=None, password=None):
+    def create_client(self, use_https, proxy, cert=None, key=None, username=None, password=None, verify_server=None):
         client = tc.HttpClient()
         client.set_use_https(use_https)
         client.set_proxy(proxy)
@@ -225,6 +233,8 @@ class TaxiiScript(object):
         elif basic:
             client.set_auth_type(tc.HttpClient.AUTH_BASIC)
             client.set_auth_credentials({'username': username, 'password': password})
+        if verify_server is not None:
+            client.set_verify_server(verify_server=True, ca_file=verify_server)
 
         return client
 
@@ -394,7 +404,8 @@ class TaxiiScript(object):
                                         args.cert,
                                         args.key,
                                         args.username,
-                                        args.password)
+                                        args.password,
+                                        args.verify_server)
 
             print("Request:\n")
             if args.xml_output is False:
