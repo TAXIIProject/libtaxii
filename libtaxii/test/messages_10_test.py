@@ -106,7 +106,7 @@ def round_trip_message(taxii_message):
     sv = SchemaValidator(SchemaValidator.TAXII_10_SCHEMA)
     try:
         result = sv.validate_string(xml_string)
-    except XMLSyntaxError:
+    except etree.XMLSyntaxError:
         raise
 
     if not result.valid:

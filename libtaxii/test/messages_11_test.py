@@ -156,7 +156,7 @@ def round_trip_message(taxii_message, print_xml=False):
     if valid is not True:
         print('Bad XML was:')
         try:
-            print(etree.tostring(taxii_message.to_etree(), pretty_print=True))
+            print(etree.tostring(taxii_message.to_etree(), pretty_print=True, encoding='utf-8'))
         except Exception as e:
             print(xml_string)
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % valid)
@@ -165,7 +165,7 @@ def round_trip_message(taxii_message, print_xml=False):
     sv = SchemaValidator(SchemaValidator.TAXII_11_SCHEMA)
     try:
         result = sv.validate_string(xml_string)
-    except XMLSyntaxError:
+    except etree.XMLSyntaxError:
         raise
 
     if not result.valid:
@@ -173,7 +173,7 @@ def round_trip_message(taxii_message, print_xml=False):
         raise Exception('\tFailure of test #1 - XML not schema valid: %s' % errors)
 
     if print_xml:
-        print(etree.tostring(taxii_message.to_etree(), pretty_print=True))
+        print(etree.tostring(taxii_message.to_etree(), pretty_print=True, encoding='utf-8'))
 
     msg_from_xml = tm11.get_message_from_xml(xml_string)
     dictionary = taxii_message.to_dict()

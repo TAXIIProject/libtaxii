@@ -381,7 +381,7 @@ class TAXIIMessage(TAXIIBase10):
         Subclasses shouldn't implement this method, as it is mainly a wrapper
         for cls.to_etree.
         """
-        return etree.tostring(self.to_etree(), pretty_print=pretty_print)
+        return etree.tostring(self.to_etree(), pretty_print=pretty_print, encoding='utf-8')
 
     def to_dict(self):
         """Create the base dictionary for the TAXII Message.
@@ -398,7 +398,7 @@ class TAXIIMessage(TAXIIBase10):
         d['extended_headers'] = {}
         for k, v in six.iteritems(self.extended_headers):
             if isinstance(v, etree._Element) or isinstance(v, etree._ElementTree):
-                v = etree.tostring(v)
+                v = etree.tostring(v, encoding='utf-8')
             elif not isinstance(v, six.string_types):
                 v = str(v)
             d['extended_headers'][k] = v
@@ -535,7 +535,7 @@ class ContentBlock(TAXIIBase10):
     @property
     def content(self):
         if self.content_is_xml:
-            return etree.tostring(self._content)
+            return etree.tostring(self._content, encoding='utf-8')
         else:
             return self._content
 
@@ -588,7 +588,7 @@ class ContentBlock(TAXIIBase10):
         block['content_binding'] = self.content_binding
 
         if self.content_is_xml:
-            block['content'] = etree.tostring(self._content)
+            block['content'] = etree.tostring(self._content, encoding='utf-8')
         else:
             block['content'] = self._content
         block['content_is_xml'] = self.content_is_xml
