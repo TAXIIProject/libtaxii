@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+1.1.117 (2020-05-26)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.116...1.1.117>`__
+
+- #244 SSL Verify Server not working correctly (@motok) (@nschwane)
+- #245 Unicode `lxml.etree.SerialisationError` on lxml 4.5.0+ (@advptr)
+
+
 1.1.116 (2020-02-14)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.115...1.1.116>`__
