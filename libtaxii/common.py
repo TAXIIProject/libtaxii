@@ -37,7 +37,7 @@ def parse(s, allow_file=True, allow_url=False):
     if not allow_url and isinstance(s, six.string_types):
         parsed = urlparse(s)
         if parsed.scheme:
-            raise ValueError('external URLs not allowed')
+            raise ValueError('external URLs are not allowed')
 
     parser = get_xml_parser()
 
@@ -71,7 +71,7 @@ def parse_xml_string(xmlstr):
         else:
             xmlstr = six.StringIO(xmlstr)
 
-    return parse(xmlstr, allow_file=False)
+    return parse(xmlstr, allow_file=True)
 
 
 def get_xml_parser():
@@ -437,7 +437,7 @@ def stringify_content(content):
 
     if hasattr(content, 'read'):  # The content is file-like
         try:  # Try to parse as XML
-            xml = parse(content, allow_file=False)
+            xml = parse(content, allow_file=True)
             return xml, True
         except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
             return content.read(), False
