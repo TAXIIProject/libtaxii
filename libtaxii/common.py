@@ -31,12 +31,14 @@ def parse(s, allow_file=True):
     """
 
     parser = get_xml_parser()
+    # parse from string if no files allowed
+    if not allow_file:
+        return etree.fromstring(s, parser)
+    # try to parse from file or string if files are allowed
     try:
-        e = etree.parse(s, parser).getroot()
+        return etree.parse(s, parser).getroot()
     except IOError:
-        e = etree.XML(s, parser)
-
-    return e
+        return etree.XML(s, parser)
 
 
 def parse_xml_string(xmlstr):
