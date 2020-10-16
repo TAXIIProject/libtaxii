@@ -10,6 +10,7 @@ from uuid import uuid4
 import dateutil.parser
 from lxml import etree
 import six
+from six.moves.urllib.parse import urlparse
 
 try:
     import simplejson as json
@@ -21,19 +22,29 @@ from libtaxii.constants import *
 _XML_PARSER = None
 
 
-def parse(s, allow_file=True):
+def parse(s, allow_file=True, allow_url=False):
     """
     Uses the default parser to parse a string or file-like object
 
     :param s: The XML String or File-like object to parse.
-    :param allow_file: Allow `s` to be a file path or external URL.
+    :param allow_file: Allow `s` to be a file path.
+    :param allow_url: Allow `s` to be a URL.
     :return: an etree._Element
     """
+    # Do a simple validation that the given string (or URL)
+    # has no protocol specified. Anything without parseable protocol
+    # will be interpreted by lxml as string instead or path of external URL.
+    if not allow_url and isinstance(s, six.string_types):
+        parsed = urlparse(s)
+        if parsed.scheme:
+            raise ValueError('external URLs not allowed')
 
     parser = get_xml_parser()
-    # parse from string if no files allowed
-    if not allow_file:
+
+    # parse from string if no external paths allowed
+    if not allow_file and not allow_url:
         return etree.fromstring(s, parser)
+
     # try to parse from file or string if files are allowed
     try:
         return etree.parse(s, parser).getroot()
