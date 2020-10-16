@@ -21,18 +21,20 @@ from libtaxii.constants import *
 _XML_PARSER = None
 
 
-def parse(s):
+def parse(s, allow_file=True):
     """
     Uses the default parser to parse a string or file-like object
 
-    :param s: The XML String or File-like object to parse
+    :param s: The XML String or File-like object to parse.
+    :param allow_file: Allow `s` to be a file path or external URL.
     :return: an etree._Element
     """
 
+    parser = get_xml_parser()
     try:
-        e = etree.parse(s, get_xml_parser()).getroot()
+        e = etree.parse(s, parser).getroot()
     except IOError:
-        e = etree.XML(s, get_xml_parser())
+        e = etree.XML(s, parser)
 
     return e
 
@@ -56,7 +58,7 @@ def parse_xml_string(xmlstr):
         else:
             xmlstr = six.StringIO(xmlstr)
 
-    return parse(xmlstr)
+    return parse(xmlstr, allow_file=False)
 
 
 def get_xml_parser():
@@ -422,7 +424,7 @@ def stringify_content(content):
 
     if hasattr(content, 'read'):  # The content is file-like
         try:  # Try to parse as XML
-            xml = parse(content)
+            xml = parse(content, allow_file=False)
             return xml, True
         except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
             return content.read(), False

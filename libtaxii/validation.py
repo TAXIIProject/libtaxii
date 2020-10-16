@@ -145,7 +145,7 @@ class SchemaValidator(object):
                                 will be used when validate_file/string/etree
                                 is used.
         """
-        schema_doc = parse(schema_file)
+        schema_doc = parse(schema_file, allow_file=True)
         self.xml_schema = etree.XMLSchema(schema_doc)
 
     def validate_file(self, file_location):
@@ -155,7 +155,7 @@ class SchemaValidator(object):
         """
 
         with open(file_location, 'r') as f:
-            etree_xml = parse(f)
+            etree_xml = parse(f, allow_file=True)
 
         return self.validate_etree(etree_xml)
 
@@ -164,7 +164,7 @@ class SchemaValidator(object):
         A wrapper for validate_etree. Parses xml_string,
         turns it into an etree, then calls validate_etree( ... )
         """
-        etree_xml = parse(xml_string)
+        etree_xml = parse(xml_string, allow_file=False)
         return self.validate_etree(etree_xml)
 
     def validate_etree(self, etree_xml):
