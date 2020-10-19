@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.1.118 (2020-10-19)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.117...1.1.118>`__
+
+- #247 [CVE-2020-27197] Avoid SSRF on parsing XML (@orsinium)
+
+
 1.1.117 (2020-05-26)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.116...1.1.117>`__
