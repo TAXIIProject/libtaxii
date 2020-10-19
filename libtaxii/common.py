@@ -10,6 +10,7 @@ from uuid import uuid4
 import dateutil.parser
 from lxml import etree
 import six
+from six.moves.urllib.parse import urlparse
 
 try:
     import simplejson as json
@@ -21,20 +22,34 @@ from libtaxii.constants import *
 _XML_PARSER = None
 
 
-def parse(s):
+def parse(s, allow_file=True, allow_url=False):
     """
     Uses the default parser to parse a string or file-like object
 
-    :param s: The XML String or File-like object to parse
+    :param s: The XML String or File-like object to parse.
+    :param allow_file: Allow `s` to be a file path.
+    :param allow_url: Allow `s` to be a URL.
     :return: an etree._Element
     """
+    # Do a simple validation that the given string (or URL)
+    # has no protocol specified. Anything without parseable protocol
+    # will be interpreted by lxml as string instead or path of external URL.
+    if not allow_url and isinstance(s, six.string_types):
+        parsed = urlparse(s)
+        if parsed.scheme:
+            raise ValueError('external URLs are not allowed')
 
+    parser = get_xml_parser()
+
+    # parse from string if no external paths allowed
+    if not allow_file and not allow_url:
+        return etree.fromstring(s, parser)
+
+    # try to parse from file or string if files are allowed
     try:
-        e = etree.parse(s, get_xml_parser()).getroot()
+        return etree.parse(s, parser).getroot()
     except IOError:
-        e = etree.XML(s, get_xml_parser())
-
-    return e
+        return etree.XML(s, parser)
 
 
 def parse_xml_string(xmlstr):
@@ -56,7 +71,7 @@ def parse_xml_string(xmlstr):
         else:
             xmlstr = six.StringIO(xmlstr)
 
-    return parse(xmlstr)
+    return parse(xmlstr, allow_file=True)
 
 
 def get_xml_parser():
@@ -422,7 +437,7 @@ def stringify_content(content):
 
     if hasattr(content, 'read'):  # The content is file-like
         try:  # Try to parse as XML
-            xml = parse(content)
+            xml = parse(content, allow_file=True)
             return xml, True
         except etree.XMLSyntaxError:  # Content is not well-formed XML; just treat as a string
             return content.read(), False

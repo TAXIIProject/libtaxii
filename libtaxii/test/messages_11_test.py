@@ -1270,6 +1270,42 @@ class TestXmlAttacks(unittest.TestCase):
         except etree.XMLSyntaxError:
             raise ValueError("An XML Syntax Error was raised, meaning a real attack would have succeeded!")
 
+    def test_ssrf(self):
+        """
+        Tests that external URLs are forbidden by default.
+        https://github.com/TAXIIProject/libtaxii/issues/246
+        """
+        try:
+            parse("http://localhost/")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("oh no!")
+
+        try:
+            parse("ftp://localhost/")
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("oh no!")
+
+    def test_local_filesystem_access(self):
+        """No access to files allowed with allow_file=False
+        """
+        try:
+            parse("file:///etc/hosts/", allow_file=False, allow_url=True)
+        except etree.XMLSyntaxError:
+            pass
+        else:
+            raise AssertionError("oh no!")
+
+        try:
+            parse("/etc/hosts/", allow_file=False)
+        except etree.XMLSyntaxError:
+            pass
+        else:
+            raise AssertionError("oh no!")
+
     def test_dtd_retrieval(self):
         pass
 

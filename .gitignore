@@ -5,6 +5,7 @@ build/
 dist/
 libtaxii.egg-info/
 venv/
+.pytest_cache
 .tox
 output.txt
 libtaxii/test/output/

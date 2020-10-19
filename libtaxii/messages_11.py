@@ -46,7 +46,7 @@ def validate_xml(xml_string):
     etree_xml = parse_xml_string(xml_string)
     package_dir, package_filename = os.path.split(__file__)
     schema_file = os.path.join(package_dir, "xsd", "TAXII_XMLMessageBinding_Schema_11.xsd")
-    taxii_schema_doc = parse(schema_file)
+    taxii_schema_doc = parse(schema_file, allow_file=True)
     xml_schema = etree.XMLSchema(taxii_schema_doc)
     valid = xml_schema.validate(etree_xml)
     # TODO: Additionally, validate the Query stuff
@@ -818,7 +818,7 @@ class ContentBlock(TAXIIBase11):
         kwargs['message'] = d.get('message')
         is_xml = d.get('content_is_xml', False)
         if is_xml:
-            kwargs['content'] = parse(d['content'])
+            kwargs['content'] = parse(d['content'], allow_file=False)
         else:
             kwargs['content'] = d['content']
 
@@ -1109,7 +1109,7 @@ class TAXIIMessage(TAXIIBase11):
         extended_headers = {}
         for k, v in six.iteritems(d['extended_headers']):
             try:
-                v = parse(v)
+                v = parse(v, allow_file=False)
             except etree.XMLSyntaxError:
                 pass
             extended_headers[k] = v
