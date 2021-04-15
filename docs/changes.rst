@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.1.119 (2021-04-15)
+--------------------
+`(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.118...1.1.119>`__
+
+- #248 Writing content blocks should not be dependent on value of "more" (@brlogan)
+
+
 1.1.118 (2020-10-19)
 --------------------
 `(diff) <https://github.com/TAXIIProject/libtaxii/compare/1.1.117...1.1.118>`__
