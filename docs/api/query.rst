@@ -1,5 +1,5 @@
-:mod:`libtaxii.taxii_default_query` Module
-==========================================
+taxii_default_query Module
+==========================
 
 .. automodule:: libtaxii.taxii_default_query
 

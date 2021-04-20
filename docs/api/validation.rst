@@ -1,5 +1,5 @@
-:mod:`libtaxii.validation` Module
-=================================
+validation Module
+=================
 
 .. _apivalidation:
 

@@ -1,5 +1,5 @@
-:mod:`libtaxii.clients` Module
-==============================
+clients Module
+==============
 
 .. module:: libtaxii.clients
 

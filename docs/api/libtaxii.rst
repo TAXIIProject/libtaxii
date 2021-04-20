@@ -1,5 +1,5 @@
-:mod:`libtaxii` Module
-=======================
+libtaxii Module
+===============
 
 .. module:: libtaxii
 
