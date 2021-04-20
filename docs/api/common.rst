@@ -1,5 +1,5 @@
-:mod:`libtaxii.common` Module
-=============================
+common Module
+=============
 
 .. automodule:: libtaxii.common
 
