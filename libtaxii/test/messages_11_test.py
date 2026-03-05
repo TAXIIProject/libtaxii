@@ -7,11 +7,13 @@
 
 import datetime
 import io
+import re
 import sys
 import unittest
 import warnings
 import inspect
 
+import pytest
 from dateutil.tz import tzutc
 from lxml import etree
 
@@ -1244,12 +1246,9 @@ class TestXmlAttacks(unittest.TestCase):
                         <foo>&xxe;</foo>
                       """
 
-        # If an XML Syntax Error is received, an attack would have succeeded
-
-        try:
-            e = parse(xee_remote)
-        except etree.XMLSyntaxError:
-            raise ValueError("An XML Syntax Error was raised, meaning a real attack would have succeeded!")
+        # Undefined xxe entity should be expected, because lxml should not attempt to define it via external reference
+        with pytest.raises(etree.XMLSyntaxError, match=re.escape("Entity 'xxe' not defined, line 4, column 35 (<string>, line 4)")):
+             parse(xee_remote)
 
     def test_xee_local(self):
         """
@@ -1263,12 +1262,10 @@ class TestXmlAttacks(unittest.TestCase):
                           <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
                         <foo>&xxe;</foo>
                       """
-        # If an XML Syntax Error is received, an attack would have succeeded
 
-        try:
-            e = parse(xee_local)
-        except etree.XMLSyntaxError:
-            raise ValueError("An XML Syntax Error was raised, meaning a real attack would have succeeded!")
+        # Undefined xxe entity is expected, because lxml should not attempt to define it via external reference
+        with pytest.raises(etree.XMLSyntaxError, match=re.escape("Entity 'xxe' not defined, line 4, column 35 (<string>, line 4)")):
+             parse(xee_local)
 
     def test_ssrf(self):
         """

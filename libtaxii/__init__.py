@@ -5,15 +5,11 @@
 The main libtaxii module
 """
 
-import six
-from six.moves import urllib
+from urllib.error import HTTPError
 
 import libtaxii.messages_10 as tm10
 import libtaxii.messages_11 as tm11
-import libtaxii.clients as tc
 from .constants import *
-
-import cgi
 
 from .version import __version__  # noqa
 
@@ -39,32 +35,22 @@ def get_message_from_http_response(http_response, in_response_to):
             parse
         in_response_to (str): the default value for in_response_to
     """
-    if isinstance(http_response, six.moves.http_client.HTTPResponse):
-        return get_message_from_httplib_http_response(http_response, in_response_to)
-    elif isinstance(http_response, urllib.error.HTTPError):
-        return get_message_from_urllib2_httperror(http_response, in_response_to)
-    elif isinstance(http_response, urllib.response.addinfourl):
-        return get_message_from_urllib_addinfourl(http_response, in_response_to)
-    else:
-        raise ValueError('Unsupported response type: %s.' % http_response.__class__.__name__)
 
+    taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
+    encoding = http_response.headers.get_content_charset() or 'utf-8'
 
-def get_message_from_urllib2_httperror(http_response, in_response_to):
-    """ This function should not be called by libtaxii users directly. """
-    info = http_response.info()
-
-    if hasattr(info, 'getheader'):
-        taxii_content_type = info.getheader('X-TAXII-Content-Type')
-        _, params = cgi.parse_header(info.getheader('Content-Type'))
-    else:
-        taxii_content_type = info.get('X-TAXII-Content-Type')
-        _, params = cgi.parse_header(info.get('Content-Type'))
-
-    encoding = params.get('charset', 'utf-8')
-    response_message = six.ensure_text(http_response.read(), errors='replace')
+    response_message = http_response.read()
 
     if taxii_content_type is None:
-        m = str(http_response) + '\r\n' + str(http_response.info()) + '\r\n' + response_message
+        if isinstance(http_response, HTTPError):
+            m = str(http_response) + '\r\n'
+        else:
+            m = ''
+        for header, value in http_response.headers.items():
+            m += f'{header}: {value}\r\n'
+        m += '\r\n'
+        m += response_message.decode(encoding, 'replace')
+
         return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
     elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
         return tm10.get_message_from_xml(response_message, encoding)
@@ -72,75 +58,5 @@ def get_message_from_urllib2_httperror(http_response, in_response_to):
         return tm11.get_message_from_xml(response_message, encoding)
     elif taxii_content_type == VID_CERT_EU_JSON_10:
         return tm10.get_message_from_json(response_message, encoding)
-    else:
-        raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
-
-
-def get_message_from_urllib_addinfourl(http_response, in_response_to):
-    """ This function should not be called by libtaxii users directly. """
-    info = http_response.info()
-
-    if hasattr(info, 'getheader'):
-        taxii_content_type = info.getheader('X-TAXII-Content-Type')
-        _, params = cgi.parse_header(info.getheader('Content-Type'))
-    else:
-        taxii_content_type = info.get('X-TAXII-Content-Type')
-        _, params = cgi.parse_header(info.get('Content-Type'))
-
-    encoding = params.get('charset', 'utf-8')
-    response_message = six.ensure_text(http_response.read(), errors='replace')
-
-    if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
-
-        message = []
-        header_dict = six.iteritems(http_response.info().dict)
-        for k, v in header_dict:
-            message.append(k + ': ' + v + '\r\n')
-        message.append('\r\n')
-        message.append(response_message)
-
-        m = ''.join(message)
-
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
-
-    elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
-    elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
-    elif taxii_content_type == VID_CERT_EU_JSON_10:
-        return tm10.get_message_from_json(response_message, encoding)
-    else:
-        raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)
-
-
-def get_message_from_httplib_http_response(http_response, in_response_to):
-    """ This function should not be called by libtaxii users directly. """
-    if hasattr(http_response, 'getheader'):
-        taxii_content_type = http_response.getheader('X-TAXII-Content-Type')
-        _, params = cgi.parse_header(http_response.getheader('Content-Type'))
-    else:
-        taxii_content_type = http_response.get('X-TAXII-Content-Type')
-        _, params = cgi.parse_header(http_response.get('Content-Type'))
-
-    encoding = params.get('charset', 'utf-8')
-    response_message = six.ensure_text(http_response.read(), errors='replace')
-
-    if taxii_content_type is None:  # Treat it as a Failure Status Message, per the spec
-
-        message = []
-        header_tuples = http_response.getheaders()
-        for k, v in header_tuples:
-            message.append(k + ': ' + v + '\r\n')
-        message.append('\r\n')
-        message.append(response_message)
-
-        m = ''.join(message)
-
-        return tm11.StatusMessage(message_id='0', in_response_to=in_response_to, status_type=ST_FAILURE, message=m)
-
-    elif taxii_content_type == VID_TAXII_XML_10:  # It's a TAXII XML 1.0 message
-        return tm10.get_message_from_xml(response_message, encoding)
-    elif taxii_content_type == VID_TAXII_XML_11:  # It's a TAXII XML 1.1 message
-        return tm11.get_message_from_xml(response_message, encoding)
     else:
         raise ValueError('Unsupported X-TAXII-Content-Type: %s' % taxii_content_type)

@@ -9,7 +9,7 @@ import traceback
 import datetime
 import libtaxii.clients as tc
 import six
-from six.moves.configparser import SafeConfigParser
+from configparser import ConfigParser
 from six.moves.urllib.parse import urlparse
 
 import libtaxii as t
@@ -71,7 +71,7 @@ def add_poll_response_args(parser):
                              "to \'clobber\'")
 
 
-class ArgParserConfig(SafeConfigParser):
+class ArgParserConfig(ConfigParser):
 
     def as_args(self, section, raw=False, vars=None):
         """
@@ -102,7 +102,7 @@ class LoadFromFile(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         config_file = ArgParserConfig()
         with values as f:
-            config_file.readfp(f)
+            config_file.read_file(f)
 
         # Overrides initial values if present on config file
         parser.parse_known_args(config_file.as_args('libtaxii'), namespace=namespace)

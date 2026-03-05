@@ -1,7 +1,8 @@
-Sphinx==1.6.1
-sphinx_rtd_theme==0.2.4
-pytest==3.0.7
-tox==2.7.0
-bumpversion==0.5.3
+Sphinx==8.1.3
+sphinx_rtd_theme==3.1.0
+pytest==7.4.4
+pytest-httpserver==1.1.1
+tox==4.47.3
+bump-my-version==1.2.7
 
 -e  .
